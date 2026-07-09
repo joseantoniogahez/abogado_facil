@@ -1,6 +1,6 @@
-# FastAPI + React + PostgreSQL Docker Template
+# Abogado Fácil
 
-Full-stack template application with JWT authentication and RBAC.
+SaaS web para abogados independientes y despachos pequeños con expedientes, tareas, documentos e IA BYOK.
 
 - Backend: FastAPI + SQLAlchemy (async) + Alembic
 - Frontend: Vite + React 19 + TypeScript
@@ -110,7 +110,7 @@ docker compose -f compose.test.yaml run --rm frontend-test
 docker compose -f compose.test.yaml run --rm backend-test && docker compose -f compose.test.yaml run --rm frontend-test
 ```
 
-`compose.test.yaml` sets `name: tech-tests`, so test resources stay isolated from local development.
+`compose.test.yaml` sets `name: abogado-facil-tests`, so test resources stay isolated from local development.
 
 ## GitHub Actions CI
 
@@ -141,7 +141,7 @@ Stop production stack:
 docker compose -f compose.yaml -f compose.prod.yaml down
 ```
 
-`compose.prod.yaml` sets `name: tech-prod`, so production resources stay isolated from dev/test projects.
+`compose.prod.yaml` sets `name: abogado-facil-prod`, so production resources stay isolated from dev/test projects.
 
 If production `database` keeps restarting due to an old volume mount path, recreate the production volume:
 

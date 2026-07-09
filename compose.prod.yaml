@@ -1,4 +1,4 @@
-name: tech-prod
+name: abogado-facil-prod
 
 services:
   database:

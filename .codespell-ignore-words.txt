@@ -1,3 +1,12 @@
 Dependant
+cliente
+comando
 dependant
+fase
+funcional
+inicial
+requiere
 selectin
+ser
+variantes
+visibles

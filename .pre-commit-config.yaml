@@ -69,13 +69,13 @@ repos:
         args: [--baseline, .secrets.baseline]
         exclude: ^(frontend/package-lock\.json|backend/alembic/versions/.*\.py|\.secrets\.baseline|\.mypy_cache/.*)$
 
-  # Fast spelling checks on source and docs, with generated artifacts excluded.
+  # Fast spelling checks on source files, with generated artifacts excluded.
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.2
     hooks:
       - id: codespell
         args: [--ignore-words=.codespell-ignore-words.txt]
-        exclude: ^(frontend/package-lock\.json|\.secrets\.baseline|frontend/src/shared/i18n/ui-text\.ts)$
+        exclude: ^(docs/.*|frontend/package-lock\.json|\.secrets\.baseline|frontend/src/shared/i18n/ui-text\.ts)$
 
   # Frontend autofix with the current frontend ESLint setup.
   - repo: local

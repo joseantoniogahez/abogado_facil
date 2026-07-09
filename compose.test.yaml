@@ -1,4 +1,4 @@
-name: tech-tests
+name: abogado-facil-tests
 
 services:
   backend-test:

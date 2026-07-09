@@ -33,8 +33,8 @@ class AuthSettings(BaseSettings):
     JWT_SECRET_KEY: str = "local-dev-jwt-secret"
     JWT_ALGORITHM: str = "HS256"
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(30, gt=0)
-    JWT_ISSUER: str = "fastapi-template"
-    JWT_AUDIENCE: str = "fastapi-template-api"
+    JWT_ISSUER: str = "abogado-facil"
+    JWT_AUDIENCE: str = "abogado-facil-api"
 
     @field_validator("APP_ENV")
     @classmethod

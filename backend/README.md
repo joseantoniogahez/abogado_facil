@@ -58,10 +58,10 @@ JWT defaults for `local/test`:
 - `JWT_SECRET_KEY=local-dev-jwt-secret`
 - `JWT_ALGORITHM=HS256`
 - `JWT_ACCESS_TOKEN_EXPIRE_MINUTES=30`
-- `JWT_ISSUER=fastapi-template`
-- `JWT_AUDIENCE=fastapi-template-api`
+- `JWT_ISSUER=abogado-facil`
+- `JWT_AUDIENCE=abogado-facil-api`
 
-Repository-level Docker Compose uses `.env` values from `.env_examples` and runs the backend against PostgreSQL by default (`DB_TYPE=postgresql+asyncpg`, `DB_HOST=system_db`, `DB_NAME=main_db`).
+Repository-level Docker Compose uses `.env` values from `.env_examples` and runs the backend against PostgreSQL by default (`DB_TYPE=postgresql+asyncpg`, `DB_HOST=abogado_facil_db`, `DB_NAME=abogado_facil_main`).
 
 For network databases, set:
 
@@ -106,13 +106,13 @@ python -m utils.rbac_bootstrap --admin-username admin --admin-password "StrongSe
 If you started services with `docker compose up --build` and want to run bootstrap from local PowerShell (without entering the container), run from `backend/`:
 
 ```powershell
-$env:DB_TYPE = "postgresql+asyncpg"; $env:DB_HOST = "localhost"; $env:DB_PORT = "5432"; $env:DB_NAME = "main_db"; $env:DB_USER = "my_admin"; $env:DB_PASSWORD = "{{DB_PASSWORD}}"; python -m utils.rbac_bootstrap --admin-username admin --admin-password "StrongSeed9"
+$env:DB_TYPE = "postgresql+asyncpg"; $env:DB_HOST = "localhost"; $env:DB_PORT = "5432"; $env:DB_NAME = "abogado_facil_main"; $env:DB_USER = "my_admin"; $env:DB_PASSWORD = "{{DB_PASSWORD}}"; python -m utils.rbac_bootstrap --admin-username admin --admin-password "StrongSeed9"
 ```
 
 macOS/Linux (bash/zsh) equivalent:
 
 ```bash
-DB_TYPE="postgresql+asyncpg" DB_HOST="localhost" DB_PORT="5432" DB_NAME="main_db" DB_USER="my_admin" DB_PASSWORD="{{DB_PASSWORD}}" python -m utils.rbac_bootstrap --admin-username admin --admin-password "StrongSeed9"
+DB_TYPE="postgresql+asyncpg" DB_HOST="localhost" DB_PORT="5432" DB_NAME="abogado_facil_main" DB_USER="my_admin" DB_PASSWORD="{{DB_PASSWORD}}" python -m utils.rbac_bootstrap --admin-username admin --admin-password "StrongSeed9"
 ```
 
 Note: use `DB_HOST=localhost` for host-side execution.
