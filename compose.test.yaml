@@ -1,0 +1,32 @@
+name: tech-tests
+
+services:
+  backend-test:
+    image: python:${PYTHON_VERSION:-3.14.3}-slim
+    working_dir: /workspace/backend
+    environment:
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONUNBUFFERED: "1"
+    volumes:
+      - ./backend:/workspace/backend
+    command:
+      [
+        "sh",
+        "-c",
+        "python -m pip install --upgrade pip && python -m pip install --no-cache-dir -r requirements.txt -r tests/requirements.txt && pytest tests",
+      ]
+
+  frontend-test:
+    image: node:22-alpine
+    working_dir: /workspace/frontend
+    environment:
+      CI: "true"
+      VITE_API_ORIGIN: "${VITE_API_ORIGIN:-http://localhost:8000}"
+      VITE_API_BASE_PATH: "${VITE_API_BASE_PATH:-/v1}"
+    volumes:
+      - ./frontend:/workspace/frontend
+      - frontend_test_node_modules:/workspace/frontend/node_modules
+    command: ["sh", "-c", "npm install -g npm@11.10.0 && npm ci && npm test"]
+
+volumes:
+  frontend_test_node_modules:

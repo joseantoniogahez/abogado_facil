@@ -1,0 +1,176 @@
+import re
+from collections import Counter
+
+import pytest
+
+from app.core.authorization import (
+    PERMISSION_CATALOG,
+    PERMISSION_CATALOG_BY_ID,
+    PERMISSION_ID_PATTERN,
+    PERMISSION_SCOPES,
+    PermissionDefinition,
+    PermissionId,
+    PermissionScope,
+    ReadAccessLevel,
+    ReadAccessPolicyDefinition,
+    build_permission_id,
+    normalize_permission_scope,
+    validate_permission_catalog,
+    validate_read_access_policy_catalog,
+)
+from app.features.rbac.dependencies import RBAC_PERMISSION_IDS
+from utils.testing_support.docs import AUTHORIZATION_MATRIX_PATH
+
+PERMISSION_TOKEN_PATTERN = re.compile(r"`([a-z][a-z0-9_]*:[a-z][a-z0-9_]*)`")
+
+
+def _extract_permission_ids_from_markdown(markdown: str) -> set[str]:
+    return {match.group(1) for match in PERMISSION_TOKEN_PATTERN.finditer(markdown)}
+
+
+def test_permission_catalog_has_no_duplicate_ids() -> None:
+    permission_ids = [permission.id for permission in PERMISSION_CATALOG]
+    duplicated_ids = sorted(permission_id for permission_id, count in Counter(permission_ids).items() if count > 1)
+    assert duplicated_ids == []
+
+
+def test_permission_catalog_ids_follow_resource_action_naming() -> None:
+    invalid_ids = sorted(
+        permission.id for permission in PERMISSION_CATALOG if PERMISSION_ID_PATTERN.fullmatch(permission.id) is None
+    )
+    assert invalid_ids == []
+
+
+def test_rbac_authorization_dependencies_reference_catalog_permissions() -> None:
+    catalog_ids = set(PERMISSION_CATALOG_BY_ID)
+    orphan_ids = sorted(set(RBAC_PERMISSION_IDS.values()) - catalog_ids)
+    assert orphan_ids == []
+
+
+def test_authorization_matrix_references_catalog_permissions_only() -> None:
+    matrix_markdown = AUTHORIZATION_MATRIX_PATH.read_text(encoding="utf-8")
+    documented_permission_ids = _extract_permission_ids_from_markdown(matrix_markdown)
+    catalog_ids = set(PERMISSION_CATALOG_BY_ID)
+
+    orphan_documented_ids = sorted(documented_permission_ids - catalog_ids)
+    assert orphan_documented_ids == []
+
+    missing_documented_ids = sorted(catalog_ids - documented_permission_ids)
+    assert missing_documented_ids == []
+
+
+def test_build_permission_id_raises_for_invalid_format() -> None:
+    with pytest.raises(ValueError, match="Invalid permission id 'Roles:manage'"):
+        build_permission_id(resource="Roles", action="manage")
+
+
+def test_validate_permission_catalog_raises_for_duplicate_ids() -> None:
+    duplicate_catalog = (
+        PermissionDefinition(resource="roles", action="manage", name="Manage roles"),
+        PermissionDefinition(resource="roles", action="manage", name="Manage roles duplicate"),
+    )
+
+    with pytest.raises(ValueError, match="Duplicate permission ids in PERMISSION_CATALOG: roles:manage"):
+        validate_permission_catalog(duplicate_catalog)
+
+
+def test_validate_read_access_policy_catalog_raises_for_invalid_method() -> None:
+    invalid_catalog = (
+        ReadAccessPolicyDefinition(method="POST", path="/v1/private", access_level=ReadAccessLevel.PUBLIC),
+    )
+
+    with pytest.raises(ValueError, match="Invalid read-access method 'POST'"):
+        validate_read_access_policy_catalog(invalid_catalog)
+
+
+def test_validate_read_access_policy_catalog_raises_for_invalid_path() -> None:
+    invalid_catalog = (
+        ReadAccessPolicyDefinition(method="GET", path="v1/private", access_level=ReadAccessLevel.PUBLIC),
+    )
+
+    with pytest.raises(ValueError, match="Invalid read-access path 'v1/private'"):
+        validate_read_access_policy_catalog(invalid_catalog)
+
+
+def test_validate_read_access_policy_catalog_raises_for_invalid_access_level() -> None:
+    invalid_catalog = (ReadAccessPolicyDefinition(method="GET", path="/v1/private", access_level="internal"),)
+
+    with pytest.raises(ValueError, match="Invalid read-access level 'internal'"):
+        validate_read_access_policy_catalog(invalid_catalog)
+
+
+def test_validate_read_access_policy_catalog_raises_for_permission_policy_without_permission_id() -> None:
+    invalid_catalog = (
+        ReadAccessPolicyDefinition(method="GET", path="/v1/private", access_level=ReadAccessLevel.PERMISSION),
+    )
+
+    with pytest.raises(ValueError, match="Permission-based read-access policies require permission_id"):
+        validate_read_access_policy_catalog(invalid_catalog)
+
+
+def test_validate_read_access_policy_catalog_raises_for_unknown_permission_id() -> None:
+    invalid_catalog = (
+        ReadAccessPolicyDefinition(
+            method="GET",
+            path="/v1/private",
+            access_level=ReadAccessLevel.PERMISSION,
+            permission_id="resources:read",
+        ),
+    )
+
+    with pytest.raises(ValueError, match="Unknown permission id 'resources:read'"):
+        validate_read_access_policy_catalog(invalid_catalog)
+
+
+def test_validate_read_access_policy_catalog_raises_for_permission_id_on_non_permission_policy() -> None:
+    invalid_catalog = (
+        ReadAccessPolicyDefinition(
+            method="GET",
+            path="/v1/public",
+            access_level=ReadAccessLevel.PUBLIC,
+            permission_id=PermissionId.ROLE_MANAGE,
+        ),
+    )
+
+    with pytest.raises(ValueError, match="Non-permission read-access policy"):
+        validate_read_access_policy_catalog(invalid_catalog)
+
+
+def test_validate_read_access_policy_catalog_raises_for_duplicate_endpoints() -> None:
+    invalid_catalog = (
+        ReadAccessPolicyDefinition(method="GET", path="/v1/private", access_level=ReadAccessLevel.PUBLIC),
+        ReadAccessPolicyDefinition(method="GET", path="/v1/private", access_level=ReadAccessLevel.PUBLIC),
+    )
+
+    with pytest.raises(ValueError, match="Duplicate endpoints in READ_ACCESS_POLICY_CATALOG: GET /v1/private"):
+        validate_read_access_policy_catalog(invalid_catalog)
+
+
+def test_validate_read_access_policy_catalog_allows_permission_based_read_policy() -> None:
+    valid_catalog = (
+        ReadAccessPolicyDefinition(
+            method="GET",
+            path="/v1/private",
+            access_level=ReadAccessLevel.PERMISSION,
+            permission_id=PermissionId.ROLE_MANAGE,
+        ),
+    )
+
+    validate_read_access_policy_catalog(valid_catalog)
+
+
+def test_permission_scopes_catalog_matches_expected_order() -> None:
+    assert PERMISSION_SCOPES == (
+        PermissionScope.OWN,
+        PermissionScope.TENANT,
+        PermissionScope.ANY,
+    )
+
+
+def test_normalize_permission_scope_trims_and_lowercases() -> None:
+    assert normalize_permission_scope("  TENANT  ") == PermissionScope.TENANT
+
+
+def test_normalize_permission_scope_raises_for_invalid_value() -> None:
+    with pytest.raises(ValueError, match="Invalid permission scope 'regional'"):
+        normalize_permission_scope("regional")

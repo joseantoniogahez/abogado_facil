@@ -1,0 +1,72 @@
+name: tech-dev
+
+services:
+  database:
+    image: postgres:18.2
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 20s
+      timeout: 20s
+      retries: 20
+      start_period: 10s
+    environment:
+      POSTGRES_USER: "${DB_USER}"
+      POSTGRES_DB: "${DB_NAME}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
+
+  backend:
+    build:
+      context: backend
+      args:
+        PYTHON_VERSION: "${PYTHON_VERSION:-3.14.3}"
+    depends_on:
+      database:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:${API_PORT:-8000}/v1/health', timeout=2)",
+        ]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 15s
+    environment:
+      APP_ENV: "${APP_ENV:-local}"
+      API_CORS_ORIGINS: "${API_CORS_ORIGINS}"
+      API_PATH: "${API_PATH}"
+      DB_HOST: "${DB_HOST}"
+      DB_NAME: "${DB_NAME}"
+      DB_PASSWORD: "${DB_PASSWORD}"
+      DB_PORT: "${DB_PORT}"
+      DB_TYPE: "${DB_TYPE}"
+      DB_USER: "${DB_USER}"
+      JWT_ALGORITHM: "${JWT_ALGORITHM:-HS256}"
+      JWT_ACCESS_TOKEN_EXPIRE_MINUTES: "${JWT_ACCESS_TOKEN_EXPIRE_MINUTES:-30}"
+      JWT_ISSUER: "${JWT_ISSUER:-fastapi-template}"
+      JWT_AUDIENCE: "${JWT_AUDIENCE:-fastapi-template-api}"
+      JWT_SECRET_KEY: "${JWT_SECRET_KEY:-local-dev-jwt-secret}"
+      LOG_LEVEL: "${LOG_LEVEL:-INFO}"
+      PORT: "${API_PORT}"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "${BACKEND_LOG_MAX_SIZE:-10m}"
+        max-file: "${BACKEND_LOG_MAX_FILE:-3}"
+
+  frontend:
+    build:
+      context: frontend
+      args:
+        VITE_API_ORIGIN: "${VITE_API_ORIGIN:-http://localhost:8000}"
+        VITE_API_BASE_PATH: "${VITE_API_BASE_PATH:-/v1}"
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      VITE_API_ORIGIN: "${VITE_API_ORIGIN:-http://localhost:8000}"
+      VITE_API_BASE_PATH: "${VITE_API_BASE_PATH:-/v1}"
+      PORT: "${UI_PORT}"
