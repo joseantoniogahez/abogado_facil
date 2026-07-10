@@ -116,10 +116,63 @@ export const ES_MESSAGES = {
   "auth.validation.username.format":
     "El username solo acepta letras minusculas, numeros, punto, guion bajo y guion medio.",
   "auth.validation.username.required": "Ingresa un username.",
+  "landing.brand": "Abogado Fácil",
   "landing.badge.portal": "Abogado Fácil",
+  "landing.byok.body":
+    "Cada usuario conecta su propia API key de OpenAI o Google Gemini. La plataforma no absorbe el costo variable de IA y el backend valida la configuración antes de cualquier llamada.",
+  "landing.byok.title": "IA BYOK desde el MVP",
+  "landing.cta.register": "Crear cuenta",
   "landing.cta.login": "Ir a login",
+  "landing.hero.disclaimer":
+    "La app organiza el trabajo del abogado; no automatiza envíos, presentaciones ni decisiones jurídicas.",
+  "landing.hero.eyebrow": "SaaS legal ligero para despachos pequeños",
+  "landing.legal.body":
+    "Las respuestas generadas por IA son apoyo de redacción y organización. Deben ser revisadas por un profesional del derecho antes de utilizarse.",
+  "landing.legal.title": "Revisión humana obligatoria",
   "landing.loading.title": "Cargando Abogado Fácil...",
-  "landing.subtitle": "Inicia sesion para acceder a Abogado Fácil.",
+  "landing.modules.ai.body":
+    "Análisis de relatos, preguntas para cliente, mensajes y borradores simples solo cuando BYOK esté configurado.",
+  "landing.modules.ai.title": "IA en flujos controlados",
+  "landing.modules.calculators.body":
+    "Estimaciones de adeudos, rentas, intereses, liquidación básica y honorarios sin depender de IA.",
+  "landing.modules.calculators.title": "Calculadoras prácticas",
+  "landing.modules.checklists.body":
+    "Listas base por tipo de asunto para pedir documentos, marcar avances y detectar faltantes.",
+  "landing.modules.checklists.title": "Checklists y pagos",
+  "landing.modules.clients.body":
+    "Clientes, asuntos, estados, contraparte, próxima acción y actividad clave en un solo lugar.",
+  "landing.modules.clients.title": "Clientes y expedientes",
+  "landing.modules.documents.body":
+    "Notas, archivos PDF/DOCX/TXT, tareas y resultados guardados para consultar sin repetir trabajo.",
+  "landing.modules.documents.title": "Notas y documentos",
+  "landing.modules.drafts.body":
+    "Plantillas para cartas, convenios y mensajes que siempre quedan como borradores editables.",
+  "landing.modules.drafts.title": "Borradores revisables",
+  "landing.modules.subtitle":
+    "El MVP se concentra en los flujos diarios de abogados independientes: ordenar, dar seguimiento y preparar material revisable.",
+  "landing.modules.title": "Módulos incluidos en el MVP",
+  "landing.nav.label": "Navegación pública",
+  "landing.preview.area": "Familiar básico",
+  "landing.preview.byokBadge": "IA configurada",
+  "landing.preview.checklist.first": "Acta de matrimonio",
+  "landing.preview.checklist.second": "Comprobantes de ingresos",
+  "landing.preview.checklist.third": "Domicilio de contraparte",
+  "landing.preview.checklist.title": "Documentos faltantes",
+  "landing.preview.client.label": "Cliente",
+  "landing.preview.client.value": "María López",
+  "landing.preview.label": "Vista previa de expediente organizado",
+  "landing.preview.next.label": "Próxima acción",
+  "landing.preview.next.value": "Pedir documentos",
+  "landing.preview.status.label": "Estado",
+  "landing.preview.status.value": "Activo",
+  "landing.preview.timeline.first.body": "Relato inicial convertido en hechos relevantes.",
+  "landing.preview.timeline.first.date": "10 jul",
+  "landing.preview.timeline.second.body": "Preguntas pendientes listas para revisar con el cliente.",
+  "landing.preview.timeline.second.date": "12 jul",
+  "landing.preview.timeline.title": "Cronología sugerida",
+  "landing.preview.title": "Expediente: Pensión alimenticia",
+  "landing.subtitle":
+    "Organiza clientes, expedientes, documentos, tareas, pagos y borradores con IA BYOK en flujos controlados.",
   "landing.title": "Abogado Fácil",
   "profile.actions.cancel": "Cancelar",
   "profile.badge": "Perfil",

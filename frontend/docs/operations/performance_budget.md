@@ -23,9 +23,9 @@ The gate evaluates production artifacts in `dist/assets`:
 
 ## Threshold Rationale
 
-- `max_total_js_bytes` is `380000` bytes after adding the admin-only Audit Log route and API
-  consumer. The production build measured `376910` raw JavaScript bytes with gzip still below the
-  existing `115000` byte limit.
+- `max_total_js_bytes` is `390000` bytes after replacing the starter landing page with the
+  product-facing Abogado Fácil public landing. The production build measured `386294` raw
+  JavaScript bytes, while gzip remains below the existing `115000` byte limit.
 
 ## Commands
 

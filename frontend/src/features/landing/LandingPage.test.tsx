@@ -8,7 +8,7 @@ import { t } from "@/shared/i18n/ui-text";
 import { LandingPage } from "@/features/landing/LandingPage";
 
 describe("LandingPage", () => {
-  it("renders CTA to login", () => {
+  it("renders the public product landing with BYOK and legal messaging", () => {
     const queryClient = createQueryClient();
     queryClient.setQueryData(SESSION_QUERY_KEY, null);
     const router = createMemoryRouter(
@@ -28,6 +28,18 @@ describe("LandingPage", () => {
     );
 
     expect(screen.getByRole("heading", { name: t("landing.title") })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: t("landing.cta.login") })).toHaveAttribute("href", "/login");
+    expect(screen.getAllByRole("link", { name: t("landing.cta.login") })[0]).toHaveAttribute(
+      "href",
+      "/login",
+    );
+    expect(screen.getAllByRole("link", { name: t("landing.cta.register") })[0]).toHaveAttribute(
+      "href",
+      "/register",
+    );
+    expect(screen.getByText(t("landing.byok.title"))).toBeInTheDocument();
+    expect(screen.getByText(t("landing.legal.title"))).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: t("landing.modules.title") })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: t("landing.modules.clients.title") })).toBeInTheDocument();
+    expect(screen.getByLabelText(t("landing.preview.label"))).toBeInTheDocument();
   });
 });
