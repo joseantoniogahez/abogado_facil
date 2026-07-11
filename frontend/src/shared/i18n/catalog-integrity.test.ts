@@ -50,13 +50,11 @@ const REQUIRED_UI_KEYS: readonly UiTextKey[] = [
   "admin.users.columns.actions",
   "admin.users.columns.roles",
   "admin.users.columns.status",
-  "admin.users.columns.username",
   "admin.users.create.password",
   "admin.users.create.roles",
   "admin.users.create.submit",
   "admin.users.create.submit.pending",
   "admin.users.create.title",
-  "admin.users.create.username",
   "admin.users.edit.cancel",
   "admin.users.edit.currentPassword",
   "admin.users.edit.disabled",
@@ -65,7 +63,6 @@ const REQUIRED_UI_KEYS: readonly UiTextKey[] = [
   "admin.users.edit.submit",
   "admin.users.edit.submit.pending",
   "admin.users.edit.title",
-  "admin.users.edit.username",
   "admin.users.list.empty",
   "admin.users.list.title",
   "admin.users.status.active",
@@ -75,7 +72,6 @@ const REQUIRED_UI_KEYS: readonly UiTextKey[] = [
   "auth.login.badge",
   "auth.login.error.generic",
   "auth.login.fields.password",
-  "auth.login.fields.username",
   "auth.login.footer.backToLanding",
   "auth.login.footer.firstTime",
   "auth.login.submit.default",
@@ -123,7 +119,10 @@ describe("ui text catalog integrity", () => {
 
   it("does not contain mojibake sequences", () => {
     for (const [key, value] of Object.entries(ES_MESSAGES)) {
-      expect(MOJIBAKE_PATTERN.test(value), `message '${key}' contains mojibake: '${value}'`).toBe(false);
+      expect(
+        MOJIBAKE_PATTERN.test(value),
+        `message '${key}' contains mojibake: '${value}'`,
+      ).toBe(false);
     }
   });
 

@@ -23,8 +23,8 @@ def _build_scoped_auth_service(
     permission_scope_cache: dict[tuple[int, str], str | None] | None = None,
 ) -> AuthService:
     repository = MagicMock()
-    repository.get_by_username = AsyncMock()
-    repository.username_exists = AsyncMock(return_value=False)
+    repository.get_by_email = AsyncMock()
+    repository.email_exists = AsyncMock(return_value=False)
     repository.create_user = AsyncMock()
     repository.update_user = AsyncMock()
     repository.get_user_permission_scope = AsyncMock(return_value=granted_scope)
@@ -143,9 +143,13 @@ def _request_with_scope(
     app = _build_scoped_test_app()
     current_user = CurrentPrincipal(
         id=current_user_id,
-        username="scope-user",
+        email="scope.user@example.com",
+        first_name="Scope",
+        middle_name=None,
+        last_name="User",
+        display_name="Scope User",
         disabled=False,
-        tenant_id=current_user_tenant_id,
+        firm_id=current_user_tenant_id,
     )
     auth_service = _build_scoped_auth_service(granted_scope)
 
@@ -248,9 +252,13 @@ def test_scoped_authorization_reuses_permission_lookup_within_request() -> None:
     app = _build_scoped_test_app()
     current_user = CurrentPrincipal(
         id=10,
-        username="scope-user",
+        email="scope.user@example.com",
+        first_name="Scope",
+        middle_name=None,
+        last_name="User",
+        display_name="Scope User",
         disabled=False,
-        tenant_id=7,
+        firm_id=7,
     )
     auth_service = _build_scoped_auth_service(
         PermissionScope.ANY,

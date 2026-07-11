@@ -23,9 +23,12 @@ The gate evaluates production artifacts in `dist/assets`:
 
 ## Threshold Rationale
 
-- `max_total_js_bytes` is `390000` bytes after replacing the starter landing page with the
-  product-facing Abogado Fácil public landing. The production build measured `386294` raw
-  JavaScript bytes, while gzip remains below the existing `115000` byte limit.
+- `max_total_js_bytes` remains `390000` bytes. PROD-002 first deduplicated the account-form markup
+  through `shared/ui/AccountFormField`; the resulting production bundle measures `389428` raw
+  bytes.
+- `max_total_js_gzip_bytes` is `116000` bytes. A source-map audit found no tests, docs, e2e,
+  coverage, or unrelated assets in the production graph; the audited bundle measures `115345`
+  gzip bytes, 345 bytes above the former threshold.
 
 ## Commands
 

@@ -2,9 +2,9 @@ from typing import cast
 from unittest.mock import AsyncMock, MagicMock
 
 from app.core.authorization.permission_evaluator import PermissionEvaluatorPort
+from app.core.common.records import UserRecord
 from app.core.config.settings import AuthSettings
 from app.core.security.service import PasswordServicePort, TokenServicePort
-from app.features.auth.models import User
 from app.features.auth.service import AuthService
 
 
@@ -18,8 +18,12 @@ def assert_unit_of_work_scope_committed(unit_of_work: object) -> None:
 
 def _build_repository_mock() -> MagicMock:
     repository = MagicMock()
-    repository.get_by_username = AsyncMock()
-    repository.username_exists = AsyncMock(return_value=False)
+    repository.get_by_email = AsyncMock()
+    repository.email_exists = AsyncMock(return_value=False)
+    repository.create_firm = AsyncMock()
+    repository.get_firm = AsyncMock(return_value=None)
+    repository.update_firm = AsyncMock()
+    repository.assign_role_by_name = AsyncMock()
     repository.create_user = AsyncMock()
     repository.update_user = AsyncMock()
     repository.get_rbac_version = AsyncMock(
@@ -72,15 +76,23 @@ def build_user(
     service: AuthService,
     *,
     user_id: int = 1,
-    username: str = "john",
+    email: str = "john@example.com",
+    first_name: str = "John",
+    middle_name: str | None = None,
+    last_name: str = "Doe",
+    display_name: str = "John Doe",
     password: str = "StrongPass1",
     disabled: bool = False,
-    tenant_id: int | None = None,
-) -> User:
-    return User(
+    firm_id: int | None = None,
+) -> UserRecord:
+    return UserRecord(
         id=user_id,
-        username=username,
+        email=email,
+        first_name=first_name,
+        middle_name=middle_name,
+        last_name=last_name,
+        display_name=display_name,
         hashed_password=service.password_service.hash_password(password),
         disabled=disabled,
-        tenant_id=tenant_id,
+        firm_id=firm_id,
     )

@@ -64,7 +64,12 @@ const renderAdminPermissionsPage = (
   const queryClient = createQueryClient();
   queryClient.setQueryData(SESSION_QUERY_KEY, {
     id: 1,
-    username: "admin",
+    email: "admin",
+    first_name: "Test",
+    middle_name: null,
+    last_name: "User",
+    display_name: "Test User",
+    firm_name: "Test Legal",
     disabled: false,
     permissions,
   });

@@ -1,8 +1,12 @@
 import { QueryClientProvider } from "@tanstack/react-query";
-import axe from "axe-core";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter, RouterProvider, createMemoryRouter } from "react-router-dom";
+import axe from "axe-core";
+import {
+  MemoryRouter,
+  RouterProvider,
+  createMemoryRouter,
+} from "react-router-dom";
 
 import { createQueryClient } from "@/app/query-client";
 import { appRoutes } from "@/app/routes";
@@ -19,7 +23,12 @@ const AXE_RUN_OPTIONS: axe.RunOptions = {
 
 const SESSION_USER = {
   id: 7,
-  username: "profile_user",
+  email: "profile@example.com",
+  first_name: "Test",
+  middle_name: null,
+  last_name: "User",
+  display_name: "Test User",
+  firm_name: "Test Legal",
   disabled: false,
   permissions: [],
 };
@@ -60,7 +69,9 @@ describe("ProfilePage", () => {
     await waitFor(() => {
       expect(router.state.location.pathname).toBe("/login");
     });
-    expect(await screen.findByRole("heading", { name: t("auth.login.title") })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: t("auth.login.title") }),
+    ).toBeInTheDocument();
   });
 
   it("updates profile data and writes through the session cache", async () => {
@@ -71,7 +82,12 @@ describe("ProfilePage", () => {
       json: () =>
         Promise.resolve({
           id: 7,
-          username: "profile_user_v2",
+          email: "profile.v2@example.com",
+          first_name: "Test",
+          middle_name: null,
+          last_name: "User",
+          display_name: "Test User",
+          firm_name: "Test Legal",
           disabled: false,
           permissions: [],
         }),
@@ -81,17 +97,51 @@ describe("ProfilePage", () => {
 
     const { queryClient } = renderProfilePage();
 
-    await user.clear(screen.getByLabelText(t("profile.fields.username")));
-    await user.type(screen.getByLabelText(t("profile.fields.username")), " profile_user_v2 ");
-    await user.type(screen.getByLabelText(t("profile.fields.currentPassword")), "ProfilePass1");
-    await user.type(screen.getByLabelText(t("profile.fields.newPassword")), "ProfilePass2");
-    await user.click(screen.getByRole("button", { name: t("profile.submit.default") }));
+    await user.clear(screen.getByLabelText(t("profile.fields.firstName")));
+    await user.type(
+      screen.getByLabelText(t("profile.fields.firstName")),
+      "Updated",
+    );
+    await user.clear(screen.getByLabelText(t("profile.fields.firmName")));
+    await user.type(
+      screen.getByLabelText(t("profile.fields.firmName")),
+      "Updated Legal",
+    );
+    await user.clear(screen.getByLabelText(t("profile.fields.email")));
+    await user.type(
+      screen.getByLabelText(t("profile.fields.email")),
+      " profile.v2@example.com ",
+    );
+    await user.type(
+      screen.getByLabelText(t("profile.fields.currentPassword")),
+      "ProfilePass1",
+    );
+    await user.type(
+      screen.getByLabelText(t("profile.fields.newPassword")),
+      "ProfilePass2",
+    );
+    await user.click(
+      screen.getByRole("button", { name: t("profile.submit.default") }),
+    );
 
-    expect(await screen.findByText(t("profile.success.body", { username: "profile_user_v2" }))).toBeInTheDocument();
-    expect(await screen.findByText(t("profile.currentUser", { username: "profile_user_v2" }))).toBeInTheDocument();
+    expect(
+      await screen.findByText(
+        t("profile.success.body", { email: "profile.v2@example.com" }),
+      ),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText(
+        t("profile.currentUser", { email: "profile.v2@example.com" }),
+      ),
+    ).toBeInTheDocument();
     expect(queryClient.getQueryData(SESSION_QUERY_KEY)).toEqual({
       id: 7,
-      username: "profile_user_v2",
+      email: "profile.v2@example.com",
+      first_name: "Test",
+      middle_name: null,
+      last_name: "User",
+      display_name: "Test User",
+      firm_name: "Test Legal",
       disabled: false,
       permissions: [],
     });
@@ -104,11 +154,12 @@ describe("ProfilePage", () => {
       status: 409,
       statusText: "Conflict",
       headers: {
-        get: (header: string) => (header === "X-Request-ID" ? "req-profile-409" : null),
+        get: (header: string) =>
+          header === "X-Request-ID" ? "req-profile-409" : null,
       },
       json: () =>
         Promise.resolve({
-          detail: "Username already exists",
+          detail: "Email already exists",
           code: "conflict",
         }),
     } satisfies Partial<Response>);
@@ -117,11 +168,30 @@ describe("ProfilePage", () => {
 
     renderProfilePage();
 
-    await user.clear(screen.getByLabelText(t("profile.fields.username")));
-    await user.type(screen.getByLabelText(t("profile.fields.username")), "admin");
-    await user.click(screen.getByRole("button", { name: t("profile.submit.default") }));
+    await user.clear(screen.getByLabelText(t("profile.fields.firstName")));
+    await user.type(
+      screen.getByLabelText(t("profile.fields.firstName")),
+      "Updated",
+    );
+    await user.clear(screen.getByLabelText(t("profile.fields.firmName")));
+    await user.type(
+      screen.getByLabelText(t("profile.fields.firmName")),
+      "Updated Legal",
+    );
+    await user.clear(screen.getByLabelText(t("profile.fields.email")));
+    await user.type(
+      screen.getByLabelText(t("profile.fields.email")),
+      "admin@example.com",
+    );
+    await user.click(
+      screen.getByRole("button", { name: t("profile.submit.default") }),
+    );
 
-    expect(await screen.findByText("Username already exists (request_id=req-profile-409)")).toBeInTheDocument();
+    expect(
+      await screen.findByText(
+        "Email already exists (request_id=req-profile-409)",
+      ),
+    ).toBeInTheDocument();
   });
 
   it("clears the session cache when the profile update returns unauthorized", async () => {
@@ -141,9 +211,17 @@ describe("ProfilePage", () => {
 
     const { queryClient } = renderProfilePage();
 
-    await user.type(screen.getByLabelText(t("profile.fields.currentPassword")), "WrongPass1");
-    await user.type(screen.getByLabelText(t("profile.fields.newPassword")), "ProfilePass2");
-    await user.click(screen.getByRole("button", { name: t("profile.submit.default") }));
+    await user.type(
+      screen.getByLabelText(t("profile.fields.currentPassword")),
+      "WrongPass1",
+    );
+    await user.type(
+      screen.getByLabelText(t("profile.fields.newPassword")),
+      "ProfilePass2",
+    );
+    await user.click(
+      screen.getByRole("button", { name: t("profile.submit.default") }),
+    );
 
     await waitFor(() => {
       expect(queryClient.getQueryData(SESSION_QUERY_KEY)).toBeNull();
@@ -153,7 +231,11 @@ describe("ProfilePage", () => {
   it("keeps the profile form accessible", async () => {
     const { view } = renderProfilePage();
 
-    expect(await screen.findByRole("heading", { name: t("profile.title") })).toBeInTheDocument();
-    expect((await axe.run(view.container, AXE_RUN_OPTIONS)).violations).toHaveLength(0);
+    expect(
+      await screen.findByRole("heading", { name: t("profile.title") }),
+    ).toBeInTheDocument();
+    expect(
+      (await axe.run(view.container, AXE_RUN_OPTIONS)).violations,
+    ).toHaveLength(0);
   });
 });

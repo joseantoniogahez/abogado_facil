@@ -9,7 +9,7 @@ import { t } from "@/shared/i18n/ui-text";
 
 interface SessionUser {
   id: number;
-  username: string;
+  email: string;
   disabled: boolean;
 }
 
@@ -68,14 +68,19 @@ describe("WelcomePage", () => {
     useSessionMock.mockReturnValue({
       data: {
         id: 1,
-        username: "alice",
+        email: "alice",
+        first_name: "Test",
+        middle_name: null,
+        last_name: "User",
+        display_name: "Test User",
+        firm_name: "Test Legal",
         disabled: false,
       },
     });
 
     renderWelcomePage();
 
-    expect(await screen.findByRole("heading", { name: t("welcome.greeting", { username: "alice" }) })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: t("welcome.greeting", { displayName: "Test User" }) })).toBeInTheDocument();
     expect(screen.getByText(t("welcome.sessionActive.body"))).toBeInTheDocument();
     expect(screen.getByRole("button", { name: t("welcome.logout") })).toBeInTheDocument();
   });
@@ -84,7 +89,12 @@ describe("WelcomePage", () => {
     useSessionMock.mockReturnValue({
       data: {
         id: 7,
-        username: "bob",
+        email: "bob",
+        first_name: "Test",
+        middle_name: null,
+        last_name: "User",
+        display_name: "Test User",
+        firm_name: "Test Legal",
         disabled: false,
       },
     });

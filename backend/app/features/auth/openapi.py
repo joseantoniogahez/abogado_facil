@@ -12,7 +12,12 @@ TOKEN_RESPONSE_EXAMPLE: dict[str, Any] = {
 
 AUTHENTICATED_USER_EXAMPLE: dict[str, Any] = {
     "id": 1,
-    "username": "admin",
+    "email": "admin@example.com",
+    "first_name": "Technical",
+    "middle_name": None,
+    "last_name": "Administrator",
+    "display_name": "Technical administrator",
+    "firm_name": "Technical administrator",
     "disabled": False,
     "permissions": [
         "audit_logs:read",
@@ -27,16 +32,28 @@ REGISTER_USER_BODY_EXAMPLES: dict[str, Any] = {
     "new_user": {
         "summary": "Valid registration",
         "value": {
-            "username": "new_user",
+            "first_name": "Maria",
+            "middle_name": None,
+            "last_name": "Perez",
+            "display_name": "Maria Perez",
+            "email": "maria@example.com",
+            "firm_name": "Perez Legal",
             "password": "{{strong_password}}",
         },
     }
 }
 
 UPDATE_CURRENT_USER_BODY_EXAMPLES: dict[str, Any] = {
-    "username": {
-        "summary": "Change username",
-        "value": {"username": "new_username"},
+    "profile": {
+        "summary": "Change account profile",
+        "value": {
+            "first_name": "Maria",
+            "middle_name": "Elena",
+            "last_name": "Perez",
+            "display_name": "Lic. Maria Perez",
+            "email": "maria@example.com",
+            "firm_name": "Perez Legal",
+        },
     },
     "password": {
         "summary": "Change password",
@@ -46,9 +63,9 @@ UPDATE_CURRENT_USER_BODY_EXAMPLES: dict[str, Any] = {
         },
     },
     "both": {
-        "summary": "Change username and password",
+        "summary": "Change email and password",
         "value": {
-            "username": "new_username",
+            "email": "new@example.com",
             "current_password": "{{current_password}}",
             "new_password": "{{new_password}}",
         },
@@ -90,9 +107,9 @@ LOGIN_FOR_ACCESS_TOKEN_DOC: dict[str, Any] = {
             },
         ),
         status.HTTP_401_UNAUTHORIZED: build_error_response(
-            description="Invalid username or password.",
+            description="Invalid email or password.",
             example={
-                "detail": "Invalid username or password",
+                "detail": "Invalid email or password",
                 "status": 401,
                 "code": "unauthorized",
             },
@@ -117,7 +134,7 @@ LOGIN_FOR_ACCESS_TOKEN_DOC: dict[str, Any] = {
             "content": {
                 "application/x-www-form-urlencoded": {
                     "example": {
-                        "username": "demo_user",
+                        "username": "demo@example.com",
                         "password": "{{password}}",
                     }
                 }
@@ -130,8 +147,8 @@ REGISTER_USER_DOC: dict[str, Any] = {
     "status_code": status.HTTP_201_CREATED,
     "summary": "Register user",
     "description": (
-        "Create a local active user. `username` is normalized to lowercase and the password "
-        "must satisfy the service password policy."
+        "Create an active product account and its firm atomically. `email` is normalized to lowercase, "
+        "the firm name falls back to `display_name`, and the user receives `account_owner`."
     ),
     "response_description": "User created successfully.",
     "responses": {
@@ -149,12 +166,12 @@ REGISTER_USER_DOC: dict[str, Any] = {
             },
         ),
         status.HTTP_409_CONFLICT: build_error_response(
-            description="Username already exists.",
+            description="Email already exists.",
             example={
-                "detail": "Username already exists",
+                "detail": "Email already exists",
                 "status": 409,
                 "code": "conflict",
-                "meta": {"username": "admin"},
+                "meta": {"email": "admin@example.com"},
             },
         ),
         status.HTTP_500_INTERNAL_SERVER_ERROR: build_error_response(
@@ -200,7 +217,7 @@ READ_CURRENT_USER_DOC: dict[str, Any] = {
 UPDATE_CURRENT_USER_DOC: dict[str, Any] = {
     "summary": "Update current user",
     "description": (
-        "Update `username`, password, or both. Password change requires both `current_password` and `new_password`."
+        "Update legal-name components, display name, email, firm name, password, or a combination. Password changes require current credentials."
     ),
     "response_description": "User updated successfully.",
     "responses": {
@@ -210,7 +227,12 @@ UPDATE_CURRENT_USER_DOC: dict[str, Any] = {
                 "application/json": {
                     "example": {
                         "id": 1,
-                        "username": "profile_user_v2",
+                        "email": "profile@example.com",
+                        "first_name": "Profile",
+                        "middle_name": None,
+                        "last_name": "User",
+                        "display_name": "Profile User",
+                        "firm_name": "Profile Legal",
                         "disabled": False,
                         "permissions": [],
                     }
@@ -243,12 +265,12 @@ UPDATE_CURRENT_USER_DOC: dict[str, Any] = {
             },
         ),
         status.HTTP_409_CONFLICT: build_error_response(
-            description="New username is already in use.",
+            description="New email is already in use.",
             example={
-                "detail": "Username already exists",
+                "detail": "Email already exists",
                 "status": 409,
                 "code": "conflict",
-                "meta": {"username": "admin"},
+                "meta": {"email": "admin@example.com"},
             },
         ),
         status.HTTP_500_INTERNAL_SERVER_ERROR: build_error_response(

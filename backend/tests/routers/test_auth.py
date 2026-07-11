@@ -11,17 +11,17 @@ from app.core.config.settings import AuthSettings
 from utils.testing_support.api_assertions import assert_error_response
 
 
-def _build_access_token(username: str) -> str:
+def _build_access_token(email: str) -> str:
     settings = AuthSettings()
     issued_at = datetime.now(UTC)
     expire_at = issued_at + timedelta(minutes=settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES)
     payload = {
-        "sub": username,
+        "sub": email,
         "iss": settings.JWT_ISSUER,
         "aud": settings.JWT_AUDIENCE,
         "iat": int(issued_at.timestamp()),
         "exp": int(expire_at.timestamp()),
-        "jti": f"test-{username}",
+        "jti": f"test-{email}",
         "rbac_version": hashlib.sha256(b"").hexdigest(),
     }
     return jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
@@ -41,7 +41,7 @@ def test_token_success(mock_client: TestClient) -> None:
     response = mock_client.post(
         "/v1/token",
         data={
-            "username": "admin",
+            "username": "admin@example.com",
             "password": "admin123",  # pragma: allowlist secret
         },
     )
@@ -55,13 +55,13 @@ def test_token_success(mock_client: TestClient) -> None:
 
 def test_token_rejects_invalid_credentials_variants(mock_client: TestClient) -> None:
     for credentials in (
-        {"username": "admin", "password": "wrong-password"},  # pragma: allowlist secret
-        {"username": "unknown", "password": "admin123"},  # pragma: allowlist secret
+        {"username": "admin@example.com", "password": "wrong-password"},  # pragma: allowlist secret
+        {"username": "unknown@example.com", "password": "admin123"},  # pragma: allowlist secret
     ):
         response = mock_client.post("/v1/token", data=credentials)
 
         assert response.status_code == HTTPStatus.UNAUTHORIZED
-        _assert_error_payload(response, "unauthorized", "Invalid username or password")
+        _assert_error_payload(response, "unauthorized", "Invalid email or password")
         assert response.headers["www-authenticate"] == "Bearer"
 
 
@@ -69,7 +69,7 @@ def test_token_disabled_user(mock_client: TestClient) -> None:
     response = mock_client.post(
         "/v1/token",
         data={
-            "username": "disabled_user",
+            "username": "disabled@example.com",
             "password": "admin123",  # pragma: allowlist secret
         },
     )
@@ -82,7 +82,7 @@ def test_get_current_active_user(mock_client: TestClient) -> None:
     token_response = mock_client.post(
         "/v1/token",
         data={
-            "username": "admin",
+            "username": "admin@example.com",
             "password": "admin123",  # pragma: allowlist secret
         },
     )
@@ -94,7 +94,12 @@ def test_get_current_active_user(mock_client: TestClient) -> None:
     expected_permissions = sorted(permission_id for permission_id, _ in PERMISSION_SPECS)
     assert response.json() == {
         "id": 1,
-        "username": "admin",
+        "email": "admin@example.com",
+        "first_name": "Ada",
+        "middle_name": None,
+        "last_name": "Admin",
+        "display_name": "Admin User",
+        "firm_name": "Admin Legal",
         "disabled": False,
         "permissions": expected_permissions,
     }
@@ -103,8 +108,8 @@ def test_get_current_active_user(mock_client: TestClient) -> None:
 def test_get_current_active_user_rejects_invalid_tokens_and_inactive_user(mock_client: TestClient) -> None:
     authorizations = (
         "Bearer not-a-valid-token",
-        f"Bearer {_build_access_token('ghost-user')}",
-        f"Bearer {_build_access_token('disabled_user')}",
+        f"Bearer {_build_access_token('ghost@example.com')}",
+        f"Bearer {_build_access_token('disabled@example.com')}",
     )
     status_codes = (HTTPStatus.UNAUTHORIZED, HTTPStatus.UNAUTHORIZED, HTTPStatus.FORBIDDEN)
     error_types = ("unauthorized", "unauthorized", "forbidden")
@@ -127,7 +132,11 @@ def test_register_user_success(mock_client: TestClient) -> None:
     response = mock_client.post(
         "/v1/users/register",
         json={
-            "username": " new_user ",
+            "first_name": " New ",
+            "middle_name": " Q. ",
+            "last_name": " User ",
+            "display_name": " New Counsel ",
+            "email": " NEW.USER@EXAMPLE.COM ",
             "password": "StrongPass1",  # pragma: allowlist secret
         },
     )
@@ -135,14 +144,22 @@ def test_register_user_success(mock_client: TestClient) -> None:
     assert response.status_code == HTTPStatus.CREATED
     payload = response.json()
     assert isinstance(payload["id"], int)
-    assert payload["username"] == "new_user"
-    assert payload["disabled"] is False
-    assert payload["permissions"] == []
+    assert payload == {
+        "id": payload["id"],
+        "email": "new.user@example.com",
+        "first_name": "New",
+        "middle_name": "Q.",
+        "last_name": "User",
+        "display_name": "New Counsel",
+        "firm_name": "New Counsel",
+        "disabled": False,
+        "permissions": [],
+    }
 
     token_response = mock_client.post(
         "/v1/token",
         data={
-            "username": "NEW_USER",
+            "username": "NEW.USER@EXAMPLE.COM",
             "password": "StrongPass1",  # pragma: allowlist secret
         },
     )
@@ -151,16 +168,34 @@ def test_register_user_success(mock_client: TestClient) -> None:
 
 def test_register_user_rejects_common_error_cases(mock_client: TestClient) -> None:
     payloads = (
-        {"username": "invalid user!", "password": "StrongPass1"},  # pragma: allowlist secret
-        {"username": "admin", "password": "StrongPass1"},  # pragma: allowlist secret
-        {"username": "policy_user", "password": "onlylowercase1"},  # pragma: allowlist secret
+        {
+            "first_name": "Invalid",
+            "last_name": "Email",
+            "display_name": "Invalid Email",
+            "email": "invalid-email",
+            "password": "StrongPass1",  # pragma: allowlist secret
+        },
+        {
+            "first_name": "Duplicate",
+            "last_name": "Admin",
+            "display_name": "Duplicate Admin",
+            "email": " ADMIN@EXAMPLE.COM ",
+            "password": "StrongPass1",  # pragma: allowlist secret
+        },
+        {
+            "first_name": "Policy",
+            "last_name": "User",
+            "display_name": "Policy User",
+            "email": "policy.user@example.com",
+            "password": "onlylowercase1",  # pragma: allowlist secret
+        },
     )
     status_codes = (HTTPStatus.BAD_REQUEST, HTTPStatus.CONFLICT, HTTPStatus.BAD_REQUEST)
     error_types = ("invalid_input", "conflict", "invalid_input")
-    messages = ("Username has invalid format", "Username already exists", "Password does not meet policy")
+    messages = ("Email has invalid format", "Email already exists", "Password does not meet policy")
     detail_dicts = (
-        {"allowed": "lowercase letters, numbers, dot, underscore and hyphen"},
-        {"username": "admin"},
+        None,
+        {"email": "admin@example.com"},
         {"violations": ["Password must include at least one uppercase letter"]},
     )
 
@@ -181,7 +216,12 @@ def test_register_user_rejects_common_error_cases(mock_client: TestClient) -> No
 def test_register_user_missing_password_returns_normalized_validation_error(mock_client: TestClient) -> None:
     response = mock_client.post(
         "/v1/users/register",
-        json={"username": "missing_password"},
+        json={
+            "first_name": "Missing",
+            "last_name": "Password",
+            "display_name": "Missing Password",
+            "email": "missing.password@example.com",
+        },
     )
 
     assert response.status_code == HTTPStatus.BAD_REQUEST
@@ -194,11 +234,16 @@ def test_register_user_missing_password_returns_normalized_validation_error(mock
     assert any(error.get("loc") == ["body", "password"] and error.get("type") == "missing" for error in payload["meta"])
 
 
-def test_update_current_user_username_and_password(mock_client: TestClient) -> None:
+def test_update_current_user_profile_email_firm_and_password(mock_client: TestClient) -> None:
     register_response = mock_client.post(
         "/v1/users/register",
         json={
-            "username": "profile_user",
+            "first_name": "Profile",
+            "middle_name": "Quinn",
+            "last_name": "User",
+            "display_name": "Profile User",
+            "email": "profile.user@example.com",
+            "firm_name": "Profile Legal",
             "password": "ProfilePass1",  # pragma: allowlist secret
         },
     )
@@ -208,7 +253,7 @@ def test_update_current_user_username_and_password(mock_client: TestClient) -> N
     login_response = mock_client.post(
         "/v1/token",
         data={
-            "username": "profile_user",
+            "username": "profile.user@example.com",
             "password": "ProfilePass1",  # pragma: allowlist secret
         },
     )
@@ -219,7 +264,12 @@ def test_update_current_user_username_and_password(mock_client: TestClient) -> N
         "/v1/users/me",
         headers=headers,
         json={
-            "username": " profile_user_v2 ",
+            "first_name": " Pat ",
+            "middle_name": " R. ",
+            "last_name": " Updated ",
+            "display_name": " Counsel Pat ",
+            "email": " PROFILE.UPDATED@EXAMPLE.COM ",
+            "firm_name": " Updated Legal ",
             "current_password": "ProfilePass1",  # pragma: allowlist secret
             "new_password": "ProfilePass2",  # pragma: allowlist secret
         },
@@ -228,7 +278,12 @@ def test_update_current_user_username_and_password(mock_client: TestClient) -> N
     assert update_response.status_code == HTTPStatus.OK
     assert update_response.json() == {
         "id": user_id,
-        "username": "profile_user_v2",
+        "email": "profile.updated@example.com",
+        "first_name": "Pat",
+        "middle_name": "R.",
+        "last_name": "Updated",
+        "display_name": "Counsel Pat",
+        "firm_name": "Updated Legal",
         "disabled": False,
         "permissions": [],
     }
@@ -236,7 +291,7 @@ def test_update_current_user_username_and_password(mock_client: TestClient) -> N
     old_login = mock_client.post(
         "/v1/token",
         data={
-            "username": "profile_user",
+            "username": "profile.user@example.com",
             "password": "ProfilePass1",  # pragma: allowlist secret
         },
     )
@@ -245,7 +300,7 @@ def test_update_current_user_username_and_password(mock_client: TestClient) -> N
     new_login = mock_client.post(
         "/v1/token",
         data={
-            "username": "PROFILE_USER_V2",
+            "username": "PROFILE.UPDATED@EXAMPLE.COM",
             "password": "ProfilePass2",  # pragma: allowlist secret
         },
     )
@@ -256,7 +311,7 @@ def test_update_current_user_rejects_invalid_update_payloads(mock_client: TestCl
     login_response = mock_client.post(
         "/v1/token",
         data={
-            "username": "admin",
+            "username": "admin@example.com",
             "password": "admin123",  # pragma: allowlist secret
         },
     )
@@ -265,7 +320,7 @@ def test_update_current_user_rejects_invalid_update_payloads(mock_client: TestCl
     payloads = (
         {"new_password": "AdminPass9"},  # pragma: allowlist secret
         {"current_password": "admin123"},  # pragma: allowlist secret
-        {"username": " ADMIN "},
+        {"email": " ADMIN@EXAMPLE.COM "},
         {"current_password": "admin123", "new_password": "admin123"},  # pragma: allowlist secret
     )
     expected_messages = (
@@ -291,7 +346,7 @@ def test_update_current_user_rejects_invalid_current_password(mock_client: TestC
     login_response = mock_client.post(
         "/v1/token",
         data={
-            "username": "admin",
+            "username": "admin@example.com",
             "password": "admin123",  # pragma: allowlist secret
         },
     )
@@ -312,11 +367,11 @@ def test_update_current_user_rejects_invalid_current_password(mock_client: TestC
     assert response.headers["www-authenticate"] == "Bearer"
 
 
-def test_update_current_user_username_conflict(mock_client: TestClient) -> None:
+def test_update_current_user_email_conflict(mock_client: TestClient) -> None:
     login_response = mock_client.post(
         "/v1/token",
         data={
-            "username": "reader_user",
+            "username": "reader@example.com",
             "password": "reader123",  # pragma: allowlist secret
         },
     )
@@ -326,13 +381,13 @@ def test_update_current_user_username_conflict(mock_client: TestClient) -> None:
     response = mock_client.patch(
         "/v1/users/me",
         headers=headers,
-        json={"username": "admin"},
+        json={"email": " ADMIN@EXAMPLE.COM "},
     )
 
     assert response.status_code == HTTPStatus.CONFLICT
     _assert_error_payload(
         response,
         "conflict",
-        "Username already exists",
-        details={"username": "admin"},
+        "Email already exists",
+        details={"email": "admin@example.com"},
     )

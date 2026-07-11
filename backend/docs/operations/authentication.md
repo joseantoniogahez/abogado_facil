@@ -15,7 +15,7 @@ For implementation rules and extension workflows, see `../backend_playbook.md`.
 Run the idempotent RBAC bootstrap command from `backend/`:
 
 ```bash
-python -m utils.rbac_bootstrap --admin-username admin --admin-password "StrongSeed9"
+python -m utils.rbac_bootstrap --admin-email admin@example.com --admin-password "StrongSeed9"
 ```
 
 This command:
@@ -72,12 +72,16 @@ Evaluation is deterministic and handled in `AuthService.user_has_permission(...)
 
 ## `POST /v1/token` Example
 
+OAuth2 password-form compatibility requires the wire field to be named `username`; clients must put
+the account email in that field. The application does not expose or accept a separate username
+identity.
+
 Success:
 
 ```bash
 curl -X POST http://localhost:8000/v1/token \
   -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "username=admin&password=<admin_password>"
+  -d "username=admin@example.com&password=<admin_password>"
 ```
 
 ```json
@@ -94,12 +98,12 @@ Invalid credentials (`401 Unauthorized`):
 ```bash
 curl -X POST http://localhost:8000/v1/token \
   -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "username=admin&password=wrong-password"
+  -d "username=admin@example.com&password=wrong-password"
 ```
 
 ```json
 {
-  "detail": "Invalid username or password",
+  "detail": "Invalid email or password",
   "status": 401,
   "code": "unauthorized",
   "request_id": "req-example-1234"
@@ -116,7 +120,12 @@ curl -X GET http://localhost:8000/v1/users/me \
 ```json
 {
   "id": 1,
-  "username": "admin",
+  "email": "admin@example.com",
+  "first_name": "Technical",
+  "middle_name": null,
+  "last_name": "Administrator",
+  "display_name": "Technical administrator",
+  "firm_name": "Technical administrator",
   "disabled": false,
   "permissions": [
     "audit_logs:read",
@@ -130,10 +139,10 @@ curl -X GET http://localhost:8000/v1/users/me \
 
 ## Registration and Update Rules
 
-Username rules:
+Email rules:
 
-- Normalized with trim + lowercase.
-- Regex: `^[a-z0-9_.-]+$`.
+- Normalized with trim + lowercase and validated as an email address.
+- Equivalent normalized emails cannot be registered twice.
 
 Password rules (registration and password update):
 
@@ -141,7 +150,7 @@ Password rules (registration and password update):
 - At least one lowercase letter.
 - At least one uppercase letter.
 - At least one number.
-- Cannot contain the username.
+- Cannot contain the normalized email.
 
 `PATCH /v1/users/me` rules:
 
@@ -158,10 +167,17 @@ Transactional behavior:
 
 Authenticated user payload behavior:
 
+- Public registration requires `first_name`, `last_name`, `display_name`, `email`, and `password`;
+  `middle_name` and `firm_name` are optional.
+- Registration creates one firm, falls back to `display_name` for its name, and assigns the non-administrative `account_owner` role atomically.
 - `POST /v1/users/register`, `GET /v1/users/me`, and `PATCH /v1/users/me` return
-  `{ id, username, disabled, permissions }`.
+  `{ id, email, first_name, middle_name, last_name, display_name, firm_name, disabled, permissions }`.
 - `permissions` is derived at read time from effective RBAC grants (direct + inherited roles), deduplicated, and
   sorted for deterministic responses.
+- Public registration does not create a session implicitly. The client must direct the new account
+  to login and obtain a bearer token explicitly.
+- Profile updates may change `first_name`, `middle_name`, `last_name`, `display_name`, `email`, and
+  `firm_name`; email remains normalized and uniqueness-protected.
 
 ## Common Auth Errors
 

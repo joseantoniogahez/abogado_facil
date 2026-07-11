@@ -13,7 +13,12 @@ const renderAppAt = (path: AdminRoutePath) => {
   const queryClient = createQueryClient();
   queryClient.setQueryData(SESSION_QUERY_KEY, {
     id: 7,
-    username: "reader_user",
+    email: "reader_user",
+    first_name: "Test",
+    middle_name: null,
+    last_name: "User",
+    display_name: "Test User",
+    firm_name: "Test Legal",
     disabled: false,
     permissions: [],
   });
@@ -41,7 +46,7 @@ describe("PermissionRoute", () => {
       expect(router.state.location.pathname).toBe("/welcome");
     });
     expect(
-      await screen.findByRole("heading", { name: t("welcome.greeting", { username: "reader_user" }) }),
+      await screen.findByRole("heading", { name: t("welcome.greeting", { displayName: "Test User" }) }),
     ).toBeInTheDocument();
     expect(fetchMock).not.toHaveBeenCalled();
   }, 10_000);
@@ -55,7 +60,7 @@ describe("PermissionRoute", () => {
       expect(router.state.location.pathname).toBe("/welcome");
     });
     expect(
-      await screen.findByRole("heading", { name: t("welcome.greeting", { username: "reader_user" }) }),
+      await screen.findByRole("heading", { name: t("welcome.greeting", { displayName: "Test User" }) }),
     ).toBeInTheDocument();
     expect(fetchMock).not.toHaveBeenCalled();
   }, 10_000);
@@ -69,7 +74,7 @@ describe("PermissionRoute", () => {
       expect(router.state.location.pathname).toBe("/welcome");
     });
     expect(
-      await screen.findByRole("heading", { name: t("welcome.greeting", { username: "reader_user" }) }),
+      await screen.findByRole("heading", { name: t("welcome.greeting", { displayName: "Test User" }) }),
     ).toBeInTheDocument();
     expect(fetchMock).not.toHaveBeenCalled();
   }, 10_000);
@@ -83,7 +88,7 @@ describe("PermissionRoute", () => {
       expect(router.state.location.pathname).toBe("/welcome");
     });
     expect(
-      await screen.findByRole("heading", { name: t("welcome.greeting", { username: "reader_user" }) }),
+      await screen.findByRole("heading", { name: t("welcome.greeting", { displayName: "Test User" }) }),
     ).toBeInTheDocument();
     expect(fetchMock).not.toHaveBeenCalled();
   }, 10_000);
@@ -97,7 +102,7 @@ describe("PermissionRoute", () => {
       expect(router.state.location.pathname).toBe("/welcome");
     });
     expect(
-      await screen.findByRole("heading", { name: t("welcome.greeting", { username: "reader_user" }) }),
+      await screen.findByRole("heading", { name: t("welcome.greeting", { displayName: "Test User" }) }),
     ).toBeInTheDocument();
     expect(fetchMock).not.toHaveBeenCalled();
   }, 10_000);

@@ -157,26 +157,44 @@ def test_rbac_repository_list_user_roles_filters_by_user_id() -> None:
     asyncio.run(run_test())
 
 
-def test_rbac_repository_list_users_orders_by_username() -> None:
+def test_rbac_repository_list_users_orders_by_email() -> None:
     session = build_session_mock()
     repository = RBACRepository(session=session)
     session.execute.return_value = _scalar_result(
         [
-            User(id=1, username="admin", hashed_password="hash", disabled=False),  # pragma: allowlist secret
-            User(id=3, username="reader_user", hashed_password="hash", disabled=True),  # pragma: allowlist secret
+            User(
+                id=1,
+                email="admin@example.com",
+                first_name="Admin",
+                middle_name=None,
+                last_name="User",
+                display_name="Admin",
+                hashed_password="hash",  # pragma: allowlist secret
+                disabled=False,
+            ),
+            User(
+                id=3,
+                email="reader@example.com",
+                first_name="Reader",
+                middle_name=None,
+                last_name="User",
+                display_name="Reader",
+                hashed_password="hash",  # pragma: allowlist secret
+                disabled=True,
+            ),
         ]
     )
 
     async def run_test() -> None:
         users = await repository.list_users()
 
-        assert [(user.id, user.username, user.disabled) for user in users] == [
-            (1, "admin", False),
-            (3, "reader_user", True),
+        assert [(user.id, user.email, user.disabled) for user in users] == [
+            (1, "admin@example.com", False),
+            (3, "reader@example.com", True),
         ]
         session.execute.assert_awaited_once()
         query = session.execute.await_args.args[0]
-        assert "ORDER BY users.username ASC" in str(query)
+        assert "ORDER BY users.email ASC" in str(query)
 
     asyncio.run(run_test())
 
@@ -202,7 +220,18 @@ def test_rbac_repository_list_role_users_filters_by_role_id() -> None:
     session = build_session_mock()
     repository = RBACRepository(session=session)
     session.execute.return_value = _scalar_result(
-        [User(id=3, username="reader_user", hashed_password="hash", disabled=False)]  # pragma: allowlist secret
+        [
+            User(
+                id=3,
+                email="reader@example.com",
+                first_name="Reader",
+                middle_name=None,
+                last_name="User",
+                display_name="Reader",
+                hashed_password="hash",  # pragma: allowlist secret
+                disabled=False,
+            )
+        ]
     )
 
     async def run_test() -> None:
@@ -210,7 +239,7 @@ def test_rbac_repository_list_role_users_filters_by_role_id() -> None:
 
         assert len(users) == 1
         assert users[0].id == 3
-        assert users[0].username == "reader_user"
+        assert users[0].email == "reader@example.com"
         assert users[0].disabled is False
         session.execute.assert_awaited_once()
         query = session.execute.await_args.args[0]
@@ -227,19 +256,23 @@ def test_rbac_repository_create_user_translates_integrity_error_to_repository_co
     async def run_test() -> None:
         with pytest.raises(RepositoryConflictError) as exc_info:
             await repository.create_user(
-                username="ops_user",
+                email="ops@example.com",
+                first_name="Ops",
+                middle_name=None,
+                last_name="User",
+                display_name="Ops",
                 hashed_password="hash",  # pragma: allowlist secret
                 disabled=False,
             )
 
-        assert "Username already exists" in str(exc_info.value)
-        assert exc_info.value.details == {"username": "ops_user"}
+        assert "Email already exists" in str(exc_info.value)
+        assert exc_info.value.details == {"email": "ops@example.com"}
         session.refresh.assert_not_awaited()
 
     asyncio.run(run_test())
 
 
-def test_rbac_repository_create_user_raises_repository_error_on_integrity_without_string_username() -> None:
+def test_rbac_repository_create_user_raises_repository_error_on_integrity_without_string_email() -> None:
     session = build_session_mock()
     session.flush.side_effect = IntegrityError("insert", {}, Exception("duplicate"))
     repository = RBACRepository(session=session)
@@ -247,7 +280,11 @@ def test_rbac_repository_create_user_raises_repository_error_on_integrity_withou
     async def run_test() -> None:
         with pytest.raises(RepositoryError, match="Failed to create user"):
             await repository.create_user(
-                username=123,
+                email=123,
+                first_name="Ops",
+                middle_name=None,
+                last_name="User",
+                display_name="Ops",
                 hashed_password="hash",  # pragma: allowlist secret
                 disabled=False,
             )
@@ -259,15 +296,33 @@ def test_rbac_repository_create_user_raises_repository_error_on_integrity_withou
 
 def test_rbac_repository_update_user_updates_columns() -> None:
     session = build_session_mock()
-    user = User(id=3, username="reader_user", hashed_password="hash", disabled=False)
+    user = User(
+        id=3,
+        email="reader@example.com",
+        first_name="Reader",
+        middle_name=None,
+        last_name="User",
+        display_name="Reader",
+        hashed_password="hash",  # pragma: allowlist secret
+        disabled=False,
+    )
     session.get.return_value = user
-    session.merge.return_value = User(id=3, username="reader_user", hashed_password="hash", disabled=True)
+    session.merge.return_value = User(
+        id=3,
+        email="reader@example.com",
+        first_name="Reader",
+        middle_name=None,
+        last_name="User",
+        display_name="Reader",
+        hashed_password="hash",  # pragma: allowlist secret
+        disabled=True,
+    )
     repository = RBACRepository(session=session)
 
     async def run_test() -> None:
         updated_user = await repository.update_user(3, disabled=True)
 
-        assert (updated_user.id, updated_user.username, updated_user.disabled) == (3, "reader_user", True)
+        assert (updated_user.id, updated_user.email, updated_user.disabled) == (3, "reader@example.com", True)
         assert user.disabled is True
         session.get.assert_awaited_once_with(User, 3)
         session.merge.assert_awaited_once()
@@ -294,7 +349,16 @@ def test_rbac_repository_update_user_raises_error_when_user_does_not_exist() -> 
 
 def test_rbac_repository_update_user_rejects_unknown_column() -> None:
     session = build_session_mock()
-    user = User(id=3, username="reader_user", hashed_password="hash", disabled=False)
+    user = User(
+        id=3,
+        email="reader@example.com",
+        first_name="Reader",
+        middle_name=None,
+        last_name="User",
+        display_name="Reader",
+        hashed_password="hash",  # pragma: allowlist secret
+        disabled=False,
+    )
     session.get.return_value = user
     repository = RBACRepository(session=session)
 
@@ -310,7 +374,16 @@ def test_rbac_repository_update_user_rejects_unknown_column() -> None:
 
 def test_rbac_repository_update_user_translates_integrity_error_to_repository_conflict() -> None:
     session = build_session_mock()
-    user = User(id=3, username="reader_user", hashed_password="hash", disabled=False)
+    user = User(
+        id=3,
+        email="reader@example.com",
+        first_name="Reader",
+        middle_name=None,
+        last_name="User",
+        display_name="Reader",
+        hashed_password="hash",  # pragma: allowlist secret
+        disabled=False,
+    )
     session.get.return_value = user
     session.merge.return_value = user
     session.flush.side_effect = IntegrityError("update", {}, Exception("duplicate"))
@@ -318,18 +391,27 @@ def test_rbac_repository_update_user_translates_integrity_error_to_repository_co
 
     async def run_test() -> None:
         with pytest.raises(RepositoryConflictError) as exc_info:
-            await repository.update_user(3, username="ops_user")
+            await repository.update_user(3, email="ops@example.com")
 
-        assert "Username already exists" in str(exc_info.value)
-        assert exc_info.value.details == {"username": "ops_user"}
+        assert "Email already exists" in str(exc_info.value)
+        assert exc_info.value.details == {"email": "ops@example.com"}
         session.refresh.assert_not_awaited()
 
     asyncio.run(run_test())
 
 
-def test_rbac_repository_update_user_raises_repository_error_on_non_username_integrity_error() -> None:
+def test_rbac_repository_update_user_raises_repository_error_on_non_email_integrity_error() -> None:
     session = build_session_mock()
-    user = User(id=3, username="reader_user", hashed_password="hash", disabled=False)
+    user = User(
+        id=3,
+        email="reader@example.com",
+        first_name="Reader",
+        middle_name=None,
+        last_name="User",
+        display_name="Reader",
+        hashed_password="hash",  # pragma: allowlist secret
+        disabled=False,
+    )
     session.get.return_value = user
     session.merge.return_value = user
     session.flush.side_effect = IntegrityError("update", {}, Exception("duplicate"))

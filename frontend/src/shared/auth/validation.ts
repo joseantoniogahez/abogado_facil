@@ -1,6 +1,7 @@
 import type { UiTextKey } from "@/shared/i18n/ui-text";
 
 const USERNAME_PATTERN = /^[a-z0-9_.-]+$/;
+const EMAIL_PATTERN = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 const LOWERCASE_PATTERN = /[a-z]/;
 const UPPERCASE_PATTERN = /[A-Z]/;
 const NUMBER_PATTERN = /[0-9]/;
@@ -8,6 +9,14 @@ const NUMBER_PATTERN = /[0-9]/;
 export const normalizeUsername = (value: string): string => value.trim().toLowerCase();
 
 export const isNormalizedUsernameValid = (value: string): boolean => USERNAME_PATTERN.test(normalizeUsername(value));
+export const normalizeEmail = (value: string): string => value.trim().toLowerCase();
+export const isEmailValid = (value: string): boolean => EMAIL_PATTERN.test(normalizeEmail(value));
+
+export const composeDisplayName = (firstName: string, middleName: string, lastName: string): string =>
+  [firstName, middleName, lastName]
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .join(" ");
 
 export const getPasswordPolicyViolationKeys = (password: string, username: string): UiTextKey[] => {
   const normalizedUsername = normalizeUsername(username);

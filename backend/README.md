@@ -100,19 +100,19 @@ alembic revision --autogenerate -m "describe change"
 Seed RBAC baseline after migrations:
 
 ```bash
-python -m utils.rbac_bootstrap --admin-username admin --admin-password "StrongSeed9"
+python -m utils.rbac_bootstrap --admin-email admin@example.com --admin-password "StrongSeed9"
 ```
 
 If you started services with `docker compose up --build` and want to run bootstrap from local PowerShell (without entering the container), run from `backend/`:
 
 ```powershell
-$env:DB_TYPE = "postgresql+asyncpg"; $env:DB_HOST = "localhost"; $env:DB_PORT = "5432"; $env:DB_NAME = "abogado_facil_main"; $env:DB_USER = "my_admin"; $env:DB_PASSWORD = "{{DB_PASSWORD}}"; python -m utils.rbac_bootstrap --admin-username admin --admin-password "StrongSeed9"
+$env:DB_TYPE = "postgresql+asyncpg"; $env:DB_HOST = "localhost"; $env:DB_PORT = "5432"; $env:DB_NAME = "abogado_facil_main"; $env:DB_USER = "my_admin"; $env:DB_PASSWORD = "{{DB_PASSWORD}}"; python -m utils.rbac_bootstrap --admin-email admin@example.com --admin-password "StrongSeed9"
 ```
 
 macOS/Linux (bash/zsh) equivalent:
 
 ```bash
-DB_TYPE="postgresql+asyncpg" DB_HOST="localhost" DB_PORT="5432" DB_NAME="abogado_facil_main" DB_USER="my_admin" DB_PASSWORD="{{DB_PASSWORD}}" python -m utils.rbac_bootstrap --admin-username admin --admin-password "StrongSeed9"
+DB_TYPE="postgresql+asyncpg" DB_HOST="localhost" DB_PORT="5432" DB_NAME="abogado_facil_main" DB_USER="my_admin" DB_PASSWORD="{{DB_PASSWORD}}" python -m utils.rbac_bootstrap --admin-email admin@example.com --admin-password "StrongSeed9"
 ```
 
 Note: use `DB_HOST=localhost` for host-side execution.

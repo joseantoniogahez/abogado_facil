@@ -120,18 +120,28 @@ Sistema básico de registro, inicio de sesión y administración de cuenta.
 
 ### Requerimientos
 
-- Registro con email y contraseña.
-- Inicio de sesión.
+- Registro con nombre, segundo nombre opcional, apellidos, nombre para mostrar editable, email y
+  contraseña.
+- Inicio de sesión con email normalizado y contraseña.
 - Cierre de sesión.
 - Recuperación de contraseña, si el proveedor de autenticación lo permite.
-- Perfil básico del usuario.
-- Nombre del despacho opcional.
-- Rol inicial: propietario de cuenta.
+- Perfil básico editable con componentes de nombre, nombre para mostrar, email y nombre del despacho.
+- El nombre del despacho puede omitirse en el registro, pero nunca se guarda vacío o nulo: si el
+  usuario no lo proporciona, se usa su `display_name`.
+- Cada registro público crea un despacho propio y aislado.
+- Rol inicial: `account_owner`, limitado al despacho creado durante su registro.
+- `account_owner` no hereda el rol administrativo técnico ni sus permisos.
+- Durante el MVP, cada propietario solo puede ser dueño de su propio despacho; miembros,
+  invitaciones y despachos multiusuario quedan fuera de alcance.
+- El producto parte sin usuarios existentes: no requiere compatibilidad con usernames ni migración
+  de datos legados a email.
 
 ### Criterios de aceptación
 
-- Un usuario puede crear cuenta e iniciar sesión.
-- Los datos de un usuario no son visibles para otro.
+- Un usuario puede crear cuenta con email e iniciar sesión.
+- El alta crea exactamente un despacho con nombre efectivo no nulo y asigna al usuario como su
+  único `account_owner`.
+- Los datos de un despacho no son visibles para propietarios de otro despacho.
 - La sesión se mantiene de forma segura.
 
 ______________________________________________________________________
@@ -652,12 +662,13 @@ ______________________________________________________________________
 ## 8.1 Seguridad
 
 - Autenticación segura.
-- Separación de datos por usuario.
+- Separación de datos por despacho y propietario autenticado.
 - Cifrado de API keys.
 - No registrar información sensible innecesaria.
 - No registrar prompts completos en logs técnicos sin protección.
 - Permitir eliminación de datos del usuario.
-- Control básico de acceso por propietario de cuenta.
+- Control básico de acceso mediante `account_owner`, limitado a su propio despacho y separado del
+  rol administrativo técnico.
 
 ## 8.2 Privacidad
 

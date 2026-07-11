@@ -12,17 +12,27 @@ import {
 import { clearAccessToken, getAccessToken, setAccessToken } from "@/shared/auth/storage";
 
 interface Credentials {
-  username: string;
+  email: string;
   password: string;
 }
 
 export interface RegisterUserInput {
-  username: string;
+  first_name: string;
+  middle_name?: string;
+  last_name: string;
+  display_name: string;
+  email: string;
+  firm_name?: string;
   password: string;
 }
 
 export interface UpdateCurrentUserInput {
-  username?: string;
+  first_name?: string;
+  middle_name?: string;
+  last_name?: string;
+  display_name?: string;
+  email?: string;
+  firm_name?: string;
   current_password?: string;
   new_password?: string;
 }
@@ -50,9 +60,9 @@ export const registerUser = (payload: RegisterUserInput): Promise<AuthenticatedU
     parse: parseAuthenticatedUser,
   });
 
-export const loginWithCredentials = async ({ username, password }: Credentials): Promise<void> => {
+export const loginWithCredentials = async ({ email, password }: Credentials): Promise<void> => {
   const body = new URLSearchParams({
-    username,
+    username: email,
     password,
   });
 

@@ -42,7 +42,7 @@ const UI = {
   title: "admin.as.title",
   uid: "admin.as.uid",
   userEmpty: "admin.as.uEmpty",
-  userLabel: "admin.users.columns.username",
+  userLabel: "admin.users.columns.email",
   userList: "admin.as.uTitle",
   usersEmpty: "admin.users.list.empty",
 } as const;
@@ -148,7 +148,7 @@ export const AdminAssignmentsPage = () => {
                   <option value="">-</option>
                   {users.map((user) => (
                     <option key={user.id} value={user.id}>
-                      {user.username}
+                      {user.email}
                     </option>
                   ))}
                 </select>
@@ -286,7 +286,7 @@ export const AdminAssignmentsPage = () => {
                   key={user.id}
                 >
                   <div className="text-sm">
-                    <p className="font-semibold">{user.username}</p>
+                    <p className="font-semibold">{user.email}</p>
                     <p className="text-xs text-[var(--app-subtle)]">{user.id}</p>
                   </div>
                   <button

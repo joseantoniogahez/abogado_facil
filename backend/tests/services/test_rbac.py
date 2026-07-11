@@ -33,7 +33,7 @@ def _build_repository_mock() -> MagicMock:
     repository.upsert_role_permission = AsyncMock()
     repository.delete_role_permission = AsyncMock()
     repository.get_user = AsyncMock(return_value=None)
-    repository.username_exists = AsyncMock(return_value=False)
+    repository.email_exists = AsyncMock(return_value=False)
     repository.create_user = AsyncMock()
     repository.update_user = AsyncMock()
     repository.list_user_role_ids = AsyncMock(return_value=[])
@@ -58,6 +58,24 @@ def _build_service() -> tuple[RBACService, MagicMock, MagicMock]:
     unit_of_work = _build_unit_of_work_mock()
     service = RBACService(rbac_repository=repository, unit_of_work=unit_of_work)
     return service, repository, unit_of_work
+
+
+def _user(
+    *,
+    user_id: int = 3,
+    email: str = "reader@example.com",
+    disabled: bool = False,
+) -> User:
+    return User(
+        id=user_id,
+        email=email,
+        first_name="Reader",
+        middle_name=None,
+        last_name="User",
+        display_name="Reader",
+        hashed_password="hash",  # pragma: allowlist secret
+        disabled=disabled,
+    )
 
 
 def test_normalize_role_name_raises_for_blank_value() -> None:
@@ -222,7 +240,7 @@ def test_role_reaches_target_skips_already_visited_nodes() -> None:
 
 def test_list_user_roles_returns_assigned_roles() -> None:
     service, repository, _ = _build_service()
-    repository.get_user.return_value = User(id=3, username="reader_user", hashed_password="hash", disabled=False)
+    repository.get_user.return_value = _user()
     repository.list_user_roles.return_value = [Role(id=2, name="reader_role")]
 
     async def run_test() -> None:
@@ -238,14 +256,12 @@ def test_list_user_roles_returns_assigned_roles() -> None:
 def test_list_role_users_returns_assigned_users() -> None:
     service, repository, _ = _build_service()
     repository.get_role.return_value = Role(id=2, name="reader_role")
-    repository.list_role_users.return_value = [
-        User(id=3, username="reader_user", hashed_password="hash", disabled=False)  # pragma: allowlist secret
-    ]
+    repository.list_role_users.return_value = [_user()]
 
     async def run_test() -> None:
         users = await service.list_role_users(2)
 
-        assert [user.model_dump() for user in users] == [{"id": 3, "username": "reader_user", "disabled": False}]
+        assert [user.model_dump() for user in users] == [{"id": 3, "email": "reader@example.com", "disabled": False}]
         repository.get_role.assert_awaited_once_with(2)
         repository.list_role_users.assert_awaited_once_with(role_id=2)
 
@@ -255,8 +271,8 @@ def test_list_role_users_returns_assigned_users() -> None:
 def test_list_users_returns_role_ids() -> None:
     service, repository, _ = _build_service()
     repository.list_users.return_value = [
-        User(id=1, username="admin", hashed_password="hash", disabled=False),  # pragma: allowlist secret
-        User(id=3, username="reader_user", hashed_password="hash", disabled=False),  # pragma: allowlist secret
+        _user(user_id=1, email="admin@example.com"),
+        _user(),
     ]
     repository.list_user_role_ids.side_effect = [[1], [2]]
 
@@ -264,8 +280,8 @@ def test_list_users_returns_role_ids() -> None:
         users = await service.list_users()
 
         assert [user.model_dump() for user in users] == [
-            {"id": 1, "username": "admin", "disabled": False, "role_ids": [1]},
-            {"id": 3, "username": "reader_user", "disabled": False, "role_ids": [2]},
+            {"id": 1, "email": "admin@example.com", "disabled": False, "role_ids": [1]},
+            {"id": 3, "email": "reader@example.com", "disabled": False, "role_ids": [2]},
         ]
         repository.list_users.assert_awaited_once_with()
         assert repository.list_user_role_ids.await_count == 2
@@ -273,17 +289,17 @@ def test_list_users_returns_role_ids() -> None:
     asyncio.run(run_test())
 
 
-def test_create_user_normalizes_username_and_assigns_roles() -> None:
+def test_create_user_normalizes_email_and_assigns_roles() -> None:
     service, repository, _ = _build_service()
     repository.get_role.side_effect = [Role(id=1, name="admin_role"), Role(id=2, name="reader_role")]
-    repository.create_user.return_value = User(id=7, username="ops_user", hashed_password="hash", disabled=False)
-    repository.get_user.return_value = User(id=7, username="ops_user", hashed_password="hash", disabled=False)
+    repository.create_user.return_value = _user(user_id=7, email="ops@example.com")
+    repository.get_user.return_value = _user(user_id=7, email="ops@example.com")
     repository.list_user_role_ids.return_value = [1, 2]
 
     async def run_test() -> None:
         user = await service.create_user(
             CreateAdminUserCommand(
-                username=" Ops_User ",
+                email=" Ops@Example.COM ",
                 password="OpsUser123",  # pragma: allowlist secret
                 role_ids=[2, 1, 2],
             )
@@ -291,11 +307,11 @@ def test_create_user_normalizes_username_and_assigns_roles() -> None:
 
         assert user.model_dump() == {
             "id": 7,
-            "username": "ops_user",
+            "email": "ops@example.com",
             "disabled": False,
             "role_ids": [1, 2],
         }
-        repository.username_exists.assert_awaited_once_with("ops_user")
+        repository.email_exists.assert_awaited_once_with("ops@example.com")
         repository.assign_user_role.assert_has_awaits(
             [
                 call(user_id=7, role_id=1),
@@ -313,13 +329,13 @@ def test_create_user_reuses_password_policy_validation() -> None:
         with pytest.raises(InvalidInputError, match="Password does not meet policy"):
             await service.create_user(
                 CreateAdminUserCommand(
-                    username="ops_user",
+                    email="ops@example.com",
                     password="short",  # pragma: allowlist secret
                     role_ids=[],
                 )
             )
 
-        repository.username_exists.assert_not_awaited()
+        repository.email_exists.assert_not_awaited()
         repository.create_user.assert_not_awaited()
 
     asyncio.run(run_test())
@@ -332,70 +348,70 @@ def test_create_user_rejects_invalid_role_ids() -> None:
         with pytest.raises(InvalidInputError, match="role_ids must contain positive integers"):
             await service.create_user(
                 CreateAdminUserCommand(
-                    username="ops_user",
+                    email="ops@example.com",
                     password="OpsUser123",  # pragma: allowlist secret
                     role_ids=[0, 2],
                 )
             )
 
-        repository.username_exists.assert_not_awaited()
+        repository.email_exists.assert_not_awaited()
         repository.create_user.assert_not_awaited()
 
     asyncio.run(run_test())
 
 
-def test_create_user_rejects_blank_username() -> None:
+def test_create_user_rejects_blank_email() -> None:
     service, repository, _ = _build_service()
 
     async def run_test() -> None:
-        with pytest.raises(InvalidInputError, match="Username is required"):
+        with pytest.raises(InvalidInputError, match="Email is required"):
             await service.create_user(
                 CreateAdminUserCommand(
-                    username="   ",
+                    email="   ",
                     password="OpsUser123",  # pragma: allowlist secret
                     role_ids=[],
                 )
             )
 
-        repository.username_exists.assert_not_awaited()
+        repository.email_exists.assert_not_awaited()
 
     asyncio.run(run_test())
 
 
-def test_create_user_rejects_invalid_username_format() -> None:
+def test_create_user_rejects_invalid_email_format() -> None:
     service, repository, _ = _build_service()
 
     async def run_test() -> None:
-        with pytest.raises(InvalidInputError, match="Username has invalid format"):
+        with pytest.raises(InvalidInputError, match="Email has invalid format"):
             await service.create_user(
                 CreateAdminUserCommand(
-                    username="bad user",
+                    email="bad email",
                     password="OpsUser123",  # pragma: allowlist secret
                     role_ids=[],
                 )
             )
 
-        repository.username_exists.assert_not_awaited()
+        repository.email_exists.assert_not_awaited()
 
     asyncio.run(run_test())
 
 
-def test_create_user_raises_conflict_when_username_exists() -> None:
+def test_create_user_raises_conflict_when_email_exists() -> None:
     service, repository, _ = _build_service()
-    repository.username_exists.return_value = True
+    repository.email_exists.return_value = True
 
     async def run_test() -> None:
         with pytest.raises(ConflictError) as exc_info:
             await service.create_user(
                 CreateAdminUserCommand(
-                    username="ops_user",
+                    email="ops@example.com",
                     password="OpsUser123",  # pragma: allowlist secret
                     role_ids=[],
                 )
             )
 
-        assert "Username already exists" in str(exc_info.value)
-        assert exc_info.value.details == {"username": "ops_user"}
+        assert "Email already exists" in str(exc_info.value)
+        assert exc_info.value.details == {"email": "ops@example.com"}
         repository.create_user.assert_not_awaited()
 
     asyncio.run(run_test())
@@ -445,7 +461,7 @@ def test_update_user_requires_current_password_when_new_password_is_provided() -
 
 def test_apply_password_update_requires_current_password_when_new_password_is_provided() -> None:
     service, repository, _ = _build_service()
-    user = User(id=3, username="reader_user", hashed_password="hash", disabled=False)
+    user = _user()
     changes: dict[str, object] = {}
 
     with pytest.raises(InvalidInputError, match="current_password is required"):
@@ -453,7 +469,7 @@ def test_apply_password_update_requires_current_password_when_new_password_is_pr
             user=user,
             current_password=None,
             new_password="NewPass123",  # pragma: allowlist secret
-            normalized_username="reader_user",
+            normalized_email="reader@example.com",
             changes=changes,
         )
 
@@ -463,7 +479,7 @@ def test_apply_password_update_requires_current_password_when_new_password_is_pr
 
 def test_update_user_replaces_role_set() -> None:
     service, repository, _ = _build_service()
-    repository.get_user.return_value = User(id=3, username="reader_user", hashed_password="hash", disabled=False)
+    repository.get_user.return_value = _user()
     repository.get_role.side_effect = [Role(id=2, name="editor_role"), Role(id=3, name="auditor_role")]
     repository.list_user_role_ids.side_effect = [[1, 2], [2, 3]]
 
@@ -475,7 +491,7 @@ def test_update_user_replaces_role_set() -> None:
 
         assert updated_user.model_dump() == {
             "id": 3,
-            "username": "reader_user",
+            "email": "reader@example.com",
             "disabled": False,
             "role_ids": [2, 3],
         }
@@ -485,43 +501,44 @@ def test_update_user_replaces_role_set() -> None:
     asyncio.run(run_test())
 
 
-def test_update_user_keeps_same_username_without_conflict_lookup() -> None:
+def test_update_user_keeps_same_email_without_conflict_lookup() -> None:
     service, repository, _ = _build_service()
-    repository.get_user.return_value = User(id=3, username="reader_user", hashed_password="hash", disabled=False)
+    repository.get_user.return_value = _user()
     repository.list_user_role_ids.return_value = [2]
 
     async def run_test() -> None:
         updated_user = await service.update_user(
             3,
-            UpdateAdminUserCommand(username="reader_user"),
+            UpdateAdminUserCommand(email="reader@example.com"),
         )
 
         assert updated_user.model_dump() == {
             "id": 3,
-            "username": "reader_user",
+            "email": "reader@example.com",
             "disabled": False,
             "role_ids": [2],
         }
-        repository.username_exists.assert_not_awaited()
+        repository.email_exists.assert_not_awaited()
         repository.update_user.assert_not_awaited()
 
     asyncio.run(run_test())
 
 
-def test_update_user_raises_conflict_when_new_username_is_taken() -> None:
+def test_update_user_raises_conflict_when_new_email_is_taken() -> None:
     service, repository, _ = _build_service()
-    repository.get_user.return_value = User(id=3, username="reader_user", hashed_password="hash", disabled=False)
-    repository.username_exists.return_value = True
+    repository.get_user.return_value = _user()
+    repository.email_exists.return_value = True
 
     async def run_test() -> None:
         with pytest.raises(ConflictError) as exc_info:
             await service.update_user(
                 3,
-                UpdateAdminUserCommand(username="ops_user"),
+                UpdateAdminUserCommand(email="ops@example.com"),
             )
 
-        assert "Username already exists" in str(exc_info.value)
-        assert exc_info.value.details == {"username": "ops_user"}
+        assert "Email already exists" in str(exc_info.value)
+        assert exc_info.value.details == {"email": "ops@example.com"}
+        repository.email_exists.assert_awaited_once_with("ops@example.com", exclude_user_id=3)
         repository.update_user.assert_not_awaited()
 
     asyncio.run(run_test())
@@ -529,7 +546,7 @@ def test_update_user_raises_conflict_when_new_username_is_taken() -> None:
 
 def test_update_user_rejects_invalid_current_password() -> None:
     service, repository, _ = _build_service()
-    repository.get_user.return_value = User(id=3, username="reader_user", hashed_password="hash", disabled=False)
+    repository.get_user.return_value = _user()
 
     password_service = MagicMock()
     password_service.verify_password.side_effect = [False]
@@ -552,7 +569,7 @@ def test_update_user_rejects_invalid_current_password() -> None:
 
 def test_update_user_rejects_reusing_current_password() -> None:
     service, repository, _ = _build_service()
-    repository.get_user.return_value = User(id=3, username="reader_user", hashed_password="hash", disabled=False)
+    repository.get_user.return_value = _user()
 
     password_service = MagicMock()
     password_service.verify_password.side_effect = [True, True]
@@ -575,7 +592,7 @@ def test_update_user_rejects_reusing_current_password() -> None:
 
 def test_update_user_applies_disabled_toggle() -> None:
     service, repository, _ = _build_service()
-    repository.get_user.return_value = User(id=3, username="reader_user", hashed_password="hash", disabled=False)
+    repository.get_user.return_value = _user()
     repository.list_user_role_ids.return_value = [2]
 
     async def run_test() -> None:
@@ -586,7 +603,7 @@ def test_update_user_applies_disabled_toggle() -> None:
 
         assert updated_user.model_dump() == {
             "id": 3,
-            "username": "reader_user",
+            "email": "reader@example.com",
             "disabled": False,
             "role_ids": [2],
         }
@@ -597,7 +614,7 @@ def test_update_user_applies_disabled_toggle() -> None:
 
 def test_delete_user_soft_delete_updates_disabled_flag() -> None:
     service, repository, _ = _build_service()
-    repository.get_user.return_value = User(id=3, username="reader_user", hashed_password="hash", disabled=False)
+    repository.get_user.return_value = _user()
 
     async def run_test() -> None:
         await service.delete_user(3)
@@ -609,7 +626,7 @@ def test_delete_user_soft_delete_updates_disabled_flag() -> None:
 
 def test_delete_user_soft_delete_is_idempotent_for_already_disabled_user() -> None:
     service, repository, _ = _build_service()
-    repository.get_user.return_value = User(id=3, username="reader_user", hashed_password="hash", disabled=True)
+    repository.get_user.return_value = _user(disabled=True)
 
     async def run_test() -> None:
         await service.delete_user(3)

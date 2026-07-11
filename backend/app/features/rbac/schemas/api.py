@@ -51,7 +51,7 @@ class AssignedRole(ApiSchema):
 
 class AssignedUser(ApiSchema):
     id: int
-    username: str = Field(min_length=1, max_length=255)
+    email: str = Field(min_length=3, max_length=320)
     disabled: bool
 
     model_config = ConfigDict(from_attributes=True)
@@ -59,7 +59,7 @@ class AssignedUser(ApiSchema):
 
 class AdminUserResponse(ApiSchema):
     id: int
-    username: str = Field(min_length=1, max_length=255)
+    email: str = Field(min_length=3, max_length=320)
     disabled: bool
     role_ids: list[int] = Field(default_factory=list)
 
@@ -67,7 +67,7 @@ class AdminUserResponse(ApiSchema):
 
 
 class CreateAdminUserRequest(ApiSchema):
-    username: str = Field(min_length=1, max_length=255)
+    email: str = Field(min_length=3, max_length=320)
     password: str = Field(min_length=8, max_length=255)
     role_ids: list[int] = Field(default_factory=list)
 
@@ -75,7 +75,7 @@ class CreateAdminUserRequest(ApiSchema):
 
 
 class UpdateAdminUserRequest(ApiSchema):
-    username: str | None = Field(default=None, min_length=1, max_length=255)
+    email: str | None = Field(default=None, min_length=3, max_length=320)
     current_password: str | None = Field(default=None, min_length=1, max_length=255)
     new_password: str | None = Field(default=None, min_length=8, max_length=255)
     disabled: bool | None = None

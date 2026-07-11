@@ -6,10 +6,10 @@ describe("ui text translations", () => {
   });
 
   it("interpolates dynamic params", () => {
-    expect(t("welcome.greeting", { username: "admin" })).toBe("Hola, admin");
+    expect(t("welcome.greeting", { displayName: "Admin" })).toBe("Hola, Admin");
   });
 
   it("keeps placeholders when params are missing", () => {
-    expect(t("welcome.greeting")).toBe("Hola, {username}");
+    expect(t("welcome.greeting")).toBe("Hola, {displayName}");
   });
 });

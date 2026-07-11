@@ -2,18 +2,36 @@ import { expect, test, type Page } from "@playwright/test";
 import { t } from "../src/shared/i18n/ui-text";
 
 const ACCESS_TOKEN_STORAGE_KEY = "auth.session.access_token";
-const SMOKE_USERNAME = "smoke-user";
+const SMOKE_EMAIL = "smoke.user@example.com";
+const SMOKE_DISPLAY_NAME = "Smoke User";
+
+const authenticatedUser = (overrides: Record<string, unknown> = {}) => ({
+  id: 1,
+  email: SMOKE_EMAIL,
+  first_name: "Smoke",
+  middle_name: null,
+  last_name: "User",
+  display_name: SMOKE_DISPLAY_NAME,
+  firm_name: "Smoke User",
+  disabled: false,
+  permissions: [],
+  ...overrides,
+});
 
 const mockUnhandledApiRequests = async (page: Page): Promise<void> => {
   await page.route("**/v1/**", (route) => {
     const request = route.request();
     const url = new URL(request.url());
-    throw new Error(`Unhandled API request in smoke test: ${request.method()} ${url.pathname}`);
+    throw new Error(
+      `Unhandled API request in smoke test: ${request.method()} ${url.pathname}`,
+    );
   });
 };
 
 test.describe("frontend foundation smoke", () => {
-  test("navigates to register and completes the registration flow", async ({ page }) => {
+  test("navigates to register and completes the registration flow", async ({
+    page,
+  }) => {
     await page.route("**/v1/**", async (route) => {
       const request = route.request();
       const method = request.method();
@@ -23,29 +41,40 @@ test.describe("frontend foundation smoke", () => {
         await route.fulfill({
           status: 201,
           contentType: "application/json",
-          body: JSON.stringify({
-            id: 11,
-            username: "new_user",
-            disabled: false,
-            permissions: [],
-          }),
+          body: JSON.stringify(authenticatedUser({ id: 11, email: "new.user@example.com", display_name: "New User", firm_name: "New User" })),
         });
         return;
       }
 
-      throw new Error(`Unhandled API request in register smoke: ${method} ${pathname}`);
+      throw new Error(
+        `Unhandled API request in register smoke: ${method} ${pathname}`,
+      );
     });
 
     await page.goto("/login");
-    await page.getByRole("link", { name: t("auth.login.footer.createAccount") }).click();
+    await page
+      .getByRole("link", { name: t("auth.login.footer.createAccount") })
+      .click();
 
     await expect(page).toHaveURL(/\/register$/);
-    await page.getByLabel(t("auth.login.fields.username")).fill(" New_User ");
+    await page
+      .getByLabel(t("auth.register.fields.firstName"), { exact: true })
+      .fill("New");
+    await page
+      .getByLabel(t("auth.register.fields.lastName"), { exact: true })
+      .fill("User");
+    await page.getByLabel(t("auth.login.fields.email")).fill(" New.User@Example.com ");
     await page.getByLabel(t("auth.login.fields.password")).fill("StrongPass1");
-    await page.getByRole("button", { name: t("auth.register.submit.default") }).click();
+    await page
+      .getByRole("button", { name: t("auth.register.submit.default") })
+      .click();
 
-    await expect(page.getByRole("heading", { name: t("auth.register.success.title") })).toBeVisible();
-    await expect(page.getByText(t("auth.register.success.body", { username: "new_user" }))).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: t("auth.register.success.title") }),
+    ).toBeVisible();
+    await expect(
+      page.getByText(t("auth.register.success.body", { email: "new.user@example.com" })),
+    ).toBeVisible();
   });
 
   test("completes login flow and lands on welcome page", async ({ page }) => {
@@ -70,10 +99,7 @@ test.describe("frontend foundation smoke", () => {
         await route.fulfill({
           status: 200,
           contentType: "application/json",
-          body: JSON.stringify({
-            id: 1,
-            username: SMOKE_USERNAME,
-            disabled: false,
+          body: JSON.stringify(authenticatedUser({
             permissions: [
               "audit_logs:read",
               "role_permissions:manage",
@@ -81,34 +107,50 @@ test.describe("frontend foundation smoke", () => {
               "user_roles:manage",
               "users:manage",
             ],
-          }),
+          })),
         });
         return;
       }
 
-      throw new Error(`Unhandled API request in login smoke: ${method} ${pathname}`);
+      throw new Error(
+        `Unhandled API request in login smoke: ${method} ${pathname}`,
+      );
     });
 
     await page.goto("/login");
 
-    await page.getByLabel(t("auth.login.fields.username")).fill(SMOKE_USERNAME);
-    await page.getByLabel(t("auth.login.fields.password")).fill("smoke-password");
-    await page.getByRole("button", { name: t("auth.login.submit.default") }).click();
+    await page.getByLabel(t("auth.login.fields.email")).fill(SMOKE_EMAIL);
+    await page
+      .getByLabel(t("auth.login.fields.password"))
+      .fill("smoke-password");
+    await page
+      .getByRole("button", { name: t("auth.login.submit.default") })
+      .click();
 
     await expect(page).toHaveURL(/\/welcome$/);
-    await expect(page.getByRole("heading", { name: t("welcome.greeting", { username: SMOKE_USERNAME }) })).toBeVisible();
+    await expect(
+      page.getByRole("heading", {
+        name: t("welcome.greeting", { displayName: SMOKE_DISPLAY_NAME }),
+      }),
+    ).toBeVisible();
   });
 
-  test("redirects protected navigation to login when no session token exists", async ({ page }) => {
+  test("redirects protected navigation to login when no session token exists", async ({
+    page,
+  }) => {
     await mockUnhandledApiRequests(page);
 
     await page.goto("/welcome");
 
     await expect(page).toHaveURL(/\/login$/);
-    await expect(page.getByRole("heading", { name: t("auth.login.title") })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: t("auth.login.title") }),
+    ).toBeVisible();
   });
 
-  test("renders protected-route error fallback with request-id diagnostics", async ({ page }) => {
+  test("renders protected-route error fallback with request-id diagnostics", async ({
+    page,
+  }) => {
     await page.addInitScript((storageKey) => {
       window.sessionStorage.setItem(storageKey, "seed-token");
     }, ACCESS_TOKEN_STORAGE_KEY);
@@ -134,16 +176,22 @@ test.describe("frontend foundation smoke", () => {
         return;
       }
 
-      throw new Error(`Unhandled API request in protected-error smoke: ${method} ${pathname}`);
+      throw new Error(
+        `Unhandled API request in protected-error smoke: ${method} ${pathname}`,
+      );
     });
 
     await page.goto("/welcome");
 
-    await expect(page.getByRole("heading", { name: t("routing.protected.error.title") })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: t("routing.protected.error.title") }),
+    ).toBeVisible();
     await expect(page.getByText(/request_id=req-e2e-500/)).toBeVisible();
   });
 
-  test("loads protected profile route and persists updated account state", async ({ page }) => {
+  test("loads protected profile route and persists updated account state", async ({
+    page,
+  }) => {
     await page.addInitScript((storageKey) => {
       window.sessionStorage.setItem(storageKey, "seed-token");
     }, ACCESS_TOKEN_STORAGE_KEY);
@@ -157,12 +205,7 @@ test.describe("frontend foundation smoke", () => {
         await route.fulfill({
           status: 200,
           contentType: "application/json",
-          body: JSON.stringify({
-            id: 1,
-            username: SMOKE_USERNAME,
-            disabled: false,
-            permissions: [],
-          }),
+          body: JSON.stringify(authenticatedUser()),
         });
         return;
       }
@@ -171,30 +214,37 @@ test.describe("frontend foundation smoke", () => {
         await route.fulfill({
           status: 200,
           contentType: "application/json",
-          body: JSON.stringify({
-            id: 1,
-            username: "smoke-user-v2",
-            disabled: false,
-            permissions: [],
-          }),
+          body: JSON.stringify(authenticatedUser({ email: "smoke.user.v2@example.com" })),
         });
         return;
       }
 
-      throw new Error(`Unhandled API request in profile smoke: ${method} ${pathname}`);
+      throw new Error(
+        `Unhandled API request in profile smoke: ${method} ${pathname}`,
+      );
     });
 
     await page.goto("/profile");
 
-    await expect(page.getByRole("heading", { name: t("profile.title") })).toBeVisible();
-    await page.getByLabel(t("profile.fields.username")).fill(" smoke-user-v2 ");
-    await page.getByRole("button", { name: t("profile.submit.default") }).click();
+    await expect(
+      page.getByRole("heading", { name: t("profile.title") }),
+    ).toBeVisible();
+    await page.getByLabel(t("profile.fields.email")).fill(" smoke.user.v2@example.com ");
+    await page
+      .getByRole("button", { name: t("profile.submit.default") })
+      .click();
 
-    await expect(page.getByText(t("profile.success.body", { username: "smoke-user-v2" }))).toBeVisible();
-    await expect(page.getByText(t("profile.currentUser", { username: "smoke-user-v2" }))).toBeVisible();
+    await expect(
+      page.getByText(t("profile.success.body", { email: "smoke.user.v2@example.com" })),
+    ).toBeVisible();
+    await expect(
+      page.getByText(t("profile.currentUser", { email: "smoke.user.v2@example.com" })),
+    ).toBeVisible();
   });
 
-  test("renders admin-users error diagnostics on forbidden RBAC access", async ({ page }) => {
+  test("renders admin-users error diagnostics on forbidden RBAC access", async ({
+    page,
+  }) => {
     await page.addInitScript((storageKey) => {
       window.sessionStorage.setItem(storageKey, "seed-token");
     }, ACCESS_TOKEN_STORAGE_KEY);
@@ -208,12 +258,7 @@ test.describe("frontend foundation smoke", () => {
         await route.fulfill({
           status: 200,
           contentType: "application/json",
-          body: JSON.stringify({
-            id: 1,
-            username: SMOKE_USERNAME,
-            disabled: false,
-            permissions: ["users:manage"],
-          }),
+          body: JSON.stringify(authenticatedUser({ permissions: ["users:manage"] })),
         });
         return;
       }
@@ -243,12 +288,16 @@ test.describe("frontend foundation smoke", () => {
         return;
       }
 
-      throw new Error(`Unhandled API request in admin-users forbidden smoke: ${method} ${pathname}`);
+      throw new Error(
+        `Unhandled API request in admin-users forbidden smoke: ${method} ${pathname}`,
+      );
     });
 
     await page.goto("/admin/users");
 
-    await expect(page.getByRole("heading", { name: t("admin.common.error.title") })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: t("admin.common.error.title") }),
+    ).toBeVisible();
     await expect(page.getByText(/request_id=req-admin-403/)).toBeVisible();
   });
 
@@ -266,12 +315,7 @@ test.describe("frontend foundation smoke", () => {
         await route.fulfill({
           status: 200,
           contentType: "application/json",
-          body: JSON.stringify({
-            id: 1,
-            username: SMOKE_USERNAME,
-            disabled: false,
-            permissions: ["audit_logs:read"],
-          }),
+          body: JSON.stringify(authenticatedUser({ permissions: ["audit_logs:read"] })),
         });
         return;
       }
@@ -295,16 +339,22 @@ test.describe("frontend foundation smoke", () => {
         return;
       }
 
-      throw new Error(`Unhandled API request in audit-log smoke: ${method} ${pathname}`);
+      throw new Error(
+        `Unhandled API request in audit-log smoke: ${method} ${pathname}`,
+      );
     });
 
     await page.goto("/admin/audit-log");
 
-    await expect(page.getByRole("heading", { name: t("admin.auditLog.title") })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: t("admin.auditLog.title") }),
+    ).toBeVisible();
     await expect(page.getByText("Seeded RBAC catalog")).toBeVisible();
   });
 
-  test("loads admin assignments workspace and shows direct-read diagnostics", async ({ page }) => {
+  test("loads admin assignments workspace and shows direct-read diagnostics", async ({
+    page,
+  }) => {
     await page.addInitScript((storageKey) => {
       window.sessionStorage.setItem(storageKey, "seed-token");
     }, ACCESS_TOKEN_STORAGE_KEY);
@@ -318,12 +368,7 @@ test.describe("frontend foundation smoke", () => {
         await route.fulfill({
           status: 200,
           contentType: "application/json",
-          body: JSON.stringify({
-            id: 1,
-            username: SMOKE_USERNAME,
-            disabled: false,
-            permissions: ["user_roles:manage"],
-          }),
+          body: JSON.stringify(authenticatedUser({ permissions: ["user_roles:manage"] })),
         });
         return;
       }
@@ -344,17 +389,23 @@ test.describe("frontend foundation smoke", () => {
         return;
       }
 
-      throw new Error(`Unhandled API request in admin-assignments smoke: ${method} ${pathname}`);
+      throw new Error(
+        `Unhandled API request in admin-assignments smoke: ${method} ${pathname}`,
+      );
     });
 
     await page.goto("/admin/assignments");
 
-    await expect(page.getByRole("heading", { level: 1, name: t("admin.as.title") })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { level: 1, name: t("admin.as.title") }),
+    ).toBeVisible();
     await page.getByLabel(t("admin.as.uid")).fill("999");
     await expect(page.getByText(/request_id=req-assignment-404/)).toBeVisible();
   });
 
-  test("loads admin permissions workspace and shows scope-mutation diagnostics", async ({ page }) => {
+  test("loads admin permissions workspace and shows scope-mutation diagnostics", async ({
+    page,
+  }) => {
     await page.addInitScript((storageKey) => {
       window.sessionStorage.setItem(storageKey, "seed-token");
     }, ACCESS_TOKEN_STORAGE_KEY);
@@ -368,12 +419,7 @@ test.describe("frontend foundation smoke", () => {
         await route.fulfill({
           status: 200,
           contentType: "application/json",
-          body: JSON.stringify({
-            id: 1,
-            username: SMOKE_USERNAME,
-            disabled: false,
-            permissions: ["role_permissions:manage"],
-          }),
+          body: JSON.stringify(authenticatedUser({ permissions: ["role_permissions:manage"] })),
         });
         return;
       }
@@ -392,7 +438,10 @@ test.describe("frontend foundation smoke", () => {
         return;
       }
 
-      if (method === "PUT" && pathname === "/v1/rbac/roles/999/permissions/users%3Amanage") {
+      if (
+        method === "PUT" &&
+        pathname === "/v1/rbac/roles/999/permissions/users%3Amanage"
+      ) {
         await route.fulfill({
           status: 404,
           headers: {
@@ -408,20 +457,32 @@ test.describe("frontend foundation smoke", () => {
         return;
       }
 
-      throw new Error(`Unhandled API request in admin-permissions smoke: ${method} ${pathname}`);
+      throw new Error(
+        `Unhandled API request in admin-permissions smoke: ${method} ${pathname}`,
+      );
     });
 
     await page.goto("/admin/permissions");
 
-    await expect(page.getByRole("heading", { name: t("admin.pm.title") })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: t("admin.pm.title") }),
+    ).toBeVisible();
     await page.getByLabel(t("admin.as.rid")).fill("999");
-    await page.getByLabel(t("admin.roles.permissions.select")).selectOption("users:manage");
-    await page.getByLabel(t("admin.roles.permissions.scope.label")).selectOption("tenant");
-    await page.getByRole("button", { name: t("admin.roles.permissions.add") }).click();
+    await page
+      .getByLabel(t("admin.roles.permissions.select"))
+      .selectOption("users:manage");
+    await page
+      .getByLabel(t("admin.roles.permissions.scope.label"))
+      .selectOption("tenant");
+    await page
+      .getByRole("button", { name: t("admin.roles.permissions.add") })
+      .click();
     await expect(page.getByText(/request_id=req-permission-404/)).toBeVisible();
   });
 
-  test("redirects unauthorized direct admin routes to /welcome", async ({ page }) => {
+  test("redirects unauthorized direct admin routes to /welcome", async ({
+    page,
+  }) => {
     await page.addInitScript((storageKey) => {
       window.sessionStorage.setItem(storageKey, "seed-token");
     }, ACCESS_TOKEN_STORAGE_KEY);
@@ -435,37 +496,54 @@ test.describe("frontend foundation smoke", () => {
         await route.fulfill({
           status: 200,
           contentType: "application/json",
-          body: JSON.stringify({
-            id: 1,
-            username: SMOKE_USERNAME,
-            disabled: false,
-            permissions: [],
-          }),
+          body: JSON.stringify(authenticatedUser()),
         });
         return;
       }
 
-      throw new Error(`Unhandled API request in permission-redirect smoke: ${method} ${pathname}`);
+      throw new Error(
+        `Unhandled API request in permission-redirect smoke: ${method} ${pathname}`,
+      );
     });
 
     await page.goto("/admin/users");
     await expect(page).toHaveURL(/\/welcome$/);
-    await expect(page.getByRole("heading", { name: t("welcome.greeting", { username: SMOKE_USERNAME }) })).toBeVisible();
+    await expect(
+      page.getByRole("heading", {
+        name: t("welcome.greeting", { displayName: SMOKE_DISPLAY_NAME }),
+      }),
+    ).toBeVisible();
 
     await page.goto("/admin/roles");
     await expect(page).toHaveURL(/\/welcome$/);
-    await expect(page.getByRole("heading", { name: t("welcome.greeting", { username: SMOKE_USERNAME }) })).toBeVisible();
+    await expect(
+      page.getByRole("heading", {
+        name: t("welcome.greeting", { displayName: SMOKE_DISPLAY_NAME }),
+      }),
+    ).toBeVisible();
 
     await page.goto("/admin/assignments");
     await expect(page).toHaveURL(/\/welcome$/);
-    await expect(page.getByRole("heading", { name: t("welcome.greeting", { username: SMOKE_USERNAME }) })).toBeVisible();
+    await expect(
+      page.getByRole("heading", {
+        name: t("welcome.greeting", { displayName: SMOKE_DISPLAY_NAME }),
+      }),
+    ).toBeVisible();
 
     await page.goto("/admin/permissions");
     await expect(page).toHaveURL(/\/welcome$/);
-    await expect(page.getByRole("heading", { name: t("welcome.greeting", { username: SMOKE_USERNAME }) })).toBeVisible();
+    await expect(
+      page.getByRole("heading", {
+        name: t("welcome.greeting", { displayName: SMOKE_DISPLAY_NAME }),
+      }),
+    ).toBeVisible();
 
     await page.goto("/admin/audit-log");
     await expect(page).toHaveURL(/\/welcome$/);
-    await expect(page.getByRole("heading", { name: t("welcome.greeting", { username: SMOKE_USERNAME }) })).toBeVisible();
+    await expect(
+      page.getByRole("heading", {
+        name: t("welcome.greeting", { displayName: SMOKE_DISPLAY_NAME }),
+      }),
+    ).toBeVisible();
   });
 });

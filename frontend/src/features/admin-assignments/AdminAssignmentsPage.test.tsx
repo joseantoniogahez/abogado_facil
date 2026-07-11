@@ -10,7 +10,7 @@ import { t } from "@/shared/i18n/ui-text";
 
 interface MockUser {
   id: number;
-  username: string;
+  email: string;
   disabled: boolean;
   role_ids: number[];
 }
@@ -32,7 +32,11 @@ const toRequestUrl = (input: RequestInfo | URL): URL => {
   return new URL(input.url);
 };
 
-const jsonResponse = (status: number, payload: unknown, requestId?: string): Partial<Response> => ({
+const jsonResponse = (
+  status: number,
+  payload: unknown,
+  requestId?: string,
+): Partial<Response> => ({
   ok: status >= 200 && status < 300,
   status,
   statusText: status === 204 ? "No Content" : "OK",
@@ -57,7 +61,12 @@ const renderAdminAssignmentsPage = (
   const queryClient = createQueryClient();
   queryClient.setQueryData(SESSION_QUERY_KEY, {
     id: 1,
-    username: "admin",
+    email: "admin@example.com",
+    first_name: "Test",
+    middle_name: null,
+    last_name: "User",
+    display_name: "Test User",
+    firm_name: "Test Legal",
     disabled: false,
     permissions,
   });
@@ -74,13 +83,23 @@ describe("AdminAssignmentsPage", () => {
     const users: MockUser[] = [
       {
         id: 1,
-        username: "admin",
+        email: "admin@example.com",
+        first_name: "Test",
+        middle_name: null,
+        last_name: "User",
+        display_name: "Test User",
+        firm_name: "Test Legal",
         disabled: false,
         role_ids: [],
       },
       {
         id: 2,
-        username: "reader_user",
+        email: "reader@example.com",
+        first_name: "Test",
+        middle_name: null,
+        last_name: "User",
+        display_name: "Test User",
+        firm_name: "Test Legal",
         disabled: false,
         role_ids: [2],
       },
@@ -110,13 +129,21 @@ describe("AdminAssignmentsPage", () => {
 
       const buildAssignedRoles = (userId: number) =>
         roles
-          .filter((role) => (assignmentsByUserId[userId] ?? []).includes(role.id))
+          .filter((role) =>
+            (assignmentsByUserId[userId] ?? []).includes(role.id),
+          )
           .map((role) => ({ id: role.id, name: role.name }));
 
       const buildAssignedUsers = (roleId: number) =>
         users
-          .filter((user) => (assignmentsByUserId[user.id] ?? []).includes(roleId))
-          .map((user) => ({ id: user.id, username: user.username, disabled: user.disabled }));
+          .filter((user) =>
+            (assignmentsByUserId[user.id] ?? []).includes(roleId),
+          )
+          .map((user) => ({
+            id: user.id,
+            email: user.email,
+            disabled: user.disabled,
+          }));
 
       if (method === "GET" && path === "/v1/rbac/users") {
         return jsonResponse(200, users);
@@ -161,100 +188,161 @@ describe("AdminAssignmentsPage", () => {
 
     renderAdminAssignmentsPage();
 
-    expect(await screen.findByRole("heading", { name: t("admin.as.title") })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: t("admin.as.title") }),
+    ).toBeInTheDocument();
 
-    await user.selectOptions(await screen.findByLabelText(t("admin.users.columns.username")), "2");
-    await user.selectOptions(await screen.findByLabelText(t("admin.users.columns.roles")), "2");
+    await user.selectOptions(
+      await screen.findByLabelText(t("admin.users.columns.email")),
+      "2",
+    );
+    await user.selectOptions(
+      await screen.findByLabelText(t("admin.users.columns.roles")),
+      "2",
+    );
 
-    const userRolesCard = screen.getByRole("heading", { name: t("admin.as.uTitle") }).closest("article");
-    const roleUsersCard = screen.getByRole("heading", { name: t("admin.as.rTitle") }).closest("article");
+    const userRolesCard = screen
+      .getByRole("heading", { name: t("admin.as.uTitle") })
+      .closest("article");
+    const roleUsersCard = screen
+      .getByRole("heading", { name: t("admin.as.rTitle") })
+      .closest("article");
     expect(userRolesCard).not.toBeNull();
     expect(roleUsersCard).not.toBeNull();
     if (!userRolesCard || !roleUsersCard) {
       throw new Error("Expected direct assignment cards");
     }
 
-    expect(await within(userRolesCard).findByText("reader_role")).toBeInTheDocument();
-    expect(await within(roleUsersCard).findByText("reader_user")).toBeInTheDocument();
+    expect(
+      await within(userRolesCard).findByText("reader_role"),
+    ).toBeInTheDocument();
+    expect(
+      await within(roleUsersCard).findByText("reader@example.com"),
+    ).toBeInTheDocument();
 
-    await user.selectOptions(screen.getByLabelText(t("admin.users.columns.roles")), "1");
-    await user.click(screen.getByRole("button", { name: t("admin.as.submit") }));
+    await user.selectOptions(
+      screen.getByLabelText(t("admin.users.columns.roles")),
+      "1",
+    );
+    await user.click(
+      screen.getByRole("button", { name: t("admin.as.submit") }),
+    );
 
     await waitFor(() => {
       expect(
         fetchMock.mock.calls.some((call) => {
           const requestUrl = toRequestUrl(call[0]);
           const request = call[1];
-          return requestUrl.pathname === "/v1/rbac/users/2/roles/1" && request?.method === "PUT";
+          return (
+            requestUrl.pathname === "/v1/rbac/users/2/roles/1" &&
+            request?.method === "PUT"
+          );
         }),
       ).toBe(true);
     });
 
-    expect(await within(userRolesCard).findByText("admin_role")).toBeInTheDocument();
-    expect(await within(roleUsersCard).findByText("reader_user")).toBeInTheDocument();
+    expect(
+      await within(userRolesCard).findByText("admin_role"),
+    ).toBeInTheDocument();
+    expect(
+      await within(roleUsersCard).findByText("reader@example.com"),
+    ).toBeInTheDocument();
 
-    const assignedUserRow = within(roleUsersCard).getByText("reader_user").closest("li");
+    const assignedUserRow = within(roleUsersCard)
+      .getByText("reader@example.com")
+      .closest("li");
     expect(assignedUserRow).not.toBeNull();
     if (!assignedUserRow) {
       throw new Error("Expected assigned user row");
     }
 
-    await user.click(within(assignedUserRow).getByRole("button", { name: t("admin.roles.permissions.remove") }));
+    await user.click(
+      within(assignedUserRow).getByRole("button", {
+        name: t("admin.roles.permissions.remove"),
+      }),
+    );
 
     await waitFor(() => {
       expect(
         fetchMock.mock.calls.filter((call) => {
           const requestUrl = toRequestUrl(call[0]);
           const request = call[1];
-          return requestUrl.pathname === "/v1/rbac/users/2/roles/1" && request?.method === "DELETE";
+          return (
+            requestUrl.pathname === "/v1/rbac/users/2/roles/1" &&
+            request?.method === "DELETE"
+          );
         }),
       ).toHaveLength(1);
     });
 
     await waitFor(() => {
-      expect(within(userRolesCard).queryByText("admin_role")).not.toBeInTheDocument();
+      expect(
+        within(userRolesCard).queryByText("admin_role"),
+      ).not.toBeInTheDocument();
     });
     await waitFor(() => {
-      expect(within(roleUsersCard).getByText(t("admin.as.rEmpty"))).toBeInTheDocument();
+      expect(
+        within(roleUsersCard).getByText(t("admin.as.rEmpty")),
+      ).toBeInTheDocument();
     });
 
-    await user.click(screen.getByRole("button", { name: t("admin.as.submit") }));
+    await user.click(
+      screen.getByRole("button", { name: t("admin.as.submit") }),
+    );
 
     await waitFor(() => {
       expect(
         fetchMock.mock.calls.filter((call) => {
           const requestUrl = toRequestUrl(call[0]);
           const request = call[1];
-          return requestUrl.pathname === "/v1/rbac/users/2/roles/1" && request?.method === "PUT";
+          return (
+            requestUrl.pathname === "/v1/rbac/users/2/roles/1" &&
+            request?.method === "PUT"
+          );
         }),
       ).toHaveLength(2);
     });
 
-    expect(await within(userRolesCard).findByText("admin_role")).toBeInTheDocument();
+    expect(
+      await within(userRolesCard).findByText("admin_role"),
+    ).toBeInTheDocument();
 
-    const assignedRoleRow = within(userRolesCard).getByText("admin_role").closest("li");
+    const assignedRoleRow = within(userRolesCard)
+      .getByText("admin_role")
+      .closest("li");
     expect(assignedRoleRow).not.toBeNull();
     if (!assignedRoleRow) {
       throw new Error("Expected assigned role row");
     }
 
-    await user.click(within(assignedRoleRow).getByRole("button", { name: t("admin.roles.permissions.remove") }));
+    await user.click(
+      within(assignedRoleRow).getByRole("button", {
+        name: t("admin.roles.permissions.remove"),
+      }),
+    );
 
     await waitFor(() => {
       expect(
         fetchMock.mock.calls.some((call) => {
           const requestUrl = toRequestUrl(call[0]);
           const request = call[1];
-          return requestUrl.pathname === "/v1/rbac/users/2/roles/1" && request?.method === "DELETE";
+          return (
+            requestUrl.pathname === "/v1/rbac/users/2/roles/1" &&
+            request?.method === "DELETE"
+          );
         }),
       ).toBe(true);
     });
 
     await waitFor(() => {
-      expect(within(userRolesCard).queryByText("admin_role")).not.toBeInTheDocument();
+      expect(
+        within(userRolesCard).queryByText("admin_role"),
+      ).not.toBeInTheDocument();
     });
     await waitFor(() => {
-      expect(within(roleUsersCard).getByText(t("admin.as.rEmpty"))).toBeInTheDocument();
+      expect(
+        within(roleUsersCard).getByText(t("admin.as.rEmpty")),
+      ).toBeInTheDocument();
     });
   });
 
@@ -289,11 +377,15 @@ describe("AdminAssignmentsPage", () => {
 
     renderAdminAssignmentsPage([IAM_PERMISSION.USER_ROLES_MANAGE]);
 
-    expect(await screen.findByRole("heading", { name: t("admin.as.title") })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: t("admin.as.title") }),
+    ).toBeInTheDocument();
     await user.type(screen.getByLabelText(t("admin.as.uid")), "999");
     await user.type(screen.getByLabelText(t("admin.as.rid")), "888");
 
-    expect(await screen.findByText(/request_id=req-assignments-user-404/)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/request_id=req-assignments-user-404/),
+    ).toBeInTheDocument();
     expect(requestPaths).not.toContain("/v1/rbac/users");
     expect(requestPaths).not.toContain("/v1/rbac/roles");
   });

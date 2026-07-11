@@ -11,33 +11,42 @@ import {
 import { SESSION_QUERY_KEY, updateCurrentUser, useSession } from "@/shared/auth/session";
 import {
   getPasswordPolicyViolationKeys,
-  isNormalizedUsernameValid,
-  normalizeUsername,
+  isEmailValid,
+  normalizeEmail,
 } from "@/shared/auth/validation";
 import { t } from "@/shared/i18n/ui-text";
 import { CenteredMessage } from "@/shared/ui/CenteredMessage";
+import { AccountFormField } from "@/shared/ui/AccountFormField";
 
 interface ProfileFormState {
-  username: string;
+  firstName: string;
+  middleName: string;
+  lastName: string;
+  displayName: string;
+  email: string;
+  firmName: string;
   currentPassword: string;
   newPassword: string;
 }
 
-const buildInitialProfileState = (username: string): ProfileFormState => ({
-  username,
+const buildInitialProfileState = (user?: { first_name: string; middle_name: string | null; last_name: string; display_name: string; email: string; firm_name: string }): ProfileFormState => ({
+  firstName: user?.first_name ?? "",
+  middleName: user?.middle_name ?? "",
+  lastName: user?.last_name ?? "",
+  displayName: user?.display_name ?? "",
+  email: user?.email ?? "",
+  firmName: user?.firm_name ?? "",
   currentPassword: "",
   newPassword: "",
 });
 
-const getProfileValidationMessage = (formState: ProfileFormState, currentUsername: string): string | null => {
-  const normalizedUsername = normalizeUsername(formState.username);
-  const normalizedCurrentUsername = normalizeUsername(currentUsername);
-
-  if (!normalizedUsername.length) {
-    return t("auth.validation.username.required");
+const getProfileValidationMessage = (formState: ProfileFormState, currentUser: { first_name: string; middle_name: string | null; last_name: string; display_name: string; email: string; firm_name: string }): string | null => {
+  const normalizedEmail = normalizeEmail(formState.email);
+  if (!formState.firstName.trim() || !formState.lastName.trim() || !formState.displayName.trim() || !formState.firmName.trim()) {
+    return t("profile.validation.names.required");
   }
-  if (!isNormalizedUsernameValid(formState.username)) {
-    return t("auth.validation.username.format");
+  if (!isEmailValid(normalizedEmail)) {
+    return t("auth.validation.email.format");
   }
   if (formState.newPassword && !formState.currentPassword) {
     return t("profile.validation.currentPassword.required");
@@ -49,14 +58,14 @@ const getProfileValidationMessage = (formState: ProfileFormState, currentUsernam
     return t("profile.validation.newPassword.different");
   }
 
-  const [firstPasswordViolation] = getPasswordPolicyViolationKeys(formState.newPassword, normalizedUsername);
+  const [firstPasswordViolation] = getPasswordPolicyViolationKeys(formState.newPassword, normalizedEmail);
   if (formState.newPassword && firstPasswordViolation) {
     return t(firstPasswordViolation);
   }
 
-  const usernameChanged = normalizedUsername !== normalizedCurrentUsername;
+  const profileChanged = normalizedEmail !== normalizeEmail(currentUser.email) || formState.firstName.trim() !== currentUser.first_name || (formState.middleName.trim() || null) !== currentUser.middle_name || formState.lastName.trim() !== currentUser.last_name || formState.displayName.trim() !== currentUser.display_name || formState.firmName.trim() !== currentUser.firm_name;
   const passwordChanged = formState.newPassword.length > 0;
-  if (!usernameChanged && !passwordChanged) {
+  if (!profileChanged && !passwordChanged) {
     return t("profile.validation.noChanges");
   }
 
@@ -66,7 +75,7 @@ const getProfileValidationMessage = (formState: ProfileFormState, currentUsernam
 export const ProfilePage = () => {
   const { data: user } = useSession();
   const queryClient = useQueryClient();
-  const [formState, setFormState] = useState<ProfileFormState>(() => buildInitialProfileState(user?.username ?? ""));
+  const [formState, setFormState] = useState<ProfileFormState>(() => buildInitialProfileState(user));
   const [clientError, setClientError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const lastSyncedUserId = useRef<number | null>(null);
@@ -81,7 +90,7 @@ export const ProfilePage = () => {
     }
 
     lastSyncedUserId.current = user.id;
-    setFormState(buildInitialProfileState(user.username));
+    setFormState(buildInitialProfileState(user));
   }, [user]);
 
   const updateMutation = useMutation({
@@ -90,8 +99,8 @@ export const ProfilePage = () => {
     onSuccess: (updatedUser) => {
       queryClient.setQueryData(SESSION_QUERY_KEY, updatedUser);
       setClientError(null);
-      setSuccessMessage(t("profile.success.body", { username: updatedUser.username }));
-      setFormState(buildInitialProfileState(updatedUser.username));
+      setSuccessMessage(t("profile.success.body", { email: updatedUser.email }));
+      setFormState(buildInitialProfileState(updatedUser));
     },
     onError: (error) => {
       if (isUnauthorizedError(error)) {
@@ -108,23 +117,30 @@ export const ProfilePage = () => {
     event.preventDefault();
     updateMutation.reset();
 
-    const validationMessage = getProfileValidationMessage(formState, user.username);
+    const validationMessage = getProfileValidationMessage(formState, user);
     if (validationMessage) {
       setClientError(validationMessage);
       setSuccessMessage(null);
       return;
     }
 
-    const normalizedUsername = normalizeUsername(formState.username);
     const payload: {
-      username?: string;
+      first_name?: string;
+      middle_name?: string;
+      last_name?: string;
+      display_name?: string;
+      email?: string;
+      firm_name?: string;
       current_password?: string;
       new_password?: string;
     } = {};
 
-    if (normalizedUsername !== normalizeUsername(user.username)) {
-      payload.username = formState.username.trim();
-    }
+    if (formState.firstName.trim() !== user.first_name) payload.first_name = formState.firstName.trim();
+    if ((formState.middleName.trim() || null) !== user.middle_name) payload.middle_name = formState.middleName.trim();
+    if (formState.lastName.trim() !== user.last_name) payload.last_name = formState.lastName.trim();
+    if (formState.displayName.trim() !== user.display_name) payload.display_name = formState.displayName.trim();
+    if (normalizeEmail(formState.email) !== normalizeEmail(user.email)) payload.email = normalizeEmail(formState.email);
+    if (formState.firmName.trim() !== user.firm_name) payload.firm_name = formState.firmName.trim();
     if (formState.currentPassword) {
       payload.current_password = formState.currentPassword;
     }
@@ -153,60 +169,20 @@ export const ProfilePage = () => {
           {t("profile.title")}
         </h1>
         <p className="fade-rise-delay-2 mt-4 text-sm text-[var(--app-subtle)]">{t("profile.subtitle")}</p>
-        <p className="mt-2 text-sm font-medium text-[var(--app-ink)]">{t("profile.currentUser", { username: user.username })}</p>
+        <p className="mt-2 text-sm font-medium text-[var(--app-ink)]">{t("profile.currentUser", { email: user.email })}</p>
 
         <form className="mt-8 space-y-4" onSubmit={submit}>
-          <label className="block">
-            <span className="mb-2 block text-sm font-medium text-[var(--app-ink)]">
-              {t("profile.fields.username")}
-            </span>
-            <input
-              autoComplete="username"
-              className="w-full rounded-2xl border border-[var(--app-border)] bg-white px-4 py-3 text-base outline-none transition focus:border-[var(--app-accent)]"
-              name="username"
-              onChange={(event) =>
-                setFormState((previous) => ({ ...previous, username: event.target.value }))
-              }
-              required
-              value={formState.username}
-            />
-          </label>
-
-          <label className="block">
-            <span className="mb-2 block text-sm font-medium text-[var(--app-ink)]">
-              {t("profile.fields.currentPassword")}
-            </span>
-            <input
-              autoComplete="current-password"
-              className="w-full rounded-2xl border border-[var(--app-border)] bg-white px-4 py-3 text-base outline-none transition focus:border-[var(--app-accent)]"
-              name="currentPassword"
-              onChange={(event) =>
-                setFormState((previous) => ({ ...previous, currentPassword: event.target.value }))
-              }
-              type="password"
-              value={formState.currentPassword}
-            />
-          </label>
-
-          <label className="block">
-            <span className="mb-2 block text-sm font-medium text-[var(--app-ink)]">
-              {t("profile.fields.newPassword")}
-            </span>
-            <input
-              autoComplete="new-password"
-              className="w-full rounded-2xl border border-[var(--app-border)] bg-white px-4 py-3 text-base outline-none transition focus:border-[var(--app-accent)]"
-              minLength={8}
-              name="newPassword"
-              onChange={(event) =>
-                setFormState((previous) => ({ ...previous, newPassword: event.target.value }))
-              }
-              type="password"
-              value={formState.newPassword}
-            />
-          </label>
+          <AccountFormField autoComplete="given-name" label={t("profile.fields.firstName")} name="firstName" onChange={(event) => setFormState((previous) => ({ ...previous, firstName: event.target.value }))} required value={formState.firstName} />
+          <AccountFormField autoComplete="additional-name" label={t("profile.fields.middleName")} name="middleName" onChange={(event) => setFormState((previous) => ({ ...previous, middleName: event.target.value }))} value={formState.middleName} />
+          <AccountFormField autoComplete="family-name" label={t("profile.fields.lastName")} name="lastName" onChange={(event) => setFormState((previous) => ({ ...previous, lastName: event.target.value }))} required value={formState.lastName} />
+          <AccountFormField autoComplete="nickname" label={t("profile.fields.displayName")} name="displayName" onChange={(event) => setFormState((previous) => ({ ...previous, displayName: event.target.value }))} required value={formState.displayName} />
+          <AccountFormField autoComplete="email" label={t("profile.fields.email")} name="email" onChange={(event) => setFormState((previous) => ({ ...previous, email: event.target.value }))} required type="email" value={formState.email} />
+          <AccountFormField autoComplete="organization" label={t("profile.fields.firmName")} name="firmName" onChange={(event) => setFormState((previous) => ({ ...previous, firmName: event.target.value }))} required value={formState.firmName} />
+          <AccountFormField autoComplete="current-password" label={t("profile.fields.currentPassword")} name="currentPassword" onChange={(event) => setFormState((previous) => ({ ...previous, currentPassword: event.target.value }))} type="password" value={formState.currentPassword} />
+          <AccountFormField autoComplete="new-password" label={t("profile.fields.newPassword")} minLength={8} name="newPassword" onChange={(event) => setFormState((previous) => ({ ...previous, newPassword: event.target.value }))} type="password" value={formState.newPassword} />
 
           <ul className="space-y-1 rounded-2xl border border-[var(--app-border)] bg-[var(--app-bg)] px-4 py-3 text-sm text-[var(--app-subtle)]">
-            <li>{t("auth.shared.username.hint")}</li>
+            <li>{t("auth.shared.email.hint")}</li>
             <li>{t("auth.shared.password.hint")}</li>
             <li>{t("profile.password.optional")}</li>
           </ul>

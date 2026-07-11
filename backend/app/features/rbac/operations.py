@@ -13,12 +13,9 @@ from app.core.common.records import (
 from app.core.db.ports import UnitOfWorkPort
 from app.core.errors.services import ConflictError, InvalidInputError, NotFoundError, UnauthorizedError
 from app.core.security.policies import (
-    USERNAME_ALLOWED_DESCRIPTION,
     PasswordPolicyError,
-    UsernamePolicyError,
-    UsernamePolicyErrorCode,
     format_password_policy_messages,
-    normalize_username,
+    normalize_email,
     validate_password_policy,
 )
 from app.core.security.service import Argon2PasswordService, PasswordServicePort
@@ -351,22 +348,16 @@ class RBACUserManagement:
         return normalized_role_ids
 
     @staticmethod
-    def _normalize_username_or_raise(username: str) -> str:
+    def _normalize_email_or_raise(email: str) -> str:
         try:
-            return normalize_username(username)
-        except UsernamePolicyError as exc:
-            if exc.code is UsernamePolicyErrorCode.REQUIRED:
-                raise InvalidInputError(message="Username is required") from exc
-
-            raise InvalidInputError(
-                message="Username has invalid format",
-                details={"allowed": USERNAME_ALLOWED_DESCRIPTION},
-            ) from exc
+            return normalize_email(email)
+        except ValueError as exc:
+            raise InvalidInputError(message=str(exc)) from exc
 
     @staticmethod
-    def _validate_password_or_raise(password: str, username: str) -> None:
+    def _validate_password_or_raise(password: str, email: str) -> None:
         try:
-            validate_password_policy(password, username)
+            validate_password_policy(password, email)
         except PasswordPolicyError as exc:
             raise InvalidInputError(
                 message="Password does not meet policy",
@@ -394,20 +385,24 @@ class RBACUserManagement:
         return await self._build_admin_user_result(user_id)
 
     async def create_user(self, user_data: CreateAdminUserCommand) -> AdminUserResult:
-        normalized_username = self._normalize_username_or_raise(user_data.username)
-        self._validate_password_or_raise(user_data.password, normalized_username)
+        normalized_email = self._normalize_email_or_raise(user_data.email)
+        self._validate_password_or_raise(user_data.password, normalized_email)
         normalized_role_ids = self._normalize_role_ids(user_data.role_ids)
 
         async with self._unit_of_work:
-            if await self._rbac_repository.username_exists(normalized_username):
+            if await self._rbac_repository.email_exists(normalized_email):
                 raise ConflictError(
-                    message="Username already exists",
-                    details={"username": normalized_username},
+                    message="Email already exists",
+                    details={"email": normalized_email},
                 )
 
             await self._validate_roles_exist(normalized_role_ids)
             user = await self._rbac_repository.create_user(
-                username=normalized_username,
+                email=normalized_email,
+                first_name=normalized_email.split("@", maxsplit=1)[0],
+                middle_name=None,
+                last_name="User",
+                display_name=normalized_email,
                 hashed_password=self._password_service.hash_password(user_data.password),
                 disabled=False,
             )
@@ -423,35 +418,35 @@ class RBACUserManagement:
         if user_data.new_password and user_data.current_password is None:
             raise InvalidInputError(message="current_password is required to update password")
         if (
-            user_data.username is None
+            user_data.email is None
             and user_data.new_password is None
             and user_data.disabled is None
             and user_data.role_ids is None
         ):
             raise InvalidInputError(message="At least one field must be provided to update the user")
 
-    async def _apply_username_update(
+    async def _apply_email_update(
         self,
         *,
         user: UserRecord,
-        requested_username: str | None,
+        requested_email: str | None,
         changes: dict[str, object],
     ) -> str:
-        normalized_username = user.username
-        if requested_username is None:
-            return normalized_username
+        normalized_email = user.email
+        if requested_email is None:
+            return normalized_email
 
-        normalized_username = self._normalize_username_or_raise(requested_username)
-        if normalized_username == user.username:
-            return normalized_username
+        normalized_email = self._normalize_email_or_raise(requested_email)
+        if normalized_email == user.email:
+            return normalized_email
 
-        if await self._rbac_repository.username_exists(normalized_username, exclude_user_id=user.id):
+        if await self._rbac_repository.email_exists(normalized_email, exclude_user_id=user.id):
             raise ConflictError(
-                message="Username already exists",
-                details={"username": normalized_username},
+                message="Email already exists",
+                details={"email": normalized_email},
             )
-        changes["username"] = normalized_username
-        return normalized_username
+        changes["email"] = normalized_email
+        return normalized_email
 
     def _apply_password_update(
         self,
@@ -459,7 +454,7 @@ class RBACUserManagement:
         user: UserRecord,
         current_password: str | None,
         new_password: str | None,
-        normalized_username: str,
+        normalized_email: str,
         changes: dict[str, object],
     ) -> None:
         if new_password is None:
@@ -472,7 +467,7 @@ class RBACUserManagement:
             raise UnauthorizedError(message="Current password is invalid")
         if self._password_service.verify_password(new_password, user.hashed_password):
             raise InvalidInputError(message="New password must be different from current password")
-        self._validate_password_or_raise(new_password, normalized_username)
+        self._validate_password_or_raise(new_password, normalized_email)
         changes["hashed_password"] = self._password_service.hash_password(new_password)
 
     @staticmethod
@@ -512,16 +507,16 @@ class RBACUserManagement:
         async with self._unit_of_work:
             user = await self._entity_lookup.get_user_or_raise(user_id)
             changes: dict[str, object] = {}
-            normalized_username = await self._apply_username_update(
+            normalized_email = await self._apply_email_update(
                 user=user,
-                requested_username=user_data.username,
+                requested_email=user_data.email,
                 changes=changes,
             )
             self._apply_password_update(
                 user=user,
                 current_password=user_data.current_password,
                 new_password=user_data.new_password,
-                normalized_username=normalized_username,
+                normalized_email=normalized_email,
                 changes=changes,
             )
             self._apply_disabled_update(

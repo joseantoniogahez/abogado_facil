@@ -45,25 +45,25 @@ class AssignedRoleResult(ApplicationSchema):
 
 class AssignedUserResult(ApplicationSchema):
     id: int
-    username: str
+    email: str
     disabled: bool
 
 
 class AdminUserResult(ApplicationSchema):
     id: int
-    username: str
+    email: str
     disabled: bool
     role_ids: list[int] = Field(default_factory=list)
 
 
 class CreateAdminUserCommand(ApplicationSchema):
-    username: str
+    email: str
     password: str
     role_ids: list[int] = Field(default_factory=list)
 
 
 class UpdateAdminUserCommand(ApplicationSchema):
-    username: str | None = None
+    email: str | None = None
     current_password: str | None = None
     new_password: str | None = None
     disabled: bool | None = None

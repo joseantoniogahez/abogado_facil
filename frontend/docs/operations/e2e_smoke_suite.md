@@ -4,7 +4,7 @@ This document defines the deterministic end-to-end smoke baseline for the fronte
 
 ## Scope
 
-- Critical login journey.
+- Critical registration, email login, profile, and logout journey.
 - Protected route navigation behavior.
 - Error fallback behavior for protected session validation.
 - Admin protected route error diagnostics for RBAC `403 forbidden` responses.
@@ -22,6 +22,12 @@ This document defines the deterministic end-to-end smoke baseline for the fronte
 - Frontend app server is started by Playwright via `webServer` in `playwright.config.ts`.
 - API calls are mocked per test with strict route handlers for `**/v1/**`.
 - Unhandled API requests fail tests immediately to expose drift or accidental network dependency.
+- Authenticated-user fixtures include email, first/middle/last name, display name, firm name,
+  disabled status, and permissions; legacy username-only fixtures are not valid.
+- The registration scenario verifies required legal-name inputs, editable display name, normalized
+  email feedback, and an explicit transition to login without implicit authentication.
+- The profile scenario verifies that the returned product profile replaces cached session state;
+  welcome headings use `display_name`.
 
 ## Execution Commands
 

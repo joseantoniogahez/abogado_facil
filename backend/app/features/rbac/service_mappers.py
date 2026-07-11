@@ -88,7 +88,7 @@ def to_assigned_user_results(users: list[UserRecord]) -> list[AssignedUserResult
     return [
         AssignedUserResult(
             id=user.id,
-            username=user.username,
+            email=user.email,
             disabled=user.disabled,
         )
         for user in users
@@ -98,7 +98,7 @@ def to_assigned_user_results(users: list[UserRecord]) -> list[AssignedUserResult
 def to_admin_user_result(user: UserRecord, *, role_ids: list[int] | tuple[int, ...]) -> AdminUserResult:
     return AdminUserResult(
         id=user.id,
-        username=user.username,
+        email=user.email,
         disabled=user.disabled,
         role_ids=list(role_ids),
     )

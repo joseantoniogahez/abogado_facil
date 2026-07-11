@@ -1,10 +1,15 @@
 import {
+  composeDisplayName,
   getPasswordPolicyViolationKeys,
   isNormalizedUsernameValid,
   normalizeUsername,
 } from "@/shared/auth/validation";
 
 describe("auth validation helpers", () => {
+  it("composes a display name while ignoring an omitted middle name", () => {
+    expect(composeDisplayName(" Maria ", "", " Perez ")).toBe("Maria Perez");
+    expect(composeDisplayName("Maria", "Elena", "Perez")).toBe("Maria Elena Perez");
+  });
   it("normalizes usernames with trim and lowercase", () => {
     expect(normalizeUsername("  Mixed.User  ")).toBe("mixed.user");
   });

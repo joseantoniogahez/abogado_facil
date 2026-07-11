@@ -27,6 +27,12 @@
             "title": "Disabled",
             "type": "boolean"
           },
+          "email": {
+            "maxLength": 320,
+            "minLength": 3,
+            "title": "Email",
+            "type": "string"
+          },
           "id": {
             "title": "Id",
             "type": "integer"
@@ -37,17 +43,11 @@
             },
             "title": "Role Ids",
             "type": "array"
-          },
-          "username": {
-            "maxLength": 255,
-            "minLength": 1,
-            "title": "Username",
-            "type": "string"
           }
         },
         "required": [
           "id",
-          "username",
+          "email",
           "disabled"
         ],
         "title": "AdminUserResponse",
@@ -79,20 +79,20 @@
             "title": "Disabled",
             "type": "boolean"
           },
+          "email": {
+            "maxLength": 320,
+            "minLength": 3,
+            "title": "Email",
+            "type": "string"
+          },
           "id": {
             "title": "Id",
             "type": "integer"
-          },
-          "username": {
-            "maxLength": 255,
-            "minLength": 1,
-            "title": "Username",
-            "type": "string"
           }
         },
         "required": [
           "id",
-          "username",
+          "email",
           "disabled"
         ],
         "title": "AssignedUser",
@@ -167,9 +167,51 @@
             "title": "Disabled",
             "type": "boolean"
           },
+          "display_name": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Display Name",
+            "type": "string"
+          },
+          "email": {
+            "maxLength": 320,
+            "minLength": 3,
+            "title": "Email",
+            "type": "string"
+          },
+          "firm_name": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Firm Name",
+            "type": "string"
+          },
+          "first_name": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "First Name",
+            "type": "string"
+          },
           "id": {
             "title": "Id",
             "type": "integer"
+          },
+          "last_name": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Last Name",
+            "type": "string"
+          },
+          "middle_name": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Middle Name"
           },
           "permissions": {
             "items": {
@@ -177,17 +219,15 @@
             },
             "title": "Permissions",
             "type": "array"
-          },
-          "username": {
-            "maxLength": 255,
-            "minLength": 1,
-            "title": "Username",
-            "type": "string"
           }
         },
         "required": [
           "id",
-          "username",
+          "email",
+          "first_name",
+          "last_name",
+          "display_name",
+          "firm_name",
           "disabled"
         ],
         "title": "AuthenticatedUserResponse",
@@ -254,6 +294,12 @@
       },
       "CreateAdminUserRequest": {
         "properties": {
+          "email": {
+            "maxLength": 320,
+            "minLength": 3,
+            "title": "Email",
+            "type": "string"
+          },
           "password": {
             "maxLength": 255,
             "minLength": 8,
@@ -266,16 +312,10 @@
             },
             "title": "Role Ids",
             "type": "array"
-          },
-          "username": {
-            "maxLength": 255,
-            "minLength": 1,
-            "title": "Username",
-            "type": "string"
           }
         },
         "required": [
-          "username",
+          "email",
           "password"
         ],
         "title": "CreateAdminUserRequest",
@@ -383,21 +423,66 @@
       },
       "RegisterUserRequest": {
         "properties": {
+          "display_name": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Display Name",
+            "type": "string"
+          },
+          "email": {
+            "maxLength": 320,
+            "minLength": 3,
+            "title": "Email",
+            "type": "string"
+          },
+          "firm_name": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Firm Name"
+          },
+          "first_name": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "First Name",
+            "type": "string"
+          },
+          "last_name": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Last Name",
+            "type": "string"
+          },
+          "middle_name": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Middle Name"
+          },
           "password": {
             "maxLength": 255,
             "minLength": 8,
             "title": "Password",
             "type": "string"
-          },
-          "username": {
-            "maxLength": 255,
-            "minLength": 1,
-            "title": "Username",
-            "type": "string"
           }
         },
         "required": [
-          "username",
+          "first_name",
+          "last_name",
+          "display_name",
+          "email",
           "password"
         ],
         "title": "RegisterUserRequest",
@@ -444,6 +529,19 @@
             ],
             "title": "Disabled"
           },
+          "email": {
+            "anyOf": [
+              {
+                "maxLength": 320,
+                "minLength": 3,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
           "new_password": {
             "anyOf": [
               {
@@ -470,19 +568,6 @@
               }
             ],
             "title": "Role Ids"
-          },
-          "username": {
-            "anyOf": [
-              {
-                "maxLength": 255,
-                "minLength": 1,
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Username"
           }
         },
         "title": "UpdateAdminUserRequest",
@@ -503,6 +588,83 @@
             ],
             "title": "Current Password"
           },
+          "display_name": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "maxLength": 320,
+                "minLength": 3,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "firm_name": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Firm Name"
+          },
+          "first_name": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Name"
+          },
+          "last_name": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Name"
+          },
+          "middle_name": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Middle Name"
+          },
           "new_password": {
             "anyOf": [
               {
@@ -515,19 +677,6 @@
               }
             ],
             "title": "New Password"
-          },
-          "username": {
-            "anyOf": [
-              {
-                "maxLength": 255,
-                "minLength": 1,
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Username"
           }
         },
         "title": "UpdateCurrentUserRequest",
@@ -4578,7 +4727,7 @@
               "application/json": {
                 "example": {
                   "code": "conflict",
-                  "detail": "Username already exists",
+                  "detail": "Email already exists",
                   "meta": {
                     "username": "reader_user"
                   },
@@ -4618,7 +4767,7 @@
                 }
               }
             },
-            "description": "Username already exists.",
+            "description": "Email already exists.",
             "headers": {
               "X-Request-ID": {
                 "description": "Request correlation identifier for diagnostics and support.",
@@ -5651,7 +5800,7 @@
               "application/json": {
                 "example": {
                   "code": "conflict",
-                  "detail": "Username already exists",
+                  "detail": "Email already exists",
                   "meta": {
                     "username": "admin"
                   },
@@ -5691,7 +5840,7 @@
                 }
               }
             },
-            "description": "Username already exists.",
+            "description": "Email already exists.",
             "headers": {
               "X-Request-ID": {
                 "description": "Request correlation identifier for diagnostics and support.",
@@ -6804,7 +6953,7 @@
             "application/x-www-form-urlencoded": {
               "example": {
                 "password": "{{password}}",
-                "username": "demo_user"
+                "username": "demo@example.com"
               },
               "schema": {
                 "$ref": "#/components/schemas/Body_login_for_access_token_v1_token_post"
@@ -6895,7 +7044,7 @@
               "application/json": {
                 "example": {
                   "code": "unauthorized",
-                  "detail": "Invalid username or password",
+                  "detail": "Invalid email or password",
                   "request_id": "req-example-1234",
                   "status": 401
                 },
@@ -6932,7 +7081,7 @@
                 }
               }
             },
-            "description": "Invalid username or password.",
+            "description": "Invalid email or password.",
             "headers": {
               "WWW-Authenticate": {
                 "description": "Bearer authentication challenge.",
@@ -7073,15 +7222,19 @@
               "application/json": {
                 "example": {
                   "disabled": false,
+                  "display_name": "Technical administrator",
+                  "email": "admin@example.com",
+                  "firm_name": "Technical administrator",
+                  "first_name": "Technical",
                   "id": 1,
+                  "last_name": "Administrator",
                   "permissions": [
                     "audit_logs:read",
                     "role_permissions:manage",
                     "roles:manage",
                     "user_roles:manage",
                     "users:manage"
-                  ],
-                  "username": "admin"
+                  ]
                 },
                 "schema": {
                   "$ref": "#/components/schemas/AuthenticatedUserResponse"
@@ -7268,7 +7421,7 @@
         ]
       },
       "patch": {
-        "description": "Update `username`, password, or both. Password change requires both `current_password` and `new_password`.",
+        "description": "Update legal-name components, display name, email, firm name, password, or a combination. Password changes require current credentials.",
         "operationId": "update_current_user_v1_users_me_patch",
         "requestBody": {
           "content": {
@@ -7286,9 +7439,13 @@
               "application/json": {
                 "example": {
                   "disabled": false,
+                  "display_name": "Profile User",
+                  "email": "profile@example.com",
+                  "firm_name": "Profile Legal",
+                  "first_name": "Profile",
                   "id": 1,
-                  "permissions": [],
-                  "username": "profile_user_v2"
+                  "last_name": "User",
+                  "permissions": []
                 },
                 "schema": {
                   "$ref": "#/components/schemas/AuthenticatedUserResponse"
@@ -7468,9 +7625,9 @@
               "application/json": {
                 "example": {
                   "code": "conflict",
-                  "detail": "Username already exists",
+                  "detail": "Email already exists",
                   "meta": {
-                    "username": "admin"
+                    "email": "admin@example.com"
                   },
                   "request_id": "req-example-1234",
                   "status": 409
@@ -7508,7 +7665,7 @@
                 }
               }
             },
-            "description": "New username is already in use.",
+            "description": "New email is already in use.",
             "headers": {
               "X-Request-ID": {
                 "description": "Request correlation identifier for diagnostics and support.",
@@ -7586,7 +7743,7 @@
     },
     "/v1/users/register": {
       "post": {
-        "description": "Create a local active user. `username` is normalized to lowercase and the password must satisfy the service password policy.",
+        "description": "Create an active product account and its firm atomically. `email` is normalized to lowercase, the firm name falls back to `display_name`, and the user receives `account_owner`.",
         "operationId": "register_user_v1_users_register_post",
         "requestBody": {
           "content": {
@@ -7604,15 +7761,19 @@
               "application/json": {
                 "example": {
                   "disabled": false,
+                  "display_name": "Technical administrator",
+                  "email": "admin@example.com",
+                  "firm_name": "Technical administrator",
+                  "first_name": "Technical",
                   "id": 1,
+                  "last_name": "Administrator",
                   "permissions": [
                     "audit_logs:read",
                     "role_permissions:manage",
                     "roles:manage",
                     "user_roles:manage",
                     "users:manage"
-                  ],
-                  "username": "admin"
+                  ]
                 },
                 "schema": {
                   "$ref": "#/components/schemas/AuthenticatedUserResponse"
@@ -7684,9 +7845,9 @@
               "application/json": {
                 "example": {
                   "code": "conflict",
-                  "detail": "Username already exists",
+                  "detail": "Email already exists",
                   "meta": {
-                    "username": "admin"
+                    "email": "admin@example.com"
                   },
                   "request_id": "req-example-1234",
                   "status": 409
@@ -7724,7 +7885,7 @@
                 }
               }
             },
-            "description": "Username already exists.",
+            "description": "Email already exists.",
             "headers": {
               "X-Request-ID": {
                 "description": "Request correlation identifier for diagnostics and support.",

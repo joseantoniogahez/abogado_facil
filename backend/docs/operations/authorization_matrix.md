@@ -92,12 +92,15 @@ This table is contract-checked by `tests/routers/test_authorization_policy_cover
 
 Seed source: `utils/rbac_bootstrap.py`
 
-| Role          | Base Permissions                                                                                  |
-| ------------- | ------------------------------------------------------------------------------------------------- |
-| `admin_role`  | `audit_logs:read`, `roles:manage`, `role_permissions:manage`, `user_roles:manage`, `users:manage` |
-| `reader_role` | none                                                                                              |
+| Role            | Base Permissions                                                                                  | Product Scope                                      |
+| --------------- | ------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| `admin_role`    | `audit_logs:read`, `roles:manage`, `role_permissions:manage`, `user_roles:manage`, `users:manage` | Technical administration (`any`)                   |
+| `reader_role`   | none                                                                                              | Technical bootstrap role                           |
+| `account_owner` | none of the technical administration permissions                                                  | Own firm only; assigned during public registration |
 
 ## Notes
 
 - Missing permission returns `403 forbidden` with `meta.permission_id`.
 - Bootstrap command is idempotent: `python -m utils.rbac_bootstrap`.
+- `account_owner` does not inherit `admin_role` or `reader_role`; public registration assigns it
+  only for the firm created in the same transaction.

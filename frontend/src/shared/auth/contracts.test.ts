@@ -6,13 +6,23 @@ describe("auth contracts", () => {
     expect(
       parseAuthenticatedUser({
         id: 1,
-        username: "admin",
+        email: "admin",
+        first_name: "Test",
+        middle_name: null,
+        last_name: "User",
+        display_name: "Test User",
+        firm_name: "Test Legal",
         disabled: false,
         permissions: ["users:manage"],
       }),
     ).toEqual({
       id: 1,
-      username: "admin",
+      email: "admin",
+      first_name: "Test",
+      middle_name: null,
+      last_name: "User",
+      display_name: "Test User",
+      firm_name: "Test Legal",
       disabled: false,
       permissions: ["users:manage"],
     });
@@ -22,7 +32,12 @@ describe("auth contracts", () => {
     expect(() =>
       parseAuthenticatedUser({
         id: "1",
-        username: "admin",
+        email: "admin",
+        first_name: "Test",
+        middle_name: null,
+        last_name: "User",
+        display_name: "Test User",
+        firm_name: "Test Legal",
         disabled: false,
         permissions: ["users:manage"],
       }),
@@ -33,7 +48,12 @@ describe("auth contracts", () => {
     expect(() =>
       parseAuthenticatedUser({
         id: 1,
-        username: "admin",
+        email: "admin",
+        first_name: "Test",
+        middle_name: null,
+        last_name: "User",
+        display_name: "Test User",
+        firm_name: "Test Legal",
         disabled: false,
       }),
     ).toThrow(ApiContractError);

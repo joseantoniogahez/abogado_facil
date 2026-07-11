@@ -26,7 +26,7 @@ describe("session client", () => {
     } satisfies Partial<Response>);
     vi.stubGlobal("fetch", fetchMock);
 
-    await loginWithCredentials({ username: "admin", password: "{{password}}" });
+    await loginWithCredentials({ email: "admin", password: "{{password}}" });
 
     const [url, request] = fetchMock.mock.calls[0] as [string, RequestInit];
     expect(url).toBe(buildApiUrl(TOKEN_ENDPOINT_PATH));
@@ -47,7 +47,12 @@ describe("session client", () => {
       json: () =>
         Promise.resolve({
           id: 5,
-          username: "new_user",
+          email: "new_user",
+          first_name: "Test",
+          middle_name: null,
+          last_name: "User",
+          display_name: "Test User",
+          firm_name: "Test Legal",
           disabled: false,
           permissions: [],
         }),
@@ -55,7 +60,7 @@ describe("session client", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     const registeredUser = await registerUser({
-      username: " new_user ",
+      email: " new_user ",
       password: "StrongPass1", // pragma: allowlist secret
     });
 
@@ -66,13 +71,18 @@ describe("session client", () => {
     expect(new Headers(request.headers).get("Authorization")).toBeNull();
     expect(request.body).toBe(
       JSON.stringify({
-        username: " new_user ",
+        email: " new_user ",
         password: "StrongPass1", // pragma: allowlist secret
       }),
     );
     expect(registeredUser).toEqual({
       id: 5,
-      username: "new_user",
+      email: "new_user",
+      first_name: "Test",
+      middle_name: null,
+      last_name: "User",
+      display_name: "Test User",
+      firm_name: "Test Legal",
       disabled: false,
       permissions: [],
     });
@@ -86,7 +96,12 @@ describe("session client", () => {
       json: () =>
         Promise.resolve({
           id: 1,
-          username: "updated_user",
+          email: "updated_user",
+          first_name: "Test",
+          middle_name: null,
+          last_name: "User",
+          display_name: "Test User",
+          firm_name: "Test Legal",
           disabled: false,
           permissions: ["users:manage"],
         }),
@@ -94,7 +109,7 @@ describe("session client", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     const updatedUser = await updateCurrentUser({
-      username: "updated_user",
+      email: "updated_user",
       current_password: "CurrentPass1", // pragma: allowlist secret
       new_password: "NextPass2", // pragma: allowlist secret
     });
@@ -106,14 +121,19 @@ describe("session client", () => {
     expect(new Headers(request.headers).get("Authorization")).toBe("Bearer valid-token");
     expect(request.body).toBe(
       JSON.stringify({
-        username: "updated_user",
+        email: "updated_user",
         current_password: "CurrentPass1", // pragma: allowlist secret
         new_password: "NextPass2", // pragma: allowlist secret
       }),
     );
     expect(updatedUser).toEqual({
       id: 1,
-      username: "updated_user",
+      email: "updated_user",
+      first_name: "Test",
+      middle_name: null,
+      last_name: "User",
+      display_name: "Test User",
+      firm_name: "Test Legal",
       disabled: false,
       permissions: ["users:manage"],
     });
@@ -147,7 +167,12 @@ describe("session client", () => {
         json: () =>
           Promise.resolve({
           id: "1",
-          username: "admin",
+          email: "admin",
+          first_name: "Test",
+          middle_name: null,
+          last_name: "User",
+          display_name: "Test User",
+          firm_name: "Test Legal",
           disabled: false,
           permissions: [],
         }),

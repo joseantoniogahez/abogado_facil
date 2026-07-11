@@ -46,14 +46,14 @@ async def build_default_permission_context() -> PermissionResourceContext:
 async def build_current_user_permission_context(current_user: CurrentActiveUserDependency) -> PermissionResourceContext:
     return PermissionResourceContext(
         owner_user_id=current_user.id,
-        tenant_id=current_user.tenant_id,
+        tenant_id=current_user.firm_id,
     )
 
 
 async def build_current_tenant_permission_context(
     current_user: CurrentActiveUserDependency,
 ) -> PermissionResourceContext:
-    return PermissionResourceContext(tenant_id=current_user.tenant_id)
+    return PermissionResourceContext(tenant_id=current_user.firm_id)
 
 
 async def allow_conditional_permission_policy() -> bool:
@@ -121,7 +121,7 @@ def require_permission(
             required_scope=normalized_required_scope,
             resource_owner_id=resource_context.owner_user_id,
             resource_tenant_id=resource_context.tenant_id,
-            user_tenant_id=current_user.tenant_id,
+            user_tenant_id=current_user.firm_id,
         )
         if not has_permission:
             _log_authorization_decision(

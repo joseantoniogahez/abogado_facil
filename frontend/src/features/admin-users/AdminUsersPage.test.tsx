@@ -3,15 +3,15 @@ import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { createQueryClient } from "@/app/query-client";
-import { SESSION_QUERY_KEY } from "@/shared/auth/session";
 import { AdminUsersPage } from "@/features/admin-users/AdminUsersPage";
+import { SESSION_QUERY_KEY } from "@/shared/auth/session";
 import { getAccessToken, setAccessToken } from "@/shared/auth/storage";
 import { t } from "@/shared/i18n/ui-text";
 import { IAM_PERMISSION } from "@/shared/iam/contracts";
 
 interface MockUser {
   id: number;
-  username: string;
+  email: string;
   disabled: boolean;
   role_ids: number[];
 }
@@ -40,7 +40,11 @@ const readJsonBody = <T,>(init?: RequestInit): T => {
   return JSON.parse(init.body) as T;
 };
 
-const jsonResponse = (status: number, payload: unknown, requestId?: string): Partial<Response> => ({
+const jsonResponse = (
+  status: number,
+  payload: unknown,
+  requestId?: string,
+): Partial<Response> => ({
   ok: status >= 200 && status < 300,
   status,
   statusText: status === 204 ? "No Content" : "OK",
@@ -64,7 +68,12 @@ const renderAdminUsersPage = (
   const queryClient = createQueryClient();
   queryClient.setQueryData(SESSION_QUERY_KEY, {
     id: 1,
-    username: "admin",
+    email: "admin@example.com",
+    first_name: "Test",
+    middle_name: null,
+    last_name: "User",
+    display_name: "Test User",
+    firm_name: "Test Legal",
     disabled: false,
     permissions,
   });
@@ -77,13 +86,11 @@ const renderAdminUsersPage = (
 };
 
 describe("AdminUsersPage", () => {
-  it(
-    "completes create, update and soft-delete flows",
-    async () => {
+  it("completes create, update and soft-delete flows", async () => {
     let users: MockUser[] = [
       {
         id: 1,
-        username: "admin",
+        email: "admin@example.com",
         disabled: false,
         role_ids: [1],
       },
@@ -103,7 +110,7 @@ describe("AdminUsersPage", () => {
       },
     ];
     let updatedPayload: {
-      username: string;
+      email: string;
       disabled: boolean;
       role_ids: number[];
       current_password?: string;
@@ -124,10 +131,12 @@ describe("AdminUsersPage", () => {
       }
 
       if (method === "POST" && path === "/v1/rbac/users") {
-        const payload = readJsonBody<{ username: string; role_ids: number[] }>(init);
+        const payload = readJsonBody<{ email: string; role_ids: number[] }>(
+          init,
+        );
         const createdUser: MockUser = {
           id: 99,
-          username: payload.username,
+          email: payload.email,
           disabled: false,
           role_ids: payload.role_ids,
         };
@@ -137,7 +146,7 @@ describe("AdminUsersPage", () => {
 
       if (method === "PUT" && path === "/v1/rbac/users/99") {
         const payload = readJsonBody<{
-          username: string;
+          email: string;
           disabled: boolean;
           role_ids: number[];
           current_password?: string;
@@ -148,7 +157,7 @@ describe("AdminUsersPage", () => {
           user.id === 99
             ? {
                 ...user,
-                username: payload.username,
+                email: payload.email,
                 disabled: payload.disabled,
                 role_ids: payload.role_ids,
               }
@@ -159,7 +168,9 @@ describe("AdminUsersPage", () => {
       }
 
       if (method === "DELETE" && path === "/v1/rbac/users/99") {
-        users = users.map((user) => (user.id === 99 ? { ...user, disabled: true } : user));
+        users = users.map((user) =>
+          user.id === 99 ? { ...user, disabled: true } : user,
+        );
         return jsonResponse(204, null);
       }
 
@@ -167,109 +178,187 @@ describe("AdminUsersPage", () => {
     });
 
     vi.stubGlobal("fetch", fetchMock);
-    vi.spyOn(window, "confirm").mockReturnValueOnce(false).mockReturnValue(true);
+    vi.spyOn(window, "confirm")
+      .mockReturnValueOnce(false)
+      .mockReturnValue(true);
     const user = userEvent.setup();
 
     renderAdminUsersPage();
 
     expect(
-      await screen.findByRole("heading", { name: t("admin.users.title") }, { timeout: 8000 }),
+      await screen.findByRole(
+        "heading",
+        { name: t("admin.users.title") },
+        { timeout: 8000 },
+      ),
     ).toBeInTheDocument();
-    expect(await screen.findByText("admin", {}, { timeout: 8000 })).toBeInTheDocument();
-    const createRolesInput = await screen.findByLabelText(t("admin.users.create.roles"));
+    expect(
+      await screen.findByText("admin@example.com", {}, { timeout: 8000 }),
+    ).toBeInTheDocument();
+    const createRolesInput = await screen.findByLabelText(
+      t("admin.users.create.roles"),
+    );
 
-    await user.type(screen.getByLabelText(t("admin.users.create.username")), "ops_user");
-    await user.type(screen.getByLabelText(t("admin.users.create.password")), "OpsUser123");
+    await user.type(
+      screen.getByLabelText(t("admin.users.create.email")),
+      "ops@example.com",
+    );
+    await user.type(
+      screen.getByLabelText(t("admin.users.create.password")),
+      "OpsUser123",
+    );
     await user.selectOptions(createRolesInput, "2");
-    await user.click(screen.getByRole("button", { name: t("admin.users.create.submit") }));
+    await user.click(
+      screen.getByRole("button", { name: t("admin.users.create.submit") }),
+    );
 
-    const createdUsernameCell = await screen.findByText("ops_user");
+    const createdUsernameCell = await screen.findByText("ops@example.com");
     const createdRow = createdUsernameCell.closest("tr");
     expect(createdRow).not.toBeNull();
     if (!createdRow) {
       throw new Error("Expected created row");
     }
 
-    await user.click(within(createdRow).getByRole("button", { name: t("admin.users.actions.edit") }));
-    const editHeading = await screen.findByRole("heading", { name: /^Editar usuario:/ });
+    await user.click(
+      within(createdRow).getByRole("button", {
+        name: t("admin.users.actions.edit"),
+      }),
+    );
+    const editHeading = await screen.findByRole("heading", {
+      name: /^Editar usuario:/,
+    });
     const editSection = editHeading.closest("section");
     expect(editSection).not.toBeNull();
     if (!editSection) {
       throw new Error("Expected edit section");
     }
     const editFormScope = within(editSection);
-    const editUsernameInput = editFormScope.getByLabelText(t("admin.users.edit.username"));
-    const editCurrentPasswordInput = editFormScope.getByLabelText(t("admin.users.edit.currentPassword"));
-    const editNewPasswordInput = editFormScope.getByLabelText(t("admin.users.edit.newPassword"));
-    const editRolesInput = editFormScope.getByLabelText(t("admin.users.edit.roles"));
+    const editUsernameInput = editFormScope.getByLabelText(
+      t("admin.users.edit.email"),
+    );
+    const editCurrentPasswordInput = editFormScope.getByLabelText(
+      t("admin.users.edit.currentPassword"),
+    );
+    const editNewPasswordInput = editFormScope.getByLabelText(
+      t("admin.users.edit.newPassword"),
+    );
+    const editRolesInput = editFormScope.getByLabelText(
+      t("admin.users.edit.roles"),
+    );
 
     await user.clear(editUsernameInput);
-    await user.type(editUsernameInput, "ops_user_draft");
+    await user.type(editUsernameInput, "ops.draft@example.com");
     await user.type(editCurrentPasswordInput, "OpsUser123");
     await user.type(editNewPasswordInput, "OpsUser456");
     await user.selectOptions(editRolesInput, "1");
-    await user.click(editFormScope.getByRole("button", { name: t("admin.users.edit.cancel") }));
+    await user.click(
+      editFormScope.getByRole("button", { name: t("admin.users.edit.cancel") }),
+    );
 
-    expect(screen.queryByRole("button", { name: t("admin.users.edit.cancel") })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: t("admin.users.edit.cancel") }),
+    ).not.toBeInTheDocument();
 
-    await user.click(within(createdRow).getByRole("button", { name: t("admin.users.actions.edit") }));
-    const editHeadingSecondPass = await screen.findByRole("heading", { name: /^Editar usuario:/ });
+    await user.click(
+      within(createdRow).getByRole("button", {
+        name: t("admin.users.actions.edit"),
+      }),
+    );
+    const editHeadingSecondPass = await screen.findByRole("heading", {
+      name: /^Editar usuario:/,
+    });
     const editSectionSecondPass = editHeadingSecondPass.closest("section");
     expect(editSectionSecondPass).not.toBeNull();
     if (!editSectionSecondPass) {
       throw new Error("Expected edit section on second pass");
     }
     const editFormScopeSecondPass = within(editSectionSecondPass);
-    await user.clear(editFormScopeSecondPass.getByLabelText(t("admin.users.edit.username")));
-    await user.type(editFormScopeSecondPass.getByLabelText(t("admin.users.edit.username")), "ops_user_v2");
-    await user.type(editFormScopeSecondPass.getByLabelText(t("admin.users.edit.currentPassword")), "OpsUser123");
-    await user.type(editFormScopeSecondPass.getByLabelText(t("admin.users.edit.newPassword")), "OpsUser789");
-    await user.selectOptions(editFormScopeSecondPass.getByLabelText(t("admin.users.edit.roles")), ["1", "2"]);
-    const disabledCheckbox = editFormScopeSecondPass.getByLabelText(t("admin.users.edit.disabled"));
+    await user.clear(
+      editFormScopeSecondPass.getByLabelText(t("admin.users.edit.email")),
+    );
+    await user.type(
+      editFormScopeSecondPass.getByLabelText(t("admin.users.edit.email")),
+      "ops.v2@example.com",
+    );
+    await user.type(
+      editFormScopeSecondPass.getByLabelText(
+        t("admin.users.edit.currentPassword"),
+      ),
+      "OpsUser123",
+    );
+    await user.type(
+      editFormScopeSecondPass.getByLabelText(t("admin.users.edit.newPassword")),
+      "OpsUser789",
+    );
+    await user.selectOptions(
+      editFormScopeSecondPass.getByLabelText(t("admin.users.edit.roles")),
+      ["1", "2"],
+    );
+    const disabledCheckbox = editFormScopeSecondPass.getByLabelText(
+      t("admin.users.edit.disabled"),
+    );
     await user.click(disabledCheckbox);
-    await user.click(editFormScopeSecondPass.getByRole("button", { name: t("admin.users.edit.submit") }));
+    await user.click(
+      editFormScopeSecondPass.getByRole("button", {
+        name: t("admin.users.edit.submit"),
+      }),
+    );
 
     await waitFor(() => {
-      expect(screen.getByText(t("admin.users.status.disabled"))).toBeInTheDocument();
+      expect(
+        screen.getByText(t("admin.users.status.disabled")),
+      ).toBeInTheDocument();
     });
     expect(updatedPayload).toEqual({
-      username: "ops_user_v2",
+      email: "ops.v2@example.com",
       disabled: true,
       role_ids: [1, 2],
       current_password: "OpsUser123", // pragma: allowlist secret
       new_password: "OpsUser789", // pragma: allowlist secret
     });
 
-    const updatedUsernameCell = await screen.findByText("ops_user_v2");
+    const updatedUsernameCell = await screen.findByText("ops.v2@example.com");
     const updatedRow = updatedUsernameCell.closest("tr");
     expect(updatedRow).not.toBeNull();
     if (!updatedRow) {
       throw new Error("Expected updated row");
     }
 
-    await user.click(within(updatedRow).getByRole("button", { name: t("admin.users.actions.delete") }));
+    await user.click(
+      within(updatedRow).getByRole("button", {
+        name: t("admin.users.actions.delete"),
+      }),
+    );
     expect(
       fetchMock.mock.calls.some((call) => {
         const requestUrl = toRequestUrl(call[0]);
         const request = call[1];
-        return requestUrl.pathname === "/v1/rbac/users/99" && request?.method === "DELETE";
+        return (
+          requestUrl.pathname === "/v1/rbac/users/99" &&
+          request?.method === "DELETE"
+        );
       }),
     ).toBe(false);
 
-    await user.click(within(updatedRow).getByRole("button", { name: t("admin.users.actions.delete") }));
+    await user.click(
+      within(updatedRow).getByRole("button", {
+        name: t("admin.users.actions.delete"),
+      }),
+    );
 
     await waitFor(() => {
       expect(
         fetchMock.mock.calls.some((call) => {
           const requestUrl = toRequestUrl(call[0]);
           const request = call[1];
-          return requestUrl.pathname === "/v1/rbac/users/99" && request?.method === "DELETE";
+          return (
+            requestUrl.pathname === "/v1/rbac/users/99" &&
+            request?.method === "DELETE"
+          );
         }),
       ).toBe(true);
     });
-    },
-    30000,
-  );
+  }, 30000);
 
   it("shows request-id diagnostics for API errors", async () => {
     const fetchMock = vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
@@ -299,8 +388,14 @@ describe("AdminUsersPage", () => {
 
     renderAdminUsersPage();
 
-    expect(await screen.findByRole("heading", { name: t("admin.common.error.title") })).toBeInTheDocument();
-    expect(await screen.findByText(/request_id=req-users-forbidden/)).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", {
+        name: t("admin.common.error.title"),
+      }),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText(/request_id=req-users-forbidden/),
+    ).toBeInTheDocument();
   });
 
   it("shows inline conflict details when user create returns 409", async () => {
@@ -328,7 +423,7 @@ describe("AdminUsersPage", () => {
         return jsonResponse(
           409,
           {
-            detail: "Username already exists",
+            detail: "Email already exists",
             code: "conflict",
             request_id: "req-users-conflict",
           },
@@ -344,19 +439,37 @@ describe("AdminUsersPage", () => {
     renderAdminUsersPage();
 
     await screen.findByRole("heading", { name: t("admin.users.title") });
-    await user.type(screen.getByLabelText(t("admin.users.create.username")), "duplicated");
-    await user.type(screen.getByLabelText(t("admin.users.create.password")), "Duplicated123");
-    await user.click(screen.getByRole("button", { name: t("admin.users.create.submit") }));
+    await user.type(
+      screen.getByLabelText(t("admin.users.create.email")),
+      "duplicated@example.com",
+    );
+    await user.type(
+      screen.getByLabelText(t("admin.users.create.password")),
+      "Duplicated123",
+    );
+    await user.click(
+      screen.getByRole("button", { name: t("admin.users.create.submit") }),
+    );
 
-    expect(await screen.findByRole("heading", { name: t("admin.common.error.title") })).toBeInTheDocument();
-    expect(await screen.findByText(/Username already exists/)).toBeInTheDocument();
-    expect(await screen.findByText(/request_id=req-users-conflict/)).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", {
+        name: t("admin.common.error.title"),
+      }),
+    ).toBeInTheDocument();
+    expect(await screen.findByText(/Email already exists/)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/request_id=req-users-conflict/),
+    ).toBeInTheDocument();
   });
 
   it("hides role controls and omits role_ids when session lacks roles:manage", async () => {
-    let createdPayload: { username: string; password: string; role_ids?: number[] } | null = null;
+    let createdPayload: {
+      email: string;
+      password: string;
+      role_ids?: number[];
+    } | null = null;
     let updatedPayload: {
-      username: string;
+      email: string;
       disabled: boolean;
       role_ids?: number[];
       current_password?: string;
@@ -372,7 +485,12 @@ describe("AdminUsersPage", () => {
         return jsonResponse(200, [
           {
             id: 1,
-            username: "admin",
+            email: "admin@example.com",
+            first_name: "Test",
+            middle_name: null,
+            last_name: "User",
+            display_name: "Test User",
+            firm_name: "Test Legal",
             disabled: false,
             role_ids: [1],
           },
@@ -380,11 +498,15 @@ describe("AdminUsersPage", () => {
       }
 
       if (method === "POST" && path === "/v1/rbac/users") {
-        const payload = readJsonBody<{ username: string; password: string; role_ids?: number[] }>(init);
+        const payload = readJsonBody<{
+          email: string;
+          password: string;
+          role_ids?: number[];
+        }>(init);
         createdPayload = payload;
         return jsonResponse(201, {
           id: 2,
-          username: payload.username,
+          email: payload.email,
           disabled: false,
           role_ids: [],
         });
@@ -392,7 +514,7 @@ describe("AdminUsersPage", () => {
 
       if (method === "PUT" && path === "/v1/rbac/users/1") {
         const payload = readJsonBody<{
-          username: string;
+          email: string;
           disabled: boolean;
           role_ids?: number[];
           current_password?: string;
@@ -401,7 +523,7 @@ describe("AdminUsersPage", () => {
         updatedPayload = payload;
         return jsonResponse(200, {
           id: 1,
-          username: payload.username,
+          email: payload.email,
           disabled: payload.disabled,
           role_ids: [1],
         });
@@ -414,10 +536,20 @@ describe("AdminUsersPage", () => {
 
     renderAdminUsersPage([IAM_PERMISSION.USERS_MANAGE]);
 
-    expect(await screen.findByRole("heading", { name: t("admin.users.title") })).toBeInTheDocument();
-    expect(screen.getByText(t("admin.users.roles.hidden.permission"))).toBeInTheDocument();
-    expect(screen.queryByLabelText(t("admin.users.create.roles"))).not.toBeInTheDocument();
-    expect(screen.queryByRole("columnheader", { name: t("admin.users.columns.roles") })).not.toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: t("admin.users.title") }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(t("admin.users.roles.hidden.permission")),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByLabelText(t("admin.users.create.roles")),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("columnheader", {
+        name: t("admin.users.columns.roles"),
+      }),
+    ).not.toBeInTheDocument();
     expect(
       fetchMock.mock.calls.some((call) => {
         const requestUrl = toRequestUrl(call[0]);
@@ -425,41 +557,63 @@ describe("AdminUsersPage", () => {
       }),
     ).toBe(false);
 
-    await user.type(screen.getByLabelText(t("admin.users.create.username")), "ops_user");
-    await user.type(screen.getByLabelText(t("admin.users.create.password")), "OpsUser123");
-    await user.click(screen.getByRole("button", { name: t("admin.users.create.submit") }));
+    await user.type(
+      screen.getByLabelText(t("admin.users.create.email")),
+      "ops@example.com",
+    );
+    await user.type(
+      screen.getByLabelText(t("admin.users.create.password")),
+      "OpsUser123",
+    );
+    await user.click(
+      screen.getByRole("button", { name: t("admin.users.create.submit") }),
+    );
 
     await waitFor(() => {
       expect(createdPayload).toEqual({
-        username: "ops_user",
+        email: "ops@example.com",
         password: "OpsUser123", // pragma: allowlist secret
       });
     });
 
-    const adminRow = (await screen.findByText("admin")).closest("tr");
+    const adminRow = (await screen.findByText("admin@example.com")).closest(
+      "tr",
+    );
     expect(adminRow).not.toBeNull();
     if (!adminRow) {
       throw new Error("Expected admin row");
     }
 
-    await user.click(within(adminRow).getByRole("button", { name: t("admin.users.actions.edit") }));
-    const editHeading = await screen.findByRole("heading", { name: /^Editar usuario:/ });
+    await user.click(
+      within(adminRow).getByRole("button", {
+        name: t("admin.users.actions.edit"),
+      }),
+    );
+    const editHeading = await screen.findByRole("heading", {
+      name: /^Editar usuario:/,
+    });
     const editSection = editHeading.closest("section");
     expect(editSection).not.toBeNull();
     if (!editSection) {
       throw new Error("Expected edit section");
     }
     const editFormScope = within(editSection);
-    expect(editFormScope.queryByLabelText(t("admin.users.edit.roles"))).not.toBeInTheDocument();
+    expect(
+      editFormScope.queryByLabelText(t("admin.users.edit.roles")),
+    ).not.toBeInTheDocument();
 
-    const editUsernameInput = editFormScope.getByLabelText(t("admin.users.edit.username"));
+    const editUsernameInput = editFormScope.getByLabelText(
+      t("admin.users.edit.email"),
+    );
     await user.clear(editUsernameInput);
-    await user.type(editUsernameInput, "admin_v2");
-    await user.click(editFormScope.getByRole("button", { name: t("admin.users.edit.submit") }));
+    await user.type(editUsernameInput, "admin.v2@example.com");
+    await user.click(
+      editFormScope.getByRole("button", { name: t("admin.users.edit.submit") }),
+    );
 
     await waitFor(() => {
       expect(updatedPayload).toEqual({
-        username: "admin_v2",
+        email: "admin.v2@example.com",
         disabled: false,
       });
     });
@@ -481,7 +635,12 @@ describe("AdminUsersPage", () => {
         return jsonResponse(200, [
           {
             id: 1,
-            username: "admin",
+            email: "admin@example.com",
+            first_name: "Test",
+            middle_name: null,
+            last_name: "User",
+            display_name: "Test User",
+            firm_name: "Test Legal",
             disabled: false,
             role_ids: [1],
           },
@@ -504,15 +663,32 @@ describe("AdminUsersPage", () => {
     });
     vi.stubGlobal("fetch", fetchMock);
 
-    renderAdminUsersPage([IAM_PERMISSION.USERS_MANAGE, IAM_PERMISSION.ROLES_MANAGE]);
+    renderAdminUsersPage([
+      IAM_PERMISSION.USERS_MANAGE,
+      IAM_PERMISSION.ROLES_MANAGE,
+    ]);
 
-    expect(await screen.findByRole("heading", { name: t("admin.users.title") })).toBeInTheDocument();
-    expect(await screen.findByText("admin")).toBeInTheDocument();
-    expect(screen.getByLabelText(t("admin.users.create.username"))).toBeInTheDocument();
-    expect(await screen.findByText(t("admin.users.roles.hidden.error"))).toBeInTheDocument();
-    expect(await screen.findByText(/request_id=req-roles-500/)).toBeInTheDocument();
-    expect(screen.queryByLabelText(t("admin.users.create.roles"))).not.toBeInTheDocument();
-    expect(screen.queryByRole("columnheader", { name: t("admin.users.columns.roles") })).not.toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: t("admin.users.title") }),
+    ).toBeInTheDocument();
+    expect(await screen.findByText("admin@example.com")).toBeInTheDocument();
+    expect(
+      screen.getByLabelText(t("admin.users.create.email")),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText(t("admin.users.roles.hidden.error")),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText(/request_id=req-roles-500/),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByLabelText(t("admin.users.create.roles")),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("columnheader", {
+        name: t("admin.users.columns.roles"),
+      }),
+    ).not.toBeInTheDocument();
   });
 
   it("clears invalid session token when RBAC endpoint responds 401", async () => {
@@ -544,8 +720,14 @@ describe("AdminUsersPage", () => {
 
     renderAdminUsersPage();
 
-    expect(await screen.findByRole("heading", { name: t("admin.common.error.title") })).toBeInTheDocument();
-    expect(await screen.findByText(/Could not validate credentials/)).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", {
+        name: t("admin.common.error.title"),
+      }),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Could not validate credentials/),
+    ).toBeInTheDocument();
     expect(getAccessToken()).toBeNull();
   });
 
@@ -571,8 +753,12 @@ describe("AdminUsersPage", () => {
 
     await waitFor(
       () => {
-        expect(screen.getByRole("heading", { name: t("admin.common.error.title") })).toBeInTheDocument();
-        expect(screen.getByText(t("admin.common.error.generic"))).toBeInTheDocument();
+        expect(
+          screen.getByRole("heading", { name: t("admin.common.error.title") }),
+        ).toBeInTheDocument();
+        expect(
+          screen.getByText(t("admin.common.error.generic")),
+        ).toBeInTheDocument();
       },
       { timeout: 4000 },
     );

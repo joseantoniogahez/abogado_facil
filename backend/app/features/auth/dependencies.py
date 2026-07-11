@@ -13,7 +13,7 @@ BearerTokenDependency = Annotated[str, Depends(oauth2_scheme)]
 
 
 async def get_auth_credentials(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> LoginCredentialsRequest:
-    return LoginCredentialsRequest(username=form_data.username, password=form_data.password)
+    return LoginCredentialsRequest(email=form_data.username, password=form_data.password)
 
 
 AuthCredentialsDependency = Annotated[LoginCredentialsRequest, Depends(get_auth_credentials)]

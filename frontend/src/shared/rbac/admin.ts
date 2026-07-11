@@ -20,13 +20,13 @@ import {
 } from "@/shared/rbac/contracts";
 
 export interface CreateAdminUserPayload {
-  username: string;
+  email: string;
   password: string;
   role_ids?: number[];
 }
 
 export interface UpdateAdminUserPayload {
-  username?: string;
+  email?: string;
   current_password?: string;
   new_password?: string;
   disabled?: boolean;

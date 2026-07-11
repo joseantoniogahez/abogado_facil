@@ -13,12 +13,16 @@ from app.core.authorization.dependencies import (
 from app.features.auth.principal import CurrentPrincipal
 
 
-def _build_user(*, user_id: int, tenant_id: int | None) -> CurrentPrincipal:
+def _build_user(*, user_id: int, firm_id: int | None) -> CurrentPrincipal:
     return CurrentPrincipal(
         id=user_id,
-        username="dependency-user",
+        email="dependency.user@example.com",
+        first_name="Dependency",
+        middle_name=None,
+        last_name="User",
+        display_name="Dependency User",
         disabled=False,
-        tenant_id=tenant_id,
+        firm_id=firm_id,
     )
 
 
@@ -49,7 +53,7 @@ def test_build_default_permission_context_returns_empty_context() -> None:
 
 
 def test_build_current_user_permission_context_maps_owner_and_tenant() -> None:
-    current_user = _build_user(user_id=7, tenant_id=11)
+    current_user = _build_user(user_id=7, firm_id=11)
 
     async def run_test() -> None:
         context = await build_current_user_permission_context(current_user)
@@ -61,7 +65,7 @@ def test_build_current_user_permission_context_maps_owner_and_tenant() -> None:
 
 
 def test_build_current_tenant_permission_context_maps_tenant_only() -> None:
-    current_user = _build_user(user_id=9, tenant_id=22)
+    current_user = _build_user(user_id=9, firm_id=22)
 
     async def run_test() -> None:
         context = await build_current_tenant_permission_context(current_user)

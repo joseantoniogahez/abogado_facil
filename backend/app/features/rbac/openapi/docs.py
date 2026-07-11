@@ -593,9 +593,9 @@ CREATE_ADMIN_USER_DOC: dict[str, Any] = {
             },
         ),
         status.HTTP_409_CONFLICT: build_error_response(
-            description="Username already exists.",
+            description="Email already exists.",
             example={
-                "detail": "Username already exists",
+                "detail": "Email already exists",
                 "status": 409,
                 "code": "conflict",
                 "meta": {"username": "reader_user"},
@@ -640,9 +640,9 @@ UPDATE_ADMIN_USER_DOC: dict[str, Any] = {
             },
         ),
         status.HTTP_409_CONFLICT: build_error_response(
-            description="Username already exists.",
+            description="Email already exists.",
             example={
-                "detail": "Username already exists",
+                "detail": "Email already exists",
                 "status": 409,
                 "code": "conflict",
                 "meta": {"username": "admin"},

@@ -15,13 +15,13 @@ describe("rbac contracts", () => {
     expect(
       parseAdminUser({
         id: 3,
-        username: "ops_user",
+        email: "ops_user",
         disabled: false,
         role_ids: [1, 2],
       }),
     ).toEqual({
       id: 3,
-      username: "ops_user",
+      email: "ops_user",
       disabled: false,
       role_ids: [1, 2],
     });
@@ -31,7 +31,7 @@ describe("rbac contracts", () => {
     expect(() =>
       parseAdminUser({
         id: 3,
-        username: "ops_user",
+        email: "ops_user",
         disabled: false,
         role_ids: ["1"],
       }),
@@ -99,7 +99,7 @@ describe("rbac contracts", () => {
       parseAdminUserList([
         {
           id: 1,
-          username: "admin",
+          email: "admin",
           disabled: false,
           role_ids: [1],
         },
@@ -135,14 +135,14 @@ describe("rbac contracts", () => {
       parseAssignedUserList([
         {
           id: 3,
-          username: "reader_user",
+          email: "reader_user",
           disabled: false,
         },
       ]),
     ).toEqual([
       {
         id: 3,
-        username: "reader_user",
+        email: "reader_user",
         disabled: false,
       },
     ]);

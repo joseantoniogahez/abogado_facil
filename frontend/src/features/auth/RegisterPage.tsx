@@ -6,38 +6,53 @@ import { ApiError, appendRequestIdDiagnostic, getApiErrorRequestId } from "@/sha
 import { type AuthenticatedUser, registerUser, useSession } from "@/shared/auth/session";
 import {
   getPasswordPolicyViolationKeys,
-  isNormalizedUsernameValid,
-  normalizeUsername,
+  composeDisplayName,
+  isEmailValid,
+  normalizeEmail,
 } from "@/shared/auth/validation";
 import { t } from "@/shared/i18n/ui-text";
 import { CenteredMessage } from "@/shared/ui/CenteredMessage";
+import { AccountFormField } from "@/shared/ui/AccountFormField";
 
 interface RegisterFormState {
-  username: string;
+  firstName: string;
+  middleName: string;
+  lastName: string;
+  displayName: string;
+  email: string;
+  firmName: string;
   password: string;
 }
 
 const INITIAL_FORM_STATE: RegisterFormState = {
-  username: "",
+  firstName: "",
+  middleName: "",
+  lastName: "",
+  displayName: "",
+  email: "",
+  firmName: "",
   password: "",
 };
 
 const getRegisterValidationMessage = (formState: RegisterFormState): string | null => {
-  const normalizedUsername = normalizeUsername(formState.username);
-
-  if (!normalizedUsername.length) {
-    return t("auth.validation.username.required");
+  const normalizedEmail = normalizeEmail(formState.email);
+  if (!formState.firstName.trim() || !formState.lastName.trim()) {
+    return t("auth.validation.legalName.required");
   }
-  if (!isNormalizedUsernameValid(formState.username)) {
-    return t("auth.validation.username.format");
+  if (!formState.displayName.trim()) {
+    return t("auth.validation.displayName.required");
+  }
+  if (!isEmailValid(normalizedEmail)) {
+    return t("auth.validation.email.format");
   }
 
-  const [firstPasswordViolation] = getPasswordPolicyViolationKeys(formState.password, normalizedUsername);
+  const [firstPasswordViolation] = getPasswordPolicyViolationKeys(formState.password, normalizedEmail);
   return firstPasswordViolation ? t(firstPasswordViolation) : null;
 };
 
 export const RegisterPage = () => {
   const [formState, setFormState] = useState<RegisterFormState>(INITIAL_FORM_STATE);
+  const [displayNameCustomized, setDisplayNameCustomized] = useState(false);
   const [clientError, setClientError] = useState<string | null>(null);
   const [registeredUser, setRegisteredUser] = useState<AuthenticatedUser | null>(null);
   const session = useSession();
@@ -49,6 +64,7 @@ export const RegisterPage = () => {
       setRegisteredUser(user);
       setClientError(null);
       setFormState(INITIAL_FORM_STATE);
+      setDisplayNameCustomized(false);
     },
   });
 
@@ -73,8 +89,23 @@ export const RegisterPage = () => {
 
     setClientError(null);
     registerMutation.mutate({
-      username: formState.username.trim(),
+      first_name: formState.firstName.trim(),
+      ...(formState.middleName.trim() ? { middle_name: formState.middleName.trim() } : {}),
+      last_name: formState.lastName.trim(),
+      display_name: formState.displayName.trim(),
+      email: normalizeEmail(formState.email),
+      ...(formState.firmName.trim() ? { firm_name: formState.firmName.trim() } : {}),
       password: formState.password,
+    });
+  };
+
+  const updateNamePart = (field: "firstName" | "middleName" | "lastName", value: string) => {
+    setFormState((previous) => {
+      const next = { ...previous, [field]: value };
+      if (!displayNameCustomized) {
+        next.displayName = composeDisplayName(next.firstName, next.middleName, next.lastName);
+      }
+      return next;
     });
   };
 
@@ -95,7 +126,7 @@ export const RegisterPage = () => {
             {t("auth.register.success.title")}
           </h1>
           <p className="fade-rise-delay-2 mt-4 text-sm text-[var(--app-subtle)]">
-            {t("auth.register.success.body", { username: registeredUser.username })}
+            {t("auth.register.success.body", { email: registeredUser.email })}
           </p>
           <div className="mt-8">
             <Link
@@ -122,42 +153,16 @@ export const RegisterPage = () => {
         </p>
 
         <form className="mt-8 space-y-4" onSubmit={submit}>
-          <label className="block">
-            <span className="mb-2 block text-sm font-medium text-[var(--app-ink)]">
-              {t("auth.login.fields.username")}
-            </span>
-            <input
-              autoComplete="username"
-              className="w-full rounded-2xl border border-[var(--app-border)] bg-white px-4 py-3 text-base outline-none transition focus:border-[var(--app-accent)]"
-              name="username"
-              onChange={(event) =>
-                setFormState((previous) => ({ ...previous, username: event.target.value }))
-              }
-              required
-              value={formState.username}
-            />
-          </label>
-
-          <label className="block">
-            <span className="mb-2 block text-sm font-medium text-[var(--app-ink)]">
-              {t("auth.login.fields.password")}
-            </span>
-            <input
-              autoComplete="new-password"
-              className="w-full rounded-2xl border border-[var(--app-border)] bg-white px-4 py-3 text-base outline-none transition focus:border-[var(--app-accent)]"
-              minLength={8}
-              name="password"
-              onChange={(event) =>
-                setFormState((previous) => ({ ...previous, password: event.target.value }))
-              }
-              required
-              type="password"
-              value={formState.password}
-            />
-          </label>
+          <AccountFormField autoComplete="given-name" label={t("auth.register.fields.firstName")} name="firstName" onChange={(event) => updateNamePart("firstName", event.target.value)} required value={formState.firstName} />
+          <AccountFormField autoComplete="additional-name" label={t("auth.register.fields.middleName")} name="middleName" onChange={(event) => updateNamePart("middleName", event.target.value)} value={formState.middleName} />
+          <AccountFormField autoComplete="family-name" label={t("auth.register.fields.lastName")} name="lastName" onChange={(event) => updateNamePart("lastName", event.target.value)} required value={formState.lastName} />
+          <AccountFormField autoComplete="nickname" label={t("auth.register.fields.displayName")} name="displayName" onChange={(event) => { setDisplayNameCustomized(true); setFormState((previous) => ({ ...previous, displayName: event.target.value })); }} required value={formState.displayName} />
+          <AccountFormField autoComplete="email" label={t("auth.login.fields.email")} name="email" onChange={(event) => setFormState((previous) => ({ ...previous, email: event.target.value }))} required type="email" value={formState.email} />
+          <AccountFormField autoComplete="organization" label={t("auth.register.fields.firmName")} name="firmName" onChange={(event) => setFormState((previous) => ({ ...previous, firmName: event.target.value }))} value={formState.firmName} />
+          <AccountFormField autoComplete="new-password" label={t("auth.login.fields.password")} minLength={8} name="password" onChange={(event) => setFormState((previous) => ({ ...previous, password: event.target.value }))} required type="password" value={formState.password} />
 
           <ul className="space-y-1 rounded-2xl border border-[var(--app-border)] bg-[var(--app-bg)] px-4 py-3 text-sm text-[var(--app-subtle)]">
-            <li>{t("auth.shared.username.hint")}</li>
+            <li>{t("auth.shared.email.hint")}</li>
             <li>{t("auth.shared.password.hint")}</li>
           </ul>
 

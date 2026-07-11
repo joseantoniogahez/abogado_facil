@@ -35,13 +35,13 @@ const RBAC_USERS_QUERY_KEY = ["rbac", "users"] as const;
 const RBAC_ROLES_QUERY_KEY = ["rbac", "roles"] as const;
 
 interface CreateUserFormState {
-  username: string;
+  email: string;
   password: string;
   roleIds: number[];
 }
 
 interface EditUserFormState {
-  username: string;
+  email: string;
   currentPassword: string;
   newPassword: string;
   disabled: boolean;
@@ -49,7 +49,7 @@ interface EditUserFormState {
 }
 
 const INITIAL_CREATE_USER_FORM_STATE: CreateUserFormState = {
-  username: "",
+  email: "",
   password: "",
   roleIds: [],
 };
@@ -64,7 +64,7 @@ const toCreateUserPayload = (
   includeRoleAssignments: boolean,
 ): CreateAdminUserPayload => {
   const payload: CreateAdminUserPayload = {
-    username: formState.username,
+    email: formState.email,
     password: formState.password,
   };
   if (includeRoleAssignments) {
@@ -75,7 +75,7 @@ const toCreateUserPayload = (
 
 const toUpdateUserPayload = (formState: EditUserFormState, includeRoleAssignments: boolean): UpdateAdminUserPayload => {
   const payload: UpdateAdminUserPayload = {
-    username: formState.username,
+    email: formState.email,
     disabled: formState.disabled,
   };
   if (includeRoleAssignments) {
@@ -91,7 +91,7 @@ const toUpdateUserPayload = (formState: EditUserFormState, includeRoleAssignment
 };
 
 const toEditFormState = (user: AdminUser): EditUserFormState => ({
-  username: user.username,
+  email: user.email,
   currentPassword: "",
   newPassword: "",
   disabled: user.disabled,
@@ -185,7 +185,7 @@ export const AdminUsersPage = () => {
   };
 
   const confirmAndDeleteUser = (user: AdminUser) => {
-    const confirmed = window.confirm(t("admin.users.actions.delete.confirm", { username: user.username }));
+    const confirmed = window.confirm(t("admin.users.actions.delete.confirm", { email: user.email }));
     if (!confirmed) {
       return;
     }
@@ -216,15 +216,17 @@ export const AdminUsersPage = () => {
         <h2 className="text-lg font-semibold">{t("admin.users.create.title")}</h2>
         <form className={ADMIN_FORM_GRID_CLASS_NAME} onSubmit={submitCreateForm}>
           <label className="block">
-            <span className={ADMIN_LABEL_CLASS_NAME}>{t("admin.users.create.username")}</span>
+            <span className={ADMIN_LABEL_CLASS_NAME}>{t("admin.users.create.email")}</span>
             <input
               className={ADMIN_FIELD_CLASS_NAME}
-              name="username"
+              autoComplete="email"
+              name="email"
               onChange={(event) =>
-                setCreateFormState((previous) => ({ ...previous, username: event.target.value }))
+                setCreateFormState((previous) => ({ ...previous, email: event.target.value }))
               }
               required
-              value={createFormState.username}
+              type="email"
+              value={createFormState.email}
             />
           </label>
 
@@ -289,7 +291,7 @@ export const AdminUsersPage = () => {
             <table className="w-full min-w-[700px] border-collapse text-left text-sm">
               <thead>
                 <tr className="border-b border-[var(--app-border)]">
-                  <th className="px-2 py-2 font-semibold">{t("admin.users.columns.username")}</th>
+                  <th className="px-2 py-2 font-semibold">{t("admin.users.columns.email")}</th>
                   <th className="px-2 py-2 font-semibold">{t("admin.users.columns.status")}</th>
                   {showRoleCatalogControls ? (
                     <th className="px-2 py-2 font-semibold">{t("admin.users.columns.roles")}</th>
@@ -300,7 +302,7 @@ export const AdminUsersPage = () => {
               <tbody>
                 {users.map((user) => (
                   <tr className="border-b border-[var(--app-border)]" key={user.id}>
-                    <td className="px-2 py-3">{user.username}</td>
+                    <td className="px-2 py-3">{user.email}</td>
                     <td className="px-2 py-3">
                       {user.disabled ? t("admin.users.status.disabled") : t("admin.users.status.active")}
                     </td>
@@ -341,19 +343,21 @@ export const AdminUsersPage = () => {
       {editingUser && editFormState ? (
         <section className={ADMIN_CARD_CLASS_NAME}>
           <h2 className="text-lg font-semibold">
-            {t("admin.users.edit.title")}: {editingUser.username}
+            {t("admin.users.edit.title")}: {editingUser.email}
           </h2>
           <form className={ADMIN_FORM_GRID_CLASS_NAME} onSubmit={submitEditForm}>
             <label className="block">
-              <span className={ADMIN_LABEL_CLASS_NAME}>{t("admin.users.edit.username")}</span>
+              <span className={ADMIN_LABEL_CLASS_NAME}>{t("admin.users.edit.email")}</span>
               <input
                 className={ADMIN_FIELD_CLASS_NAME}
-                name="edit-username"
+                autoComplete="email"
+                name="edit-email"
                 onChange={(event) =>
-                  setEditFormState((previous) => ({ ...previous!, username: event.target.value }))
+                  setEditFormState((previous) => ({ ...previous!, email: event.target.value }))
                 }
                 required
-                value={editFormState.username}
+                type="email"
+                value={editFormState.email}
               />
             </label>
 

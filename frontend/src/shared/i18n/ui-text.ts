@@ -1,7 +1,8 @@
 export const ES_MESSAGES = {
-  "admin.common.error.generic": "No fue posible completar la operacion, intenta nuevamente.",
-  "admin.common.error.title": "Error del modulo administrador",
-  "admin.common.loading": "Cargando modulo administrador...",
+  "admin.common.error.generic":
+    "No fue posible completar la operación, intenta nuevamente.",
+  "admin.common.error.title": "Error del módulo administrador",
+  "admin.common.loading": "Cargando módulo administrador...",
   "admin.as.submit": "Asignar",
   "admin.as.pending": "Asignando...",
   "admin.as.rid": "ID de rol",
@@ -13,18 +14,19 @@ export const ES_MESSAGES = {
   "admin.as.uEmpty": "Sin roles directos.",
   "admin.as.uTitle": "Roles directos del usuario",
   "admin.auditLog.actor.system": "Sistema",
-  "admin.auditLog.columns.action": "Accion",
+  "admin.auditLog.columns.action": "Acción",
   "admin.auditLog.columns.actor": "Actor",
   "admin.auditLog.columns.createdAt": "Fecha UTC",
   "admin.auditLog.columns.resource": "Recurso",
   "admin.auditLog.columns.summary": "Resumen",
-  "admin.auditLog.empty": "No hay eventos de auditoria registrados.",
-  "admin.auditLog.subtitle": "Revisa los eventos administrativos mas recientes registrados por la API.",
-  "admin.auditLog.title": "Bitacora de auditoria",
+  "admin.auditLog.empty": "No hay eventos de auditoría registrados.",
+  "admin.auditLog.subtitle":
+    "Revisa los eventos administrativos mas recientes registrados por la API.",
+  "admin.auditLog.title": "Bitacora de auditoría",
   "admin.pm.help": "own=propio, tenant=tenant actual, any=global.",
   "admin.pm.list": "Permisos asignados",
   "admin.pm.manual": "Sin roles:manage, usa ID manual.",
-  "admin.pm.missing": "Rol fuera del catalogo.",
+  "admin.pm.missing": "Rol fuera del catálogo.",
   "admin.pm.title": "Permisos por rol",
   "admin.roles.actions.delete": "Eliminar rol",
   "admin.roles.actions.delete.confirm": "Eliminar el rol {roleName}?",
@@ -32,7 +34,7 @@ export const ES_MESSAGES = {
   "admin.roles.actions.update.pending": "Guardando...",
   "admin.roles.card.noParents": "Sin roles padre asignados.",
   "admin.roles.card.noPermissions": "Sin permisos asignados.",
-  "admin.roles.card.parents": "Jerarquia de roles",
+  "admin.roles.card.parents": "Jerarquía de roles",
   "admin.roles.card.permissions": "Permisos del rol",
   "admin.roles.create.name": "Nombre del rol",
   "admin.roles.create.submit": "Crear rol",
@@ -47,75 +49,91 @@ export const ES_MESSAGES = {
   "admin.roles.permissions.scope.any": "Alcance: any",
   "admin.roles.permissions.scope.label": "Alcance",
   "admin.roles.permissions.select": "Selecciona permiso",
-  "admin.roles.subtitle": "Gestiona roles, jerarquia y permisos predefinidos.",
-  "admin.roles.title": "Administracion de roles y permisos",
+  "admin.roles.subtitle": "Gestiona roles, jerarquía y permisos predefinidos.",
+  "admin.roles.title": "Administración de roles y permisos",
   "admin.users.actions.delete": "Deshabilitar usuario",
-  "admin.users.actions.delete.confirm": "Deshabilitar al usuario {username}?",
+  "admin.users.actions.delete.confirm": "¿Deshabilitar la cuenta {email}?",
   "admin.users.actions.edit": "Editar usuario",
   "admin.users.columns.actions": "Acciones",
   "admin.users.columns.roles": "Roles",
   "admin.users.columns.status": "Estado",
-  "admin.users.columns.username": "Usuario",
-  "admin.users.create.password": "Contrasena", // pragma: allowlist secret
+  "admin.users.columns.email": "Correo electrónico",
+  "admin.users.create.password": "Contraseña", // pragma: allowlist secret
   "admin.users.create.roles": "Roles",
   "admin.users.create.submit": "Crear usuario",
   "admin.users.create.submit.pending": "Creando usuario...",
   "admin.users.create.title": "Crear usuario",
-  "admin.users.create.username": "Username",
+  "admin.users.create.email": "Correo electrónico",
   "admin.users.edit.cancel": "Cancelar",
-  "admin.users.edit.currentPassword": "Contrasena actual", // pragma: allowlist secret
+  "admin.users.edit.currentPassword": "Contraseña actual", // pragma: allowlist secret
   "admin.users.edit.disabled": "Usuario deshabilitado",
-  "admin.users.edit.newPassword": "Nueva contrasena", // pragma: allowlist secret
+  "admin.users.edit.newPassword": "Nueva contraseña", // pragma: allowlist secret
   "admin.users.edit.roles": "Roles",
   "admin.users.edit.submit": "Guardar cambios",
   "admin.users.edit.submit.pending": "Guardando...",
   "admin.users.edit.title": "Editar usuario",
-  "admin.users.edit.username": "Username",
+  "admin.users.edit.email": "Correo electrónico",
   "admin.users.list.empty": "No hay usuarios registrados.",
   "admin.users.list.title": "Usuarios",
-  "admin.users.roles.hidden.error": "Los controles de roles estan ocultos porque no fue posible cargar el catalogo.",
+  "admin.users.roles.hidden.error":
+    "Los controles de roles estan ocultos porque no fue posible cargar el catálogo.",
   "admin.users.roles.hidden.permission":
-    "Los controles de roles estan ocultos porque esta sesion no puede consultar el catalogo de roles.",
-  "admin.users.roles.loading": "Cargando catalogo de roles para esta vista...",
+    "Los controles de roles estan ocultos porque esta sesión no puede consultar el catálogo de roles.",
+  "admin.users.roles.loading": "Cargando catálogo de roles para esta vista...",
   "admin.users.status.active": "Activo",
   "admin.users.status.disabled": "Inactivo",
   "admin.users.subtitle":
-    "Crea, actualiza y deshabilita usuarios; los controles de roles aparecen cuando el catalogo esta disponible.",
-  "admin.users.title": "Administracion de usuarios",
+    "Crea, actualiza y deshabilita usuarios; los controles de roles aparecen cuando el catálogo esta disponible.",
+  "admin.users.title": "Administración de usuarios",
   "auth.login.badge": "Login",
-  "auth.login.error.generic": "No fue posible iniciar sesion, intenta nuevamente.",
-  "auth.login.fields.password": "Contrasena", // pragma: allowlist secret
-  "auth.login.fields.username": "Usuario",
+  "auth.login.error.generic":
+    "No fue posible iniciar sesión, intenta nuevamente.",
+  "auth.login.fields.password": "Contraseña", // pragma: allowlist secret
+  "auth.login.fields.email": "Correo electrónico",
   "auth.login.footer.backToLanding": "Regresa a Abogado Fácil",
   "auth.login.footer.createAccount": "Crea tu cuenta",
-  "auth.login.footer.firstTime": "Primera vez aqui?",
+  "auth.login.footer.firstTime": "Primera vez aquí?",
   "auth.login.submit.default": "Entrar",
   "auth.login.submit.pending": "Validando...",
-  "auth.login.subtitle": "Usa tus credenciales para continuar al panel de bienvenida.",
-  "auth.login.title": "Inicia sesion",
-  "auth.login.validating.title": "Validando sesion...",
+  "auth.login.subtitle":
+    "Usa tus credenciales para continuar al panel de bienvenida.",
+  "auth.login.title": "Inicia sesión",
+  "auth.login.validating.title": "Validando sesión...",
   "auth.register.badge": "Registro",
-  "auth.register.error.generic": "No fue posible crear la cuenta, intenta nuevamente.",
+  "auth.register.error.generic":
+    "No fue posible crear la cuenta, intenta nuevamente.",
   "auth.register.footer.haveAccount": "Ya tienes cuenta?",
-  "auth.register.footer.signIn": "Inicia sesion",
+  "auth.register.footer.signIn": "Inicia sesión",
   "auth.register.submit.default": "Crear cuenta",
   "auth.register.submit.pending": "Creando cuenta...",
-  "auth.register.subtitle": "Crea un acceso local usando el contrato actual de autenticacion.",
-  "auth.register.success.body": "La cuenta {username} quedo lista. Inicia sesion para continuar.",
+  "auth.register.subtitle":
+    "Crea un acceso local usando el contrato actual de autenticación.",
+  "auth.register.success.body":
+    "La cuenta {email} quedo lista. Inicia sesión para continuar.",
+  "auth.register.fields.firstName": "Nombre",
+  "auth.register.fields.middleName": "Segundo nombre (opcional)",
+  "auth.register.fields.lastName": "Apellidos",
+  "auth.register.fields.displayName": "Nombre para mostrar",
+  "auth.register.fields.firmName": "Nombre del despacho (opcional)",
   "auth.register.success.title": "Cuenta creada",
   "auth.register.title": "Crea tu cuenta",
   "auth.shared.password.hint":
-    "La contrasena requiere al menos 8 caracteres, una minuscula, una mayuscula y un numero, y no puede contener el username.", // pragma: allowlist secret
-  "auth.shared.username.hint":
-    "El username se normaliza a minusculas y solo acepta letras, numeros, punto, guion bajo y guion medio.",
-  "auth.validation.password.containsUsername": "La contrasena no puede contener el username.", // pragma: allowlist secret
-  "auth.validation.password.length": "La contrasena debe tener al menos 8 caracteres.", // pragma: allowlist secret
-  "auth.validation.password.lowercase": "La contrasena debe incluir al menos una letra minuscula.", // pragma: allowlist secret
-  "auth.validation.password.number": "La contrasena debe incluir al menos un numero.", // pragma: allowlist secret
-  "auth.validation.password.uppercase": "La contrasena debe incluir al menos una letra mayuscula.", // pragma: allowlist secret
-  "auth.validation.username.format":
-    "El username solo acepta letras minusculas, numeros, punto, guion bajo y guion medio.",
-  "auth.validation.username.required": "Ingresa un username.",
+    "La contraseña requiere al menos 8 caracteres, una minúscula, una mayúscula y un número, y no puede contener el correo electrónico.", // pragma: allowlist secret
+  "auth.shared.email.hint":
+    "El correo se normaliza a minúsculas y sera tu identificador de acceso.",
+  "auth.validation.email.format": "Ingresa un correo electrónico válido.",
+  "auth.validation.legalName.required": "Ingresa nombre y apellidos.",
+  "auth.validation.displayName.required": "Ingresa un nombre para mostrar.",
+  "auth.validation.password.containsUsername":
+    "La contraseña no puede contener el correo electrónico.", // pragma: allowlist secret
+  "auth.validation.password.length":
+    "La contraseña debe tener al menos 8 caracteres.", // pragma: allowlist secret
+  "auth.validation.password.lowercase":
+    "La contraseña debe incluir al menos una letra minúscula.", // pragma: allowlist secret
+  "auth.validation.password.number":
+    "La contraseña debe incluir al menos un número.", // pragma: allowlist secret
+  "auth.validation.password.uppercase":
+    "La contraseña debe incluir al menos una letra mayúscula.", // pragma: allowlist secret
   "landing.brand": "Abogado Fácil",
   "landing.badge.portal": "Abogado Fácil",
   "landing.byok.body":
@@ -165,9 +183,11 @@ export const ES_MESSAGES = {
   "landing.preview.next.value": "Pedir documentos",
   "landing.preview.status.label": "Estado",
   "landing.preview.status.value": "Activo",
-  "landing.preview.timeline.first.body": "Relato inicial convertido en hechos relevantes.",
+  "landing.preview.timeline.first.body":
+    "Relato inicial convertido en hechos relevantes.",
   "landing.preview.timeline.first.date": "10 jul",
-  "landing.preview.timeline.second.body": "Preguntas pendientes listas para revisar con el cliente.",
+  "landing.preview.timeline.second.body":
+    "Preguntas pendientes listas para revisar con el cliente.",
   "landing.preview.timeline.second.date": "12 jul",
   "landing.preview.timeline.title": "Cronología sugerida",
   "landing.preview.title": "Expediente: Pensión alimenticia",
@@ -176,24 +196,34 @@ export const ES_MESSAGES = {
   "landing.title": "Abogado Fácil",
   "profile.actions.cancel": "Cancelar",
   "profile.badge": "Perfil",
-  "profile.currentUser": "Sesion activa para {username}",
-  "profile.error.generic": "No fue posible actualizar el perfil, intenta nuevamente.",
-  "profile.fields.currentPassword": "Contrasena actual", // pragma: allowlist secret
-  "profile.fields.newPassword": "Nueva contrasena", // pragma: allowlist secret
-  "profile.fields.username": "Username",
-  "profile.password.optional": "Deja ambos campos de contrasena vacios si solo cambiaras el username.",
+  "profile.currentUser": "Sesion activa para {email}",
+  "profile.error.generic":
+    "No fue posible actualizar el perfil, intenta nuevamente.",
+  "profile.fields.currentPassword": "Contraseña actual", // pragma: allowlist secret
+  "profile.fields.newPassword": "Nueva contraseña", // pragma: allowlist secret
+  "profile.fields.firstName": "Nombre",
+  "profile.fields.middleName": "Segundo nombre",
+  "profile.fields.lastName": "Apellidos",
+  "profile.fields.displayName": "Nombre para mostrar",
+  "profile.fields.email": "Correo electrónico",
+  "profile.fields.firmName": "Despacho",
+  "profile.password.optional":
+    "Deja ambos campos de contraseña vacíos si solo cambiarás los datos del perfil.",
   "profile.submit.default": "Guardar perfil",
   "profile.submit.pending": "Guardando perfil...",
-  "profile.subtitle": "Actualiza tu username y, si lo necesitas, rota tu contrasena actual.",
-  "profile.success.body": "La sesion local ya refleja los cambios de {username}.",
+  "profile.subtitle":
+    "Actualiza los datos de tu cuenta y, si lo necesitas, cambia tu contraseña.",
+  "profile.success.body": "La sesión local ya refleja los cambios de {email}.",
+  "profile.validation.names.required":
+    "Nombre completo y despacho son obligatorios.",
   "profile.success.title": "Perfil actualizado",
   "profile.title": "Administra tu cuenta",
   "profile.validation.currentPassword.required":
-    "Ingresa la contrasena actual para cambiar la contrasena.", // pragma: allowlist secret
+    "Ingresa la contraseña actual para cambiar la contraseña.", // pragma: allowlist secret
   "profile.validation.newPassword.different":
-    "La nueva contrasena debe ser diferente a la actual.", // pragma: allowlist secret
+    "La nueva contraseña debe ser diferente a la actual.", // pragma: allowlist secret
   "profile.validation.newPassword.required":
-    "Ingresa la nueva contrasena para completar el cambio.", // pragma: allowlist secret
+    "Ingresa la nueva contraseña para completar el cambio.", // pragma: allowlist secret
   "profile.validation.noChanges": "No hay cambios para guardar.",
   "routing.error.body": "No fue posible cargar esta ruta.",
   "routing.error.title": "Error de navegacion",
@@ -208,26 +238,30 @@ export const ES_MESSAGES = {
   "routing.nav.home": "Inicio",
   "routing.nav.menu.toggle": "Abrir menu de navegacion",
   "routing.nav.profile": "Perfil",
-  "routing.protected.error.body": "Revisa la conexion con la API e intenta nuevamente.",
-  "routing.protected.error.title": "No fue posible validar la sesion",
+  "routing.protected.error.body":
+    "Revisa la conexion con la API e intenta nuevamente.",
+  "routing.protected.error.title": "No fue posible validar la sesión",
   "routing.protected.validating.body": "Espera un momento.",
-  "routing.protected.validating.title": "Validando sesion...",
+  "routing.protected.validating.title": "Validando sesión...",
   "shared.centeredMessage.stateLabel": "Estado",
   "welcome.badge": "Bienvenida",
-  "welcome.greeting": "Hola, {username}",
-  "welcome.logout": "Cerrar sesion",
-  "welcome.logout.pending": "Cerrando sesion...",
-  "welcome.noSession.body": "Vuelve a iniciar sesion.",
-  "welcome.noSession.title": "No hay sesion activa",
+  "welcome.greeting": "Hola, {displayName}",
+  "welcome.logout": "Cerrar sesión",
+  "welcome.logout.pending": "Cerrando sesión...",
+  "welcome.noSession.body": "Vuelve a iniciar sesión.",
+  "welcome.noSession.title": "No hay sesión activa",
   "welcome.sessionActive.body":
-    "Tu sesion esta activa y validada contra la API. Desde aqui puedes continuar al siguiente modulo.",
+    "Tu sesión esta activa y validada contra la API. Desde aquí puedes continuar al siguiente módulo.",
 } as const;
 
 export type UiTextKey = keyof typeof ES_MESSAGES;
 
 const PARAM_PATTERN = /\{(\w+)\}/g;
 
-export const t = (key: UiTextKey, params?: Record<string, string | number>): string => {
+export const t = (
+  key: UiTextKey,
+  params?: Record<string, string | number>,
+): string => {
   const template = ES_MESSAGES[key];
   if (!params) {
     return template;

@@ -62,7 +62,12 @@ describe("LoginPage", () => {
         json: () =>
           Promise.resolve({
           id: 1,
-          username: "admin",
+          email: "admin@example.com",
+          first_name: "Test",
+          middle_name: null,
+          last_name: "User",
+          display_name: "Test User",
+          firm_name: "Test Legal",
           disabled: false,
           permissions: ["users:manage", "roles:manage"],
           }),
@@ -73,7 +78,12 @@ describe("LoginPage", () => {
         json: () =>
           Promise.resolve({
           id: 1,
-          username: "admin",
+          email: "admin@example.com",
+          first_name: "Test",
+          middle_name: null,
+          last_name: "User",
+          display_name: "Test User",
+          firm_name: "Test Legal",
           disabled: false,
           permissions: ["users:manage", "roles:manage"],
           }),
@@ -83,7 +93,7 @@ describe("LoginPage", () => {
 
     renderLogin();
 
-    await user.type(screen.getByLabelText(t("auth.login.fields.username")), "admin");
+    await user.type(screen.getByLabelText(t("auth.login.fields.email")), "admin@example.com");
     await user.type(screen.getByLabelText(t("auth.login.fields.password")), "admin123");
     await user.click(screen.getByRole("button", { name: t("auth.login.submit.default") }));
 
@@ -106,7 +116,7 @@ describe("LoginPage", () => {
 
     renderLogin();
 
-    await user.type(screen.getByLabelText(t("auth.login.fields.username")), "admin");
+    await user.type(screen.getByLabelText(t("auth.login.fields.email")), "admin@example.com");
     await user.type(screen.getByLabelText(t("auth.login.fields.password")), "wrong");
     await user.click(screen.getByRole("button", { name: t("auth.login.submit.default") }));
 
@@ -132,7 +142,7 @@ describe("LoginPage", () => {
 
     renderLogin();
 
-    await user.type(screen.getByLabelText(t("auth.login.fields.username")), "admin");
+    await user.type(screen.getByLabelText(t("auth.login.fields.email")), "admin@example.com");
     await user.type(screen.getByLabelText(t("auth.login.fields.password")), "wrong");
     await user.click(screen.getByRole("button", { name: t("auth.login.submit.default") }));
 

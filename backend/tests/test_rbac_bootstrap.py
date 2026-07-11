@@ -25,12 +25,12 @@ def test_bootstrap_rbac_is_idempotent() -> None:
             try:
                 first_run = await bootstrap_rbac(
                     mock_db.Session,
-                    admin_username="admin",
+                    admin_email=" ADMIN@EXAMPLE.COM ",
                     admin_password="StrongSeed9",  # pragma: allowlist secret
                 )
                 second_run = await bootstrap_rbac(
                     mock_db.Session,
-                    admin_username="admin",
+                    admin_email="admin@example.com",
                     admin_password=None,
                 )
 
@@ -40,6 +40,7 @@ def test_bootstrap_rbac_is_idempotent() -> None:
                 assert first_run.role_permissions_created == len(BASE_PERMISSION_SPECS)
                 assert first_run.admin_user_created is True
                 assert first_run.admin_role_assigned is True
+                assert first_run.admin_email == "admin@example.com"
 
                 assert second_run.permissions_created == 0
                 assert second_run.permissions_updated == 0
@@ -47,6 +48,7 @@ def test_bootstrap_rbac_is_idempotent() -> None:
                 assert second_run.role_permissions_created == 0
                 assert second_run.admin_user_created is False
                 assert second_run.admin_role_assigned is False
+                assert second_run.admin_email == "admin@example.com"
 
                 async with mock_db.Session() as session:
                     assert await _count_rows(session, Permission) == len(BASE_PERMISSION_SPECS)
@@ -57,8 +59,12 @@ def test_bootstrap_rbac_is_idempotent() -> None:
                     role_permissions = (await session.execute(select(RolePermission))).scalars().all()
                     assert {role_permission.scope for role_permission in role_permissions} == {"any"}
 
-                    admin = await session.scalar(select(User).where(User.username == "admin"))
+                    admin = await session.scalar(select(User).where(User.email == "admin@example.com"))
                     assert admin is not None
+                    assert admin.first_name == "Technical"
+                    assert admin.middle_name is None
+                    assert admin.last_name == "Administrator"
+                    assert admin.display_name == "Technical administrator"
                     assert admin.disabled is False
                     assert admin.hashed_password != "StrongSeed9"  # pragma: allowlist secret
             finally:
@@ -79,7 +85,7 @@ def test_bootstrap_requires_admin_password_if_admin_user_is_missing() -> None:
                 ):
                     await bootstrap_rbac(
                         mock_db.Session,
-                        admin_username="admin",
+                        admin_email="admin@example.com",
                         admin_password=None,
                     )
 

@@ -39,7 +39,7 @@ export const WelcomePage = () => {
       <section className="w-full max-w-3xl rounded-[var(--radius-card)] border border-[var(--app-border)] bg-[var(--app-surface)] p-8 shadow-[0_16px_40px_rgba(23,33,43,0.08)] sm:p-12">
         <p className="mono-label fade-rise text-[var(--app-subtle)]">{t("welcome.badge")}</p>
         <h1 className="fade-rise-delay mt-4 text-4xl font-semibold tracking-tight sm:text-6xl">
-          {t("welcome.greeting", { username: user.username })}
+          {t("welcome.greeting", { displayName: user.display_name })}
         </h1>
         <p className="fade-rise-delay-2 mt-6 max-w-xl text-base text-[var(--app-subtle)] sm:text-lg">
           {t("welcome.sessionActive.body")}

@@ -4,17 +4,27 @@ from app.core.common.schema import ApplicationSchema
 
 
 class LoginCommand(ApplicationSchema):
-    username: str
+    email: str
     password: str
 
 
 class RegisterUserCommand(ApplicationSchema):
-    username: str
+    first_name: str
+    middle_name: str | None = None
+    last_name: str
+    display_name: str
+    email: str
+    firm_name: str | None = None
     password: str
 
 
 class UpdateCurrentUserCommand(ApplicationSchema):
-    username: str | None = None
+    first_name: str | None = None
+    middle_name: str | None = None
+    last_name: str | None = None
+    display_name: str | None = None
+    email: str | None = None
+    firm_name: str | None = None
     current_password: str | None = None
     new_password: str | None = None
 
@@ -26,7 +36,12 @@ class AccessTokenResult(ApplicationSchema):
 
 class AuthenticatedUserResult(ApplicationSchema):
     id: int
-    username: str
+    email: str
+    first_name: str
+    middle_name: str | None = None
+    last_name: str
+    display_name: str
+    firm_name: str
     disabled: bool
     permissions: tuple[str, ...] = Field(default_factory=tuple)
 

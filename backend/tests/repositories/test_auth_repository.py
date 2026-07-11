@@ -86,19 +86,41 @@ def test_auth_repository_create_user_translates_integrity_error_to_repository_co
     async def run_test() -> None:
         with pytest.raises(RepositoryConflictError) as exc_info:
             await repository.create_user(
-                username="john",
+                email="john@example.com",
+                first_name="John",
+                middle_name=None,
+                last_name="Doe",
+                display_name="John Doe",
                 hashed_password="hash",  # pragma: allowlist secret
                 disabled=False,
             )
 
-        assert "Username already exists" in str(exc_info.value)
-        assert exc_info.value.details == {"username": "john"}
+        assert "Email already exists" in str(exc_info.value)
+        assert exc_info.value.details == {"email": "john@example.com"}
         session.refresh.assert_not_awaited()
 
     asyncio.run(run_test())
 
 
-def test_auth_repository_create_user_translates_non_username_integrity_error_to_repository_internal_error() -> None:
+def test_auth_repository_get_firm_returns_none_when_not_found() -> None:
+    session = build_session_mock()
+    session.get.return_value = None
+    repository = AuthRepository(session=session)
+
+    assert asyncio.run(repository.get_firm(404)) is None
+    session.get.assert_awaited_once()
+
+
+def test_auth_repository_update_firm_raises_when_not_found() -> None:
+    session = build_session_mock()
+    session.get.return_value = None
+    repository = AuthRepository(session=session)
+
+    with pytest.raises(RepositoryInternalError, match="Firm 404 not found"):
+        asyncio.run(repository.update_firm(404, name="Missing Firm"))
+
+
+def test_auth_repository_create_user_translates_non_email_integrity_error_to_repository_internal_error() -> None:
     session = build_session_mock()
     session.flush.side_effect = IntegrityError("insert", {}, Exception("constraint"))
     repository = AuthRepository(session=session)
@@ -106,7 +128,11 @@ def test_auth_repository_create_user_translates_non_username_integrity_error_to_
     async def run_test() -> None:
         with pytest.raises(RepositoryInternalError) as exc_info:
             await repository.create_user(
-                username=None,
+                email=None,
+                first_name="John",
+                middle_name=None,
+                last_name="Doe",
+                display_name="John Doe",
                 hashed_password="hash",  # pragma: allowlist secret
                 disabled=False,
             )
@@ -117,20 +143,29 @@ def test_auth_repository_create_user_translates_non_username_integrity_error_to_
     asyncio.run(run_test())
 
 
-def test_auth_repository_update_user_translates_username_integrity_error_to_repository_conflict() -> None:
+def test_auth_repository_update_user_translates_email_integrity_error_to_repository_conflict() -> None:
     session = build_session_mock()
     session.flush.side_effect = IntegrityError("update", {}, Exception("duplicate"))
-    user = User(id=3, username="john", hashed_password="hash", disabled=False)
+    user = User(
+        id=3,
+        email="john@example.com",
+        first_name="John",
+        middle_name=None,
+        last_name="Doe",
+        display_name="John Doe",
+        hashed_password="hash",  # pragma: allowlist secret
+        disabled=False,
+    )
     session.get.return_value = user
     session.merge.return_value = user
     repository = AuthRepository(session=session)
 
     async def run_test() -> None:
         with pytest.raises(RepositoryConflictError) as exc_info:
-            await repository.update_user(3, username="new-user")
+            await repository.update_user(3, email="new-user@example.com")
 
-        assert "Username already exists" in str(exc_info.value)
-        assert exc_info.value.details == {"username": "new-user"}
+        assert "Email already exists" in str(exc_info.value)
+        assert exc_info.value.details == {"email": "new-user@example.com"}
         session.refresh.assert_not_awaited()
 
     asyncio.run(run_test())
@@ -139,7 +174,16 @@ def test_auth_repository_update_user_translates_username_integrity_error_to_repo
 def test_auth_repository_update_user_translates_other_integrity_errors_to_repository_internal_error() -> None:
     session = build_session_mock()
     session.flush.side_effect = IntegrityError("update", {}, Exception("constraint"))
-    user = User(id=3, username="john", hashed_password="hash", disabled=False)
+    user = User(
+        id=3,
+        email="john@example.com",
+        first_name="John",
+        middle_name=None,
+        last_name="Doe",
+        display_name="John Doe",
+        hashed_password="hash",  # pragma: allowlist secret
+        disabled=False,
+    )
     session.get.return_value = user
     session.merge.return_value = user
     repository = AuthRepository(session=session)
@@ -161,7 +205,7 @@ def test_auth_repository_update_user_raises_internal_error_when_user_does_not_ex
 
     async def run_test() -> None:
         with pytest.raises(RepositoryInternalError) as exc_info:
-            await repository.update_user(404, username="new-user")
+            await repository.update_user(404, email="new-user@example.com")
 
         assert "User 404 not found" in str(exc_info.value)
         session.merge.assert_not_awaited()

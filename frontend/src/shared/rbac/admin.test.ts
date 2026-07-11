@@ -38,7 +38,7 @@ describe("rbac admin client", () => {
         Promise.resolve([
           {
             id: 1,
-            username: "admin",
+            email: "admin",
             disabled: false,
             role_ids: [1],
           },
@@ -61,7 +61,7 @@ describe("rbac admin client", () => {
       json: () =>
         Promise.resolve({
           id: 7,
-          username: "auditor",
+          email: "auditor",
           disabled: false,
           role_ids: [2],
         }),
@@ -70,7 +70,7 @@ describe("rbac admin client", () => {
 
     const user = await readAdminUser(7);
 
-    expect(user.username).toBe("auditor");
+    expect(user.email).toBe("auditor");
     const [url, request] = fetchMock.mock.calls[0] as [string, RequestInit];
     expect(url).toBe(buildApiUrl("/rbac/users/7"));
     expect(request.method).toBeUndefined();
@@ -111,7 +111,7 @@ describe("rbac admin client", () => {
         Promise.resolve([
           {
             id: 3,
-            username: "reader_user",
+            email: "reader_user",
             disabled: false,
           },
         ]),
@@ -123,7 +123,7 @@ describe("rbac admin client", () => {
     expect(users).toEqual([
       {
         id: 3,
-        username: "reader_user",
+        email: "reader_user",
         disabled: false,
       },
     ]);
@@ -140,7 +140,7 @@ describe("rbac admin client", () => {
       json: () =>
         Promise.resolve({
           id: 9,
-          username: "ops_user",
+          email: "ops_user",
           disabled: false,
           role_ids: [1, 2],
         }),
@@ -148,7 +148,7 @@ describe("rbac admin client", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     await createAdminUser({
-      username: "ops_user",
+      email: "ops_user",
       password: "OpsUser123", // pragma: allowlist secret
       role_ids: [1, 2],
     });
@@ -159,7 +159,7 @@ describe("rbac admin client", () => {
     expect(new Headers(request.headers).get("Content-Type")).toBe("application/json");
     expect(new Headers(request.headers).get("Authorization")).toBe("Bearer valid-token");
     expect(request.body).toBe(
-      JSON.stringify({ username: "ops_user", password: "OpsUser123", role_ids: [1, 2] }), // pragma: allowlist secret
+      JSON.stringify({ email: "ops_user", password: "OpsUser123", role_ids: [1, 2] }), // pragma: allowlist secret
     );
   });
 

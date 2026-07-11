@@ -12,7 +12,7 @@ from app.core.authorization import PERMISSION_SPECS
 from app.core.db.database import Base
 from app.core.setup.dependencies import get_db_session
 from app.features.audit_log.models import AuditLogEntry
-from app.features.auth.models import User
+from app.features.auth.models import Firm, User
 from app.features.outbox.models import OutboxEvent
 from app.features.rbac.models import Permission, Role, RoleInheritance, RolePermission, UserRole
 from app.main import app
@@ -31,22 +31,46 @@ def mock_users() -> list[dict[str, Any]]:
     return [
         {
             "id": 1,
-            "username": "admin",
+            "email": "admin@example.com",
+            "first_name": "Ada",
+            "middle_name": None,
+            "last_name": "Admin",
+            "display_name": "Admin User",
             "hashed_password": password_hasher.hash("admin123"),
             "disabled": False,
+            "firm_id": 1,
         },
         {
             "id": 2,
-            "username": "disabled_user",
+            "email": "disabled@example.com",
+            "first_name": "Diana",
+            "middle_name": "Inactive",
+            "last_name": "User",
+            "display_name": "Disabled User",
             "hashed_password": password_hasher.hash("admin123"),
             "disabled": True,
+            "firm_id": 2,
         },
         {
             "id": 3,
-            "username": "reader_user",
+            "email": "reader@example.com",
+            "first_name": "Rita",
+            "middle_name": None,
+            "last_name": "Reader",
+            "display_name": "Reader User",
             "hashed_password": password_hasher.hash("reader123"),
             "disabled": False,
+            "firm_id": 3,
         },
+    ]
+
+
+@pytest.fixture(scope="module")
+def mock_firms() -> list[dict[str, Any]]:
+    return [
+        {"id": 1, "name": "Admin Legal"},
+        {"id": 2, "name": "Disabled Legal"},
+        {"id": 3, "name": "Reader Legal"},
     ]
 
 
@@ -78,6 +102,7 @@ def mock_role_permissions() -> list[dict[str, Any]]:
 
 @pytest.fixture(scope="module")
 def mock_data(
+    mock_firms: list[dict[str, Any]],
     mock_users: list[dict[str, Any]],
     mock_roles: list[dict[str, Any]],
     mock_permissions: list[dict[str, Any]],
@@ -85,6 +110,7 @@ def mock_data(
     mock_role_permissions: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
     return [
+        {"class": Firm, "json": mock_firms},
         {"class": User, "json": mock_users},
         {"class": Role, "json": mock_roles},
         {"class": Permission, "json": mock_permissions},

@@ -5,10 +5,21 @@ from app.core.common.schema import ApplicationSchema
 
 class UserRecord(ApplicationSchema):
     id: int
-    username: str
+    email: str
+    first_name: str
+    middle_name: str | None = None
+    last_name: str
+    display_name: str
     hashed_password: str
     disabled: bool
-    tenant_id: int | None = None
+    firm_id: int | None = None
+
+    model_config = ConfigDict(frozen=True, from_attributes=True)
+
+
+class FirmRecord(ApplicationSchema):
+    id: int
+    name: str
 
     model_config = ConfigDict(frozen=True, from_attributes=True)
 

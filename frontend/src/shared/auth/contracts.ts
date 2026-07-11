@@ -42,7 +42,12 @@ const expectStringArrayField = (record: Record<string, unknown>, field: string, 
 
 export interface AuthenticatedUser {
   id: number;
-  username: string;
+  email: string;
+  first_name: string;
+  middle_name: string | null;
+  last_name: string;
+  display_name: string;
+  firm_name: string;
   disabled: boolean;
   permissions: string[];
 }
@@ -58,7 +63,12 @@ export const parseAuthenticatedUser = (payload: unknown): AuthenticatedUser => {
 
   return {
     id: expectNumberField(record, "id", context),
-    username: expectStringField(record, "username", context, { minLength: 1 }),
+    email: expectStringField(record, "email", context, { minLength: 3 }),
+    first_name: expectStringField(record, "first_name", context, { minLength: 1 }),
+    middle_name: record.middle_name === null ? null : expectStringField(record, "middle_name", context),
+    last_name: expectStringField(record, "last_name", context, { minLength: 1 }),
+    display_name: expectStringField(record, "display_name", context, { minLength: 1 }),
+    firm_name: expectStringField(record, "firm_name", context, { minLength: 1 }),
     disabled: expectBooleanField(record, "disabled", context),
     permissions: expectStringArrayField(record, "permissions", context),
   };

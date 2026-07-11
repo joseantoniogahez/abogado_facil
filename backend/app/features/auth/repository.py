@@ -6,25 +6,25 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.authorization import PERMISSION_SCOPE_RANK
-from app.core.common.records import UserRecord
+from app.core.common.records import FirmRecord, UserRecord
 from app.core.db.repository_base import BaseRepository
 from app.core.errors.repositories import RepositoryConflictError, RepositoryInternalError
-from app.features.auth.models import User
-from app.features.rbac.models import RoleInheritance, RolePermission, UserRole
+from app.features.auth.models import Firm, User
+from app.features.rbac.models import Role, RoleInheritance, RolePermission, UserRole
 
 
 class AuthRepository(BaseRepository[User]):
     def __init__(self, session: AsyncSession):
         super().__init__(session, User, default_record_type=UserRecord)
 
-    async def get_by_username(self, username: str) -> UserRecord | None:
-        user = await self.get_one_by({"username": username})
+    async def get_by_email(self, email: str) -> UserRecord | None:
+        user = await self.get_one_by({"email": email})
         if user is None:
             return None
         return self._to_record(user)
 
-    async def username_exists(self, username: str, *, exclude_user_id: int | None = None) -> bool:
-        query = select(User.id).where(User.username == username)
+    async def email_exists(self, email: str, *, exclude_user_id: int | None = None) -> bool:
+        query = select(User.id).where(User.email == email)
         if exclude_user_id is not None:
             query = query.where(User.id != exclude_user_id)
 
@@ -36,11 +36,11 @@ class AuthRepository(BaseRepository[User]):
             user = await self.create(**kwargs)
             return self._to_record(user)
         except IntegrityError as exc:
-            username = kwargs.get("username")
-            if isinstance(username, str):
+            email = kwargs.get("email")
+            if isinstance(email, str):
                 raise RepositoryConflictError(
-                    message="Username already exists",
-                    details={"username": username},
+                    message="Email already exists",
+                    details={"email": email},
                 ) from exc
             raise RepositoryInternalError() from exc
 
@@ -53,13 +53,43 @@ class AuthRepository(BaseRepository[User]):
             updated_user = await self.update(user, **changes)
             return self._to_record(updated_user)
         except IntegrityError as exc:
-            username = changes.get("username")
-            if isinstance(username, str):
+            email = changes.get("email")
+            if isinstance(email, str):
                 raise RepositoryConflictError(
-                    message="Username already exists",
-                    details={"username": username},
+                    message="Email already exists",
+                    details={"email": email},
                 ) from exc
             raise RepositoryInternalError() from exc
+
+    async def create_firm(self, *, name: str) -> FirmRecord:
+        firm = Firm(name=name)
+        self.session.add(firm)
+        await self.session.flush()
+        await self.session.refresh(firm)
+        return FirmRecord.model_validate(firm)
+
+    async def get_firm(self, firm_id: int) -> FirmRecord | None:
+        firm = await self.session.get(Firm, firm_id)
+        return None if firm is None else FirmRecord.model_validate(firm)
+
+    async def update_firm(self, firm_id: int, *, name: str) -> FirmRecord:
+        firm = await self.session.get(Firm, firm_id)
+        if firm is None:
+            raise RepositoryInternalError(message=f"Firm {firm_id} not found")
+        firm.name = name
+        await self.session.flush()
+        await self.session.refresh(firm)
+        return FirmRecord.model_validate(firm)
+
+    async def assign_role_by_name(self, *, user_id: int, role_name: str) -> None:
+        role_id = await self.session.scalar(select(Role.id).where(Role.name == role_name).limit(1))
+        if role_id is None:
+            role = Role(name=role_name)
+            self.session.add(role)
+            await self.session.flush()
+            role_id = role.id
+        self.session.add(UserRole(user_id=user_id, role_id=role_id))
+        await self.session.flush()
 
     @staticmethod
     def _build_effective_roles_cte(user_id: int):

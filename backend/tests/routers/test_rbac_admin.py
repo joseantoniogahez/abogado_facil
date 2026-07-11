@@ -11,15 +11,15 @@ from utils.testing_support.api_assertions import assert_error_response
 from utils.testing_support.database import MockDatabase
 
 
-def _auth_headers(mock_client: TestClient, username: str, password: str) -> dict[str, str]:
-    response = mock_client.post("/v1/token", data={"username": username, "password": password})
+def _auth_headers(mock_client: TestClient, email: str, password: str) -> dict[str, str]:
+    response = mock_client.post("/v1/token", data={"username": email, "password": password})
     assert response.status_code == HTTPStatus.OK
     token = response.json()["access_token"]
     return {"Authorization": f"Bearer {token}"}
 
 
 def _admin_headers(mock_client: TestClient) -> dict[str, str]:
-    return _auth_headers(mock_client, "admin", "admin123")
+    return _auth_headers(mock_client, "admin@example.com", "admin123")
 
 
 async def _get_role_id(mock_database: MockDatabase, role_name: str) -> int | None:
@@ -97,7 +97,7 @@ def test_admin_can_list_roles_and_permission_catalog(mock_client: TestClient) ->
 
 
 def test_rbac_admin_endpoints_require_expected_permissions(mock_client: TestClient) -> None:
-    reader_headers = _auth_headers(mock_client, "reader_user", "reader123")
+    reader_headers = _auth_headers(mock_client, "reader@example.com", "reader123")
     cases: tuple[dict[str, Any], ...] = (
         {
             "method": "GET",
@@ -561,7 +561,7 @@ def test_user_role_assignment_visibility_endpoints(mock_client: TestClient) -> N
     )
     assert list_role_users_response.status_code == HTTPStatus.OK
     assert list_role_users_response.json() == [
-        {"id": 3, "username": "reader_user", "disabled": False},
+        {"id": 3, "email": "reader@example.com", "disabled": False},
     ]
 
 
@@ -569,7 +569,7 @@ def test_admin_user_management_crud_soft_delete(mock_client: TestClient) -> None
     create_response = mock_client.post(
         "/v1/rbac/users",
         json={
-            "username": " ops_user ",
+            "email": " OPS.USER@EXAMPLE.COM ",
             "password": "OpsUser123",  # pragma: allowlist secret
             "role_ids": [2],
         },
@@ -577,7 +577,7 @@ def test_admin_user_management_crud_soft_delete(mock_client: TestClient) -> None
     )
     assert create_response.status_code == HTTPStatus.CREATED
     created_user = create_response.json()
-    assert created_user["username"] == "ops_user"
+    assert created_user["email"] == "ops.user@example.com"
     assert created_user["disabled"] is False
     assert created_user["role_ids"] == [2]
     user_id = created_user["id"]
@@ -588,7 +588,7 @@ def test_admin_user_management_crud_soft_delete(mock_client: TestClient) -> None
     )
     assert list_response.status_code == HTTPStatus.OK
     by_id = {user["id"]: user for user in list_response.json()}
-    assert by_id[user_id]["username"] == "ops_user"
+    assert by_id[user_id]["email"] == "ops.user@example.com"
     assert by_id[user_id]["role_ids"] == [2]
 
     get_response = mock_client.get(
@@ -601,7 +601,7 @@ def test_admin_user_management_crud_soft_delete(mock_client: TestClient) -> None
     update_response = mock_client.put(
         f"/v1/rbac/users/{user_id}",
         json={
-            "username": "ops_user_v2",
+            "email": "ops.user.v2@example.com",
             "current_password": "OpsUser123",  # pragma: allowlist secret
             "new_password": "OpsUser456",  # pragma: allowlist secret
             "role_ids": [1],
@@ -611,7 +611,7 @@ def test_admin_user_management_crud_soft_delete(mock_client: TestClient) -> None
     assert update_response.status_code == HTTPStatus.OK
     assert update_response.json() == {
         "id": user_id,
-        "username": "ops_user_v2",
+        "email": "ops.user.v2@example.com",
         "disabled": False,
         "role_ids": [1],
     }
@@ -637,7 +637,7 @@ def test_admin_user_management_crud_soft_delete(mock_client: TestClient) -> None
 
     login_disabled_response = mock_client.post(
         "/v1/token",
-        data={"username": "ops_user_v2", "password": "OpsUser456"},  # pragma: allowlist secret
+        data={"username": "ops.user.v2@example.com", "password": "OpsUser456"},  # pragma: allowlist secret
     )
     assert login_disabled_response.status_code == HTTPStatus.FORBIDDEN
 

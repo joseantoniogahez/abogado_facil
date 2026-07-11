@@ -116,7 +116,12 @@ describe("routing integration", () => {
           json: () =>
             Promise.resolve({
               id: 1,
-              username: "admin",
+              email: "admin",
+              first_name: "Test",
+              middle_name: null,
+              last_name: "User",
+              display_name: "Test User",
+              firm_name: "Test Legal",
               disabled: false,
               permissions: ["users:manage"],
             }),
@@ -170,7 +175,12 @@ describe("routing integration", () => {
           json: () =>
             Promise.resolve({
               id: 1,
-              username: "audit_admin",
+              email: "audit_admin",
+              first_name: "Test",
+              middle_name: null,
+              last_name: "User",
+              display_name: "Test User",
+              firm_name: "Test Legal",
               disabled: false,
               permissions: ["audit_logs:read"],
             }),
@@ -216,7 +226,12 @@ describe("routing integration", () => {
           json: () =>
             Promise.resolve({
               id: 1,
-              username: "rbac_admin",
+              email: "rbac_admin",
+              first_name: "Test",
+              middle_name: null,
+              last_name: "User",
+              display_name: "Test User",
+              firm_name: "Test Legal",
               disabled: false,
               permissions: ["user_roles:manage"],
             }),
@@ -254,7 +269,12 @@ describe("routing integration", () => {
           json: () =>
             Promise.resolve({
               id: 1,
-              username: "permission_admin",
+              email: "permission_admin",
+              first_name: "Test",
+              middle_name: null,
+              last_name: "User",
+              display_name: "Test User",
+              firm_name: "Test Legal",
               disabled: false,
               permissions: ["role_permissions:manage"],
             }),

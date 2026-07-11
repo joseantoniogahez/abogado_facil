@@ -43,6 +43,9 @@ Example of normalized validation error:
 }
 ```
 
+For `POST /v1/token`, `username` in validation locations is the OAuth2 password-form wire field. Its
+value is the account email; the product has no separate username identity.
+
 ## Domain Error Code Mapping
 
 | Domain Error Code | HTTP Status                 |

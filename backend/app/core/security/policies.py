@@ -34,6 +34,23 @@ PASSWORD_POLICY_SUMMARY_MESSAGES: dict[PasswordPolicyRule, str] = {
 }
 
 _USERNAME_PATTERN = re.compile(r"^[a-z0-9_.-]+$")
+_EMAIL_PATTERN = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+
+
+def normalize_email(email: str) -> str:
+    normalized_email = email.strip().lower()
+    if not normalized_email:
+        raise ValueError("Email is required")
+    if len(normalized_email) > 320 or _EMAIL_PATTERN.fullmatch(normalized_email) is None:
+        raise ValueError("Email has invalid format")
+    return normalized_email
+
+
+def normalize_required_name(value: str, *, field_name: str) -> str:
+    normalized = " ".join(value.split())
+    if not normalized:
+        raise ValueError(f"{field_name} is required")
+    return normalized
 
 
 class UsernamePolicyError(ValueError):

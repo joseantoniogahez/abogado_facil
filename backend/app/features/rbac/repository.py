@@ -24,7 +24,7 @@ class RBACRepository(BaseRepository[Role]):
         return self._to_records(roles)
 
     async def list_users(self) -> list[UserRecord]:
-        users = await self.session.execute(select(User).order_by(User.username.asc()))
+        users = await self.session.execute(select(User).order_by(User.email.asc()))
         return self._to_records(list(users.scalars().all()), UserRecord)
 
     async def list_permissions(self) -> list[PermissionRecord]:
@@ -72,8 +72,8 @@ class RBACRepository(BaseRepository[Role]):
             return None
         return self._to_record(role)
 
-    async def username_exists(self, username: str, *, exclude_user_id: int | None = None) -> bool:
-        query = select(User.id).where(User.username == username)
+    async def email_exists(self, email: str, *, exclude_user_id: int | None = None) -> bool:
+        query = select(User.id).where(User.email == email)
         if exclude_user_id is not None:
             query = query.where(User.id != exclude_user_id)
 
@@ -187,11 +187,11 @@ class RBACRepository(BaseRepository[Role]):
             await self.session.refresh(user)
             return self._to_record(user, UserRecord)
         except IntegrityError as exc:
-            username = kwargs.get("username")
-            if isinstance(username, str):
+            email = kwargs.get("email")
+            if isinstance(email, str):
                 raise RepositoryConflictError(
-                    message="Username already exists",
-                    details={"username": username},
+                    message="Email already exists",
+                    details={"email": email},
                 ) from exc
             raise RepositoryError("Failed to create user") from exc
 
@@ -212,11 +212,11 @@ class RBACRepository(BaseRepository[Role]):
             await self.session.refresh(updated_user)
             return self._to_record(updated_user, UserRecord)
         except IntegrityError as exc:
-            username = changes.get("username")
-            if isinstance(username, str):
+            email = changes.get("email")
+            if isinstance(email, str):
                 raise RepositoryConflictError(
-                    message="Username already exists",
-                    details={"username": username},
+                    message="Email already exists",
+                    details={"email": email},
                 ) from exc
             raise RepositoryError("Failed to update user") from exc
 
@@ -266,7 +266,7 @@ class RBACRepository(BaseRepository[Role]):
             select(User)
             .join(UserRole, UserRole.user_id == User.id)
             .where(UserRole.role_id == role_id)
-            .order_by(User.username.asc())
+            .order_by(User.email.asc())
         )
         result = await self.session.execute(query)
         users = list(result.scalars().all())

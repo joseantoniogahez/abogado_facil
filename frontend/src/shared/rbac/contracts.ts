@@ -87,7 +87,7 @@ export interface RbacRole {
 
 export interface AdminUser {
   id: number;
-  username: string;
+  email: string;
   disabled: boolean;
   role_ids: number[];
 }
@@ -99,7 +99,7 @@ export interface AssignedRole {
 
 export interface AssignedUser {
   id: number;
-  username: string;
+  email: string;
   disabled: boolean;
 }
 
@@ -155,7 +155,7 @@ export const parseAdminUser = (payload: unknown): AdminUser => {
 
   return {
     id: expectNumberField(record, "id", context),
-    username: expectStringField(record, "username", context, { minLength: 1 }),
+    email: expectStringField(record, "email", context, { minLength: 3 }),
     disabled: expectBooleanField(record, "disabled", context),
     role_ids: expectNumberArrayField(record, "role_ids", context),
   };
@@ -183,7 +183,7 @@ export const parseAssignedUser = (payload: unknown): AssignedUser => {
 
   return {
     id: expectNumberField(record, "id", context),
-    username: expectStringField(record, "username", context, { minLength: 1 }),
+    email: expectStringField(record, "email", context, { minLength: 3 }),
     disabled: expectBooleanField(record, "disabled", context),
   };
 };

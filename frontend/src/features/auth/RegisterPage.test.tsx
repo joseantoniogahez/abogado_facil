@@ -78,7 +78,12 @@ describe("RegisterPage", () => {
       json: () =>
         Promise.resolve({
           id: 9,
-          username: "new_user",
+          email: "new.user@example.com",
+          first_name: "Test",
+          middle_name: null,
+          last_name: "User",
+          display_name: "Test User",
+          firm_name: "Test Legal",
           disabled: false,
           permissions: [],
         }),
@@ -88,12 +93,15 @@ describe("RegisterPage", () => {
 
     const { queryClient } = renderRegisterPage();
 
-    await user.type(screen.getByLabelText(t("auth.login.fields.username")), " New_User ");
+    await user.type(screen.getByLabelText(t("auth.register.fields.firstName")), "New");
+    await user.type(screen.getByLabelText(t("auth.register.fields.lastName")), "User");
+    await user.type(screen.getByLabelText(t("auth.register.fields.displayName")), "New User");
+    await user.type(screen.getByLabelText(t("auth.login.fields.email")), " New.User@Example.com ");
     await user.type(screen.getByLabelText(t("auth.login.fields.password")), "StrongPass1");
     await user.click(screen.getByRole("button", { name: t("auth.register.submit.default") }));
 
     expect(await screen.findByRole("heading", { name: t("auth.register.success.title") })).toBeInTheDocument();
-    expect(screen.getByText(t("auth.register.success.body", { username: "new_user" }))).toBeInTheDocument();
+    expect(screen.getByText(t("auth.register.success.body", { email: "new.user@example.com" }))).toBeInTheDocument();
     expect(queryClient.getQueryData(SESSION_QUERY_KEY)).toBeNull();
   });
 
@@ -116,7 +124,10 @@ describe("RegisterPage", () => {
 
     renderRegisterPage();
 
-    await user.type(screen.getByLabelText(t("auth.login.fields.username")), "new_user");
+    await user.type(screen.getByLabelText(t("auth.register.fields.firstName")), "New");
+    await user.type(screen.getByLabelText(t("auth.register.fields.lastName")), "User");
+    await user.type(screen.getByLabelText(t("auth.register.fields.displayName")), "New User");
+    await user.type(screen.getByLabelText(t("auth.login.fields.email")), "new.user@example.com");
     await user.type(screen.getByLabelText(t("auth.login.fields.password")), "ValidPass1");
     await user.click(screen.getByRole("button", { name: t("auth.register.submit.default") }));
 
@@ -136,7 +147,12 @@ describe("RegisterPage", () => {
     const queryClient = createQueryClient();
     queryClient.setQueryData(SESSION_QUERY_KEY, {
       id: 1,
-      username: "admin",
+      email: "admin@example.com",
+      first_name: "Test",
+      middle_name: null,
+      last_name: "User",
+      display_name: "Test User",
+      firm_name: "Test Legal",
       disabled: false,
       permissions: [],
     });

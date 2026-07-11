@@ -49,7 +49,12 @@ describe("RootLayout", () => {
   it("renders hamburger menu for authenticated session and filters admin items by permissions", async () => {
     renderLayout({
       id: 1,
-      username: "admin",
+      email: "admin",
+      first_name: "Test",
+      middle_name: null,
+      last_name: "User",
+      display_name: "Test User",
+      firm_name: "Test Legal",
       disabled: false,
       permissions: [IAM_PERMISSION.USER_ROLES_MANAGE, IAM_PERMISSION.USERS_MANAGE],
     });
@@ -74,7 +79,12 @@ describe("RootLayout", () => {
   it("shows assignments nav item for user_roles:manage without users:manage", async () => {
     renderLayout({
       id: 4,
-      username: "rbac_admin",
+      email: "rbac_admin",
+      first_name: "Test",
+      middle_name: null,
+      last_name: "User",
+      display_name: "Test User",
+      firm_name: "Test Legal",
       disabled: false,
       permissions: [IAM_PERMISSION.USER_ROLES_MANAGE],
     });
@@ -91,7 +101,12 @@ describe("RootLayout", () => {
   it("shows audit log nav item for audit_logs:read without other admin permissions", async () => {
     renderLayout({
       id: 6,
-      username: "audit_admin",
+      email: "audit_admin",
+      first_name: "Test",
+      middle_name: null,
+      last_name: "User",
+      display_name: "Test User",
+      firm_name: "Test Legal",
       disabled: false,
       permissions: [IAM_PERMISSION.AUDIT_LOGS_READ],
     });
@@ -108,7 +123,12 @@ describe("RootLayout", () => {
   it("shows permissions nav item for role_permissions:manage without roles:manage", async () => {
     renderLayout({
       id: 5,
-      username: "permission_admin",
+      email: "permission_admin",
+      first_name: "Test",
+      middle_name: null,
+      last_name: "User",
+      display_name: "Test User",
+      firm_name: "Test Legal",
       disabled: false,
       permissions: [IAM_PERMISSION.ROLE_PERMISSIONS_MANAGE],
     });

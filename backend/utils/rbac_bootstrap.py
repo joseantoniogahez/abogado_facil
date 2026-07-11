@@ -12,10 +12,8 @@ from app.core.authorization import PERMISSION_SPECS, PermissionScope
 from app.core.db.database import get_async_session_factory
 from app.core.security.policies import (
     PasswordPolicyError,
-    UsernamePolicyError,
-    UsernamePolicyErrorCode,
     format_password_policy_summary,
-    normalize_username,
+    normalize_email,
     validate_password_policy,
 )
 from app.features.auth.models import User
@@ -28,6 +26,7 @@ BASE_PERMISSION_IDS: tuple[str, ...] = tuple(permission_id for permission_id, _ 
 BASE_ROLE_PERMISSION_SPECS: dict[str, tuple[str, ...]] = {
     "admin_role": BASE_PERMISSION_IDS,
     "reader_role": (),
+    "account_owner": (),
 }
 
 
@@ -39,19 +38,7 @@ class BootstrapReport:
     role_permissions_created: int
     admin_user_created: bool
     admin_role_assigned: bool
-    admin_username: str
-
-
-def _normalize_username(username: str) -> str:
-    try:
-        return normalize_username(username)
-    except UsernamePolicyError as exc:
-        if exc.code is UsernamePolicyErrorCode.REQUIRED:
-            raise ValueError("Admin username is required.") from exc
-
-        raise ValueError(
-            "Admin username has invalid format. Use lowercase letters, numbers, dot, underscore, hyphen."
-        ) from exc
+    admin_email: str
 
 
 def _validate_password_policy(password: str, username: str) -> None:
@@ -133,20 +120,24 @@ async def _sync_role_permissions(session: AsyncSession, roles_by_name: dict[str,
 async def _ensure_admin_user(
     session: AsyncSession,
     *,
-    admin_username: str,
+    admin_email: str,
     admin_password: str | None,
     password_hasher: PasswordHasher,
 ) -> tuple[User, bool]:
-    existing_user = await session.scalar(select(User).where(User.username == admin_username).limit(1))
+    existing_user = await session.scalar(select(User).where(User.email == admin_email).limit(1))
     if existing_user is not None:
         return existing_user, False
 
     if admin_password is None or not admin_password.strip():
         raise ValueError("Admin user does not exist. Provide --admin-password or set RBAC_BOOTSTRAP_ADMIN_PASSWORD.")
 
-    _validate_password_policy(admin_password, admin_username)
+    _validate_password_policy(admin_password, admin_email)
     user = User(
-        username=admin_username,
+        email=admin_email,
+        first_name="Technical",
+        middle_name=None,
+        last_name="Administrator",
+        display_name="Technical administrator",
         hashed_password=password_hasher.hash(admin_password),
         disabled=False,
     )
@@ -173,10 +164,13 @@ async def _ensure_admin_role_assignment(session: AsyncSession, *, user_id: int, 
 async def bootstrap_rbac(
     session_factory: async_sessionmaker[AsyncSession],
     *,
-    admin_username: str,
+    admin_email: str,
     admin_password: str | None,
 ) -> BootstrapReport:
-    normalized_admin_username = _normalize_username(admin_username)
+    try:
+        normalized_admin_email = normalize_email(admin_email)
+    except ValueError as exc:
+        raise ValueError(f"Admin email is invalid: {exc}.") from exc
     password_hasher = PasswordHasher()
 
     async with session_factory() as session, session.begin():
@@ -185,7 +179,7 @@ async def bootstrap_rbac(
         role_permissions_created = await _sync_role_permissions(session, roles_by_name)
         admin_user, admin_user_created = await _ensure_admin_user(
             session,
-            admin_username=normalized_admin_username,
+            admin_email=normalized_admin_email,
             admin_password=admin_password,
             password_hasher=password_hasher,
         )
@@ -202,16 +196,16 @@ async def bootstrap_rbac(
         role_permissions_created=role_permissions_created,
         admin_user_created=admin_user_created,
         admin_role_assigned=admin_role_assigned,
-        admin_username=normalized_admin_username,
+        admin_email=normalized_admin_email,
     )
 
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Idempotent RBAC bootstrap utility.")
     parser.add_argument(
-        "--admin-username",
-        default=os.getenv("RBAC_BOOTSTRAP_ADMIN_USERNAME", "admin"),
-        help="Bootstrap admin username (default: RBAC_BOOTSTRAP_ADMIN_USERNAME or 'admin').",
+        "--admin-email",
+        default=os.getenv("RBAC_BOOTSTRAP_ADMIN_EMAIL", "admin@example.com"),
+        help="Bootstrap admin email.",
     )
     parser.add_argument(
         "--admin-password",
@@ -224,7 +218,7 @@ def _build_parser() -> argparse.ArgumentParser:
 def _format_report(report: BootstrapReport) -> str:
     return (
         "RBAC bootstrap completed.\n"
-        f"- admin_username: {report.admin_username}\n"
+        f"- admin_email: {report.admin_email}\n"
         f"- permissions_created: {report.permissions_created}\n"
         f"- permissions_updated: {report.permissions_updated}\n"
         f"- roles_created: {report.roles_created}\n"
@@ -242,7 +236,7 @@ def main() -> int:
         report = asyncio.run(
             bootstrap_rbac(
                 get_async_session_factory(),
-                admin_username=args.admin_username,
+                admin_email=args.admin_email,
                 admin_password=args.admin_password,
             )
         )
