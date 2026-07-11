@@ -79,6 +79,7 @@ This table is contract-checked by `tests/routers/test_authorization_policy_cover
 | Method | Path                             | Access Level    | Permission                |
 | ------ | -------------------------------- | --------------- | ------------------------- |
 | `GET`  | `/v1/audit-log`                  | `permission`    | `audit_logs:read`         |
+| `GET`  | `/v1/dashboard`                  | `authenticated` | No                        |
 | `GET`  | `/v1/health`                     | `public`        | No                        |
 | `GET`  | `/v1/users/me`                   | `authenticated` | No                        |
 | `GET`  | `/v1/rbac/roles`                 | `permission`    | `roles:manage`            |

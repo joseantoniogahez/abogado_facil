@@ -19,12 +19,13 @@ const ROUTE_OWNER_BY_COMPONENT: Record<string, string> = {
   AdminPermissionsPage: "features/admin-permissions/AdminPermissionsPage",
   AdminRolesPage: "features/admin-roles/AdminRolesPage",
   AdminUsersPage: "features/admin-users/AdminUsersPage",
+  DashboardPage: "features/dashboard/DashboardPage",
   LandingPage: "features/landing/LandingPage",
   LoginPage: "features/auth/LoginPage",
   NotFoundPage: "features/not-found/NotFoundPage",
   ProfilePage: "features/profile/ProfilePage",
   RegisterPage: "features/auth/RegisterPage",
-  WelcomePage: "features/welcome/WelcomePage",
+  Navigate: "app/routes",
 };
 
 interface RouteContractRow {
@@ -133,13 +134,13 @@ describe("route inventory contracts", () => {
     expect(markdown).toContain("`/*`");
     expect(markdown).toContain("`/register`");
     expect(markdown).toContain("`/profile`");
-    expect(markdown).toContain("Requires `audit_logs:read`; missing permission redirects to `/welcome`.");
-    expect(markdown).toContain("Requires `user_roles:manage`; missing permission redirects to `/welcome`.");
+    expect(markdown).toContain("Requires `audit_logs:read`; missing permission redirects to `/dashboard`.");
+    expect(markdown).toContain("Requires `user_roles:manage`; missing permission redirects to `/dashboard`.");
     expect(markdown).toContain("Requires `role_permissions:manage`; role inventory falls back to manual ID without `roles:manage`.");
     expect(markdown).toContain(
-      "Requires `users:manage`; missing permission redirects to `/welcome`, while role-related controls stay hidden in-page unless the session also has `roles:manage`.",
+      "Requires `users:manage`; missing permission redirects to `/dashboard`, while role-related controls stay hidden in-page unless the session also has `roles:manage`.",
     );
-    expect(markdown).toContain("Requires `roles:manage`; missing permission redirects to `/welcome`.");
+    expect(markdown).toContain("Requires `roles:manage`; missing permission redirects to `/dashboard`.");
   });
 
   it("keeps root route error boundary ownership explicit in route tree", () => {

@@ -5,7 +5,7 @@ This document defines the deterministic end-to-end smoke baseline for the fronte
 ## Scope
 
 - Critical registration, email login, profile, and logout journey.
-- Protected route navigation behavior.
+- Canonical dashboard navigation, legacy `/welcome` redirect, and protected route behavior.
 - Error fallback behavior for protected session validation.
 - Admin protected route error diagnostics for RBAC `403 forbidden` responses.
 - Admin audit-log route visibility for sessions with `audit_logs:read`.
@@ -27,7 +27,7 @@ This document defines the deterministic end-to-end smoke baseline for the fronte
 - The registration scenario verifies required legal-name inputs, editable display name, normalized
   email feedback, and an explicit transition to login without implicit authentication.
 - The profile scenario verifies that the returned product profile replaces cached session state;
-  welcome headings use `display_name`.
+  dashboard headings use `display_name`; dashboard API mocks are firm-scoped and deterministic.
 
 ## Execution Commands
 

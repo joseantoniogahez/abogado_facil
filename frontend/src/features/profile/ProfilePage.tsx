@@ -215,7 +215,7 @@ export const ProfilePage = () => {
             </button>
             <Link
               className="inline-flex flex-1 items-center justify-center rounded-full border border-[var(--app-border)] px-5 py-3 text-sm font-semibold text-[var(--app-ink)] transition hover:border-[var(--app-accent)] hover:text-[var(--app-accent)]"
-              to="/welcome"
+              to="/dashboard"
             >
               {t("profile.actions.cancel")}
             </Link>

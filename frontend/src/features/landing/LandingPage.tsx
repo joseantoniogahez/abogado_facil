@@ -54,7 +54,7 @@ export const LandingPage = () => {
   }
 
   if (user) {
-    return <Navigate replace to="/welcome" />;
+    return <Navigate replace to="/dashboard" />;
   }
 
   return (

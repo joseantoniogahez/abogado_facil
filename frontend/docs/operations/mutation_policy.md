@@ -19,7 +19,7 @@ This document defines deterministic mutation retry and invalidation behavior by 
 - Login mutation consumer: `src/features/auth/LoginPage.tsx`
 - Registration mutation consumer: `src/features/auth/RegisterPage.tsx`
 - Profile mutation consumer: `src/features/profile/ProfilePage.tsx`
-- Logout mutation consumer: `src/features/welcome/WelcomePage.tsx`
+- Logout mutation consumer: `src/shared/routing/RootLayout.tsx`
 
 ## Failure Behavior Contract
 

@@ -17,6 +17,7 @@ All routes are versioned under `/v1`.
 | Method   | Path                                                   | Auth | Permission                | Main Request Contract                                   | Success Response                   | Common Error Statuses                    |
 | -------- | ------------------------------------------------------ | ---- | ------------------------- | ------------------------------------------------------- | ---------------------------------- | ---------------------------------------- |
 | `GET`    | `/v1/audit-log`                                        | Yes  | `audit_logs:read`         | No body                                                 | `200` `AuditLogEntryResponse[]`    | `401`, `403`, `500`                      |
+| `GET`    | `/v1/dashboard`                                        | Yes  | No                        | No body                                                 | `200` `DashboardSummaryResponse`   | `401`, `403`, `500`                      |
 | `GET`    | `/v1/health`                                           | No   | No                        | No body                                                 | `200` `{ "status": "ok" }`         | -                                        |
 | `POST`   | `/v1/token`                                            | No   | No                        | OAuth2 form (`username` carries email, plus `password`) | `200` bearer token                 | `400`, `401`, `403`, `500`               |
 | `POST`   | `/v1/users/register`                                   | No   | No                        | JSON `RegisterUserRequest`                              | `201` `AuthenticatedUserResponse`  | `400`, `409`, `500`                      |
@@ -51,6 +52,7 @@ This table classifies each `GET` endpoint as `public`, `authenticated`, or `perm
 | Method | Path                             | Access Level    | Permission                |
 | ------ | -------------------------------- | --------------- | ------------------------- |
 | `GET`  | `/v1/audit-log`                  | `permission`    | `audit_logs:read`         |
+| `GET`  | `/v1/dashboard`                  | `authenticated` | No                        |
 | `GET`  | `/v1/health`                     | `public`        | No                        |
 | `GET`  | `/v1/users/me`                   | `authenticated` | No                        |
 | `GET`  | `/v1/rbac/roles`                 | `permission`    | `roles:manage`            |
@@ -72,6 +74,7 @@ This table classifies each `GET` endpoint as `public`, `authenticated`, or `perm
 - The OAuth2 form field for `POST /v1/token` remains named `username` for protocol compatibility,
   but its value is the account email and the JWT subject is the normalized email.
 - `PATCH /v1/users/me` supports legal-name components, display name, email, firm name, and password updates.
+- `GET /v1/dashboard` resolves the firm from the authenticated principal and accepts no client-selected firm identifier.
 - `POST /v1/users/register`, `GET /v1/users/me`, and `PATCH /v1/users/me` return
   `AuthenticatedUserResponse` with deterministic `permissions` (sorted unique effective permission ids from direct
   and inherited roles).

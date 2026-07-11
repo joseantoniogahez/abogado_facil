@@ -30,6 +30,15 @@ This command:
 1. Exchange credentials for a bearer token with `POST /v1/token`.
 1. Call protected endpoints with `Authorization: Bearer <access_token>`.
 
+Client navigation after authentication:
+
+- A successful login stores the bearer session and redirects the user to `/dashboard`, the
+  canonical authenticated home.
+- `/welcome` is retained only as a temporary compatibility route and redirects authenticated
+  users to `/dashboard`; it does not own a separate page or authentication flow.
+- Public registration does not create a session. After registration, the user must log in before
+  the client can navigate to `/dashboard`.
+
 Access tokens now include:
 
 - standard claims `sub`, `iss`, `aud`, `iat`, `exp`, and `jti`,

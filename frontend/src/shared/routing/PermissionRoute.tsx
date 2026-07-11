@@ -10,7 +10,7 @@ interface PermissionRouteProps {
   fallbackTo?: string;
 }
 
-export const PermissionRoute = ({ requiredPermission, fallbackTo = "/welcome" }: PermissionRouteProps) => {
+export const PermissionRoute = ({ requiredPermission, fallbackTo = "/dashboard" }: PermissionRouteProps) => {
   const { data: user } = useSession();
   const location = useLocation();
   const hasRequiredPermission = userHasPermission(user, requiredPermission);

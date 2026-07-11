@@ -37,73 +37,75 @@ const renderAppAt = (path: AdminRoutePath) => {
 };
 
 describe("PermissionRoute", () => {
-  it("redirects unauthorized direct navigation from /admin/users to /welcome", async () => {
-    const fetchMock = vi.fn();
+  const dashboardResponse = { ok: true, status: 200, json: () => Promise.resolve({ firm_id: 1, firm_name: "Test Legal", clients: { value: 0, available: false }, active_matters: { value: 0, available: false }, pending_tasks: { value: 0, available: false }, upcoming_tasks: [], ai_status: "not_available", actions: [] }) } satisfies Partial<Response>;
+
+  it("redirects unauthorized direct navigation from /admin/users to /dashboard", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(dashboardResponse);
     vi.stubGlobal("fetch", fetchMock);
     const router = renderAppAt("/admin/users");
 
     await waitFor(() => {
-      expect(router.state.location.pathname).toBe("/welcome");
+      expect(router.state.location.pathname).toBe("/dashboard");
     });
     expect(
-      await screen.findByRole("heading", { name: t("welcome.greeting", { displayName: "Test User" }) }),
+      await screen.findByRole("heading", { name: t("dashboard.greeting", { displayName: "Test User" }) }),
     ).toBeInTheDocument();
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   }, 10_000);
 
-  it("redirects unauthorized direct navigation from /admin/audit-log to /welcome", async () => {
-    const fetchMock = vi.fn();
+  it("redirects unauthorized direct navigation from /admin/audit-log to /dashboard", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(dashboardResponse);
     vi.stubGlobal("fetch", fetchMock);
     const router = renderAppAt("/admin/audit-log");
 
     await waitFor(() => {
-      expect(router.state.location.pathname).toBe("/welcome");
+      expect(router.state.location.pathname).toBe("/dashboard");
     });
     expect(
-      await screen.findByRole("heading", { name: t("welcome.greeting", { displayName: "Test User" }) }),
+      await screen.findByRole("heading", { name: t("dashboard.greeting", { displayName: "Test User" }) }),
     ).toBeInTheDocument();
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   }, 10_000);
 
-  it("redirects unauthorized direct navigation from /admin/roles to /welcome", async () => {
-    const fetchMock = vi.fn();
+  it("redirects unauthorized direct navigation from /admin/roles to /dashboard", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(dashboardResponse);
     vi.stubGlobal("fetch", fetchMock);
     const router = renderAppAt("/admin/roles");
 
     await waitFor(() => {
-      expect(router.state.location.pathname).toBe("/welcome");
+      expect(router.state.location.pathname).toBe("/dashboard");
     });
     expect(
-      await screen.findByRole("heading", { name: t("welcome.greeting", { displayName: "Test User" }) }),
+      await screen.findByRole("heading", { name: t("dashboard.greeting", { displayName: "Test User" }) }),
     ).toBeInTheDocument();
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   }, 10_000);
 
-  it("redirects unauthorized direct navigation from /admin/assignments to /welcome", async () => {
-    const fetchMock = vi.fn();
+  it("redirects unauthorized direct navigation from /admin/assignments to /dashboard", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(dashboardResponse);
     vi.stubGlobal("fetch", fetchMock);
     const router = renderAppAt("/admin/assignments");
 
     await waitFor(() => {
-      expect(router.state.location.pathname).toBe("/welcome");
+      expect(router.state.location.pathname).toBe("/dashboard");
     });
     expect(
-      await screen.findByRole("heading", { name: t("welcome.greeting", { displayName: "Test User" }) }),
+      await screen.findByRole("heading", { name: t("dashboard.greeting", { displayName: "Test User" }) }),
     ).toBeInTheDocument();
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   }, 10_000);
 
-  it("redirects unauthorized direct navigation from /admin/permissions to /welcome", async () => {
-    const fetchMock = vi.fn();
+  it("redirects unauthorized direct navigation from /admin/permissions to /dashboard", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(dashboardResponse);
     vi.stubGlobal("fetch", fetchMock);
     const router = renderAppAt("/admin/permissions");
 
     await waitFor(() => {
-      expect(router.state.location.pathname).toBe("/welcome");
+      expect(router.state.location.pathname).toBe("/dashboard");
     });
     expect(
-      await screen.findByRole("heading", { name: t("welcome.greeting", { displayName: "Test User" }) }),
+      await screen.findByRole("heading", { name: t("dashboard.greeting", { displayName: "Test User" }) }),
     ).toBeInTheDocument();
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   }, 10_000);
 });

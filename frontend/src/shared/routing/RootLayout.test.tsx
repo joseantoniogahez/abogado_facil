@@ -23,6 +23,10 @@ const renderLayout = (sessionValue: AuthenticatedUser | null) => {
             path: "welcome",
             element: <h1>{t("welcome.badge")}</h1>,
           },
+          {
+            path: "login",
+            element: <h1>{t("auth.login.title")}</h1>,
+          },
         ],
       },
     ],
@@ -36,6 +40,7 @@ const renderLayout = (sessionValue: AuthenticatedUser | null) => {
       <RouterProvider router={router} />
     </QueryClientProvider>,
   );
+  return { queryClient, router };
 };
 
 describe("RootLayout", () => {
@@ -140,5 +145,25 @@ describe("RootLayout", () => {
     expect(screen.getByRole("link", { name: t("routing.nav.admin.permissions") })).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: t("routing.nav.admin.roles") })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: t("routing.nav.admin.users") })).not.toBeInTheDocument();
+  });
+
+  it("logs out from the authenticated layout and redirects to login", async () => {
+    const { queryClient, router } = renderLayout({
+      id: 8,
+      email: "owner@example.com",
+      first_name: "Test",
+      middle_name: null,
+      last_name: "Owner",
+      display_name: "Test Owner",
+      firm_name: "Test Legal",
+      disabled: false,
+      permissions: [],
+    });
+
+    await userEvent.setup().click(await screen.findByRole("button", { name: t("routing.logout") }));
+
+    expect(router.state.location.pathname).toBe("/login");
+    expect(queryClient.getQueryData(SESSION_QUERY_KEY)).toBeNull();
+    expect(await screen.findByRole("heading", { name: t("auth.login.title") })).toBeInTheDocument();
   });
 });

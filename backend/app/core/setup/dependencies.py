@@ -12,6 +12,7 @@ from app.features.audit_log.repository import AuditLogRepository
 from app.features.audit_log.service import AuditLogService, AuditLogServicePort
 from app.features.auth.repository import AuthRepository
 from app.features.auth.service import AuthService, AuthServicePort
+from app.features.dashboard.service import DashboardService, DashboardServicePort
 from app.features.outbox.repository import OutboxRepository
 from app.features.outbox.service import OutboxService, OutboxServicePort
 from app.features.rbac.repository import RBACRepository
@@ -147,6 +148,13 @@ async def get_audit_log_service(
 
 
 AuditLogServiceDependency = Annotated[AuditLogServicePort, Depends(get_audit_log_service)]
+
+
+async def get_dashboard_service() -> DashboardServicePort:
+    return DashboardService()
+
+
+DashboardServiceDependency = Annotated[DashboardServicePort, Depends(get_dashboard_service)]
 
 
 async def get_outbox_service(

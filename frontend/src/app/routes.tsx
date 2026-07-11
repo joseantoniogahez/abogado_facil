@@ -8,9 +8,10 @@ import { AdminUsersPage } from "@/features/admin-users/AdminUsersPage";
 import { LoginPage } from "@/features/auth/LoginPage";
 import { RegisterPage } from "@/features/auth/RegisterPage";
 import { LandingPage } from "@/features/landing/LandingPage";
+import { DashboardPage } from "@/features/dashboard/DashboardPage";
 import { NotFoundPage } from "@/features/not-found/NotFoundPage";
 import { ProfilePage } from "@/features/profile/ProfilePage";
-import { WelcomePage } from "@/features/welcome/WelcomePage";
+import { Navigate } from "react-router-dom";
 import { ProtectedRoute } from "@/shared/routing/ProtectedRoute";
 import { PermissionRoute } from "@/shared/routing/PermissionRoute";
 import { RootLayout } from "@/shared/routing/RootLayout";
@@ -40,7 +41,11 @@ export const appRoutes: RouteObject[] = [
         children: [
           {
             path: "welcome",
-            element: <WelcomePage />,
+            element: <Navigate replace to="/dashboard" />,
+          },
+          {
+            path: "dashboard",
+            element: <DashboardPage />,
           },
           {
             path: "profile",

@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { startTransition, useEffect, useMemo, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 
-import { useSession } from "@/shared/auth/session";
+import { authLogoutMutationPolicy } from "@/app/mutation-policy";
+import { logout, SESSION_QUERY_KEY, useSession } from "@/shared/auth/session";
 import { IAM_PERMISSION } from "@/shared/iam/contracts";
 import { userHasPermission } from "@/shared/iam/api";
 import { t } from "@/shared/i18n/ui-text";
@@ -19,13 +21,13 @@ interface AdminMenuItem {
 
 interface PrimaryMenuItem {
   key: "routing.nav.home" | "routing.nav.profile";
-  to: "/welcome" | "/profile";
+  to: "/dashboard" | "/profile";
 }
 
 const PRIMARY_MENU_ITEMS: readonly PrimaryMenuItem[] = [
   {
     key: "routing.nav.home",
-    to: "/welcome",
+    to: "/dashboard",
   },
   {
     key: "routing.nav.profile",
@@ -64,7 +66,18 @@ const ADMIN_MENU_ITEMS: readonly AdminMenuItem[] = [
 export const RootLayout = () => {
   const { data: user } = useSession();
   const location = useLocation();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const logoutMutation = useMutation({
+    ...authLogoutMutationPolicy,
+    mutationFn: () => logout(),
+    onSuccess: async () => {
+      queryClient.setQueryData(SESSION_QUERY_KEY, null);
+      await queryClient.invalidateQueries({ queryKey: SESSION_QUERY_KEY });
+      startTransition(() => void navigate("/login", { replace: true }));
+    },
+  });
 
   useEffect(() => {
     setIsMenuOpen(false);
@@ -97,9 +110,12 @@ export const RootLayout = () => {
               &#8801;
             </span>
           </button>
-          <Link className="text-sm font-semibold" to="/welcome">
-            {t("routing.nav.home")}
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link className="text-sm font-semibold" to="/dashboard">{t("routing.nav.home")}</Link>
+            <button className="text-sm font-semibold" disabled={logoutMutation.isPending} onClick={() => logoutMutation.mutate()} type="button">
+              {logoutMutation.isPending ? t("routing.logout.pending") : t("routing.logout")}
+            </button>
+          </div>
         </div>
       </header>
 

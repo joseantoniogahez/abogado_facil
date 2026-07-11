@@ -23,12 +23,13 @@ The gate evaluates production artifacts in `dist/assets`:
 
 ## Threshold Rationale
 
-- `max_total_js_bytes` remains `390000` bytes. PROD-002 first deduplicated the account-form markup
-  through `shared/ui/AccountFormField`; the resulting production bundle measures `389428` raw
-  bytes.
-- `max_total_js_gzip_bytes` is `116000` bytes. A source-map audit found no tests, docs, e2e,
-  coverage, or unrelated assets in the production graph; the audited bundle measures `115345`
-  gzip bytes, 345 bytes above the former threshold.
+- `max_total_js_bytes` is `395000` bytes. PROD-003 adds the authenticated dashboard, API parser,
+  route states, and global logout without adding dependencies; the approved production baseline is
+  `392774` raw bytes.
+- `max_total_js_gzip_bytes` is `117000` bytes. The corresponding approved PROD-003 baseline is
+  `116209` gzip bytes.
+- The PROD-003 limit adjustment was explicitly authorized on 2026-07-11 and retains `2226` raw
+  bytes and `791` gzip bytes of headroom.
 
 ## Commands
 

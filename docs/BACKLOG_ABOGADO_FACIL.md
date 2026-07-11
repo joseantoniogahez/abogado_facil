@@ -54,7 +54,7 @@ Repositorio base: template FastAPI + React + PostgreSQL + Docker
 | SETUP-007 | Docs       | P0        | Hecho        | Actualizar documentación raíz con identidad de producto.  | README describe Abogado Fácil sin perder instrucciones operativas.                                          |
 | PROD-001  | Frontend   | P1        | Hecho        | Rediseñar landing pública para Abogado Fácil.             | Visitante entiende valor, BYOK y aviso legal en menos de un minuto.                                         |
 | PROD-002  | Full-stack | P1        | Hecho        | Alinear auth existente con registro/login del producto.   | Registro, rechazo de credenciales incorrectas, login y logout validados; pasan todos los gates.             |
-| PROD-003  | Full-stack | P1        | Identificado | Crear dashboard autenticado inicial.                      | Muestra contadores base, tareas próximas y estado de IA.                                                    |
+| PROD-003  | Full-stack | P1        | Hecho        | Crear dashboard autenticado inicial.                      | Muestra contadores base, tareas próximas y estado de IA.                                                    |
 | LEGAL-001 | Legal      | P1        | Identificado | Definir textos mínimos de aviso legal y revisión humana.  | Mensajes visibles en landing y funciones de IA.                                                             |
 
 ## Fase 1 - Núcleo Legal Sin IA

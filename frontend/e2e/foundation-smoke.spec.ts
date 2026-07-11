@@ -18,6 +18,12 @@ const authenticatedUser = (overrides: Record<string, unknown> = {}) => ({
   ...overrides,
 });
 
+const dashboardSummary = () => ({
+  firm_id: 1, firm_name: "Smoke User",
+  clients: { value: 0, available: false }, active_matters: { value: 0, available: false },
+  pending_tasks: { value: 0, available: false }, upcoming_tasks: [], ai_status: "not_available", actions: [],
+});
+
 const mockUnhandledApiRequests = async (page: Page): Promise<void> => {
   await page.route("**/v1/**", (route) => {
     const request = route.request();
@@ -77,7 +83,7 @@ test.describe("frontend foundation smoke", () => {
     ).toBeVisible();
   });
 
-  test("completes login flow and lands on welcome page", async ({ page }) => {
+  test("completes login flow and lands on dashboard", async ({ page }) => {
     await page.route("**/v1/**", async (route) => {
       const request = route.request();
       const method = request.method();
@@ -112,6 +118,11 @@ test.describe("frontend foundation smoke", () => {
         return;
       }
 
+      if (method === "GET" && pathname === "/v1/dashboard") {
+        await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(dashboardSummary()) });
+        return;
+      }
+
       throw new Error(
         `Unhandled API request in login smoke: ${method} ${pathname}`,
       );
@@ -127,10 +138,10 @@ test.describe("frontend foundation smoke", () => {
       .getByRole("button", { name: t("auth.login.submit.default") })
       .click();
 
-    await expect(page).toHaveURL(/\/welcome$/);
+    await expect(page).toHaveURL(/\/dashboard$/);
     await expect(
       page.getByRole("heading", {
-        name: t("welcome.greeting", { displayName: SMOKE_DISPLAY_NAME }),
+        name: t("dashboard.greeting", { displayName: SMOKE_DISPLAY_NAME }),
       }),
     ).toBeVisible();
   });
@@ -140,12 +151,35 @@ test.describe("frontend foundation smoke", () => {
   }) => {
     await mockUnhandledApiRequests(page);
 
-    await page.goto("/welcome");
+    await page.goto("/dashboard");
 
     await expect(page).toHaveURL(/\/login$/);
     await expect(
       page.getByRole("heading", { name: t("auth.login.title") }),
     ).toBeVisible();
+  });
+
+  test("redirects authenticated legacy welcome route to dashboard", async ({ page }) => {
+    await page.addInitScript((storageKey) => {
+      window.sessionStorage.setItem(storageKey, "seed-token");
+    }, ACCESS_TOKEN_STORAGE_KEY);
+    await page.route("**/v1/**", async (route) => {
+      const pathname = new URL(route.request().url()).pathname;
+      if (pathname === "/v1/users/me") {
+        await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(authenticatedUser()) });
+        return;
+      }
+      if (pathname === "/v1/dashboard") {
+        await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(dashboardSummary()) });
+        return;
+      }
+      throw new Error(`Unhandled API request in legacy redirect smoke: ${pathname}`);
+    });
+
+    await page.goto("/welcome");
+
+    await expect(page).toHaveURL(/\/dashboard$/);
+    await expect(page.getByRole("heading", { name: t("dashboard.greeting", { displayName: SMOKE_DISPLAY_NAME }) })).toBeVisible();
   });
 
   test("renders protected-route error fallback with request-id diagnostics", async ({
@@ -181,7 +215,7 @@ test.describe("frontend foundation smoke", () => {
       );
     });
 
-    await page.goto("/welcome");
+    await page.goto("/dashboard");
 
     await expect(
       page.getByRole("heading", { name: t("routing.protected.error.title") }),
@@ -480,7 +514,7 @@ test.describe("frontend foundation smoke", () => {
     await expect(page.getByText(/request_id=req-permission-404/)).toBeVisible();
   });
 
-  test("redirects unauthorized direct admin routes to /welcome", async ({
+  test("redirects unauthorized direct admin routes to /dashboard", async ({
     page,
   }) => {
     await page.addInitScript((storageKey) => {
@@ -501,48 +535,53 @@ test.describe("frontend foundation smoke", () => {
         return;
       }
 
+      if (method === "GET" && pathname === "/v1/dashboard") {
+        await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(dashboardSummary()) });
+        return;
+      }
+
       throw new Error(
         `Unhandled API request in permission-redirect smoke: ${method} ${pathname}`,
       );
     });
 
     await page.goto("/admin/users");
-    await expect(page).toHaveURL(/\/welcome$/);
+    await expect(page).toHaveURL(/\/dashboard$/);
     await expect(
       page.getByRole("heading", {
-        name: t("welcome.greeting", { displayName: SMOKE_DISPLAY_NAME }),
+        name: t("dashboard.greeting", { displayName: SMOKE_DISPLAY_NAME }),
       }),
     ).toBeVisible();
 
     await page.goto("/admin/roles");
-    await expect(page).toHaveURL(/\/welcome$/);
+    await expect(page).toHaveURL(/\/dashboard$/);
     await expect(
       page.getByRole("heading", {
-        name: t("welcome.greeting", { displayName: SMOKE_DISPLAY_NAME }),
+        name: t("dashboard.greeting", { displayName: SMOKE_DISPLAY_NAME }),
       }),
     ).toBeVisible();
 
     await page.goto("/admin/assignments");
-    await expect(page).toHaveURL(/\/welcome$/);
+    await expect(page).toHaveURL(/\/dashboard$/);
     await expect(
       page.getByRole("heading", {
-        name: t("welcome.greeting", { displayName: SMOKE_DISPLAY_NAME }),
+        name: t("dashboard.greeting", { displayName: SMOKE_DISPLAY_NAME }),
       }),
     ).toBeVisible();
 
     await page.goto("/admin/permissions");
-    await expect(page).toHaveURL(/\/welcome$/);
+    await expect(page).toHaveURL(/\/dashboard$/);
     await expect(
       page.getByRole("heading", {
-        name: t("welcome.greeting", { displayName: SMOKE_DISPLAY_NAME }),
+        name: t("dashboard.greeting", { displayName: SMOKE_DISPLAY_NAME }),
       }),
     ).toBeVisible();
 
     await page.goto("/admin/audit-log");
-    await expect(page).toHaveURL(/\/welcome$/);
+    await expect(page).toHaveURL(/\/dashboard$/);
     await expect(
       page.getByRole("heading", {
-        name: t("welcome.greeting", { displayName: SMOKE_DISPLAY_NAME }),
+        name: t("dashboard.greeting", { displayName: SMOKE_DISPLAY_NAME }),
       }),
     ).toBeVisible();
   });

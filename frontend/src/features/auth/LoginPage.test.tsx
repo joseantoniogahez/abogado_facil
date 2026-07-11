@@ -18,8 +18,8 @@ const renderLogin = () => {
         element: <LoginPage />,
       },
       {
-        path: "/welcome",
-        element: <h1>Pantalla de bienvenida</h1>,
+        path: "/dashboard",
+        element: <h1>Dashboard de prueba</h1>,
       },
     ],
     {
@@ -44,7 +44,7 @@ describe("LoginPage", () => {
     );
   });
 
-  it("completes login flow and redirects to welcome", async () => {
+  it("completes login flow and redirects to dashboard", async () => {
     const fetchMock = vi
       .fn()
       .mockResolvedValueOnce({
@@ -97,7 +97,7 @@ describe("LoginPage", () => {
     await user.type(screen.getByLabelText(t("auth.login.fields.password")), "admin123");
     await user.click(screen.getByRole("button", { name: t("auth.login.submit.default") }));
 
-    expect(await screen.findByRole("heading", { name: "Pantalla de bienvenida" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Dashboard de prueba" })).toBeInTheDocument();
   }, 10_000);
 
   it("shows backend error message on invalid credentials", async () => {

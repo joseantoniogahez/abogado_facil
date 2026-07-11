@@ -32,8 +32,8 @@ const renderRegisterPage = () => {
         element: <h1>{t("auth.login.title")}</h1>,
       },
       {
-        path: "/welcome",
-        element: <h1>{t("welcome.badge")}</h1>,
+        path: "/dashboard",
+        element: <h1>{t("dashboard.badge")}</h1>,
       },
     ],
     {
@@ -144,6 +144,11 @@ describe("RegisterPage", () => {
   });
 
   it("redirects authenticated users away from /register", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: () => Promise.resolve({ firm_id: 1, firm_name: "Test Legal", clients: { value: 0, available: false }, active_matters: { value: 0, available: false }, pending_tasks: { value: 0, available: false }, upcoming_tasks: [], ai_status: "not_available", actions: [] }),
+    } satisfies Partial<Response>));
     const queryClient = createQueryClient();
     queryClient.setQueryData(SESSION_QUERY_KEY, {
       id: 1,
@@ -167,7 +172,7 @@ describe("RegisterPage", () => {
     );
 
     await waitFor(() => {
-      expect(router.state.location.pathname).toBe("/welcome");
+      expect(router.state.location.pathname).toBe("/dashboard");
     });
   });
 });

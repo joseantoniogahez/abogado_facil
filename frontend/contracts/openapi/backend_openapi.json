@@ -336,6 +336,103 @@
         "title": "CreateRoleRequest",
         "type": "object"
       },
+      "DashboardAction": {
+        "properties": {
+          "available": {
+            "title": "Available",
+            "type": "boolean"
+          },
+          "id": {
+            "enum": [
+              "create_client",
+              "create_matter",
+              "analyze_intake"
+            ],
+            "title": "Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "available"
+        ],
+        "title": "DashboardAction",
+        "type": "object"
+      },
+      "DashboardMetric": {
+        "properties": {
+          "available": {
+            "title": "Available",
+            "type": "boolean"
+          },
+          "value": {
+            "minimum": 0,
+            "title": "Value",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "value",
+          "available"
+        ],
+        "title": "DashboardMetric",
+        "type": "object"
+      },
+      "DashboardSummaryResponse": {
+        "properties": {
+          "actions": {
+            "items": {
+              "$ref": "#/components/schemas/DashboardAction"
+            },
+            "title": "Actions",
+            "type": "array"
+          },
+          "active_matters": {
+            "$ref": "#/components/schemas/DashboardMetric"
+          },
+          "ai_status": {
+            "enum": [
+              "not_available",
+              "not_configured",
+              "configured",
+              "error"
+            ],
+            "title": "Ai Status",
+            "type": "string"
+          },
+          "clients": {
+            "$ref": "#/components/schemas/DashboardMetric"
+          },
+          "firm_id": {
+            "title": "Firm Id",
+            "type": "integer"
+          },
+          "firm_name": {
+            "title": "Firm Name",
+            "type": "string"
+          },
+          "pending_tasks": {
+            "$ref": "#/components/schemas/DashboardMetric"
+          },
+          "upcoming_tasks": {
+            "items": {},
+            "title": "Upcoming Tasks",
+            "type": "array"
+          }
+        },
+        "required": [
+          "firm_id",
+          "firm_name",
+          "clients",
+          "active_matters",
+          "pending_tasks",
+          "upcoming_tasks",
+          "ai_status",
+          "actions"
+        ],
+        "title": "DashboardSummaryResponse",
+        "type": "object"
+      },
       "RBACPermission": {
         "properties": {
           "id": {
@@ -942,6 +1039,146 @@
         "summary": "List audit log entries",
         "tags": [
           "audit-log"
+        ]
+      }
+    },
+    "/v1/dashboard": {
+      "get": {
+        "description": "Returns one bounded summary for the firm resolved from the bearer session.",
+        "operationId": "get_dashboard_summary_v1_dashboard_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardSummaryResponse"
+                }
+              }
+            },
+            "description": "Dashboard summary returned."
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "unauthorized",
+                  "detail": "Could not validate credentials",
+                  "request_id": "req-example-1234",
+                  "status": 401
+                },
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "description": "Machine-readable domain error code.",
+                      "type": "string"
+                    },
+                    "detail": {
+                      "description": "Human-readable error message.",
+                      "type": "string"
+                    },
+                    "meta": {
+                      "description": "Optional structured error metadata."
+                    },
+                    "request_id": {
+                      "description": "Request correlation identifier echoed in the response header.",
+                      "example": "req-example-1234",
+                      "type": "string"
+                    },
+                    "status": {
+                      "description": "HTTP status code.",
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "detail",
+                    "status",
+                    "code",
+                    "request_id"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Missing, expired, or invalid token.",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer authentication challenge.",
+                "schema": {
+                  "example": "Bearer",
+                  "type": "string"
+                }
+              },
+              "X-Request-ID": {
+                "description": "Request correlation identifier for diagnostics and support.",
+                "schema": {
+                  "example": "req-example-1234",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "internal_error",
+                  "detail": "Internal server error",
+                  "request_id": "req-example-1234",
+                  "status": 500
+                },
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "description": "Machine-readable domain error code.",
+                      "type": "string"
+                    },
+                    "detail": {
+                      "description": "Human-readable error message.",
+                      "type": "string"
+                    },
+                    "meta": {
+                      "description": "Optional structured error metadata."
+                    },
+                    "request_id": {
+                      "description": "Request correlation identifier echoed in the response header.",
+                      "example": "req-example-1234",
+                      "type": "string"
+                    },
+                    "status": {
+                      "description": "HTTP status code.",
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "detail",
+                    "status",
+                    "code",
+                    "request_id"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Unhandled internal server error.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Request correlation identifier for diagnostics and support.",
+                "schema": {
+                  "example": "req-example-1234",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Get the authenticated firm's dashboard summary",
+        "tags": [
+          "dashboard"
         ]
       }
     },

@@ -73,7 +73,7 @@ export const RegisterPage = () => {
   }
 
   if (session.data) {
-    return <Navigate replace to="/welcome" />;
+    return <Navigate replace to="/dashboard" />;
   }
 
   const submit = (event: FormEvent<HTMLFormElement>) => {

@@ -34,7 +34,7 @@ export const LoginPage = () => {
       queryClient.setQueryData(SESSION_QUERY_KEY, user);
       await queryClient.invalidateQueries({ queryKey: SESSION_QUERY_KEY });
       startTransition(() => {
-        void navigate("/welcome", { replace: true });
+        void navigate("/dashboard", { replace: true });
       });
     },
   });
@@ -44,7 +44,7 @@ export const LoginPage = () => {
   }
 
   if (session.data) {
-    return <Navigate replace to="/welcome" />;
+    return <Navigate replace to="/dashboard" />;
   }
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
