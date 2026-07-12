@@ -292,6 +292,117 @@
         "title": "Body_login_for_access_token_v1_token_post",
         "type": "object"
       },
+      "ClientListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ClientResponse"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "limit": {
+            "maximum": 100,
+            "minimum": 1,
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "minimum": 0,
+            "title": "Offset",
+            "type": "integer"
+          },
+          "total": {
+            "minimum": 0,
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "ClientListResponse",
+        "type": "object"
+      },
+      "ClientResponse": {
+        "properties": {
+          "address": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "maxLength": 320,
+                "pattern": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "full_name": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Full Name",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 10000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "phone": {
+            "maxLength": 32,
+            "minLength": 1,
+            "title": "Phone",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "full_name",
+          "phone",
+          "id",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "ClientResponse",
+        "type": "object"
+      },
       "CreateAdminUserRequest": {
         "properties": {
           "email": {
@@ -319,6 +430,65 @@
           "password"
         ],
         "title": "CreateAdminUserRequest",
+        "type": "object"
+      },
+      "CreateClientRequest": {
+        "properties": {
+          "address": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "maxLength": 320,
+                "pattern": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "full_name": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Full Name",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 10000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "phone": {
+            "maxLength": 32,
+            "minLength": 1,
+            "title": "Phone",
+            "type": "string"
+          }
+        },
+        "required": [
+          "full_name",
+          "phone"
+        ],
+        "title": "CreateClientRequest",
         "type": "object"
       },
       "CreateRoleRequest": {
@@ -668,6 +838,75 @@
           }
         },
         "title": "UpdateAdminUserRequest",
+        "type": "object"
+      },
+      "UpdateClientRequest": {
+        "properties": {
+          "address": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "maxLength": 320,
+                "pattern": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "full_name": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 10000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "maxLength": 32,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          }
+        },
+        "title": "UpdateClientRequest",
         "type": "object"
       },
       "UpdateCurrentUserRequest": {
@@ -1039,6 +1278,964 @@
         "summary": "List audit log entries",
         "tags": [
           "audit-log"
+        ]
+      }
+    },
+    "/v1/clients": {
+      "get": {
+        "description": "Lists or searches only clients in the authenticated firm.",
+        "operationId": "list_clients_v1_clients_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "search",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 255,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Search"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "invalid_input",
+                  "detail": "Validation error",
+                  "request_id": "req-example-1234",
+                  "status": 422
+                },
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "description": "Machine-readable domain error code.",
+                      "type": "string"
+                    },
+                    "detail": {
+                      "description": "Human-readable error message.",
+                      "type": "string"
+                    },
+                    "meta": {
+                      "description": "Optional structured error metadata."
+                    },
+                    "request_id": {
+                      "description": "Request correlation identifier echoed in the response header.",
+                      "example": "req-example-1234",
+                      "type": "string"
+                    },
+                    "status": {
+                      "description": "HTTP status code.",
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "detail",
+                    "status",
+                    "code",
+                    "request_id"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Request validation failed.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Request correlation identifier for diagnostics and support.",
+                "schema": {
+                  "example": "req-example-1234",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "unauthorized",
+                  "detail": "Could not validate credentials",
+                  "request_id": "req-example-1234",
+                  "status": 401
+                },
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "description": "Machine-readable domain error code.",
+                      "type": "string"
+                    },
+                    "detail": {
+                      "description": "Human-readable error message.",
+                      "type": "string"
+                    },
+                    "meta": {
+                      "description": "Optional structured error metadata."
+                    },
+                    "request_id": {
+                      "description": "Request correlation identifier echoed in the response header.",
+                      "example": "req-example-1234",
+                      "type": "string"
+                    },
+                    "status": {
+                      "description": "HTTP status code.",
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "detail",
+                    "status",
+                    "code",
+                    "request_id"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Missing, expired, or invalid token.",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer authentication challenge.",
+                "schema": {
+                  "example": "Bearer",
+                  "type": "string"
+                }
+              },
+              "X-Request-ID": {
+                "description": "Request correlation identifier for diagnostics and support.",
+                "schema": {
+                  "example": "req-example-1234",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "internal_error",
+                  "detail": "Internal server error",
+                  "request_id": "req-example-1234",
+                  "status": 500
+                },
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "description": "Machine-readable domain error code.",
+                      "type": "string"
+                    },
+                    "detail": {
+                      "description": "Human-readable error message.",
+                      "type": "string"
+                    },
+                    "meta": {
+                      "description": "Optional structured error metadata."
+                    },
+                    "request_id": {
+                      "description": "Request correlation identifier echoed in the response header.",
+                      "example": "req-example-1234",
+                      "type": "string"
+                    },
+                    "status": {
+                      "description": "HTTP status code.",
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "detail",
+                    "status",
+                    "code",
+                    "request_id"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Unhandled internal server error.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Request correlation identifier for diagnostics and support.",
+                "schema": {
+                  "example": "req-example-1234",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "List clients",
+        "tags": [
+          "clients"
+        ]
+      },
+      "post": {
+        "description": "Creates a client in the firm resolved from the bearer session.",
+        "operationId": "create_client_v1_clients_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateClientRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "invalid_input",
+                  "detail": "Validation error",
+                  "request_id": "req-example-1234",
+                  "status": 422
+                },
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "description": "Machine-readable domain error code.",
+                      "type": "string"
+                    },
+                    "detail": {
+                      "description": "Human-readable error message.",
+                      "type": "string"
+                    },
+                    "meta": {
+                      "description": "Optional structured error metadata."
+                    },
+                    "request_id": {
+                      "description": "Request correlation identifier echoed in the response header.",
+                      "example": "req-example-1234",
+                      "type": "string"
+                    },
+                    "status": {
+                      "description": "HTTP status code.",
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "detail",
+                    "status",
+                    "code",
+                    "request_id"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Request validation failed.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Request correlation identifier for diagnostics and support.",
+                "schema": {
+                  "example": "req-example-1234",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "unauthorized",
+                  "detail": "Could not validate credentials",
+                  "request_id": "req-example-1234",
+                  "status": 401
+                },
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "description": "Machine-readable domain error code.",
+                      "type": "string"
+                    },
+                    "detail": {
+                      "description": "Human-readable error message.",
+                      "type": "string"
+                    },
+                    "meta": {
+                      "description": "Optional structured error metadata."
+                    },
+                    "request_id": {
+                      "description": "Request correlation identifier echoed in the response header.",
+                      "example": "req-example-1234",
+                      "type": "string"
+                    },
+                    "status": {
+                      "description": "HTTP status code.",
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "detail",
+                    "status",
+                    "code",
+                    "request_id"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Missing, expired, or invalid token.",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer authentication challenge.",
+                "schema": {
+                  "example": "Bearer",
+                  "type": "string"
+                }
+              },
+              "X-Request-ID": {
+                "description": "Request correlation identifier for diagnostics and support.",
+                "schema": {
+                  "example": "req-example-1234",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "internal_error",
+                  "detail": "Internal server error",
+                  "request_id": "req-example-1234",
+                  "status": 500
+                },
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "description": "Machine-readable domain error code.",
+                      "type": "string"
+                    },
+                    "detail": {
+                      "description": "Human-readable error message.",
+                      "type": "string"
+                    },
+                    "meta": {
+                      "description": "Optional structured error metadata."
+                    },
+                    "request_id": {
+                      "description": "Request correlation identifier echoed in the response header.",
+                      "example": "req-example-1234",
+                      "type": "string"
+                    },
+                    "status": {
+                      "description": "HTTP status code.",
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "detail",
+                    "status",
+                    "code",
+                    "request_id"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Unhandled internal server error.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Request correlation identifier for diagnostics and support.",
+                "schema": {
+                  "example": "req-example-1234",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Create a client",
+        "tags": [
+          "clients"
+        ]
+      }
+    },
+    "/v1/clients/{client_id}": {
+      "get": {
+        "description": "Gets one client in the authenticated firm.",
+        "operationId": "get_client_v1_clients__client_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "client_id",
+            "required": true,
+            "schema": {
+              "title": "Client Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "invalid_input",
+                  "detail": "Validation error",
+                  "request_id": "req-example-1234",
+                  "status": 422
+                },
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "description": "Machine-readable domain error code.",
+                      "type": "string"
+                    },
+                    "detail": {
+                      "description": "Human-readable error message.",
+                      "type": "string"
+                    },
+                    "meta": {
+                      "description": "Optional structured error metadata."
+                    },
+                    "request_id": {
+                      "description": "Request correlation identifier echoed in the response header.",
+                      "example": "req-example-1234",
+                      "type": "string"
+                    },
+                    "status": {
+                      "description": "HTTP status code.",
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "detail",
+                    "status",
+                    "code",
+                    "request_id"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Request validation failed.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Request correlation identifier for diagnostics and support.",
+                "schema": {
+                  "example": "req-example-1234",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "unauthorized",
+                  "detail": "Could not validate credentials",
+                  "request_id": "req-example-1234",
+                  "status": 401
+                },
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "description": "Machine-readable domain error code.",
+                      "type": "string"
+                    },
+                    "detail": {
+                      "description": "Human-readable error message.",
+                      "type": "string"
+                    },
+                    "meta": {
+                      "description": "Optional structured error metadata."
+                    },
+                    "request_id": {
+                      "description": "Request correlation identifier echoed in the response header.",
+                      "example": "req-example-1234",
+                      "type": "string"
+                    },
+                    "status": {
+                      "description": "HTTP status code.",
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "detail",
+                    "status",
+                    "code",
+                    "request_id"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Missing, expired, or invalid token.",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer authentication challenge.",
+                "schema": {
+                  "example": "Bearer",
+                  "type": "string"
+                }
+              },
+              "X-Request-ID": {
+                "description": "Request correlation identifier for diagnostics and support.",
+                "schema": {
+                  "example": "req-example-1234",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "not_found",
+                  "detail": "Client not found",
+                  "request_id": "req-example-1234",
+                  "status": 404
+                },
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "description": "Machine-readable domain error code.",
+                      "type": "string"
+                    },
+                    "detail": {
+                      "description": "Human-readable error message.",
+                      "type": "string"
+                    },
+                    "meta": {
+                      "description": "Optional structured error metadata."
+                    },
+                    "request_id": {
+                      "description": "Request correlation identifier echoed in the response header.",
+                      "example": "req-example-1234",
+                      "type": "string"
+                    },
+                    "status": {
+                      "description": "HTTP status code.",
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "detail",
+                    "status",
+                    "code",
+                    "request_id"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Client does not exist in the authenticated firm.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Request correlation identifier for diagnostics and support.",
+                "schema": {
+                  "example": "req-example-1234",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "internal_error",
+                  "detail": "Internal server error",
+                  "request_id": "req-example-1234",
+                  "status": 500
+                },
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "description": "Machine-readable domain error code.",
+                      "type": "string"
+                    },
+                    "detail": {
+                      "description": "Human-readable error message.",
+                      "type": "string"
+                    },
+                    "meta": {
+                      "description": "Optional structured error metadata."
+                    },
+                    "request_id": {
+                      "description": "Request correlation identifier echoed in the response header.",
+                      "example": "req-example-1234",
+                      "type": "string"
+                    },
+                    "status": {
+                      "description": "HTTP status code.",
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "detail",
+                    "status",
+                    "code",
+                    "request_id"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Unhandled internal server error.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Request correlation identifier for diagnostics and support.",
+                "schema": {
+                  "example": "req-example-1234",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Get a client",
+        "tags": [
+          "clients"
+        ]
+      },
+      "patch": {
+        "description": "Partially updates one client in the authenticated firm.",
+        "operationId": "update_client_v1_clients__client_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "client_id",
+            "required": true,
+            "schema": {
+              "title": "Client Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateClientRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "invalid_input",
+                  "detail": "Validation error",
+                  "request_id": "req-example-1234",
+                  "status": 422
+                },
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "description": "Machine-readable domain error code.",
+                      "type": "string"
+                    },
+                    "detail": {
+                      "description": "Human-readable error message.",
+                      "type": "string"
+                    },
+                    "meta": {
+                      "description": "Optional structured error metadata."
+                    },
+                    "request_id": {
+                      "description": "Request correlation identifier echoed in the response header.",
+                      "example": "req-example-1234",
+                      "type": "string"
+                    },
+                    "status": {
+                      "description": "HTTP status code.",
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "detail",
+                    "status",
+                    "code",
+                    "request_id"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Request validation failed.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Request correlation identifier for diagnostics and support.",
+                "schema": {
+                  "example": "req-example-1234",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "unauthorized",
+                  "detail": "Could not validate credentials",
+                  "request_id": "req-example-1234",
+                  "status": 401
+                },
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "description": "Machine-readable domain error code.",
+                      "type": "string"
+                    },
+                    "detail": {
+                      "description": "Human-readable error message.",
+                      "type": "string"
+                    },
+                    "meta": {
+                      "description": "Optional structured error metadata."
+                    },
+                    "request_id": {
+                      "description": "Request correlation identifier echoed in the response header.",
+                      "example": "req-example-1234",
+                      "type": "string"
+                    },
+                    "status": {
+                      "description": "HTTP status code.",
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "detail",
+                    "status",
+                    "code",
+                    "request_id"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Missing, expired, or invalid token.",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer authentication challenge.",
+                "schema": {
+                  "example": "Bearer",
+                  "type": "string"
+                }
+              },
+              "X-Request-ID": {
+                "description": "Request correlation identifier for diagnostics and support.",
+                "schema": {
+                  "example": "req-example-1234",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "not_found",
+                  "detail": "Client not found",
+                  "request_id": "req-example-1234",
+                  "status": 404
+                },
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "description": "Machine-readable domain error code.",
+                      "type": "string"
+                    },
+                    "detail": {
+                      "description": "Human-readable error message.",
+                      "type": "string"
+                    },
+                    "meta": {
+                      "description": "Optional structured error metadata."
+                    },
+                    "request_id": {
+                      "description": "Request correlation identifier echoed in the response header.",
+                      "example": "req-example-1234",
+                      "type": "string"
+                    },
+                    "status": {
+                      "description": "HTTP status code.",
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "detail",
+                    "status",
+                    "code",
+                    "request_id"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Client does not exist in the authenticated firm.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Request correlation identifier for diagnostics and support.",
+                "schema": {
+                  "example": "req-example-1234",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "internal_error",
+                  "detail": "Internal server error",
+                  "request_id": "req-example-1234",
+                  "status": 500
+                },
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "description": "Machine-readable domain error code.",
+                      "type": "string"
+                    },
+                    "detail": {
+                      "description": "Human-readable error message.",
+                      "type": "string"
+                    },
+                    "meta": {
+                      "description": "Optional structured error metadata."
+                    },
+                    "request_id": {
+                      "description": "Request correlation identifier echoed in the response header.",
+                      "example": "req-example-1234",
+                      "type": "string"
+                    },
+                    "status": {
+                      "description": "HTTP status code.",
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "detail",
+                    "status",
+                    "code",
+                    "request_id"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Unhandled internal server error.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Request correlation identifier for diagnostics and support.",
+                "schema": {
+                  "example": "req-example-1234",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Update a client",
+        "tags": [
+          "clients"
         ]
       }
     },

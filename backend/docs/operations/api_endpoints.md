@@ -22,6 +22,10 @@ All routes are versioned under `/v1`.
 | `POST`   | `/v1/token`                                            | No   | No                        | OAuth2 form (`username` carries email, plus `password`) | `200` bearer token                 | `400`, `401`, `403`, `500`               |
 | `POST`   | `/v1/users/register`                                   | No   | No                        | JSON `RegisterUserRequest`                              | `201` `AuthenticatedUserResponse`  | `400`, `409`, `500`                      |
 | `GET`    | `/v1/users/me`                                         | Yes  | No                        | No body                                                 | `200` `AuthenticatedUserResponse`  | `401`, `403`, `500`                      |
+| `POST`   | `/v1/clients`                                          | Yes  | No                        | JSON `CreateClientRequest`                              | `201` `ClientResponse`             | `400`, `401`, `500`                      |
+| `GET`    | `/v1/clients`                                          | Yes  | No                        | Query `search`, `limit`, `offset`                       | `200` `ClientListResponse`         | `400`, `401`, `500`                      |
+| `GET`    | `/v1/clients/{client_id}`                              | Yes  | No                        | Path `client_id`                                        | `200` `ClientResponse`             | `400`, `401`, `404`, `500`               |
+| `PATCH`  | `/v1/clients/{client_id}`                              | Yes  | No                        | Path `client_id` + JSON `UpdateClientRequest`           | `200` `ClientResponse`             | `400`, `401`, `404`, `500`               |
 | `PATCH`  | `/v1/users/me`                                         | Yes  | No                        | JSON `UpdateCurrentUserRequest`                         | `200` `AuthenticatedUserResponse`  | `400`, `401`, `403`, `409`, `500`        |
 | `GET`    | `/v1/rbac/roles`                                       | Yes  | `roles:manage`            | No body                                                 | `200` `RBACRole[]`                 | `401`, `403`, `500`                      |
 | `GET`    | `/v1/rbac/permissions`                                 | Yes  | `role_permissions:manage` | No body                                                 | `200` `RBACPermission[]`           | `401`, `403`, `500`                      |
@@ -53,6 +57,8 @@ This table classifies each `GET` endpoint as `public`, `authenticated`, or `perm
 | ------ | -------------------------------- | --------------- | ------------------------- |
 | `GET`  | `/v1/audit-log`                  | `permission`    | `audit_logs:read`         |
 | `GET`  | `/v1/dashboard`                  | `authenticated` | No                        |
+| `GET`  | `/v1/clients`                    | `authenticated` | No                        |
+| `GET`  | `/v1/clients/{client_id}`        | `authenticated` | No                        |
 | `GET`  | `/v1/health`                     | `public`        | No                        |
 | `GET`  | `/v1/users/me`                   | `authenticated` | No                        |
 | `GET`  | `/v1/rbac/roles`                 | `permission`    | `roles:manage`            |
@@ -75,6 +81,11 @@ This table classifies each `GET` endpoint as `public`, `authenticated`, or `perm
   but its value is the account email and the JWT subject is the normalized email.
 - `PATCH /v1/users/me` supports legal-name components, display name, email, firm name, and password updates.
 - `GET /v1/dashboard` resolves the firm from the authenticated principal and accepts no client-selected firm identifier.
+- Client endpoints resolve `firm_id` from the authenticated principal. List, detail, search, and
+  update are always firm-scoped; an absent or foreign `client_id` returns the same `404`.
+- Client phones use Mexico country code `52` in a separate persisted column and expose only the
+  normalized 10-digit national number. Create/update accept common formatting and optional `+52`;
+  phone search removes formatting and an optional leading `52` before matching.
 - `POST /v1/users/register`, `GET /v1/users/me`, and `PATCH /v1/users/me` return
   `AuthenticatedUserResponse` with deterministic `permissions` (sorted unique effective permission ids from direct
   and inherited roles).

@@ -585,4 +585,32 @@ test.describe("frontend foundation smoke", () => {
       }),
     ).toBeVisible();
   });
+
+  test("creates, views, edits, and searches a firm-scoped client", async ({ page }) => {
+    await page.addInitScript((storageKey) => window.sessionStorage.setItem(storageKey, "clients-token"), ACCESS_TOKEN_STORAGE_KEY);
+    let storedClient = { id: 21, full_name: "María López", phone: "5512345678", email: "maria@example.com", address: null, notes: null as string | null, created_at: "2026-07-11T12:00:00Z", updated_at: "2026-07-11T12:00:00Z" };
+    await page.route("**/v1/**", async (route) => {
+      const request = route.request(); const url = new URL(request.url());
+      if (request.method() === "GET" && url.pathname === "/v1/users/me") { await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(authenticatedUser()) }); return; }
+      if (request.method() === "POST" && url.pathname === "/v1/clients") { const payload = request.postDataJSON() as Partial<typeof storedClient>; storedClient = { ...storedClient, ...payload }; await route.fulfill({ status: 201, contentType: "application/json", body: JSON.stringify(storedClient) }); return; }
+      if (request.method() === "PATCH" && url.pathname === "/v1/clients/21") { const payload = request.postDataJSON() as Partial<typeof storedClient>; storedClient = { ...storedClient, ...payload }; await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(storedClient) }); return; }
+      if (request.method() === "GET" && url.pathname === "/v1/clients/21") { await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(storedClient) }); return; }
+      if (request.method() === "GET" && url.pathname === "/v1/clients") { await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ items: [storedClient], total: 1, limit: 50, offset: 0 }) }); return; }
+      throw new Error(`Unhandled API request in clients smoke: ${request.method()} ${url.pathname}`);
+    });
+    await page.goto("/clients/new");
+    await page.getByLabel(t("clients.fields.name")).fill(storedClient.full_name);
+    await page.getByRole("textbox", { name: /^Teléfono/ }).fill(storedClient.phone);
+    await page.getByLabel(t("clients.fields.email")).fill(storedClient.email);
+    await page.getByRole("button", { name: t("clients.save") }).click();
+    await expect(page).toHaveURL(/\/clients\/21$/);
+    await expect(page.getByRole("heading", { name: storedClient.full_name })).toBeVisible();
+    await page.getByRole("link", { name: t("clients.edit") }).click();
+    await page.getByLabel(t("clients.fields.notes")).fill("Contacto prioritario");
+    await page.getByRole("button", { name: t("clients.save") }).click();
+    await expect(page.getByText("Contacto prioritario")).toBeVisible();
+    await page.getByRole("link", { name: t("clients.back") }).click();
+    await page.getByLabel(t("clients.search")).fill("María");
+    await expect(page.getByRole("link", { name: storedClient.full_name })).toBeVisible();
+  });
 });

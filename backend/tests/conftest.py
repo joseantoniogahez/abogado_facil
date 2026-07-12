@@ -13,6 +13,7 @@ from app.core.db.database import Base
 from app.core.setup.dependencies import get_db_session
 from app.features.audit_log.models import AuditLogEntry
 from app.features.auth.models import Firm, User
+from app.features.clients.models import Client
 from app.features.outbox.models import OutboxEvent
 from app.features.rbac.models import Permission, Role, RoleInheritance, RolePermission, UserRole
 from app.main import app
@@ -119,6 +120,7 @@ def mock_data(
         {"class": RoleInheritance, "json": []},
         {"class": OutboxEvent, "json": []},
         {"class": AuditLogEntry, "json": []},
+        {"class": Client, "json": []},
     ]
 
 

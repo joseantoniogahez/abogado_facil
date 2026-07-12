@@ -6,6 +6,7 @@ This document defines the deterministic end-to-end smoke baseline for the fronte
 
 - Critical registration, email login, profile, and logout journey.
 - Canonical dashboard navigation, legacy `/welcome` redirect, and protected route behavior.
+- Protected client list, creation, detail, editing, search, and dashboard counter/action journey.
 - Error fallback behavior for protected session validation.
 - Admin protected route error diagnostics for RBAC `403 forbidden` responses.
 - Admin audit-log route visibility for sessions with `audit_logs:read`.

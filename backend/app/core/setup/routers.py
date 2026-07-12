@@ -8,6 +8,7 @@ ROUTER_MODULES: tuple[str, ...] = (
     "app.features.rbac.router",
     "app.features.audit_log.router",
     "app.features.dashboard.router",
+    "app.features.clients.router",
 )
 ROUTER_ATTRIBUTE: str = "router"
 

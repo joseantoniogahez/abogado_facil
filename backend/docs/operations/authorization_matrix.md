@@ -80,6 +80,8 @@ This table is contract-checked by `tests/routers/test_authorization_policy_cover
 | ------ | -------------------------------- | --------------- | ------------------------- |
 | `GET`  | `/v1/audit-log`                  | `permission`    | `audit_logs:read`         |
 | `GET`  | `/v1/dashboard`                  | `authenticated` | No                        |
+| `GET`  | `/v1/clients`                    | `authenticated` | No                        |
+| `GET`  | `/v1/clients/{client_id}`        | `authenticated` | No                        |
 | `GET`  | `/v1/health`                     | `public`        | No                        |
 | `GET`  | `/v1/users/me`                   | `authenticated` | No                        |
 | `GET`  | `/v1/rbac/roles`                 | `permission`    | `roles:manage`            |
@@ -105,3 +107,5 @@ Seed source: `utils/rbac_bootstrap.py`
 - Bootstrap command is idempotent: `python -m utils.rbac_bootstrap`.
 - `account_owner` does not inherit `admin_role` or `reader_role`; public registration assigns it
   only for the firm created in the same transaction.
+- Client reads and writes require an active session and derive the tenant boundary from
+  `CurrentPrincipal.firm_id`; clients cannot select a firm and foreign identifiers are hidden as `404`.

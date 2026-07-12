@@ -12,6 +12,8 @@ from app.features.audit_log.repository import AuditLogRepository
 from app.features.audit_log.service import AuditLogService, AuditLogServicePort
 from app.features.auth.repository import AuthRepository
 from app.features.auth.service import AuthService, AuthServicePort
+from app.features.clients.repository import ClientsRepository
+from app.features.clients.service import ClientsService, ClientsServicePort
 from app.features.dashboard.service import DashboardService, DashboardServicePort
 from app.features.outbox.repository import OutboxRepository
 from app.features.outbox.service import OutboxService, OutboxServicePort
@@ -63,6 +65,13 @@ async def get_auth_repository(session: DbSessionDependency):
 
 
 AuthRepositoryDependency = Annotated[AuthRepository, Depends(get_auth_repository)]
+
+
+async def get_clients_repository(session: DbSessionDependency):
+    return ClientsRepository(session=session)
+
+
+ClientsRepositoryDependency = Annotated[ClientsRepository, Depends(get_clients_repository)]
 
 
 async def get_rbac_repository(session: DbSessionDependency):
@@ -150,11 +159,20 @@ async def get_audit_log_service(
 AuditLogServiceDependency = Annotated[AuditLogServicePort, Depends(get_audit_log_service)]
 
 
-async def get_dashboard_service() -> DashboardServicePort:
-    return DashboardService()
+async def get_dashboard_service(clients_repository: ClientsRepositoryDependency) -> DashboardServicePort:
+    return DashboardService(clients_repository=clients_repository)
 
 
 DashboardServiceDependency = Annotated[DashboardServicePort, Depends(get_dashboard_service)]
+
+
+async def get_clients_service(
+    repository: ClientsRepositoryDependency, unit_of_work: UnitOfWorkDependency
+) -> ClientsServicePort:
+    return ClientsService(repository=repository, unit_of_work=unit_of_work)
+
+
+ClientsServiceDependency = Annotated[ClientsServicePort, Depends(get_clients_service)]
 
 
 async def get_outbox_service(

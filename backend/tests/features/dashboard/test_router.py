@@ -30,7 +30,7 @@ def test_dashboard_uses_firm_from_authenticated_session(mock_client: TestClient)
     payload = response.json()
     assert payload["firm_id"] > 0
     assert payload["firm_name"]
-    assert payload["clients"] == {"value": 0, "available": False}
+    assert payload["clients"] == {"value": 0, "available": True}
     assert payload["upcoming_tasks"] == []
     assert payload["ai_status"] == "not_available"
 

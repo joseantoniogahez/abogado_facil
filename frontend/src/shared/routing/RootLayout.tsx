@@ -20,8 +20,8 @@ interface AdminMenuItem {
 }
 
 interface PrimaryMenuItem {
-  key: "routing.nav.home" | "routing.nav.profile";
-  to: "/dashboard" | "/profile";
+  key: "routing.nav.clients" | "routing.nav.home" | "routing.nav.profile";
+  to: "/clients" | "/dashboard" | "/profile";
 }
 
 const PRIMARY_MENU_ITEMS: readonly PrimaryMenuItem[] = [
@@ -32,6 +32,10 @@ const PRIMARY_MENU_ITEMS: readonly PrimaryMenuItem[] = [
   {
     key: "routing.nav.profile",
     to: "/profile",
+  },
+  {
+    key: "routing.nav.clients",
+    to: "/clients",
   },
 ];
 

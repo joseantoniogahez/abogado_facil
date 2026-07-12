@@ -11,6 +11,7 @@ import { LandingPage } from "@/features/landing/LandingPage";
 import { DashboardPage } from "@/features/dashboard/DashboardPage";
 import { NotFoundPage } from "@/features/not-found/NotFoundPage";
 import { ProfilePage } from "@/features/profile/ProfilePage";
+import { ClientDetailPage, ClientsPage, NewClientPage } from "@/features/clients/ClientsPage";
 import { Navigate } from "react-router-dom";
 import { ProtectedRoute } from "@/shared/routing/ProtectedRoute";
 import { PermissionRoute } from "@/shared/routing/PermissionRoute";
@@ -51,6 +52,10 @@ export const appRoutes: RouteObject[] = [
             path: "profile",
             element: <ProfilePage />,
           },
+          { path: "clients", element: <ClientsPage /> },
+          { path: "clients/new", element: <NewClientPage /> },
+          { path: "clients/:clientId", element: <ClientDetailPage /> },
+          { path: "clients/:clientId/edit", element: <ClientDetailPage edit /> },
           {
             element: <PermissionRoute requiredPermission={IAM_PERMISSION.AUDIT_LOGS_READ} />,
             children: [

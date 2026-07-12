@@ -12,6 +12,10 @@ This document is the canonical consumer-side inventory of backend endpoints used
 | `/users/me`                                         | `PATCH`  | `shared/auth/session.ts`    | `updateCurrentUser`         | `bearer`  | updated product account profile + permissions  |
 | `/audit-log`                                        | `GET`    | `features/audit-log/api.ts` | `readAuditLogEntries`       | `bearer`  | `AuditLogEntry[]`                              |
 | `/dashboard`                                        | `GET`    | `features/dashboard/api.ts` | dashboard query             | `bearer`  | `DashboardSummary`                             |
+| `/clients`                                          | `GET`    | `features/clients/api.ts`   | `clientsQueryOptions`       | `bearer`  | `ClientList`                                   |
+| `/clients`                                          | `POST`   | `features/clients/api.ts`   | `createClient`              | `bearer`  | `ClientRecord`                                 |
+| `/clients/{client_id}`                              | `GET`    | `features/clients/api.ts`   | `clientQueryOptions`        | `bearer`  | `ClientRecord`                                 |
+| `/clients/{client_id}`                              | `PATCH`  | `features/clients/api.ts`   | `updateClient`              | `bearer`  | `ClientRecord`                                 |
 | `/rbac/users`                                       | `GET`    | `shared/rbac/admin.ts`      | `readAdminUsers`            | `bearer`  | `AdminUser[]`                                  |
 | `/rbac/users`                                       | `POST`   | `shared/rbac/admin.ts`      | `createAdminUser`           | `bearer`  | `AdminUser`                                    |
 | `/rbac/users/{user_id}`                             | `GET`    | `shared/rbac/admin.ts`      | `readAdminUser`             | `bearer`  | `AdminUser`                                    |
@@ -45,6 +49,9 @@ This document is the canonical consumer-side inventory of backend endpoints used
 - Successful profile updates write the returned profile through `SESSION_QUERY_KEY` so email, names,
   display name, and firm name update together.
 
+- Client forms display only the 10-digit Mexican national number. The fixed `+52` country code is
+  implicit in the MVP, and non-digit formatting is removed before requests are sent.
+
 - `readAuditLogEntries` is routed through `/admin/audit-log`, which requires `audit_logs:read` before the page can request the endpoint.
 
 - `readRbacRoles` is permission-gated on `/admin/users`: the page only requests `/rbac/roles` when the current session has `roles:manage`; otherwise it hides role-related controls and does not send `role_ids`.
@@ -58,6 +65,7 @@ This document is the canonical consumer-side inventory of backend endpoints used
 | `/users/me`         | `invalid_input`, `unauthorized`, `forbidden`, `conflict`, `internal_error`, `network_error`              | Use `X-Request-ID`/payload `request_id` when available | `GET` unauthorized clears session; successful `PATCH` writes through `SESSION_QUERY_KEY`; unauthorized `PATCH` clears session. |
 | `/audit-log`        | `unauthorized`, `forbidden`, `network_error`, `internal_error`                                           | Use `X-Request-ID`/payload `request_id` when available | Show audit log error panel with backend detail and request-id diagnostic.                                                      |
 | `/dashboard`        | `unauthorized`, `forbidden`, `network_error`, `internal_error`                                           | Use `X-Request-ID`/payload `request_id` when available | Protected session handling clears invalid tokens; recoverable errors show retry and request-id diagnostics.                    |
+| `/clients*`         | `invalid_input`, `unauthorized`, `not_found`, `network_error`, `internal_error`                          | Use `X-Request-ID`/payload `request_id` when available | List errors offer retry; successful mutations invalidate client list/detail and dashboard summary.                             |
 | `/rbac/users*`      | `invalid_input`, `unauthorized`, `forbidden`, `not_found`, `conflict`, `network_error`, `internal_error` | Use `X-Request-ID`/payload `request_id` when available | Show admin error panel with backend detail and request-id diagnostic.                                                          |
 | `/rbac/roles*`      | `invalid_input`, `unauthorized`, `forbidden`, `not_found`, `conflict`, `network_error`, `internal_error` | Use `X-Request-ID`/payload `request_id` when available | Keep page interactive; explicit-scope permission mutations surface diagnostics without silent fallback.                        |
 | `/rbac/permissions` | `unauthorized`, `forbidden`, `network_error`, `internal_error`                                           | Use `X-Request-ID`/payload `request_id` when available | Permission catalog failures block role-permission actions and show diagnostics.                                                |
