@@ -14,6 +14,12 @@ scope before implementation.
 - `agent_capability_improvement_plan.md`: tracking plan for skills, plugin packaging, and MCP
   decisions that improve agent portability across new projects.
 
+## Backlog Tracking
+
+- `backlog_tracking.md`: canonical procedure for planning, pausing, resuming, documenting, and
+  completing backlog items.
+- `templates/backlog_item_plan.md`: reusable detailed plan and progress record for one backlog item.
+
 ## Skills
 
 - `../../skills/README.md`: repository-local skill catalog and manual activation guide.
@@ -27,6 +33,8 @@ scope before implementation.
 
 ## Templates
 
+- `templates/backlog_item_plan.md`: plan, pause record, validation log, and completion checklist for
+  each backlog item.
 - `templates/full_stack_feature_request.md`: request shape for features that touch both backend and
   frontend.
 - `templates/new_app_request.md`: request shape for bootstrapping a new application from this

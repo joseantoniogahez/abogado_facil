@@ -145,8 +145,14 @@ export const ES_MESSAGES = {
     "La app organiza el trabajo del abogado; no automatiza envíos, presentaciones ni decisiones jurídicas.",
   "landing.hero.eyebrow": "SaaS legal ligero para despachos pequeños",
   "landing.legal.body":
-    "Las respuestas generadas por IA son apoyo de redacción y organización. Deben ser revisadas por un profesional del derecho antes de utilizarse.",
+    "Las respuestas generadas por IA son apoyo de redacción y organización. Deben ser revisadas y validadas por un profesional del derecho antes de utilizarse. Abogado Fácil no garantiza su exactitud jurídica ni sustituye el criterio profesional.",
   "landing.legal.title": "Revisión humana obligatoria",
+  "legal.ai.disclaimer.contextual":
+    "Revisa y valida su contenido, hechos, fechas, cálculos, fundamentos y adecuación al asunto antes de utilizarlo. Abogado Fácil no garantiza exactitud jurídica ni resultados legales.",
+  "legal.ai.disclaimer.short":
+    "Contenido generado con IA: revisa y valida antes de utilizarlo.",
+  "legal.ai.status.draft": "Borrador generado con IA",
+  "legal.ai.status.suggestion": "Sugerencia generada con IA",
   "landing.loading.title": "Cargando Abogado Fácil...",
   "landing.modules.ai.body":
     "Análisis de relatos, preguntas para cliente, mensajes y borradores simples solo cuando BYOK esté configurado.",

@@ -145,6 +145,8 @@ AI governance docs to consider:
 - `AGENTS.md` when task routing, required reading, non-negotiable rules, or validation expectations
   change.
 - `docs/ai/README.md` when repository-level AI workflow docs are added, removed, or reorganized.
+- `docs/ai/backlog_tracking.md` and `docs/ai/templates/backlog_item_plan.md` when backlog item
+  planning, pause tracking, or completion rules change.
 - `docs/ai/start_new_project.md` when the new-project bootstrap workflow changes.
 - `docs/ai/templates/*.md` when full-stack or new-app request shape changes.
 - `docs/ai/new_app_bootstrap_checklist.md` when new-app identity or validation workflow changes.
@@ -196,6 +198,24 @@ New app bootstrap:
 1. Update affected docs and contract inventories.
 1. Run the validation commands that match the task.
 1. Report changed files, validation results, skipped validations, and residual risk.
+
+## Backlog Item Tracking
+
+For every backlog item, follow `docs/ai/backlog_tracking.md` and use
+`docs/ai/templates/backlog_item_plan.md` as the default plan shape.
+
+1. Before implementation, create or locate `docs/<TICKET>_<NAME>_PLAN.md` and keep it as the
+   detailed source of truth for scope, decisions, progress, validations, and remaining work.
+1. When implementation starts, set the item in `docs/BACKLOG_ABOGADO_FACIL.md` to `En progreso`.
+1. Before every pause or partial handoff, update the item plan with completed work, pending work,
+   decisions, validation results, blockers, and the exact safe resume point; keep the backlog status
+   synchronized.
+1. Before completion, review code changes for required updates to READMEs, operation docs,
+   architecture docs, contract inventories, foundation status, and other canonical documentation.
+1. Mark an item `Hecho` only after acceptance criteria, required validations, documentation updates,
+   and mandatory human approvals are complete.
+1. Keep `docs/BACKLOG_ABOGADO_FACIL.md` concise: it stores summary status, priority, work, and the
+   deliverable; detailed history belongs in the item plan.
 
 ## When to Ask Before Acting
 

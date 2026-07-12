@@ -12,6 +12,7 @@ This document defines the automated accessibility quality gate for foundation ro
 ## Automation Contract
 
 - Baseline test file: `src/app/accessibility.routes.test.tsx`.
+- Shared AI notice test: `src/shared/ui/AiGeneratedContentNotice.test.tsx`.
 - Engine: `axe-core` running inside the frontend Vitest workflow.
 - Violations fail the test suite and therefore fail `npm --prefix frontend run check`.
 
@@ -24,6 +25,8 @@ This document defines the automated accessibility quality gate for foundation ro
 
 - Any UI change on baseline routes keeps `test:a11y` green.
 - New UI states include semantic labels/headings and keyboard-safe controls.
+- AI-generated result views use `AiGeneratedContentNotice`, associate the result and its actions
+  with the notice ID when implemented, and keep the complete contextual warning visible.
 - If accepted violations are temporarily allowed, they require explicit reviewer notes and follow-up task ID.
 
 ## Maintenance Rule

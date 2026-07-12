@@ -4,6 +4,10 @@ Estado inicial: 2026-07-08
 Fuente principal: `docs/REQUERIMIENTOS_ABOGADO_FACIL_IA.md`
 Repositorio base: template FastAPI + React + PostgreSQL + Docker
 
+Este archivo conserva únicamente el estado resumido de cada elemento. El alcance detallado,
+decisiones, avance, pausas, validaciones y cierre se registran en el plan correspondiente según
+`docs/ai/backlog_tracking.md`.
+
 ## Leyenda
 
 - Estado: `Identificado`, `Listo`, `En progreso`, `Bloqueado`, `Hecho`
@@ -24,38 +28,38 @@ Repositorio base: template FastAPI + React + PostgreSQL + Docker
 
 ## Decisiones de Producto
 
-| ID      | Decisión                     | Propuesta inicial                                                                                         | Estado    |
-| ------- | ---------------------------- | --------------------------------------------------------------------------------------------------------- | --------- |
-| DEC-001 | Nombre público               | Abogado Fácil                                                                                             | Listo     |
-| DEC-002 | Slug interno                 | `abogado-facil`                                                                                           | Listo     |
-| DEC-003 | Env prefix                   | `abogado_facil`                                                                                           | Listo     |
-| DEC-004 | Frontend package             | `abogado-facil-frontend`                                                                                  | Listo     |
-| DEC-005 | Compose dev/test/prod        | `abogado-facil-dev`, `abogado-facil-tests`, `abogado-facil-prod`                                          | Listo     |
-| DEC-006 | DB name                      | `abogado_facil_main`                                                                                      | Listo     |
-| DEC-007 | JWT issuer/audience          | `abogado-facil`, `abogado-facil-api`                                                                      | Listo     |
-| DEC-008 | Descripción corta            | SaaS web para abogados independientes y despachos pequeños con expedientes, tareas, documentos e IA BYOK. | Listo     |
-| DEC-009 | Roles MVP                    | `account_owner` público, limitado a su despacho y sin herencia del rol administrativo técnico.            | Listo     |
-| DEC-010 | Storage de documentos        | Local en desarrollo; S3-compatible para despliegue.                                                       | Pendiente |
-| DEC-011 | Proveedor despliegue inicial | Local/Docker primero; elegir target productivo después.                                                   | Pendiente |
-| DEC-012 | Tracker principal            | Markdown en este archivo; migrar a GitHub Issues cuando el alcance se estabilice.                         | Listo     |
-| DEC-013 | Identidad de acceso MVP      | Email normalizado; no se requiere compatibilidad ni migración de datos de usernames existentes.           | Listo     |
-| DEC-014 | Despacho inicial             | Un despacho por alta; nombre no nulo con fallback a `display_name`; el alta es su único owner.            | Listo     |
+| ID      | Decisión                     | Propuesta inicial                                                                                                      | Estado    |
+| ------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------- | --------- |
+| DEC-001 | Nombre público               | Abogado Fácil                                                                                                          | Listo     |
+| DEC-002 | Slug interno                 | `abogado-facil`                                                                                                        | Listo     |
+| DEC-003 | Env prefix                   | `abogado_facil`                                                                                                        | Listo     |
+| DEC-004 | Frontend package             | `abogado-facil-frontend`                                                                                               | Listo     |
+| DEC-005 | Compose dev/test/prod        | `abogado-facil-dev`, `abogado-facil-tests`, `abogado-facil-prod`                                                       | Listo     |
+| DEC-006 | DB name                      | `abogado_facil_main`                                                                                                   | Listo     |
+| DEC-007 | JWT issuer/audience          | `abogado-facil`, `abogado-facil-api`                                                                                   | Listo     |
+| DEC-008 | Descripción corta            | SaaS web para abogados independientes y despachos pequeños con expedientes, tareas, documentos e IA BYOK.              | Listo     |
+| DEC-009 | Roles MVP                    | `account_owner` público, limitado a su despacho y sin herencia del rol administrativo técnico.                         | Listo     |
+| DEC-010 | Storage de documentos        | Local en desarrollo; S3-compatible para despliegue.                                                                    | Pendiente |
+| DEC-011 | Proveedor despliegue inicial | Local/Docker primero; elegir target productivo después.                                                                | Pendiente |
+| DEC-012 | Tracker principal            | Estado resumido aquí y detalle en un plan Markdown por ticket; migrar a GitHub Issues cuando el alcance se estabilice. | Listo     |
+| DEC-013 | Identidad de acceso MVP      | Email normalizado; no se requiere compatibilidad ni migración de datos de usernames existentes.                        | Listo     |
+| DEC-014 | Despacho inicial             | Un despacho por alta; nombre no nulo con fallback a `display_name`; el alta es su único owner.                         | Listo     |
 
 ## Fase 0 - Bootstrap y Base Pública
 
-| ID        | Tipo       | Prioridad | Estado       | Trabajo                                                   | Entregable / Criterio                                                                                       |
-| --------- | ---------- | --------- | ------------ | --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| SETUP-001 | Setup      | P0        | Hecho        | Ejecutar preview del bootstrap inicial.                   | `scripts/bootstrap_new_app.py` muestra archivos a tocar sin `--write`. Preview ejecutado con la venv local. |
-| SETUP-002 | Setup      | P0        | Hecho        | Aplicar bootstrap identity-only.                          | README/env/Compose/JWT/package/título/textos visibles usan identidad Abogado Fácil.                         |
-| SETUP-003 | Ops        | P0        | Hecho        | Crear `.env` desde `.env_examples` después del bootstrap. | Stack local puede resolver variables nuevas.                                                                |
-| SETUP-004 | Ops        | P0        | Hecho        | Validar Compose dev/test/prod.                            | `docker compose config` y variantes test/prod pasan.                                                        |
-| SETUP-005 | Backend    | P0        | Hecho        | Validar backend base después del bootstrap.               | Tests backend y coverage gate pasan sin cambios funcionales.                                                |
-| SETUP-006 | Frontend   | P0        | Hecho        | Validar frontend base después del bootstrap.              | `npm --prefix frontend run check` y build pasan.                                                            |
-| SETUP-007 | Docs       | P0        | Hecho        | Actualizar documentación raíz con identidad de producto.  | README describe Abogado Fácil sin perder instrucciones operativas.                                          |
-| PROD-001  | Frontend   | P1        | Hecho        | Rediseñar landing pública para Abogado Fácil.             | Visitante entiende valor, BYOK y aviso legal en menos de un minuto.                                         |
-| PROD-002  | Full-stack | P1        | Hecho        | Alinear auth existente con registro/login del producto.   | Registro, rechazo de credenciales incorrectas, login y logout validados; pasan todos los gates.             |
-| PROD-003  | Full-stack | P1        | Hecho        | Crear dashboard autenticado inicial.                      | Muestra contadores base, tareas próximas y estado de IA.                                                    |
-| LEGAL-001 | Legal      | P1        | Identificado | Definir textos mínimos de aviso legal y revisión humana.  | Mensajes visibles en landing y funciones de IA.                                                             |
+| ID        | Tipo       | Prioridad | Estado | Trabajo                                                   | Entregable / Criterio                                                                                       |
+| --------- | ---------- | --------- | ------ | --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| SETUP-001 | Setup      | P0        | Hecho  | Ejecutar preview del bootstrap inicial.                   | `scripts/bootstrap_new_app.py` muestra archivos a tocar sin `--write`. Preview ejecutado con la venv local. |
+| SETUP-002 | Setup      | P0        | Hecho  | Aplicar bootstrap identity-only.                          | README/env/Compose/JWT/package/título/textos visibles usan identidad Abogado Fácil.                         |
+| SETUP-003 | Ops        | P0        | Hecho  | Crear `.env` desde `.env_examples` después del bootstrap. | Stack local puede resolver variables nuevas.                                                                |
+| SETUP-004 | Ops        | P0        | Hecho  | Validar Compose dev/test/prod.                            | `docker compose config` y variantes test/prod pasan.                                                        |
+| SETUP-005 | Backend    | P0        | Hecho  | Validar backend base después del bootstrap.               | Tests backend y coverage gate pasan sin cambios funcionales.                                                |
+| SETUP-006 | Frontend   | P0        | Hecho  | Validar frontend base después del bootstrap.              | `npm --prefix frontend run check` y build pasan.                                                            |
+| SETUP-007 | Docs       | P0        | Hecho  | Actualizar documentación raíz con identidad de producto.  | README describe Abogado Fácil sin perder instrucciones operativas.                                          |
+| PROD-001  | Frontend   | P1        | Hecho  | Rediseñar landing pública para Abogado Fácil.             | Visitante entiende valor, BYOK y aviso legal en menos de un minuto.                                         |
+| PROD-002  | Full-stack | P1        | Hecho  | Alinear auth existente con registro/login del producto.   | Registro, rechazo de credenciales incorrectas, login y logout validados; pasan todos los gates.             |
+| PROD-003  | Full-stack | P1        | Hecho  | Crear dashboard autenticado inicial.                      | Muestra contadores base, tareas próximas y estado de IA.                                                    |
+| LEGAL-001 | Legal      | P1        | Hecho  | Definir textos mínimos de aviso legal y revisión humana.  | Mensajes visibles en landing y patrón compartido para funciones de IA.                                      |
 
 ## Fase 1 - Núcleo Legal Sin IA
 
@@ -84,11 +88,12 @@ Repositorio base: template FastAPI + React + PostgreSQL + Docker
 
 ## Fase 3 - IA Inicial Controlada
 
-| ID     | Tipo       | Prioridad | Estado       | Trabajo                              | Entregable / Criterio                                                        |
-| ------ | ---------- | --------- | ------------ | ------------------------------------ | ---------------------------------------------------------------------------- |
-| AI-101 | Full-stack | P1        | Identificado | Analizador de relato inicial.        | Entrada libre, salida JSON validada y guardable en asunto.                   |
-| AI-102 | Full-stack | P1        | Identificado | Generador de preguntas para cliente. | Lista editable/copiable de preguntas, datos críticos y documentos faltantes. |
-| AI-103 | Full-stack | P1        | Identificado | Generador de mensajes para cliente.  | Mensajes para WhatsApp/email copiables y editables antes de enviar.          |
+| ID        | Tipo       | Prioridad | Estado       | Trabajo                                   | Entregable / Criterio                                                                                        |
+| --------- | ---------- | --------- | ------------ | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| AI-101    | Full-stack | P1        | Identificado | Analizador de relato inicial.             | Entrada libre, salida JSON validada y guardable en asunto.                                                   |
+| AI-102    | Full-stack | P1        | Identificado | Generador de preguntas para cliente.      | Lista editable/copiable de preguntas, datos críticos y documentos faltantes.                                 |
+| AI-103    | Full-stack | P1        | Identificado | Generador de mensajes para cliente.       | Mensajes para WhatsApp/email copiables y editables antes de enviar.                                          |
+| LEGAL-002 | Frontend   | P1        | Identificado | Validar avisos en funciones reales de IA. | Después de 2 o 3 funciones IA, todas conservan identificación, aviso y revisión humana en sus flujos reales. |
 
 ## Fase 4 - Expediente Asistido
 
@@ -108,14 +113,14 @@ Repositorio base: template FastAPI + React + PostgreSQL + Docker
 
 ## Seguridad, Privacidad y Operación
 
-| ID      | Tipo    | Prioridad | Estado       | Trabajo                                              | Entregable / Criterio                                                   |
-| ------- | ------- | --------- | ------------ | ---------------------------------------------------- | ----------------------------------------------------------------------- |
-| SEC-001 | Backend | P1        | Identificado | Aislamiento estricto por usuario/propietario.        | Ningún usuario ve clientes, asuntos, documentos o IA de otro usuario.   |
-| SEC-002 | Legal   | P1        | Identificado | Aviso de privacidad y términos mínimos para IA BYOK. | Explica envío de contenido al proveedor elegido por el usuario.         |
-| SEC-003 | Backend | P1        | Identificado | Eliminación de datos del usuario.                    | Usuario puede eliminar documentos/asuntos según política definida.      |
-| OPS-001 | Ops     | P1        | Identificado | Límites configurables de archivos y análisis.        | Tamaño, número de documentos y entrada IA controlados por config.       |
-| OPS-002 | Ops     | P1        | Identificado | Backups básicos de PostgreSQL.                       | Procedimiento documentado antes de despliegue productivo.               |
-| OPS-003 | Docs    | P1        | Identificado | Mantener matrices de operaciones actualizadas.       | Docs backend/frontend reflejan rutas, permisos, runtime, errores y e2e. |
+| ID      | Tipo    | Prioridad | Estado       | Trabajo                                                           | Entregable / Criterio                                                             |
+| ------- | ------- | --------- | ------------ | ----------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| SEC-001 | Backend | P1        | Identificado | Aislamiento estricto por usuario/propietario.                     | Ningún usuario ve clientes, asuntos, documentos o IA de otro usuario.             |
+| SEC-002 | Legal   | P1        | Identificado | Aviso de privacidad, términos y aprobación jurídica para IA BYOK. | Explica el envío al proveedor y registra revisión jurídica antes del lanzamiento. |
+| SEC-003 | Backend | P1        | Identificado | Eliminación de datos del usuario.                                 | Usuario puede eliminar documentos/asuntos según política definida.                |
+| OPS-001 | Ops     | P1        | Identificado | Límites configurables de archivos y análisis.                     | Tamaño, número de documentos y entrada IA controlados por config.                 |
+| OPS-002 | Ops     | P1        | Identificado | Backups básicos de PostgreSQL.                                    | Procedimiento documentado antes de despliegue productivo.                         |
+| OPS-003 | Docs    | P1        | Identificado | Mantener matrices de operaciones actualizadas.                    | Docs backend/frontend reflejan rutas, permisos, runtime, errores y e2e.           |
 
 ## Fuera del MVP
 

@@ -38,6 +38,7 @@ describe("LandingPage", () => {
     );
     expect(screen.getByText(t("landing.byok.title"))).toBeInTheDocument();
     expect(screen.getByText(t("landing.legal.title"))).toBeInTheDocument();
+    expect(screen.getByText(t("landing.legal.body"))).toBeVisible();
     expect(screen.getByRole("heading", { name: t("landing.modules.title") })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: t("landing.modules.clients.title") })).toBeInTheDocument();
     expect(screen.getByLabelText(t("landing.preview.label"))).toBeInTheDocument();
