@@ -26,6 +26,10 @@ All routes are versioned under `/v1`.
 | `GET`    | `/v1/clients`                                          | Yes  | No                        | Query `search`, `limit`, `offset`                       | `200` `ClientListResponse`         | `400`, `401`, `500`                      |
 | `GET`    | `/v1/clients/{client_id}`                              | Yes  | No                        | Path `client_id`                                        | `200` `ClientResponse`             | `400`, `401`, `404`, `500`               |
 | `PATCH`  | `/v1/clients/{client_id}`                              | Yes  | No                        | Path `client_id` + JSON `UpdateClientRequest`           | `200` `ClientResponse`             | `400`, `401`, `404`, `500`               |
+| `POST`   | `/v1/matters`                                          | Yes  | No                        | JSON `CreateMatterRequest`                              | `201` `MatterResponse`             | `400`, `401`, `404`, `500`               |
+| `GET`    | `/v1/matters`                                          | Yes  | No                        | Query `client_id`, `limit`, `offset`                    | `200` `MatterListResponse`         | `400`, `401`, `404`, `500`               |
+| `GET`    | `/v1/matters/{matter_id}`                              | Yes  | No                        | Path `matter_id`                                        | `200` `MatterResponse`             | `400`, `401`, `404`, `500`               |
+| `PATCH`  | `/v1/matters/{matter_id}`                              | Yes  | No                        | Path `matter_id` + JSON `UpdateMatterRequest`           | `200` `MatterResponse`             | `400`, `401`, `404`, `500`               |
 | `PATCH`  | `/v1/users/me`                                         | Yes  | No                        | JSON `UpdateCurrentUserRequest`                         | `200` `AuthenticatedUserResponse`  | `400`, `401`, `403`, `409`, `500`        |
 | `GET`    | `/v1/rbac/roles`                                       | Yes  | `roles:manage`            | No body                                                 | `200` `RBACRole[]`                 | `401`, `403`, `500`                      |
 | `GET`    | `/v1/rbac/permissions`                                 | Yes  | `role_permissions:manage` | No body                                                 | `200` `RBACPermission[]`           | `401`, `403`, `500`                      |
@@ -59,6 +63,8 @@ This table classifies each `GET` endpoint as `public`, `authenticated`, or `perm
 | `GET`  | `/v1/dashboard`                  | `authenticated` | No                        |
 | `GET`  | `/v1/clients`                    | `authenticated` | No                        |
 | `GET`  | `/v1/clients/{client_id}`        | `authenticated` | No                        |
+| `GET`  | `/v1/matters`                    | `authenticated` | No                        |
+| `GET`  | `/v1/matters/{matter_id}`        | `authenticated` | No                        |
 | `GET`  | `/v1/health`                     | `public`        | No                        |
 | `GET`  | `/v1/users/me`                   | `authenticated` | No                        |
 | `GET`  | `/v1/rbac/roles`                 | `permission`    | `roles:manage`            |

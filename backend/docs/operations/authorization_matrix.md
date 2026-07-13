@@ -82,6 +82,8 @@ This table is contract-checked by `tests/routers/test_authorization_policy_cover
 | `GET`  | `/v1/dashboard`                  | `authenticated` | No                        |
 | `GET`  | `/v1/clients`                    | `authenticated` | No                        |
 | `GET`  | `/v1/clients/{client_id}`        | `authenticated` | No                        |
+| `GET`  | `/v1/matters`                    | `authenticated` | No                        |
+| `GET`  | `/v1/matters/{matter_id}`        | `authenticated` | No                        |
 | `GET`  | `/v1/health`                     | `public`        | No                        |
 | `GET`  | `/v1/users/me`                   | `authenticated` | No                        |
 | `GET`  | `/v1/rbac/roles`                 | `permission`    | `roles:manage`            |

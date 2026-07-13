@@ -103,6 +103,85 @@ describe("routing integration", () => {
     expect(screen.getByText(t("routing.notFound.body"))).toBeInTheDocument();
   });
 
+  it.each([
+    ["/matters", "matters.title"],
+    ["/matters/new", "matters.create.title"],
+    ["/matters/1", "Matter under test"],
+    ["/matters/1/edit", "matters.edit"],
+  ] as const)("renders the lazy route %s", async (path, heading) => {
+    setAccessToken("valid-matters-token");
+
+    const fetchMock = vi.fn((input: RequestInfo | URL) => {
+      const pathname = toRequestPathname(input);
+
+      if (pathname === "/v1/users/me") {
+        return {
+          ok: true,
+          status: 200,
+          json: () =>
+            Promise.resolve({
+              id: 1,
+              email: "lawyer@example.com",
+              first_name: "Test",
+              middle_name: null,
+              last_name: "Lawyer",
+              display_name: "Test Lawyer",
+              firm_name: "Test Legal",
+              disabled: false,
+              permissions: [],
+            }),
+        } satisfies Partial<Response>;
+      }
+
+      if (pathname === "/v1/matters") {
+        return {
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve({ items: [], total: 0, limit: 50, offset: 0 }),
+        } satisfies Partial<Response>;
+      }
+
+      if (pathname === "/v1/matters/1") {
+        return {
+          ok: true,
+          status: 200,
+          json: () =>
+            Promise.resolve({
+              id: 1,
+              client_id: 2,
+              title: "Matter under test",
+              matter_type: "Civil",
+              status: "active",
+              counterparty: null,
+              description: null,
+              next_action: null,
+              next_action_date: null,
+              created_at: "2026-07-12T00:00:00Z",
+              updated_at: "2026-07-12T00:00:00Z",
+            }),
+        } satisfies Partial<Response>;
+      }
+
+      throw new Error(`Unhandled route integration request: ${pathname}`);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const queryClient = createQueryClient();
+    const router = createMemoryRouter(appRoutes, { initialEntries: [path] });
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>,
+    );
+
+    expect(
+      await screen.findByRole("heading", {
+        name: heading === "Matter under test" ? heading : t(heading),
+      }),
+    ).toBeInTheDocument();
+  });
+
   it("renders admin users route when session is valid", async () => {
     setAccessToken("valid-admin-token");
 

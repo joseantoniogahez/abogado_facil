@@ -94,7 +94,7 @@ describe("clients pages", () => {
     const fetchMock = vi.fn().mockResolvedValueOnce(response(client)).mockResolvedValueOnce(response(client)).mockResolvedValueOnce(response(updated));
     const { unmount } = renderRoute("/clients/7", fetchMock);
     expect(await screen.findByRole("heading", { name: client.full_name })).toBeInTheDocument();
-    expect(screen.getByText(t("clients.matters.empty"))).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: t("matters.viewForClient") })).toHaveAttribute("href", "/matters?clientId=7");
     unmount();
     renderRoute("/clients/7/edit", fetchMock);
     const notes = await screen.findByLabelText(t("clients.fields.notes"));

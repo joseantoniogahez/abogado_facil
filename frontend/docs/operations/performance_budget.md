@@ -36,6 +36,12 @@ The gate evaluates production artifacts in `dist/assets`:
   CORE-001 baseline is `400816` raw JS bytes, `118122` gzip JS bytes, and `20244` raw CSS bytes.
 - The CORE-001 adjustment was explicitly approved on 2026-07-12 and retains `2184` raw JS bytes,
   `878` gzip JS bytes, and `256` raw CSS bytes of headroom. The CSS gzip limit remains `6000`.
+- CORE-002 adds the protected matter list, create, detail, edit, client-context navigation, and
+  route-level lazy chunk without new dependencies. Its measured baseline is `410459` total raw JS
+  bytes and `121236` total gzip JS bytes.
+- The CORE-002 adjustment was explicitly approved on 2026-07-12. The JS limits are now `411000`
+  raw bytes and `122000` gzip bytes, retaining `541` raw and `764` gzip bytes of headroom. CSS
+  limits remain unchanged.
 
 ## Commands
 

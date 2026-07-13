@@ -491,6 +491,92 @@
         "title": "CreateClientRequest",
         "type": "object"
       },
+      "CreateMatterRequest": {
+        "properties": {
+          "client_id": {
+            "exclusiveMinimum": 0,
+            "title": "Client Id",
+            "type": "integer"
+          },
+          "counterparty": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Counterparty"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "maxLength": 10000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "matter_type": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Matter Type",
+            "type": "string"
+          },
+          "next_action": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Action"
+          },
+          "next_action_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Action Date"
+          },
+          "status": {
+            "default": "active",
+            "enum": [
+              "active",
+              "pending",
+              "closed"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "client_id",
+          "title",
+          "matter_type"
+        ],
+        "title": "CreateMatterRequest",
+        "type": "object"
+      },
       "CreateRoleRequest": {
         "properties": {
           "name": {
@@ -601,6 +687,140 @@
           "actions"
         ],
         "title": "DashboardSummaryResponse",
+        "type": "object"
+      },
+      "MatterListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MatterResponse"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "limit": {
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "title": "Offset",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "MatterListResponse",
+        "type": "object"
+      },
+      "MatterResponse": {
+        "properties": {
+          "client_id": {
+            "exclusiveMinimum": 0,
+            "title": "Client Id",
+            "type": "integer"
+          },
+          "counterparty": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Counterparty"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "maxLength": 10000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "matter_type": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Matter Type",
+            "type": "string"
+          },
+          "next_action": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Action"
+          },
+          "next_action_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Action Date"
+          },
+          "status": {
+            "default": "active",
+            "enum": [
+              "active",
+              "pending",
+              "closed"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "client_id",
+          "title",
+          "matter_type",
+          "id",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "MatterResponse",
         "type": "object"
       },
       "RBACPermission": {
@@ -1016,6 +1236,102 @@
           }
         },
         "title": "UpdateCurrentUserRequest",
+        "type": "object"
+      },
+      "UpdateMatterRequest": {
+        "properties": {
+          "counterparty": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Counterparty"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "maxLength": 10000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "matter_type": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Matter Type"
+          },
+          "next_action": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Action"
+          },
+          "next_action_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Action Date"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "enum": [
+                  "active",
+                  "pending",
+                  "closed"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "title": "UpdateMatterRequest",
         "type": "object"
       },
       "UpdateRoleRequest": {
@@ -2405,6 +2721,193 @@
         "summary": "Health check",
         "tags": [
           "health"
+        ]
+      }
+    },
+    "/v1/matters": {
+      "get": {
+        "description": "Lists matters in the authenticated firm, optionally filtered by client.",
+        "operationId": "list_matters_v1_matters_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "client_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Client Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatterListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "List matters",
+        "tags": [
+          "matters"
+        ]
+      },
+      "post": {
+        "description": "Creates a matter for a client in the authenticated firm.",
+        "operationId": "create_matter_v1_matters_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMatterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatterResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Create matter",
+        "tags": [
+          "matters"
+        ]
+      }
+    },
+    "/v1/matters/{matter_id}": {
+      "get": {
+        "description": "Returns a firm-scoped matter.",
+        "operationId": "get_matter_v1_matters__matter_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "matter_id",
+            "required": true,
+            "schema": {
+              "title": "Matter Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatterResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Get matter",
+        "tags": [
+          "matters"
+        ]
+      },
+      "patch": {
+        "description": "Partially updates a firm-scoped matter.",
+        "operationId": "update_matter_v1_matters__matter_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "matter_id",
+            "required": true,
+            "schema": {
+              "title": "Matter Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMatterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatterResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Update matter",
+        "tags": [
+          "matters"
         ]
       }
     },

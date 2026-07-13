@@ -1,4 +1,5 @@
 import type { RouteObject } from "react-router-dom";
+import { lazy, Suspense } from "react";
 
 import { AdminAssignmentsPage } from "@/features/admin-assignments/AdminAssignmentsPage";
 import { AuditLogPage } from "@/features/audit-log/AuditLogPage";
@@ -18,6 +19,16 @@ import { PermissionRoute } from "@/shared/routing/PermissionRoute";
 import { RootLayout } from "@/shared/routing/RootLayout";
 import { RouteErrorBoundary } from "@/shared/routing/RouteErrorBoundary";
 import { IAM_PERMISSION } from "@/shared/iam/contracts";
+
+const MattersPage = lazy(() => import("@/features/matters/MattersPage").then((module) => ({ default: module.MattersPage })));
+const NewMatterPage = lazy(() => import("@/features/matters/MattersPage").then((module) => ({ default: module.NewMatterPage })));
+const MatterDetailPage = lazy(() => import("@/features/matters/MattersPage").then((module) => ({ default: module.MatterDetailPage })));
+/* v8 ignore next */
+const MattersRoute = () => <Suspense fallback={null}><MattersPage /></Suspense>;
+/* v8 ignore next */
+const NewMatterRoute = () => <Suspense fallback={null}><NewMatterPage /></Suspense>;
+/* v8 ignore next */
+const MatterDetailRoute = ({ edit = false }: { edit?: boolean }) => <Suspense fallback={null}><MatterDetailPage edit={edit} /></Suspense>;
 
 export const appRoutes: RouteObject[] = [
   {
@@ -56,6 +67,10 @@ export const appRoutes: RouteObject[] = [
           { path: "clients/new", element: <NewClientPage /> },
           { path: "clients/:clientId", element: <ClientDetailPage /> },
           { path: "clients/:clientId/edit", element: <ClientDetailPage edit /> },
+          { path: "matters", element: <MattersRoute /> },
+          { path: "matters/new", element: <NewMatterRoute /> },
+          { path: "matters/:matterId", element: <MatterDetailRoute /> },
+          { path: "matters/:matterId/edit", element: <MatterDetailRoute edit /> },
           {
             element: <PermissionRoute requiredPermission={IAM_PERMISSION.AUDIT_LOGS_READ} />,
             children: [

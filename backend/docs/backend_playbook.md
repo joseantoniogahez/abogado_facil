@@ -31,6 +31,7 @@ Router registration is centralized in `app/core/setup/routers.py`.
 - `app.features.audit_log.router`
 - `app.features.dashboard.router`
 - `app.features.clients.router`
+- `app.features.matters.router`
 
 All registered routers are mounted under API prefix `/v1`.
 
