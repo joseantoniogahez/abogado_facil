@@ -23,6 +23,8 @@ from app.features.outbox.repository import OutboxRepository
 from app.features.outbox.service import OutboxService, OutboxServicePort
 from app.features.rbac.repository import RBACRepository
 from app.features.rbac.service import RBACService, RBACServicePort
+from app.integrations.files import FileStoragePort
+from app.integrations.s3 import S3FileStorage
 
 PermissionScopeCache = dict[tuple[int, str], str | None]
 _PERMISSION_SCOPE_CACHE_STATE_KEY = "_permission_scope_cache"
@@ -118,6 +120,13 @@ async def get_auth_settings() -> AuthSettings:
 
 
 AuthSettingsDependency = Annotated[AuthSettings, Depends(get_auth_settings)]
+
+
+async def get_file_storage() -> FileStoragePort:
+    return S3FileStorage()
+
+
+FileStorageDependency = Annotated[FileStoragePort, Depends(get_file_storage)]
 
 
 async def get_password_service() -> PasswordServicePort:

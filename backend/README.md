@@ -61,6 +61,17 @@ JWT defaults for `local/test`:
 - `JWT_ISSUER=abogado-facil`
 - `JWT_AUDIENCE=abogado-facil-api`
 
+Required object storage configuration:
+
+- Define `S3_ENDPOINT_URL`, `S3_REGION`, `S3_BUCKET`, `S3_ACCESS_KEY`, and `S3_SECRET_KEY` in every environment.
+- Compose supplies the values from the repository `.env`; direct backend execution must export them first.
+- `S3_PATH_STYLE` defaults to `true`.
+- Connection/read timeouts default to 3/10 seconds.
+
+Features consume `FileStoragePort`; provider code is isolated in `app/integrations/s3.py`, and tests
+use a test-only `FakeFileStorage` or a mocked SDK client without Docker or network access. No feature should
+import `boto3` directly.
+
 Repository-level Docker Compose uses `.env` values from `.env_examples` and runs the backend against PostgreSQL by default (`DB_TYPE=postgresql+asyncpg`, `DB_HOST=abogado_facil_db`, `DB_NAME=abogado_facil_main`).
 
 For network databases, set:
@@ -161,6 +172,7 @@ Before production startup (`APP_ENV=prod`), set strong values for:
 - `JWT_ACCESS_TOKEN_EXPIRE_MINUTES`
 - `JWT_ISSUER`
 - `JWT_AUDIENCE`
+- `S3_ENDPOINT_URL`, `S3_REGION`, `S3_BUCKET`, `S3_ACCESS_KEY`, and `S3_SECRET_KEY`
 
 Run production stack from repo root:
 

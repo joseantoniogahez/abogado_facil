@@ -87,6 +87,8 @@ Endpoints:
 
 - Frontend: `http://localhost:3000`
 - API docs: `http://localhost:8000/docs`
+- MinIO S3 API: `http://localhost:9000`
+- MinIO console: `http://localhost:9001`
 
 Notes:
 
@@ -94,6 +96,8 @@ Notes:
 - `compose.override.yaml` is loaded automatically for local runs and enables backend hot reload via bind mount.
 - Frontend API target is controlled by `VITE_API_ORIGIN` and `VITE_API_BASE_PATH`.
 - Vite env vars are baked into build output; rebuild frontend image after changing them.
+- Compose creates the private `S3_BUCKET` idempotently. Object data lives in the named
+  `object_storage_data` volume and survives container recreation.
 
 ## Run Tests (Docker Compose)
 
@@ -134,6 +138,8 @@ Production JWT note:
 
 - `compose.prod.yaml` sets `APP_ENV=prod`.
 - Define `JWT_SECRET_KEY`, `JWT_ALGORITHM`, `JWT_ACCESS_TOKEN_EXPIRE_MINUTES`, `JWT_ISSUER`, and `JWT_AUDIENCE` in `.env` before starting.
+- Define `S3_ENDPOINT_URL`, `S3_REGION`, `S3_BUCKET`, `S3_ACCESS_KEY`, and `S3_SECRET_KEY`; production
+  has no object-storage credential defaults and does not publish MinIO ports.
 
 Stop production stack:
 

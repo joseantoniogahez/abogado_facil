@@ -1,7 +1,7 @@
 import os
 from typing import ClassVar
 
-from pydantic import Field, field_validator, model_validator
+from pydantic import Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings
 
 
@@ -96,3 +96,30 @@ class DatabaseSettings(BaseSettings):
     DB_HOST: str | None = None
     DB_PORT: int | None = None
     DB_NAME: str = "app.db"
+
+
+class ObjectStorageSettings(BaseSettings):
+    S3_ENDPOINT_URL: str
+    S3_REGION: str
+    S3_BUCKET: str
+    S3_ACCESS_KEY: str
+    S3_SECRET_KEY: SecretStr
+    S3_PATH_STYLE: bool = True
+    S3_CONNECT_TIMEOUT_SECONDS: float = Field(3.0, gt=0)
+    S3_READ_TIMEOUT_SECONDS: float = Field(10.0, gt=0)
+
+    @field_validator("S3_ENDPOINT_URL", "S3_REGION", "S3_BUCKET", "S3_ACCESS_KEY")
+    @classmethod
+    def reject_blank_storage_values(cls, value: str) -> str:
+        normalized = value.strip()
+        if not normalized:
+            raise ValueError("Object storage configuration values cannot be empty.")
+        return normalized
+
+    @model_validator(mode="after")
+    def validate_storage_configuration(self) -> ObjectStorageSettings:
+        if not self.S3_ENDPOINT_URL.startswith(("http://", "https://")):
+            raise ValueError("S3_ENDPOINT_URL must use http:// or https://.")
+        if not self.S3_SECRET_KEY.get_secret_value().strip():
+            raise ValueError("S3_SECRET_KEY cannot be empty.")
+        return self

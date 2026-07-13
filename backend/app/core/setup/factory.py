@@ -10,7 +10,7 @@ from fastapi.openapi.utils import get_openapi
 from pydantic import ValidationError
 
 from app.core.common.openapi import normalize_generated_openapi_schema
-from app.core.config.settings import ApiSettings, AuthSettings
+from app.core.config.settings import ApiSettings, AuthSettings, ObjectStorageSettings
 from app.core.errors.setup.handlers import REQUEST_ID_HEADER, configure_exception_handlers
 from app.core.setup.cors import configure_cors
 from app.core.setup.routers import configure_routers
@@ -68,6 +68,15 @@ def validate_auth_settings() -> None:
         ) from exc
 
 
+def validate_object_storage_settings() -> None:
+    try:
+        ObjectStorageSettings()
+    except ValidationError as exc:
+        raise RuntimeError(
+            "Invalid object storage settings. Set an S3 endpoint, region, bucket and explicit credentials."
+        ) from exc
+
+
 def configure_request_context_middleware(app: FastAPI) -> None:
     logger = logging.getLogger("app.http")
 
@@ -117,6 +126,7 @@ def configure_request_context_middleware(app: FastAPI) -> None:
 async def app_lifespan(app: FastAPI) -> AsyncIterator[None]:
     logger = logging.getLogger("app.lifecycle")
     validate_auth_settings()
+    validate_object_storage_settings()
     logger.info("Backend startup.")
     yield
     logger.info("Backend shutdown.")

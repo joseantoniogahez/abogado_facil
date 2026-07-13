@@ -1,11 +1,14 @@
 import asyncio
 from unittest.mock import AsyncMock, MagicMock
 
+import pytest
 from starlette.requests import Request
 
+from app.core.setup import dependencies
 from app.core.setup.dependencies import (
     get_audit_log_repository,
     get_audit_log_service,
+    get_file_storage,
     get_outbox_repository,
     get_outbox_service,
     get_request_permission_scope_cache,
@@ -14,6 +17,7 @@ from app.features.audit_log.repository import AuditLogRepository
 from app.features.audit_log.service import AuditLogService
 from app.features.outbox.repository import OutboxRepository
 from app.features.outbox.service import OutboxService
+from utils.testing_support.file_storage import FakeFileStorage
 
 
 def _request(path: str) -> Request:
@@ -94,5 +98,15 @@ def test_get_outbox_service_builds_outbox_service() -> None:
         assert isinstance(service, OutboxService)
         assert service.outbox_repository is outbox_repository
         assert service.unit_of_work is unit_of_work
+
+    asyncio.run(run_test())
+
+
+def test_get_file_storage_builds_configured_adapter(monkeypatch: pytest.MonkeyPatch) -> None:
+    fake_storage = FakeFileStorage()
+    monkeypatch.setattr(dependencies, "S3FileStorage", lambda: fake_storage)
+
+    async def run_test() -> None:
+        assert await get_file_storage() is fake_storage
 
     asyncio.run(run_test())

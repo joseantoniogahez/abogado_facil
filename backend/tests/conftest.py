@@ -10,20 +10,38 @@ from starlette.testclient import TestClient
 
 from app.core.authorization import PERMISSION_SPECS
 from app.core.db.database import Base
-from app.core.setup.dependencies import get_db_session
+from app.core.setup.dependencies import get_db_session, get_file_storage
 from app.features.audit_log.models import AuditLogEntry
 from app.features.auth.models import Firm, User
 from app.features.clients.models import Client
 from app.features.outbox.models import OutboxEvent
 from app.features.rbac.models import Permission, Role, RoleInheritance, RolePermission, UserRole
+from app.integrations.files import FileStoragePort
 from app.main import app
 from utils.testing_support.database import MockDatabase
+from utils.testing_support.file_storage import FakeFileStorage
 from utils.testing_support.fixtures import load_mock_data
 
 
 @pytest.fixture(scope="session", autouse=True)
 def set_app_http_logger_to_error() -> None:
     logging.getLogger("app.http").setLevel(logging.ERROR)
+
+
+@pytest.fixture(scope="session", autouse=True)
+def object_storage_environment() -> Generator[None]:
+    with pytest.MonkeyPatch.context() as monkeypatch:
+        monkeypatch.setenv("S3_ENDPOINT_URL", "http://s3.test")
+        monkeypatch.setenv("S3_REGION", "test-region")
+        monkeypatch.setenv("S3_BUCKET", "test-bucket")
+        monkeypatch.setenv("S3_ACCESS_KEY", "test-access-key")
+        monkeypatch.setenv("S3_SECRET_KEY", "test-secret-key")
+        yield
+
+
+@pytest.fixture
+def fake_file_storage() -> FakeFileStorage:
+    return FakeFileStorage()
 
 
 @pytest.fixture(scope="module")
@@ -139,12 +157,17 @@ def mock_database(mock_data: list[dict[str, Any]]) -> Generator[MockDatabase]:
 @pytest.fixture
 def mock_client(
     mock_database: MockDatabase,
+    fake_file_storage: FakeFileStorage,
 ) -> Generator[TestClient]:
     async def override_db_session() -> AsyncGenerator[Any]:
         async with mock_database.Session() as session:
             yield session
 
+    async def override_file_storage() -> FileStoragePort:
+        return fake_file_storage
+
     app.dependency_overrides[get_db_session] = override_db_session
+    app.dependency_overrides[get_file_storage] = override_file_storage
     try:
         with TestClient(app) as client:
             yield client

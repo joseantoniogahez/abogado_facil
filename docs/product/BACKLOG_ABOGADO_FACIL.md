@@ -39,7 +39,7 @@ decisiones, avance, pausas, validaciones y cierre se registran en el plan corres
 | DEC-007 | JWT issuer/audience          | `abogado-facil`, `abogado-facil-api`                                                                                   | Listo     |
 | DEC-008 | Descripción corta            | SaaS web para abogados independientes y despachos pequeños con expedientes, tareas, documentos e IA BYOK.              | Listo     |
 | DEC-009 | Roles MVP                    | `account_owner` público, limitado a su despacho y sin herencia del rol administrativo técnico.                         | Listo     |
-| DEC-010 | Storage de documentos        | Local en desarrollo; S3-compatible para despliegue.                                                                    | Pendiente |
+| DEC-010 | Storage de documentos        | MinIO en Compose mediante API S3; archivos fuera de PostgreSQL y metadata en la base.                                  | Listo     |
 | DEC-011 | Proveedor despliegue inicial | Local/Docker primero; elegir target productivo después.                                                                | Pendiente |
 | DEC-012 | Tracker principal            | Estado resumido aquí y detalle en un plan Markdown por ticket; migrar a GitHub Issues cuando el alcance se estabilice. | Listo     |
 | DEC-013 | Identidad de acceso MVP      | Email normalizado; no se requiere compatibilidad ni migración de datos de usernames existentes.                        | Listo     |
@@ -63,17 +63,18 @@ decisiones, avance, pausas, validaciones y cierre se registran en el plan corres
 
 ## Fase 1 - Núcleo Legal Sin IA
 
-| ID       | Tipo       | Prioridad | Estado       | Trabajo                                       | Entregable / Criterio                                                                 |
-| -------- | ---------- | --------- | ------------ | --------------------------------------------- | ------------------------------------------------------------------------------------- |
-| CORE-001 | Full-stack | P1        | Hecho        | Gestión de clientes.                          | Crear, editar, buscar y ver detalle de cliente con aislamiento por usuario.           |
-| CORE-002 | Full-stack | P1        | Hecho        | Gestión de asuntos/expedientes.               | Seleccionar cliente por nombre, crear y editar asunto, ver detalle y próxima acción.  |
-| CORE-003 | Full-stack | P1        | Hecho        | Notas de expediente.                          | Crear, editar, eliminar y marcar notas relevantes.                                    |
-| CORE-004 | Full-stack | P1        | Identificado | Documentos de expediente.                     | Subir, listar, descargar y eliminar PDF/DOCX/TXT con límites configurables.           |
-| CORE-005 | Backend    | P1        | Identificado | Extracción de texto de PDF cuando sea viable. | Texto extraído queda disponible para futuros flujos de IA.                            |
-| CORE-006 | Full-stack | P1        | Identificado | Checklists base por tipo de asunto.           | Checklist determinístico con completo/pendiente/no aplica y elementos personalizados. |
-| CORE-007 | Full-stack | P1        | Identificado | Tareas y recordatorios simples.               | Tareas por asunto con fecha límite y estado completado.                               |
-| CORE-008 | Full-stack | P1        | Identificado | Control básico de pagos.                      | Honorarios, anticipos, pagos parciales, saldo y notas.                                |
-| CORE-009 | Full-stack | P1        | Identificado | Calculadoras básicas sin IA.                  | Cálculos copiables y guardables en asunto con advertencia de estimación.              |
+| ID       | Tipo       | Prioridad | Estado       | Trabajo                                       | Entregable / Criterio                                                                    |
+| -------- | ---------- | --------- | ------------ | --------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| CORE-001 | Full-stack | P1        | Hecho        | Gestión de clientes.                          | Crear, editar, buscar y ver detalle de cliente con aislamiento por usuario.              |
+| CORE-002 | Full-stack | P1        | Hecho        | Gestión de asuntos/expedientes.               | Seleccionar cliente por nombre, crear y editar asunto, ver detalle y próxima acción.     |
+| CORE-003 | Full-stack | P1        | Hecho        | Notas de expediente.                          | Crear, editar, eliminar y marcar notas relevantes.                                       |
+| CORE-004 | Backend    | P1        | Identificado | API y metadata de documentos de expediente.   | API aislada para subir, listar, descargar y eliminar PDF/DOCX/TXT usando object storage. |
+| CORE-005 | Backend    | P1        | Identificado | Extracción de texto de PDF cuando sea viable. | Texto extraído queda disponible para futuros flujos de IA.                               |
+| CORE-006 | Full-stack | P1        | Identificado | Checklists base por tipo de asunto.           | Checklist determinístico con completo/pendiente/no aplica y elementos personalizados.    |
+| CORE-007 | Full-stack | P1        | Identificado | Tareas y recordatorios simples.               | Tareas por asunto con fecha límite y estado completado.                                  |
+| CORE-008 | Full-stack | P1        | Identificado | Control básico de pagos.                      | Honorarios, anticipos, pagos parciales, saldo y notas.                                   |
+| CORE-009 | Full-stack | P1        | Identificado | Calculadoras básicas sin IA.                  | Cálculos copiables y guardables en asunto con advertencia de estimación.                 |
+| CORE-010 | Frontend   | P1        | Identificado | Interfaz de documentos de expediente.         | Cargar, listar, descargar y eliminar documentos desde el detalle del asunto.             |
 
 ## Fase 2 - BYOK y Capa de IA
 
@@ -113,14 +114,15 @@ decisiones, avance, pausas, validaciones y cierre se registran en el plan corres
 
 ## Seguridad, Privacidad y Operación
 
-| ID      | Tipo    | Prioridad | Estado       | Trabajo                                                           | Entregable / Criterio                                                             |
-| ------- | ------- | --------- | ------------ | ----------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| SEC-001 | Backend | P1        | Identificado | Aislamiento estricto por usuario/propietario.                     | Ningún usuario ve clientes, asuntos, documentos o IA de otro usuario.             |
-| SEC-002 | Legal   | P1        | Identificado | Aviso de privacidad, términos y aprobación jurídica para IA BYOK. | Explica el envío al proveedor y registra revisión jurídica antes del lanzamiento. |
-| SEC-003 | Backend | P1        | Identificado | Eliminación de datos del usuario.                                 | Usuario puede eliminar documentos/asuntos según política definida.                |
-| OPS-001 | Ops     | P1        | Identificado | Límites configurables de archivos y análisis.                     | Tamaño, número de documentos y entrada IA controlados por config.                 |
-| OPS-002 | Ops     | P1        | Identificado | Backups básicos de PostgreSQL.                                    | Procedimiento documentado antes de despliegue productivo.                         |
-| OPS-003 | Docs    | P1        | Identificado | Mantener matrices de operaciones actualizadas.                    | Docs backend/frontend reflejan rutas, permisos, runtime, errores y e2e.           |
+| ID      | Tipo    | Prioridad | Estado       | Trabajo                                                           | Entregable / Criterio                                                              |
+| ------- | ------- | --------- | ------------ | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| SEC-001 | Backend | P1        | Identificado | Aislamiento estricto por usuario/propietario.                     | Ningún usuario ve clientes, asuntos, documentos o IA de otro usuario.              |
+| SEC-002 | Legal   | P1        | Identificado | Aviso de privacidad, términos y aprobación jurídica para IA BYOK. | Explica el envío al proveedor y registra revisión jurídica antes del lanzamiento.  |
+| SEC-003 | Backend | P1        | Identificado | Eliminación de datos del usuario.                                 | Usuario puede eliminar documentos/asuntos según política definida.                 |
+| OPS-001 | Ops     | P1        | Identificado | Límites configurables de archivos y análisis.                     | Tamaño, número de documentos y entrada IA controlados por config.                  |
+| OPS-002 | Ops     | P1        | Identificado | Backups básicos de PostgreSQL.                                    | Procedimiento documentado antes de despliegue productivo.                          |
+| OPS-003 | Docs    | P1        | Identificado | Mantener matrices de operaciones actualizadas.                    | Docs backend/frontend reflejan rutas, permisos, runtime, errores y e2e.            |
+| OPS-004 | Ops     | P1        | Hecho        | Base S3-compatible con MinIO.                                     | Compose levanta bucket privado persistente y backend dispone de un puerto probado. |
 
 ## Fuera del MVP
 

@@ -22,6 +22,7 @@ Main providers:
 - `get_outbox_service`
 - `get_password_service`
 - `get_token_service`
+- `get_file_storage`
 
 Feature-local auth dependencies live in:
 
@@ -76,3 +77,7 @@ Clear overrides during teardown:
 ```python
 app.dependency_overrides.clear()
 ```
+
+External adapters are overridden through their provider function, not by patching concrete classes. Tests
+override `get_file_storage` with the test-only `FakeFileStorage`; focused `S3FileStorage` tests inject a mocked
+SDK client and do not access the network.

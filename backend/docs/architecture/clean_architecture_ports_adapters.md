@@ -10,6 +10,19 @@ Current top-level shape:
 - `app/features`
 - `app/integrations`
 
+## Object storage port and adapter
+
+- `app/integrations/files.py` owns the provider-neutral `FileStoragePort` and safe error types.
+- The port supports storing bytes, streaming reads in bounded chunks, and idempotent-aware deletion.
+- `app/integrations/s3.py` is the only production module allowed to import the boto3 S3 SDK.
+- `utils/testing_support/file_storage.py` provides the in-memory test adapter; production packages do not ship test fakes.
+- Features pass bucket/path contracts through the port and never receive SDK exceptions or credentials.
+- Provider failures are translated to messages that omit endpoints, credentials, and response details.
+- S3 connection/read timeouts and path-style addressing are runtime configuration, allowing MinIO locally
+  and another S3-compatible endpoint in production.
+- Automated tests replace the storage dependency with the in-memory adapter or inject a mocked S3 client;
+  they never require a reachable object-storage service.
+
 ## Ownership
 
 `app/core` owns cross-feature concerns only:
