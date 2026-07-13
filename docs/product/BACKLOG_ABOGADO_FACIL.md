@@ -66,7 +66,7 @@ decisiones, avance, pausas, validaciones y cierre se registran en el plan corres
 | ID       | Tipo       | Prioridad | Estado       | Trabajo                                       | Entregable / Criterio                                                                 |
 | -------- | ---------- | --------- | ------------ | --------------------------------------------- | ------------------------------------------------------------------------------------- |
 | CORE-001 | Full-stack | P1        | Hecho        | Gestión de clientes.                          | Crear, editar, buscar y ver detalle de cliente con aislamiento por usuario.           |
-| CORE-002 | Full-stack | P1        | Hecho        | Gestión de asuntos/expedientes.               | Crear asunto asociado a cliente, editar estado, ver detalle y próxima acción.         |
+| CORE-002 | Full-stack | P1        | Hecho        | Gestión de asuntos/expedientes.               | Seleccionar cliente por nombre, crear y editar asunto, ver detalle y próxima acción.  |
 | CORE-003 | Full-stack | P1        | Identificado | Notas de expediente.                          | Crear, editar, eliminar y marcar notas relevantes.                                    |
 | CORE-004 | Full-stack | P1        | Identificado | Documentos de expediente.                     | Subir, listar, descargar y eliminar PDF/DOCX/TXT con límites configurables.           |
 | CORE-005 | Backend    | P1        | Identificado | Extracción de texto de PDF cuando sea viable. | Texto extraído queda disponible para futuros flujos de IA.                            |

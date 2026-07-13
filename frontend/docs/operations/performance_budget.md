@@ -42,6 +42,10 @@ The gate evaluates production artifacts in `dist/assets`:
 - The CORE-002 adjustment was explicitly approved on 2026-07-12. The JS limits are now `411000`
   raw bytes and `122000` gzip bytes, retaining `541` raw and `764` gzip bytes of headroom. CSS
   limits remain unchanged.
+- The searchable client selector and reassignment confirmation added to CORE-002 measure `412622`
+  raw JS bytes and `20855` raw CSS bytes. The owner explicitly approved the minimum follow-up
+  adjustment on 2026-07-12: raw JS is `413000` bytes and raw CSS is `21000` bytes, retaining `378`
+  and `145` bytes of headroom respectively. Gzip limits remain unchanged.
 
 ## Commands
 

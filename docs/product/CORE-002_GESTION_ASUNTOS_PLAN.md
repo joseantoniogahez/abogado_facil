@@ -58,6 +58,8 @@ existe persistencia, API ni interfaz funcional para expedientes.
 - [x] El detalle de cliente permite listar y crear sus asuntos contextualmente.
 - [x] El dashboard muestra asuntos activos reales y habilita “Crear asunto”.
 - [x] Rutas, API, OpenAPI, textos, documentación y pruebas están sincronizados.
+- [x] Alta y edición seleccionan al cliente por nombre mediante un control con búsqueda.
+- [x] La edición solicita confirmación antes de reasignar el asunto a otro cliente.
 - [x] Los gates backend, frontend, e2e, build y pre-commit pasan.
 - [x] Aprobación humana del presupuesto registrada.
 
@@ -105,6 +107,9 @@ existe persistencia, API ni interfaz funcional para expedientes.
 | 2026-07-12 | En progreso | Alcance, decisiones, criterios y gates definidos                                           | Ejecutar scaffold y materializar slice backend                                   |
 | 2026-07-12 | En progreso | Slice full-stack, migración, aislamiento, dashboard, OpenAPI, docs y pruebas implementados | Obtener aprobación del ajuste mínimo de presupuesto; actualizarlo y cerrar gates |
 | 2026-07-12 | Hecho       | Presupuesto aprobado; build, cobertura 100% y pre-commit pasan                             | Ninguna acción obligatoria pendiente                                             |
+| 2026-07-12 | Hecho       | Selector buscable de cliente y confirmación de reasignación incorporados                   | Ninguna acción obligatoria pendiente                                             |
+| 2026-07-12 | Bloqueado   | Implementación, pruebas, contratos y check frontend completos                              | Aprobar presupuesto mínimo de JS/CSS y repetir build                             |
+| 2026-07-12 | Hecho       | Presupuesto aprobado; build y pre-commit pasan                                             | Ninguna acción obligatoria pendiente                                             |
 
 ## Resultados de validación
 
@@ -122,13 +127,18 @@ existe persistencia, API ni interfaz funcional para expedientes.
 | 2026-07-12 | `npm --prefix frontend run build` final  | Pasó                      | JS 410,459/411,000 B; gzip 121,236/122,000 B; CSS pasa                                           |
 | 2026-07-12 | `pre-commit run --all-files` final       | Pasó                      | Todos los hooks pasan                                                                            |
 | 2026-07-12 | Revisión de artefactos scaffold          | Pasó                      | Tres checklists cerrados; placeholder de schema eliminado; alcance e2e documentado               |
+| 2026-07-12 | Pruebas enfocadas de asuntos             | Pasó                      | 4 pruebas; selección por nombre, filtro y confirmación de reasignación                           |
+| 2026-07-12 | `npm --prefix frontend run check`        | Pasó                      | 205 pruebas; cobertura global de ramas por encima de 85%; OpenAPI y dependencias pasan           |
+| 2026-07-12 | `npm --prefix frontend run build`        | Bloqueado por presupuesto | Compila; JS 412,622/411,000 B y CSS 20,855/20,500 B; gzip JS y CSS pasan                         |
+| 2026-07-12 | Aprobación humana de presupuesto         | Aprobado                  | Límites mínimos aprobados: JS raw 413,000 B y CSS raw 21,000 B                                   |
+| 2026-07-12 | `npm --prefix frontend run build` final  | Pasó                      | JS 412,622/413,000 B; CSS 20,855/21,000 B; ambos presupuestos gzip pasan                         |
 
 ## Pausa / handoff
 
-- Estado actual: CORE-002 completo; capacidad, contratos, documentación y gates están verdes.
+- Estado actual: cambio de selector completo; implementación, documentación y gates verdes.
 - Cambios: slice `matters`, migración, dashboard, rutas/UI, OpenAPI, docs y pruebas.
 - Pendiente: ninguna acción obligatoria.
-- Bloqueos o aprobaciones: ajuste de presupuesto aprobado por el propietario.
+- Bloqueos o aprobaciones: ajuste mínimo de presupuesto aprobado por el propietario.
 - Riesgo residual: el smoke e2e conserva los recorridos base; no incluye todavía un recorrido
   Playwright dedicado de asuntos.
-- Siguiente acción segura: iniciar CORE-003 o añadir smoke específico de asuntos como mejora.
+- Siguiente acción segura: iniciar el siguiente ítem priorizado.

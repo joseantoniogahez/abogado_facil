@@ -4,40 +4,40 @@ This document is the canonical consumer-side inventory of backend endpoints used
 
 ## Endpoint Consumer Catalog
 
-| Endpoint                                            | Method   | Consumer Module             | Consumer Function           | Auth Mode | Success Contract                               |
-| --------------------------------------------------- | -------- | --------------------------- | --------------------------- | --------- | ---------------------------------------------- |
-| `/token`                                            | `POST`   | `shared/auth/session.ts`    | `loginWithCredentials`      | `public`  | `access_token` + `token_type`                  |
-| `/users/register`                                   | `POST`   | `shared/auth/session.ts`    | `registerUser`              | `public`  | product account profile; no implicit session   |
-| `/users/me`                                         | `GET`    | `shared/auth/session.ts`    | `readCurrentUser`           | `bearer`  | product account profile + permissions snapshot |
-| `/users/me`                                         | `PATCH`  | `shared/auth/session.ts`    | `updateCurrentUser`         | `bearer`  | updated product account profile + permissions  |
-| `/audit-log`                                        | `GET`    | `features/audit-log/api.ts` | `readAuditLogEntries`       | `bearer`  | `AuditLogEntry[]`                              |
-| `/dashboard`                                        | `GET`    | `features/dashboard/api.ts` | dashboard query             | `bearer`  | `DashboardSummary`                             |
-| `/clients`                                          | `GET`    | `features/clients/api.ts`   | `clientsQueryOptions`       | `bearer`  | `ClientList`                                   |
-| `/clients`                                          | `POST`   | `features/clients/api.ts`   | `createClient`              | `bearer`  | `ClientRecord`                                 |
-| `/clients/{client_id}`                              | `GET`    | `features/clients/api.ts`   | `clientQueryOptions`        | `bearer`  | `ClientRecord`                                 |
-| `/clients/{client_id}`                              | `PATCH`  | `features/clients/api.ts`   | `updateClient`              | `bearer`  | `ClientRecord`                                 |
-| `/matters`                                          | `GET`    | `features/matters/api.ts`   | `mattersQueryOptions`       | `bearer`  | `MatterList`                                   |
-| `/matters`                                          | `POST`   | `features/matters/api.ts`   | `createMatter`              | `bearer`  | `MatterRecord`                                 |
-| `/matters/{matter_id}`                              | `GET`    | `features/matters/api.ts`   | `matterQueryOptions`        | `bearer`  | `MatterRecord`                                 |
-| `/matters/{matter_id}`                              | `PATCH`  | `features/matters/api.ts`   | `updateMatter`              | `bearer`  | `MatterRecord`                                 |
-| `/rbac/users`                                       | `GET`    | `shared/rbac/admin.ts`      | `readAdminUsers`            | `bearer`  | `AdminUser[]`                                  |
-| `/rbac/users`                                       | `POST`   | `shared/rbac/admin.ts`      | `createAdminUser`           | `bearer`  | `AdminUser`                                    |
-| `/rbac/users/{user_id}`                             | `GET`    | `shared/rbac/admin.ts`      | `readAdminUser`             | `bearer`  | `AdminUser`                                    |
-| `/rbac/users/{user_id}/roles`                       | `GET`    | `shared/rbac/admin.ts`      | `readRbacUserRoles`         | `bearer`  | `AssignedRole[]`                               |
-| `/rbac/users/{user_id}`                             | `PUT`    | `shared/rbac/admin.ts`      | `updateAdminUser`           | `bearer`  | `AdminUser`                                    |
-| `/rbac/users/{user_id}`                             | `DELETE` | `shared/rbac/admin.ts`      | `softDeleteAdminUser`       | `bearer`  | `204 no-content`                               |
-| `/rbac/roles`                                       | `GET`    | `shared/rbac/admin.ts`      | `readRbacRoles`             | `bearer`  | `RbacRole[]`                                   |
-| `/rbac/roles`                                       | `POST`   | `shared/rbac/admin.ts`      | `createRbacRole`            | `bearer`  | `RbacRole`                                     |
-| `/rbac/roles/{role_id}/users`                       | `GET`    | `shared/rbac/admin.ts`      | `readRbacRoleUsers`         | `bearer`  | `AssignedUser[]`                               |
-| `/rbac/roles/{role_id}`                             | `PUT`    | `shared/rbac/admin.ts`      | `updateRbacRole`            | `bearer`  | `RbacRole`                                     |
-| `/rbac/roles/{role_id}`                             | `DELETE` | `shared/rbac/admin.ts`      | `deleteRbacRole`            | `bearer`  | `204 no-content`                               |
-| `/rbac/roles/{role_id}/inherits/{parent_role_id}`   | `PUT`    | `shared/rbac/admin.ts`      | `assignRbacRoleInheritance` | `bearer`  | `204 no-content`                               |
-| `/rbac/roles/{role_id}/inherits/{parent_role_id}`   | `DELETE` | `shared/rbac/admin.ts`      | `removeRbacRoleInheritance` | `bearer`  | `204 no-content`                               |
-| `/rbac/permissions`                                 | `GET`    | `shared/rbac/admin.ts`      | `readRbacPermissions`       | `bearer`  | `RbacPermission[]`                             |
-| `/rbac/roles/{role_id}/permissions/{permission_id}` | `PUT`    | `shared/rbac/admin.ts`      | `assignRbacRolePermission`  | `bearer`  | `RbacRolePermission`                           |
-| `/rbac/roles/{role_id}/permissions/{permission_id}` | `DELETE` | `shared/rbac/admin.ts`      | `removeRbacRolePermission`  | `bearer`  | `204 no-content`                               |
-| `/rbac/users/{user_id}/roles/{role_id}`             | `PUT`    | `shared/rbac/admin.ts`      | `assignRbacUserRole`        | `bearer`  | `UserRoleAssignmentResponse`                   |
-| `/rbac/users/{user_id}/roles/{role_id}`             | `DELETE` | `shared/rbac/admin.ts`      | `removeRbacUserRole`        | `bearer`  | `204 no-content`                               |
+| Endpoint                                            | Method   | Consumer Module                                               | Consumer Function                                | Auth Mode | Success Contract                               |
+| --------------------------------------------------- | -------- | ------------------------------------------------------------- | ------------------------------------------------ | --------- | ---------------------------------------------- |
+| `/token`                                            | `POST`   | `shared/auth/session.ts`                                      | `loginWithCredentials`                           | `public`  | `access_token` + `token_type`                  |
+| `/users/register`                                   | `POST`   | `shared/auth/session.ts`                                      | `registerUser`                                   | `public`  | product account profile; no implicit session   |
+| `/users/me`                                         | `GET`    | `shared/auth/session.ts`                                      | `readCurrentUser`                                | `bearer`  | product account profile + permissions snapshot |
+| `/users/me`                                         | `PATCH`  | `shared/auth/session.ts`                                      | `updateCurrentUser`                              | `bearer`  | updated product account profile + permissions  |
+| `/audit-log`                                        | `GET`    | `features/audit-log/api.ts`                                   | `readAuditLogEntries`                            | `bearer`  | `AuditLogEntry[]`                              |
+| `/dashboard`                                        | `GET`    | `features/dashboard/api.ts`                                   | dashboard query                                  | `bearer`  | `DashboardSummary`                             |
+| `/clients`                                          | `GET`    | `features/clients/api.ts`, `features/matters/MattersPage.tsx` | `clientsQueryOptions`, `readMatterClientOptions` | `bearer`  | `ClientList` / matter client options           |
+| `/clients`                                          | `POST`   | `features/clients/api.ts`                                     | `createClient`                                   | `bearer`  | `ClientRecord`                                 |
+| `/clients/{client_id}`                              | `GET`    | `features/clients/api.ts`                                     | `clientQueryOptions`                             | `bearer`  | `ClientRecord`                                 |
+| `/clients/{client_id}`                              | `PATCH`  | `features/clients/api.ts`                                     | `updateClient`                                   | `bearer`  | `ClientRecord`                                 |
+| `/matters`                                          | `GET`    | `features/matters/api.ts`                                     | `mattersQueryOptions`                            | `bearer`  | `MatterList`                                   |
+| `/matters`                                          | `POST`   | `features/matters/api.ts`                                     | `createMatter`                                   | `bearer`  | `MatterRecord`                                 |
+| `/matters/{matter_id}`                              | `GET`    | `features/matters/api.ts`                                     | `matterQueryOptions`                             | `bearer`  | `MatterRecord`                                 |
+| `/matters/{matter_id}`                              | `PATCH`  | `features/matters/api.ts`                                     | `updateMatter`                                   | `bearer`  | `MatterRecord`                                 |
+| `/rbac/users`                                       | `GET`    | `shared/rbac/admin.ts`                                        | `readAdminUsers`                                 | `bearer`  | `AdminUser[]`                                  |
+| `/rbac/users`                                       | `POST`   | `shared/rbac/admin.ts`                                        | `createAdminUser`                                | `bearer`  | `AdminUser`                                    |
+| `/rbac/users/{user_id}`                             | `GET`    | `shared/rbac/admin.ts`                                        | `readAdminUser`                                  | `bearer`  | `AdminUser`                                    |
+| `/rbac/users/{user_id}/roles`                       | `GET`    | `shared/rbac/admin.ts`                                        | `readRbacUserRoles`                              | `bearer`  | `AssignedRole[]`                               |
+| `/rbac/users/{user_id}`                             | `PUT`    | `shared/rbac/admin.ts`                                        | `updateAdminUser`                                | `bearer`  | `AdminUser`                                    |
+| `/rbac/users/{user_id}`                             | `DELETE` | `shared/rbac/admin.ts`                                        | `softDeleteAdminUser`                            | `bearer`  | `204 no-content`                               |
+| `/rbac/roles`                                       | `GET`    | `shared/rbac/admin.ts`                                        | `readRbacRoles`                                  | `bearer`  | `RbacRole[]`                                   |
+| `/rbac/roles`                                       | `POST`   | `shared/rbac/admin.ts`                                        | `createRbacRole`                                 | `bearer`  | `RbacRole`                                     |
+| `/rbac/roles/{role_id}/users`                       | `GET`    | `shared/rbac/admin.ts`                                        | `readRbacRoleUsers`                              | `bearer`  | `AssignedUser[]`                               |
+| `/rbac/roles/{role_id}`                             | `PUT`    | `shared/rbac/admin.ts`                                        | `updateRbacRole`                                 | `bearer`  | `RbacRole`                                     |
+| `/rbac/roles/{role_id}`                             | `DELETE` | `shared/rbac/admin.ts`                                        | `deleteRbacRole`                                 | `bearer`  | `204 no-content`                               |
+| `/rbac/roles/{role_id}/inherits/{parent_role_id}`   | `PUT`    | `shared/rbac/admin.ts`                                        | `assignRbacRoleInheritance`                      | `bearer`  | `204 no-content`                               |
+| `/rbac/roles/{role_id}/inherits/{parent_role_id}`   | `DELETE` | `shared/rbac/admin.ts`                                        | `removeRbacRoleInheritance`                      | `bearer`  | `204 no-content`                               |
+| `/rbac/permissions`                                 | `GET`    | `shared/rbac/admin.ts`                                        | `readRbacPermissions`                            | `bearer`  | `RbacPermission[]`                             |
+| `/rbac/roles/{role_id}/permissions/{permission_id}` | `PUT`    | `shared/rbac/admin.ts`                                        | `assignRbacRolePermission`                       | `bearer`  | `RbacRolePermission`                           |
+| `/rbac/roles/{role_id}/permissions/{permission_id}` | `DELETE` | `shared/rbac/admin.ts`                                        | `removeRbacRolePermission`                       | `bearer`  | `204 no-content`                               |
+| `/rbac/users/{user_id}/roles/{role_id}`             | `PUT`    | `shared/rbac/admin.ts`                                        | `assignRbacUserRole`                             | `bearer`  | `UserRoleAssignmentResponse`                   |
+| `/rbac/users/{user_id}/roles/{role_id}`             | `DELETE` | `shared/rbac/admin.ts`                                        | `removeRbacUserRole`                             | `bearer`  | `204 no-content`                               |
 
 ## Conditional Consumer Notes
 
@@ -55,6 +55,10 @@ This document is the canonical consumer-side inventory of backend endpoints used
 
 - Client forms display only the 10-digit Mexican national number. The fixed `+52` country code is
   implicit in the MVP, and non-digit formatting is removed before requests are sent.
+
+- Matter create and edit forms consume the firm-scoped client list as a name-searchable selector;
+  the selected record contributes `client_id` to the matter mutation, and reassignment during edit
+  requires explicit user confirmation.
 
 - `readAuditLogEntries` is routed through `/admin/audit-log`, which requires `audit_logs:read` before the page can request the endpoint.
 
