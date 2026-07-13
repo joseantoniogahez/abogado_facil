@@ -7,7 +7,7 @@ This document defines the deterministic end-to-end smoke baseline for the fronte
 - Critical registration, email login, profile, and logout journey.
 - Canonical dashboard navigation, legacy `/welcome` redirect, and protected route behavior.
 - Protected client list, creation, detail, editing, search, and dashboard counter/action journey.
-- Matter routes remain covered by route-inventory, architecture, API-contract, component, and
+- Matter and embedded note journeys remain covered by route-inventory, architecture, API-contract, component, and
   accessibility gates. CORE-002 did not add a dedicated Playwright matter journey; its firm/client
   isolation and CRUD behavior are exercised by backend router, service, and repository tests.
 - Error fallback behavior for protected session validation.

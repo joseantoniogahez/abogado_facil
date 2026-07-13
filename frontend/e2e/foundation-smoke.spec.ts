@@ -35,6 +35,74 @@ const mockUnhandledApiRequests = async (page: Page): Promise<void> => {
 };
 
 test.describe("frontend foundation smoke", () => {
+  test("creates, edits, marks, and deletes an expediente note", async ({ page }) => {
+    await page.addInitScript((storageKey) => {
+      window.sessionStorage.setItem(storageKey, "seed-token");
+    }, ACCESS_TOKEN_STORAGE_KEY);
+    const matter = {
+      id: 3,
+      client_id: 2,
+      title: "Pensión",
+      matter_type: "Familiar",
+      status: "active",
+      counterparty: null,
+      description: null,
+      next_action: null,
+      next_action_date: null,
+      created_at: "2026-07-12T10:00:00Z",
+      updated_at: "2026-07-12T10:00:00Z",
+    };
+    let notes: Record<string, unknown>[] = [];
+    await page.route("**/v1/**", async (route) => {
+      const request = route.request();
+      const method = request.method();
+      const pathname = new URL(request.url()).pathname;
+      if (method === "GET" && pathname === "/v1/users/me") {
+        await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(authenticatedUser()) });
+        return;
+      }
+      if (method === "GET" && pathname === "/v1/matters/3") {
+        await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(matter) });
+        return;
+      }
+      if (method === "GET" && pathname === "/v1/matters/3/notes") {
+        await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ items: notes, total: notes.length }) });
+        return;
+      }
+      if (method === "POST" && pathname === "/v1/matters/3/notes") {
+        const payload = request.postDataJSON() as { content: string };
+        notes = [{ id: 7, matter_id: 3, content: payload.content, is_relevant: false, created_at: matter.created_at, updated_at: matter.updated_at }];
+        await route.fulfill({ status: 201, contentType: "application/json", body: JSON.stringify(notes[0]) });
+        return;
+      }
+      if (method === "PATCH" && pathname === "/v1/matters/3/notes/7") {
+        notes = [{ ...notes[0], ...(request.postDataJSON() as Record<string, unknown>), updated_at: "2026-07-12T11:00:00Z" }];
+        await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(notes[0]) });
+        return;
+      }
+      if (method === "DELETE" && pathname === "/v1/matters/3/notes/7") {
+        notes = [];
+        await route.fulfill({ status: 204 });
+        return;
+      }
+      throw new Error(`Unhandled API request in matter note smoke: ${method} ${pathname}`);
+    });
+
+    await page.goto("/matters/3");
+    await page.getByLabel(t("matterNotes.content")).fill("Llamada inicial");
+    await page.getByRole("button", { name: t("matterNotes.add") }).click();
+    await expect(page.getByText("Llamada inicial")).toBeVisible();
+    await page.getByRole("button", { name: t("matterNotes.edit") }).click();
+    await page.getByLabel(t("matterNotes.content")).nth(1).fill("Seguimiento editado");
+    await page.getByRole("button", { name: t("matterNotes.save") }).click();
+    await expect(page.getByText("Seguimiento editado")).toBeVisible();
+    await page.getByRole("button", { name: t("matterNotes.mark") }).click();
+    await expect(page.getByText(t("matterNotes.relevant"))).toBeVisible();
+    page.once("dialog", (dialog) => void dialog.accept());
+    await page.getByRole("button", { name: t("matterNotes.delete") }).click();
+    await expect(page.getByText(t("matterNotes.empty"))).toBeVisible();
+  });
+
   test("navigates to register and completes the registration flow", async ({
     page,
   }) => {

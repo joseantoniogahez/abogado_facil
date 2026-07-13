@@ -491,6 +491,26 @@
         "title": "CreateClientRequest",
         "type": "object"
       },
+      "CreateMatterNoteRequest": {
+        "properties": {
+          "content": {
+            "maxLength": 20000,
+            "minLength": 1,
+            "title": "Content",
+            "type": "string"
+          },
+          "is_relevant": {
+            "default": false,
+            "title": "Is Relevant",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "content"
+        ],
+        "title": "CreateMatterNoteRequest",
+        "type": "object"
+      },
       "CreateMatterRequest": {
         "properties": {
           "client_id": {
@@ -718,6 +738,67 @@
           "offset"
         ],
         "title": "MatterListResponse",
+        "type": "object"
+      },
+      "MatterNoteListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MatterNoteResponse"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "MatterNoteListResponse",
+        "type": "object"
+      },
+      "MatterNoteResponse": {
+        "properties": {
+          "content": {
+            "title": "Content",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "is_relevant": {
+            "title": "Is Relevant",
+            "type": "boolean"
+          },
+          "matter_id": {
+            "title": "Matter Id",
+            "type": "integer"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "matter_id",
+          "content",
+          "is_relevant",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "MatterNoteResponse",
         "type": "object"
       },
       "MatterResponse": {
@@ -1236,6 +1317,36 @@
           }
         },
         "title": "UpdateCurrentUserRequest",
+        "type": "object"
+      },
+      "UpdateMatterNoteRequest": {
+        "properties": {
+          "content": {
+            "anyOf": [
+              {
+                "maxLength": 20000,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content"
+          },
+          "is_relevant": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Relevant"
+          }
+        },
+        "title": "UpdateMatterNoteRequest",
         "type": "object"
       },
       "UpdateMatterRequest": {
@@ -2908,6 +3019,185 @@
         "summary": "Update matter",
         "tags": [
           "matters"
+        ]
+      }
+    },
+    "/v1/matters/{matter_id}/notes": {
+      "get": {
+        "description": "Lists matter notes newest first.",
+        "operationId": "list_matter_notes_v1_matters__matter_id__notes_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "matter_id",
+            "required": true,
+            "schema": {
+              "title": "Matter Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatterNoteListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "List matter notes",
+        "tags": [
+          "matter-notes"
+        ]
+      },
+      "post": {
+        "description": "Creates a note in a firm-scoped matter.",
+        "operationId": "create_matter_note_v1_matters__matter_id__notes_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "matter_id",
+            "required": true,
+            "schema": {
+              "title": "Matter Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMatterNoteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatterNoteResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Create matter note",
+        "tags": [
+          "matter-notes"
+        ]
+      }
+    },
+    "/v1/matters/{matter_id}/notes/{note_id}": {
+      "delete": {
+        "description": "Permanently deletes a firm-scoped matter note.",
+        "operationId": "delete_matter_note_v1_matters__matter_id__notes__note_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "matter_id",
+            "required": true,
+            "schema": {
+              "title": "Matter Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "note_id",
+            "required": true,
+            "schema": {
+              "title": "Note Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Delete matter note",
+        "tags": [
+          "matter-notes"
+        ]
+      },
+      "patch": {
+        "description": "Updates note content and/or relevance.",
+        "operationId": "update_matter_note_v1_matters__matter_id__notes__note_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "matter_id",
+            "required": true,
+            "schema": {
+              "title": "Matter Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "note_id",
+            "required": true,
+            "schema": {
+              "title": "Note Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMatterNoteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatterNoteResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Update matter note",
+        "tags": [
+          "matter-notes"
         ]
       }
     },

@@ -15,6 +15,8 @@ from app.features.auth.service import AuthService, AuthServicePort
 from app.features.clients.repository import ClientsRepository
 from app.features.clients.service import ClientsService, ClientsServicePort
 from app.features.dashboard.service import DashboardService, DashboardServicePort
+from app.features.matter_notes.repository import MatterNotesRepository
+from app.features.matter_notes.service import MatterNotesService, MatterNotesServicePort
 from app.features.matters.repository import MattersRepository
 from app.features.matters.service import MattersService, MattersServicePort
 from app.features.outbox.repository import OutboxRepository
@@ -81,6 +83,13 @@ async def get_matters_repository(session: DbSessionDependency):
 
 
 MattersRepositoryDependency = Annotated[MattersRepository, Depends(get_matters_repository)]
+
+
+async def get_matter_notes_repository(session: DbSessionDependency):
+    return MatterNotesRepository(session=session)
+
+
+MatterNotesRepositoryDependency = Annotated[MatterNotesRepository, Depends(get_matter_notes_repository)]
 
 
 async def get_rbac_repository(session: DbSessionDependency):
@@ -195,6 +204,17 @@ async def get_matters_service(
 
 
 MattersServiceDependency = Annotated[MattersServicePort, Depends(get_matters_service)]
+
+
+async def get_matter_notes_service(
+    repository: MatterNotesRepositoryDependency,
+    matters_repository: MattersRepositoryDependency,
+    unit_of_work: UnitOfWorkDependency,
+) -> MatterNotesServicePort:
+    return MatterNotesService(repository=repository, matters_repository=matters_repository, unit_of_work=unit_of_work)
+
+
+MatterNotesServiceDependency = Annotated[MatterNotesServicePort, Depends(get_matter_notes_service)]
 
 
 async def get_outbox_service(

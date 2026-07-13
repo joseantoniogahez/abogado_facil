@@ -22,6 +22,7 @@ import {
   updateMatter,
 } from "./api";
 import type { MatterInput, MatterRecord, MatterStatus } from "./contracts";
+import { MatterNotes } from "./matter-notes/MatterNotes";
 
 const DASHBOARD_QUERY_KEY = ["dashboard"] as const;
 
@@ -323,6 +324,7 @@ export const MatterDetailPage = ({ edit = false }: { edit?: boolean }) => {
         <p className="whitespace-pre-wrap">{m.description}</p>
       ) : null}
       <Link to={`/matters/${id}/edit`}>{t("matters.edit")}</Link>
+      <MatterNotes matterId={id} />
     </main>
   );
 };

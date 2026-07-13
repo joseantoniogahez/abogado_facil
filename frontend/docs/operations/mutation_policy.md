@@ -12,6 +12,7 @@ This document defines deterministic mutation retry and invalidation behavior by 
 | Auth registration mutation | No retry                                         | Keep session unchanged; show explicit login transition |
 | Profile update mutation    | No retry                                         | Write returned profile through `SESSION_QUERY_KEY`     |
 | Client/matter mutation     | Default mutation policy                          | Explicit domain list/detail and dashboard invalidation |
+| Matter note mutation       | Default mutation policy                          | Invalidate only the note list for its matter           |
 
 ## Implementation References
 

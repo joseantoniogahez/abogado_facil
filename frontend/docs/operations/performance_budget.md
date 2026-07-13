@@ -46,6 +46,12 @@ The gate evaluates production artifacts in `dist/assets`:
   raw JS bytes and `20855` raw CSS bytes. The owner explicitly approved the minimum follow-up
   adjustment on 2026-07-12: raw JS is `413000` bytes and raw CSS is `21000` bytes, retaining `378`
   and `145` bytes of headroom respectively. Gzip limits remain unchanged.
+- CORE-003 adds the embedded matter-note form, deterministic list states, edit/relevance/delete
+  controls, and no new dependency. Its measured baseline is `417611` raw JS bytes, `122844` gzip JS
+  bytes, `21069` raw CSS bytes, and `5247` gzip CSS bytes.
+- The owner explicitly approved the CORE-003 adjustment on 2026-07-12. Limits are now `418000` raw
+  JS bytes, `123500` gzip JS bytes, and `21200` raw CSS bytes, retaining `389`, `656`, and `131`
+  bytes of headroom respectively. The CSS gzip limit remains `6000`.
 
 ## Commands
 
