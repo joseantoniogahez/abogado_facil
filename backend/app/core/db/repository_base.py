@@ -9,7 +9,7 @@ from app.core.common.pagination import DEFAULT_LIST_LIMIT, DEFAULT_SORT, MAX_LIS
 from app.core.db.database import Base
 from app.core.errors.repositories import RepositoryError
 
-IdType = int
+IdType = int | str
 
 
 class SupportsFromDomain[RecordType](Protocol):

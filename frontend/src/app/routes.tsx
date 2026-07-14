@@ -23,12 +23,14 @@ import { IAM_PERMISSION } from "@/shared/iam/contracts";
 const MattersPage = lazy(() => import("@/features/matters/MattersPage").then((module) => ({ default: module.MattersPage })));
 const NewMatterPage = lazy(() => import("@/features/matters/MattersPage").then((module) => ({ default: module.NewMatterPage })));
 const MatterDetailPage = lazy(() => import("@/features/matters/MattersPage").then((module) => ({ default: module.MatterDetailPage })));
+/* eslint-disable react-refresh/only-export-components -- route adapters belong with the centralized route composition */
 /* v8 ignore next */
 const MattersRoute = () => <Suspense fallback={null}><MattersPage /></Suspense>;
 /* v8 ignore next */
 const NewMatterRoute = () => <Suspense fallback={null}><NewMatterPage /></Suspense>;
 /* v8 ignore next */
 const MatterDetailRoute = ({ edit = false }: { edit?: boolean }) => <Suspense fallback={null}><MatterDetailPage edit={edit} /></Suspense>;
+/* eslint-enable react-refresh/only-export-components */
 
 export const appRoutes: RouteObject[] = [
   {

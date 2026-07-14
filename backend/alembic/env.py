@@ -9,6 +9,7 @@ from app.core.db.database import Base, get_database_url
 from app.features.audit_log.models import AuditLogEntry
 from app.features.auth.models import User
 from app.features.clients.models import Client
+from app.features.matter_documents.models import MatterDocument
 from app.features.matter_notes.models import MatterNote
 from app.features.matters.models import Matter
 from app.features.outbox.models import OutboxEvent
@@ -32,6 +33,7 @@ _MODEL_REGISTRY = (
     Client,
     Matter,
     MatterNote,
+    MatterDocument,
 )
 
 target_metadata = Base.metadata

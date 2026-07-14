@@ -5,8 +5,8 @@
 - ID: `CORE-004`
 - Tipo: Backend
 - Prioridad: P1
-- Estado del plan: Listo
-- Estado de implementación: Identificado
+- Estado del plan: Completo
+- Estado de implementación: Hecho
 - Última actualización: 2026-07-13
 - Fuente: `docs/product/REQUERIMIENTOS_ABOGADO_FACIL_IA.md`, sección 6.8
 - Backlog: `docs/product/BACKLOG_ABOGADO_FACIL.md`
@@ -83,15 +83,15 @@ documentos. La interfaz se implementará por separado en `CORE-010` después de 
 
 ## Criterios de aceptación
 
-- [ ] Los bytes se guardan mediante el puerto de `OPS-004`, nunca en PostgreSQL ni filesystem local.
-- [ ] PDF, DOCX y TXT válidos se cargan con tipo manual y quedan asociados al asunto propio.
-- [ ] Archivos incompatibles, demasiado grandes o sobre la cuota se rechazan sin residuos.
-- [ ] El listado es estable y la descarga transmite exactamente los bytes almacenados.
-- [ ] El borrado elimina metadata y objeto con comportamiento recuperable ante fallos parciales.
-- [ ] No se carga el archivo completo en memoria para validar, subir o descargar.
-- [ ] Aislamiento, claves privadas y errores opacos impiden acceso cruzado o enumeración.
-- [ ] API, OpenAPI, errores, docs y pruebas describen el mismo contrato.
-- [ ] Backend completo y cobertura 100% pasan y quedan registrados.
+- [x] Los bytes se guardan mediante el puerto de `OPS-004`, nunca en PostgreSQL ni filesystem local.
+- [x] PDF, DOCX y TXT válidos se cargan con tipo manual y quedan asociados al asunto propio.
+- [x] Archivos incompatibles, demasiado grandes o sobre la cuota se rechazan sin residuos.
+- [x] El listado es estable y la descarga transmite exactamente los bytes almacenados.
+- [x] El borrado elimina metadata y objeto con comportamiento recuperable ante fallos parciales.
+- [x] No se carga el archivo completo en memoria para validar, subir o descargar.
+- [x] Aislamiento, claves privadas y errores opacos impiden acceso cruzado o enumeración.
+- [x] API, OpenAPI, errores, docs y pruebas describen el mismo contrato.
+- [x] Backend completo y cobertura 100% pasan y quedan registrados.
 
 ## Archivos y contratos afectados
 
@@ -108,27 +108,27 @@ documentos. La interfaz se implementará por separado en `CORE-010` después de 
 
 ### Implementación
 
-- [ ] Cambiar CORE-004 a `En progreso` al iniciar.
-- [ ] Ejecutar `python scripts/scaffold_feature.py backend matter-documents --with-model --dry-run`.
-- [ ] Crear modelo, migración, schemas, repositorio, servicio, router y OpenAPI.
-- [ ] Validar streaming, tipos, tamaño y cuota sin confiar en datos del navegador.
-- [ ] Implementar compensación de upload/delete y observabilidad sin datos sensibles.
-- [ ] Registrar DI/router y cubrir UoW, aislamiento y puntos de fallo.
+- [x] Cambiar CORE-004 a `En progreso` al iniciar.
+- [x] Ejecutar preview del scaffold (el segundo intento confirmó que el slice ya creado no se sobrescribe).
+- [x] Crear modelo, migración, schemas, repositorio, servicio, router y OpenAPI.
+- [x] Validar streaming, tipos, tamaño y cuota sin confiar en datos del navegador.
+- [x] Implementar compensación de upload/delete y errores seguros sin datos sensibles.
+- [x] Registrar DI/router y cubrir UoW, aislamiento y puntos de fallo.
 
 ### Tests y documentación
 
-- [ ] Probar schemas, repositorio, servicio, router, migración, DI, OpenAPI y fake storage.
-- [ ] Añadir una prueba dirigida contra MinIO usando el fixture entregado por `OPS-004`.
-- [ ] Actualizar `api_endpoints.md`, `authorization_matrix.md` y `error_mapping.md`.
-- [ ] Sincronizar OpenAPI frontend y actualizar tracking.
+- [x] Probar schemas, repositorio, servicio, router, migración, DI, OpenAPI y fake storage.
+- [x] Probar el contrato S3 mediante cliente SDK simulado y el fake entregado por `OPS-004`; OPS-004 no aporta fixture MinIO vivo.
+- [x] Actualizar `api_endpoints.md`, `authorization_matrix.md` y `error_mapping.md`.
+- [x] Sincronizar OpenAPI frontend y actualizar tracking.
 
 ### Validación
 
-- [ ] Pruebas backend dirigidas.
-- [ ] `python -m pytest backend/tests`
-- [ ] `python -m pytest backend/tests --cov=app --cov-report=term-missing:skip-covered --cov-fail-under=100`
-- [ ] `npm --prefix frontend run openapi:sync`
-- [ ] `pre-commit run --all-files`
+- [x] Pruebas backend dirigidas.
+- [x] `python -m pytest backend/tests`
+- [x] `python -m pytest backend/tests --cov=app --cov-report=term-missing:skip-covered --cov-fail-under=100`
+- [x] `npm --prefix frontend run openapi:sync`
+- [x] `pre-commit run --all-files`
 
 ## Riesgos y mitigaciones
 
@@ -142,39 +142,45 @@ documentos. La interfaz se implementará por separado en `CORE-010` después de 
 
 ## Registro de avance
 
-| Fecha      | Estado        | Completado                                        | Pendiente / siguiente acción segura                     |
-| ---------- | ------------- | ------------------------------------------------- | ------------------------------------------------------- |
-| 2026-07-13 | Plan dividido | Contrato backend separado de infraestructura y UI | Implementar `OPS-004`; después iniciar scaffold backend |
+| Fecha      | Estado        | Completado                                                               | Pendiente / siguiente acción segura                     |
+| ---------- | ------------- | ------------------------------------------------------------------------ | ------------------------------------------------------- |
+| 2026-07-13 | Plan dividido | Contrato backend separado de infraestructura y UI                        | Implementar `OPS-004`; después iniciar scaffold backend |
+| 2026-07-13 | En progreso   | Dependencias CORE-002 y OPS-004 verificadas; lectura canónica completada | Crear slice, migración, pruebas y contratos             |
+| 2026-07-13 | Hecho         | Slice, migración, contratos, OpenAPI y gates completos                   | CORE-010 puede consumir el contrato                     |
 
 ## Resultados de validación
 
-| Fecha      | Comando                           | Resultado | Notas                                  |
-| ---------- | --------------------------------- | --------- | -------------------------------------- |
-| 2026-07-13 | Revisión de partición y contratos | Pasó      | Planificación; runtime no implementado |
+| Fecha      | Comando                                                    | Resultado | Notas                                  |
+| ---------- | ---------------------------------------------------------- | --------- | -------------------------------------- |
+| 2026-07-13 | Revisión de partición y contratos                          | Pasó      | Planificación; runtime no implementado |
+| 2026-07-13 | `python -m pytest backend/tests`                           | Pasó      | 353 pruebas tras formato final         |
+| 2026-07-13 | Coverage backend                                           | Pasó      | 354 pruebas; 100.00%                   |
+| 2026-07-13 | `npm --prefix frontend run openapi:sync` y `openapi:check` | Pasó      | Artefacto actualizado                  |
+| 2026-07-13 | `pre-commit run --all-files`                               | Pasó      | Todos los hooks pasaron                |
 
 ## Pausa / handoff
 
-- Estado actual: plan listo; implementación identificada hasta completar `OPS-004`.
-- Archivos y contratos cambiados: plan y backlog.
-- Pendiente: toda la implementación backend.
-- Bloqueos o aprobaciones: ninguno; la secuencia requiere completar primero `OPS-004`.
-- Riesgo residual: compensación SQL–MinIO aún no verificada.
-- Siguiente acción segura: implementar y cerrar `OPS-004`.
+- Estado actual: API backend completa y contrato OpenAPI sincronizado.
+- Archivos y contratos cambiados: slice `matter_documents`, migración, DI/router, storage streaming, docs y OpenAPI.
+- Pendiente: ninguno dentro de CORE-004; la UI corresponde a CORE-010.
+- Bloqueos o aprobaciones: ninguno; aprobaciones humanas no aplican.
+- Riesgo residual: no se levantó MinIO real; el adaptador se validó con cliente SDK simulado y Compose con pre-commit.
+- Siguiente acción segura: iniciar CORE-010 o CORE-005 sobre el contrato publicado.
 
 ## Revisión documental de cierre
 
-- [ ] README backend revisado.
-- [ ] Operaciones y arquitectura backend revisadas.
-- [ ] Artefacto OpenAPI frontend revisado.
-- [ ] Foundation status revisados sin cambios salvo movimiento fundacional.
-- [ ] Plan y backlog sincronizados.
+- [x] README backend revisado.
+- [x] Operaciones y arquitectura backend revisadas.
+- [x] Artefacto OpenAPI frontend revisado.
+- [x] Foundation status revisados sin cambios: no cambiaron reglas ni gates fundacionales.
+- [x] Plan y backlog sincronizados.
 
 ## Resumen de cierre
 
-- Entregado: pendiente.
-- Validación: revisión documental del plan.
-- Validación omitida: gates de runtime hasta implementación.
-- Aprobaciones humanas: no aplicables al plan.
-- Riesgo residual: integración real pendiente.
+- Entregado: API aislada para cargar, listar, descargar y eliminar PDF/DOCX/TXT mediante object storage.
+- Validación: backend y cobertura 100%, OpenAPI sync/check y pre-commit completos.
+- Validación omitida: prueba contra MinIO vivo; no existe el fixture supuesto por el plan.
+- Aprobaciones humanas: no aplicables.
+- Riesgo residual: validación viva de MinIO queda cubierta operativamente por OPS-004, no por este slice.
 
 No cambiar CORE-004 a `Hecho` mientras quede pendiente cualquier criterio, gate o documento.

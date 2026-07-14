@@ -123,3 +123,8 @@ class ObjectStorageSettings(BaseSettings):
         if not self.S3_SECRET_KEY.get_secret_value().strip():
             raise ValueError("S3_SECRET_KEY cannot be empty.")
         return self
+
+
+class MatterDocumentSettings(BaseSettings):
+    MATTER_DOCUMENT_MAX_SIZE_BYTES: int = Field(10 * 1024 * 1024, gt=0)
+    MATTER_DOCUMENT_MAX_PER_MATTER: int = Field(50, gt=0)

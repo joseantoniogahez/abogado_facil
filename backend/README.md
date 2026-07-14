@@ -67,6 +67,8 @@ Required object storage configuration:
 - Compose supplies the values from the repository `.env`; direct backend execution must export them first.
 - `S3_PATH_STYLE` defaults to `true`.
 - Connection/read timeouts default to 3/10 seconds.
+- `MATTER_DOCUMENT_MAX_SIZE_BYTES` defaults to 10 MiB and `MATTER_DOCUMENT_MAX_PER_MATTER`
+  defaults to 50. Uploads are serialized per matter in PostgreSQL while enforcing the quota.
 
 Features consume `FileStoragePort`; provider code is isolated in `app/integrations/s3.py`, and tests
 use a test-only `FakeFileStorage` or a mocked SDK client without Docker or network access. No feature should

@@ -14,6 +14,9 @@ from app.core.setup.dependencies import get_db_session, get_file_storage
 from app.features.audit_log.models import AuditLogEntry
 from app.features.auth.models import Firm, User
 from app.features.clients.models import Client
+from app.features.matter_documents.models import MatterDocument
+from app.features.matter_notes.models import MatterNote
+from app.features.matters.models import Matter
 from app.features.outbox.models import OutboxEvent
 from app.features.rbac.models import Permission, Role, RoleInheritance, RolePermission, UserRole
 from app.integrations.files import FileStoragePort
@@ -139,6 +142,9 @@ def mock_data(
         {"class": OutboxEvent, "json": []},
         {"class": AuditLogEntry, "json": []},
         {"class": Client, "json": []},
+        {"class": Matter, "json": []},
+        {"class": MatterNote, "json": []},
+        {"class": MatterDocument, "json": []},
     ]
 
 

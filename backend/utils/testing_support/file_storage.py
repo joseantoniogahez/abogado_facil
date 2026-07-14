@@ -10,8 +10,9 @@ class FakeFileStorage:
         self.objects: dict[tuple[str, str], bytes] = {}
 
     async def store(self, command: StoreFileCommand) -> StoredFileResult:
-        self.objects[(command.bucket, command.path)] = command.body
-        etag = md5(command.body, usedforsecurity=False).hexdigest()
+        body = command.body if isinstance(command.body, bytes) else command.body.read()
+        self.objects[(command.bucket, command.path)] = body
+        etag = md5(body, usedforsecurity=False).hexdigest()
         return StoredFileResult(bucket=command.bucket, path=command.path, etag=etag)
 
     async def stream(self, *, bucket: str, path: str) -> AsyncIterator[bytes]:

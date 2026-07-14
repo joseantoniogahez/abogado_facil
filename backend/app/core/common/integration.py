@@ -29,7 +29,7 @@ class StoreFileCommand(ApplicationSchema):
     bucket: str
     path: str
     content_type: str
-    body: bytes
+    body: Any
 
 
 class StoredFileResult(ApplicationSchema):

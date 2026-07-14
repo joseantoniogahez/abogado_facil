@@ -56,3 +56,7 @@ value is the account email; the product has no separate username identity.
 | `not_found`       | `404 Not Found`             |
 | `conflict`        | `409 Conflict`              |
 | `internal_error`  | `500 Internal Server Error` |
+
+Matter document uploads use `400 invalid_input` for unsupported, empty, oversized, or content-mismatched
+files; `409 conflict` when the per-matter quota is reached; opaque `404 not_found` for missing or foreign
+matters/documents; and `500 internal_error` for object-storage failures without provider details.

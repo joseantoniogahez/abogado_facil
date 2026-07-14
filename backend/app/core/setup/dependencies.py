@@ -3,7 +3,7 @@ from typing import Annotated, cast
 from fastapi import Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.config.settings import AuthSettings
+from app.core.config.settings import AuthSettings, MatterDocumentSettings, ObjectStorageSettings
 from app.core.db.database import get_async_session_factory
 from app.core.db.ports import UnitOfWorkPort
 from app.core.db.uow import UnitOfWork
@@ -15,6 +15,8 @@ from app.features.auth.service import AuthService, AuthServicePort
 from app.features.clients.repository import ClientsRepository
 from app.features.clients.service import ClientsService, ClientsServicePort
 from app.features.dashboard.service import DashboardService, DashboardServicePort
+from app.features.matter_documents.repository import MatterDocumentsRepository
+from app.features.matter_documents.service import MatterDocumentsService, MatterDocumentsServicePort
 from app.features.matter_notes.repository import MatterNotesRepository
 from app.features.matter_notes.service import MatterNotesService, MatterNotesServicePort
 from app.features.matters.repository import MattersRepository
@@ -94,6 +96,13 @@ async def get_matter_notes_repository(session: DbSessionDependency):
 MatterNotesRepositoryDependency = Annotated[MatterNotesRepository, Depends(get_matter_notes_repository)]
 
 
+async def get_matter_documents_repository(session: DbSessionDependency):
+    return MatterDocumentsRepository(session=session)
+
+
+MatterDocumentsRepositoryDependency = Annotated[MatterDocumentsRepository, Depends(get_matter_documents_repository)]
+
+
 async def get_rbac_repository(session: DbSessionDependency):
     return RBACRepository(session=session)
 
@@ -127,6 +136,20 @@ async def get_file_storage() -> FileStoragePort:
 
 
 FileStorageDependency = Annotated[FileStoragePort, Depends(get_file_storage)]
+
+
+async def get_object_storage_settings() -> ObjectStorageSettings:
+    return ObjectStorageSettings()
+
+
+ObjectStorageSettingsDependency = Annotated[ObjectStorageSettings, Depends(get_object_storage_settings)]
+
+
+async def get_matter_document_settings() -> MatterDocumentSettings:
+    return MatterDocumentSettings()
+
+
+MatterDocumentSettingsDependency = Annotated[MatterDocumentSettings, Depends(get_matter_document_settings)]
 
 
 async def get_password_service() -> PasswordServicePort:
@@ -224,6 +247,27 @@ async def get_matter_notes_service(
 
 
 MatterNotesServiceDependency = Annotated[MatterNotesServicePort, Depends(get_matter_notes_service)]
+
+
+async def get_matter_documents_service(
+    repository: MatterDocumentsRepositoryDependency,
+    matters_repository: MattersRepositoryDependency,
+    unit_of_work: UnitOfWorkDependency,
+    storage: FileStorageDependency,
+    storage_settings: ObjectStorageSettingsDependency,
+    settings: MatterDocumentSettingsDependency,
+) -> MatterDocumentsServicePort:
+    return MatterDocumentsService(
+        repository=repository,
+        matters_repository=matters_repository,
+        unit_of_work=unit_of_work,
+        storage=storage,
+        storage_settings=storage_settings,
+        settings=settings,
+    )
+
+
+MatterDocumentsServiceDependency = Annotated[MatterDocumentsServicePort, Depends(get_matter_documents_service)]
 
 
 async def get_outbox_service(
