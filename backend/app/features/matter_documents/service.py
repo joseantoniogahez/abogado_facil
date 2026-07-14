@@ -17,6 +17,7 @@ from app.features.matter_documents.models import MatterDocument
 from app.features.matter_documents.repository import MatterDocumentsRepository
 from app.features.matter_documents.schemas.api import DocumentType
 from app.integrations.files import FileStorageError, FileStoragePort
+from app.integrations.pdf_text import PdfTextExtractionError, PdfTextExtractorPort
 
 logger = logging.getLogger("app.matter_documents")
 _CHUNK_SIZE = 64 * 1024
@@ -51,6 +52,7 @@ class MatterDocumentsService:
         storage: FileStoragePort,
         storage_settings: ObjectStorageSettings,
         settings: MatterDocumentSettings,
+        pdf_text_extractor: PdfTextExtractorPort,
     ):
         self.repository = repository
         self.matters_repository = matters_repository
@@ -58,6 +60,19 @@ class MatterDocumentsService:
         self.storage = storage
         self.bucket = storage_settings.S3_BUCKET
         self.settings = settings
+        self.pdf_text_extractor = pdf_text_extractor
+
+    def _extract_text(self, body: BinaryIO, media_type: str) -> tuple[str, str | None]:
+        if media_type != "application/pdf":
+            return "not_applicable", None
+        try:
+            extracted_text = self.pdf_text_extractor.extract(body)
+        except PdfTextExtractionError:
+            logger.warning("event=matter_document_text_extraction_failed")
+            return "failed", None
+        if not extracted_text:
+            return "empty", None
+        return "available", extracted_text
 
     async def _require_matter(self, *, firm_id: int, matter_id: int) -> None:
         if await self.matters_repository.get_for_firm(matter_id=matter_id, firm_id=firm_id) is None:
@@ -128,6 +143,7 @@ class MatterDocumentsService:
         self, *, firm_id: int, matter_id: int, document_type: DocumentType, file: UploadFile
     ) -> MatterDocument:
         body, size, filename, media_type = await self._spool(file)
+        text_extraction_status, extracted_text = self._extract_text(body, media_type)
         document_id = str(uuid.uuid4())
         storage_key = f"firms/{firm_id}/matters/{matter_id}/{document_id}"
         stored = False
@@ -158,6 +174,8 @@ class MatterDocumentsService:
                     media_type=media_type,
                     size_bytes=size,
                     storage_key=storage_key,
+                    text_extraction_status=text_extraction_status,
+                    extracted_text=extracted_text,
                 )
         except Exception as exc:
             if stored:

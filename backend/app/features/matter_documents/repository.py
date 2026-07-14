@@ -23,6 +23,14 @@ class MatterDocumentsRepository(BaseRepository[MatterDocument]):
         )
         return (await self.session.execute(query)).scalar_one_or_none()
 
+    async def get_extracted_text(self, *, document_id: str, matter_id: int, firm_id: int) -> str | None:
+        query = select(MatterDocument.extracted_text).where(
+            MatterDocument.id == document_id,
+            MatterDocument.matter_id == matter_id,
+            MatterDocument.firm_id == firm_id,
+        )
+        return await self.session.scalar(query)
+
     async def list_for_matter(self, *, matter_id: int, firm_id: int) -> list[MatterDocument]:
         query = (
             select(MatterDocument)

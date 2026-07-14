@@ -186,6 +186,7 @@ repos:
           - fastapi==0.129.0
           - pydantic==2.12.5
           - pydantic-settings==2.13.0
+          - pypdf==6.6.2
           - PyJWT==2.10.1
           - pytest==9.0.2
           - sqlalchemy[mypy]==2.0.46

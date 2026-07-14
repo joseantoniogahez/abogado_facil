@@ -15,6 +15,7 @@ from app.features.matter_documents.router import _firm_id
 from app.features.matter_documents.schemas.api import DocumentType
 from app.features.matter_documents.service import MatterDocumentsService
 from app.integrations.files import FileStorageError
+from app.integrations.pdf_text import PdfTextExtractionError
 
 
 def _uow() -> MagicMock:
@@ -26,6 +27,8 @@ def _uow() -> MagicMock:
 
 def _service(*, max_size: int = 100, max_count: int = 50):
     repository, matters, storage = AsyncMock(), AsyncMock(), AsyncMock()
+    pdf_text_extractor = MagicMock()
+    pdf_text_extractor.extract.return_value = "Extracted text"
     matters.get_for_firm.return_value = object()
     repository.count_for_matter.return_value = 0
     return (
@@ -39,11 +42,25 @@ def _service(*, max_size: int = 100, max_count: int = 50):
                 MATTER_DOCUMENT_MAX_SIZE_BYTES=max_size,
                 MATTER_DOCUMENT_MAX_PER_MATTER=max_count,
             ),
+            pdf_text_extractor,
         ),
         repository,
         matters,
         storage,
     )
+
+
+def test_text_extraction_statuses_are_non_fatal() -> None:
+    service, _, _, _ = _service()
+    body = BytesIO(b"%PDF-1")
+
+    assert service._extract_text(body, "text/plain") == ("not_applicable", None)
+    service.pdf_text_extractor.extract.return_value = ""
+    assert service._extract_text(body, "application/pdf") == ("empty", None)
+    service.pdf_text_extractor.extract.return_value = "Extracted text"
+    assert service._extract_text(body, "application/pdf") == ("available", "Extracted text")
+    service.pdf_text_extractor.extract.side_effect = PdfTextExtractionError("private parser detail")
+    assert service._extract_text(body, "application/pdf") == ("failed", None)
 
 
 def _upload(name: str | None, body: bytes) -> UploadFile:
@@ -132,6 +149,18 @@ def test_upload_compensates_when_metadata_write_fails() -> None:
     asyncio.run(run())
 
 
+def test_upload_persists_pdf_extraction_result() -> None:
+    async def run() -> None:
+        service, repository, _, _ = _service()
+        await service.upload(
+            firm_id=1, matter_id=2, document_type=DocumentType.RECORD, file=_upload("ok.pdf", b"%PDF-1")
+        )
+        assert repository.create.await_args.kwargs["text_extraction_status"] == "available"
+        assert repository.create.await_args.kwargs["extracted_text"] == "Extracted text"
+
+    asyncio.run(run())
+
+
 def test_document_router_requires_a_firm() -> None:
     principal = CurrentPrincipal(
         id=1,
@@ -160,5 +189,19 @@ def test_repository_quota_lock_is_postgresql_only() -> None:
         statement, parameters = session.execute.await_args.args
         assert "pg_advisory_xact_lock" in str(statement)
         assert parameters == {"lock_key": (1 << 32) | 2}
+
+    asyncio.run(run())
+
+
+def test_repository_gets_extracted_text_with_full_scope() -> None:
+    async def run() -> None:
+        session = MagicMock()
+        session.scalar = AsyncMock(return_value="Scoped text")
+        repository = MatterDocumentsRepository(session)
+        assert await repository.get_extracted_text(document_id="doc", matter_id=2, firm_id=1) == "Scoped text"
+        query = str(session.scalar.await_args.args[0])
+        assert "matter_documents.id" in query
+        assert "matter_documents.matter_id" in query
+        assert "matter_documents.firm_id" in query
 
     asyncio.run(run())

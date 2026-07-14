@@ -23,6 +23,14 @@ Current top-level shape:
 - Automated tests replace the storage dependency with the in-memory adapter or inject a mocked S3 client;
   they never require a reachable object-storage service.
 
+## PDF text extraction port and adapter
+
+- `app/integrations/pdf_text.py` owns `PdfTextExtractorPort` and the local `pypdf` adapter.
+- The matter-document service invokes the port only for validated PDFs and persists normalized text.
+- Empty text layers and parser failures are explicit, non-fatal states; OCR and external providers
+  are outside this adapter.
+- Parser exceptions are wrapped and never expose document content or parser details through the API.
+
 ## Ownership
 
 `app/core` owns cross-feature concerns only:

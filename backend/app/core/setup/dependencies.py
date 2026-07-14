@@ -26,6 +26,7 @@ from app.features.outbox.service import OutboxService, OutboxServicePort
 from app.features.rbac.repository import RBACRepository
 from app.features.rbac.service import RBACService, RBACServicePort
 from app.integrations.files import FileStoragePort
+from app.integrations.pdf_text import PdfTextExtractorPort, PyPdfTextExtractor
 from app.integrations.s3 import S3FileStorage
 
 PermissionScopeCache = dict[tuple[int, str], str | None]
@@ -136,6 +137,13 @@ async def get_file_storage() -> FileStoragePort:
 
 
 FileStorageDependency = Annotated[FileStoragePort, Depends(get_file_storage)]
+
+
+async def get_pdf_text_extractor() -> PdfTextExtractorPort:
+    return PyPdfTextExtractor()
+
+
+PdfTextExtractorDependency = Annotated[PdfTextExtractorPort, Depends(get_pdf_text_extractor)]
 
 
 async def get_object_storage_settings() -> ObjectStorageSettings:
@@ -256,6 +264,7 @@ async def get_matter_documents_service(
     storage: FileStorageDependency,
     storage_settings: ObjectStorageSettingsDependency,
     settings: MatterDocumentSettingsDependency,
+    pdf_text_extractor: PdfTextExtractorDependency,
 ) -> MatterDocumentsServicePort:
     return MatterDocumentsService(
         repository=repository,
@@ -264,6 +273,7 @@ async def get_matter_documents_service(
         storage=storage,
         storage_settings=storage_settings,
         settings=settings,
+        pdf_text_extractor=pdf_text_extractor,
     )
 
 

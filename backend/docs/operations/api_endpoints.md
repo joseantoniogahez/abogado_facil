@@ -128,3 +128,13 @@ This table classifies each `GET` endpoint as `public`, `authenticated`, or `perm
 - `GET /v1/audit-log` returns the most recent audit log entries for administrator review.
 - Access requires `audit_logs:read`.
 - The current feature exposes existing audit rows only; automatic event capture is intentionally out of scope.
+
+### Matter document text extraction
+
+- Validated PDF uploads are parsed locally and their normalized text is persisted for future backend
+  AI workflows; extraction does not trigger an AI analysis.
+- PDFs without a text layer remain stored with state `empty`; parser failures remain stored with
+  state `failed`. No OCR is attempted.
+- Existing documents use `unprocessed`, while DOCX and TXT uploads use `not_applicable`.
+- Extracted text and extraction state are internal metadata and do not change
+  `MatterDocumentResponse` or the public document endpoint shapes.

@@ -74,6 +74,11 @@ Features consume `FileStoragePort`; provider code is isolated in `app/integratio
 use a test-only `FakeFileStorage` or a mocked SDK client without Docker or network access. No feature should
 import `boto3` directly.
 
+PDF uploads are parsed locally through `PdfTextExtractorPort`. When a text layer is available, its
+normalized content is stored with the document metadata for future AI workflows. Scanned PDFs are
+kept with an `empty` extraction state and are not sent through OCR; parser failures are non-fatal and
+record `failed`. Existing documents remain `unprocessed`, and non-PDF files are `not_applicable`.
+
 Repository-level Docker Compose uses `.env` values from `.env_examples` and runs the backend against PostgreSQL by default (`DB_TYPE=postgresql+asyncpg`, `DB_HOST=abogado_facil_db`, `DB_NAME=abogado_facil_main`).
 
 For network databases, set:
