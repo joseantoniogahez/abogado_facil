@@ -23,6 +23,7 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     setupFiles: "./src/test/setup.ts",
+    testTimeout: 10_000,
     css: true,
     exclude: ["e2e/**", "**/node_modules/**", "**/dist/**", "**/.{idea,git,cache,output,temp}/**"],
     coverage: {

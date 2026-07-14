@@ -53,6 +53,7 @@ test.describe("frontend foundation smoke", () => {
       updated_at: "2026-07-12T10:00:00Z",
     };
     let notes: Record<string, unknown>[] = [];
+    let documents: Record<string, unknown>[] = [];
     await page.route("**/v1/**", async (route) => {
       const request = route.request();
       const method = request.method();
@@ -85,6 +86,24 @@ test.describe("frontend foundation smoke", () => {
         await route.fulfill({ status: 204 });
         return;
       }
+      if (method === "GET" && pathname === "/v1/matters/3/documents") {
+        await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ items: documents, total: documents.length }) });
+        return;
+      }
+      if (method === "POST" && pathname === "/v1/matters/3/documents") {
+        documents = [{ id: "doc-7", matter_id: 3, original_filename: "relato.txt", document_type: "evidence", media_type: "text/plain", size_bytes: 18, created_at: matter.created_at }];
+        await route.fulfill({ status: 201, contentType: "application/json", body: JSON.stringify(documents[0]) });
+        return;
+      }
+      if (method === "GET" && pathname === "/v1/matters/3/documents/doc-7/download") {
+        await route.fulfill({ status: 200, contentType: "text/plain", headers: { "Content-Disposition": "attachment; filename*=UTF-8''relato.txt" }, body: "Relato del cliente" });
+        return;
+      }
+      if (method === "DELETE" && pathname === "/v1/matters/3/documents/doc-7") {
+        documents = [];
+        await route.fulfill({ status: 204 });
+        return;
+      }
       throw new Error(`Unhandled API request in matter note smoke: ${method} ${pathname}`);
     });
 
@@ -101,6 +120,16 @@ test.describe("frontend foundation smoke", () => {
     page.once("dialog", (dialog) => void dialog.accept());
     await page.getByRole("button", { name: t("matterNotes.delete") }).click();
     await expect(page.getByText(t("matterNotes.empty"))).toBeVisible();
+    await page.getByLabel(t("matterDocuments.type")).selectOption("evidence");
+    await page.getByLabel(t("matterDocuments.file")).setInputFiles({ name: "relato.txt", mimeType: "text/plain", buffer: Buffer.from("Relato del cliente") });
+    await page.getByRole("button", { name: t("matterDocuments.upload") }).click();
+    await expect(page.getByText("relato.txt")).toBeVisible();
+    const download = page.waitForEvent("download");
+    await page.getByRole("button", { name: t("matterDocuments.download") }).click();
+    expect((await download).suggestedFilename()).toBe("relato.txt");
+    page.once("dialog", (dialog) => void dialog.accept());
+    await page.getByRole("button", { name: t("matterDocuments.delete") }).click();
+    await expect(page.getByText(t("matterDocuments.empty"))).toBeVisible();
   });
 
   test("navigates to register and completes the registration flow", async ({

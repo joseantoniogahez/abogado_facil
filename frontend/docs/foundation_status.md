@@ -7,7 +7,7 @@ This document replaces backlog-style historical tracking for frontend foundation
 
 ## Current Foundation Snapshot
 
-Status date: `2026-05-01`
+Status date: `2026-07-14`
 
 - Foundation maturity: `ready for feature delivery`.
 - Architecture baseline enforced:
@@ -23,6 +23,9 @@ Status date: `2026-05-01`
   - Accessibility baseline gate.
   - Performance budget gate.
   - E2E smoke baseline for auth/routing/error journeys.
+
+The JavaScript budget is `836000` raw bytes and `247000` gzip bytes after the owner-approved
+CORE-010 capacity increase; enforcement and route-level/dependency review remain mandatory.
 
 ## Active Guardrails
 

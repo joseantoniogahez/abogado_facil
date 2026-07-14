@@ -81,6 +81,7 @@ Frontend URL: `http://localhost:3000`
 - `/admin/permissions`: authenticated RBAC role-permission assignments
 - `/admin/users`: authenticated RBAC user administration
 - `/admin/roles`: authenticated RBAC role and permission administration
+- `/matters/:matterId`: authenticated matter detail with notes and document management
 
 ## Testing and Quality Gates
 

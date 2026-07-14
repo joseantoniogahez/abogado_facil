@@ -52,6 +52,13 @@ The gate evaluates production artifacts in `dist/assets`:
 - The owner explicitly approved the CORE-003 adjustment on 2026-07-12. Limits are now `418000` raw
   JS bytes, `123500` gzip JS bytes, and `21200` raw CSS bytes, retaining `389`, `656`, and `131`
   bytes of headroom respectively. The CSS gzip limit remains `6000`.
+- CORE-010 adds multipart document upload, authenticated binary download, metadata listing,
+  confirmed deletion, accessible states, and no new dependency. Its measured baseline is `425052`
+  total raw JS bytes and `124429` total gzip JS bytes; the matters route remains lazy-loaded.
+- On 2026-07-14 the owner explicitly approved doubling the JavaScript limits to provide deliberate
+  capacity for the remaining product backlog. Limits are now `836000` raw bytes and `247000` gzip
+  bytes. This capacity decision does not waive route-level lazy loading, dependency review, bundle
+  impact assessment, or the enforced build gate. CSS limits remain unchanged.
 
 ## Commands
 

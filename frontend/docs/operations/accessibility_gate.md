@@ -8,11 +8,13 @@ This document defines the automated accessibility quality gate for foundation ro
 - Login route (`/login`)
 - Dashboard (`/dashboard`) and protected error state for session validation failure.
 - Selected admin routes, including users, assignments, permissions, and audit log.
+- Matter document empty/form/list states through the focused component axe test.
 
 ## Automation Contract
 
 - Baseline test file: `src/app/accessibility.routes.test.tsx`.
 - Shared AI notice test: `src/shared/ui/AiGeneratedContentNotice.test.tsx`.
+- Matter documents test: `src/features/matters/matter-documents/MatterDocuments.test.tsx`.
 - Engine: `axe-core` running inside the frontend Vitest workflow.
 - Violations fail the test suite and therefore fail `npm --prefix frontend run check`.
 

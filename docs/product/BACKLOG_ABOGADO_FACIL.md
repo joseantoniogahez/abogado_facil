@@ -74,7 +74,7 @@ decisiones, avance, pausas, validaciones y cierre se registran en el plan corres
 | CORE-007 | Full-stack | P1        | Identificado | Tareas y recordatorios simples.               | Tareas por asunto con fecha límite y estado completado.                                  |
 | CORE-008 | Full-stack | P1        | Identificado | Control básico de pagos.                      | Honorarios, anticipos, pagos parciales, saldo y notas.                                   |
 | CORE-009 | Full-stack | P1        | Identificado | Calculadoras básicas sin IA.                  | Cálculos copiables y guardables en asunto con advertencia de estimación.                 |
-| CORE-010 | Frontend   | P1        | Identificado | Interfaz de documentos de expediente.         | Cargar, listar, descargar y eliminar documentos desde el detalle del asunto.             |
+| CORE-010 | Frontend   | P1        | Hecho        | Interfaz de documentos de expediente.         | Cargar, listar, descargar y eliminar documentos desde el detalle del asunto.             |
 
 ## Fase 2 - BYOK y Capa de IA
 

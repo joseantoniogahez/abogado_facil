@@ -13,6 +13,7 @@ This document defines deterministic mutation retry and invalidation behavior by 
 | Profile update mutation    | No retry                                         | Write returned profile through `SESSION_QUERY_KEY`     |
 | Client/matter mutation     | Default mutation policy                          | Explicit domain list/detail and dashboard invalidation |
 | Matter note mutation       | Default mutation policy                          | Invalidate only the note list for its matter           |
+| Matter document mutation   | Default mutation policy                          | Invalidate only the document list for its matter       |
 
 ## Implementation References
 
@@ -22,6 +23,7 @@ This document defines deterministic mutation retry and invalidation behavior by 
 - Registration mutation consumer: `src/features/auth/RegisterPage.tsx`
 - Profile mutation consumer: `src/features/profile/ProfilePage.tsx`
 - Logout mutation consumer: `src/shared/routing/RootLayout.tsx`
+- Matter document mutations: `src/features/matters/matter-documents/api.ts`
 
 ## Failure Behavior Contract
 

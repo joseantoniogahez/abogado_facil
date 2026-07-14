@@ -11,6 +11,11 @@ type RequestOptions<T> = Omit<RequestInit, "headers"> & {
   parse?: ResponseParser<T>;
 };
 
+export interface ApiBlobResponse {
+  blob: Blob;
+  contentDisposition: string | null;
+}
+
 export const apiRequest = async <T>(path: string, options: RequestOptions<T> = {}): Promise<T> => {
   const { withAuth = true, headers, parse, ...init } = options;
   const requestHeaders = new Headers(headers ?? {});
@@ -72,4 +77,47 @@ export const apiRequest = async <T>(path: string, options: RequestOptions<T> = {
   }
 
   return payload as T;
+};
+
+export const apiBlobRequest = async (
+  path: string,
+  options: Omit<RequestOptions<never>, "parse"> = {},
+): Promise<ApiBlobResponse> => {
+  const { withAuth = true, headers, ...init } = options;
+  const requestHeaders = new Headers(headers ?? {});
+  if (withAuth) {
+    const token = getAccessToken();
+    if (token) requestHeaders.set("Authorization", `Bearer ${token}`);
+  }
+
+  const method = init.method ?? "GET";
+  let response: Response;
+  try {
+    response = await fetch(buildApiUrl(path), { ...init, headers: requestHeaders });
+  } catch {
+    const error = new ApiError("Error de comunicacion con el servidor", 0, "network_error");
+    emitObservabilityEvent({
+      event_name: "api.request.network_error",
+      level: "error",
+      context: { method, path, code: error.code },
+    });
+    throw error;
+  }
+
+  if (!response.ok) {
+    const error = await parseApiError(response);
+    if (withAuth && error.status === 401) clearAccessToken();
+    emitObservabilityEvent({
+      event_name: "api.request.response_error",
+      level: "error",
+      request_id: error.requestId ?? null,
+      context: { method, path, status: error.status, code: error.code },
+    });
+    throw error;
+  }
+
+  return {
+    blob: await response.blob(),
+    contentDisposition: response.headers.get("Content-Disposition"),
+  };
 };
