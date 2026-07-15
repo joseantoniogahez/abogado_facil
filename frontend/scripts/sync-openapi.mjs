@@ -23,7 +23,7 @@ const execute = (command, args) =>
   spawnSync(command, args, {
     cwd: BACKEND_DIR,
     encoding: "utf8",
-    env: process.env,
+    env: { ...process.env, PYTHONIOENCODING: "utf-8" },
   });
 
 const runPythonExport = () => {

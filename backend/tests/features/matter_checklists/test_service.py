@@ -15,6 +15,8 @@ from app.features.matter_checklists.templates import checklist_for, normalize_ma
 def test_templates_normalize_accents_and_supported_types() -> None:
     assert normalize_matter_type("  Pensión / alimenticia ") == "pension alimenticia"
     assert checklist_for("Pensión alimenticia")
+    assert checklist_for("Divorcio básico")[0] == "Acta de matrimonio"
+    assert checklist_for("Otro") == ()
     assert checklist_for("Tipo libre") == ()
 
 

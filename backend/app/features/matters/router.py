@@ -3,12 +3,20 @@ from typing import Annotated
 from fastapi import APIRouter, Query, status
 
 from app.core.authorization.dependencies import AuthenticatedReadAccessDependency
+from app.core.common.matter_types import MatterType
 from app.core.setup.dependencies import MattersServiceDependency
-from app.features.matters.openapi import CREATE_MATTER_DOC, GET_MATTER_DOC, LIST_MATTERS_DOC, UPDATE_MATTER_DOC
+from app.features.matters.openapi import (
+    CREATE_MATTER_DOC,
+    GET_MATTER_DOC,
+    LIST_MATTER_TYPES_DOC,
+    LIST_MATTERS_DOC,
+    UPDATE_MATTER_DOC,
+)
 from app.features.matters.schemas.api import (
     CreateMatterRequest,
     MatterListResponse,
     MatterResponse,
+    MatterTypeResponse,
     UpdateMatterRequest,
 )
 
@@ -19,6 +27,11 @@ def _firm_id(user: AuthenticatedReadAccessDependency) -> int:
     if user.firm_id is None:
         raise ValueError("Authenticated matter users must belong to a firm")
     return user.firm_id
+
+
+@router.get("/types", response_model=list[MatterTypeResponse], **LIST_MATTER_TYPES_DOC)
+async def list_matter_types(user: AuthenticatedReadAccessDependency):
+    return [MatterTypeResponse(value=matter_type) for matter_type in MatterType]
 
 
 @router.post("", response_model=MatterResponse, status_code=status.HTTP_201_CREATED, **CREATE_MATTER_DOC)

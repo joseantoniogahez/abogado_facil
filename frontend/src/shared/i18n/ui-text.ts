@@ -65,6 +65,8 @@ export const ES_MESSAGES = {
   "matters.fields.status": "Estado",
   "matters.fields.title": "Título",
   "matters.fields.type": "Tipo de asunto",
+  "matters.fields.typePlaceholder": "Selecciona un tipo",
+  "matters.fields.typeError": "No fue posible cargar los tipos de asunto.",
   "matters.loading": "Cargando asuntos...",
   "matters.new": "Nuevo asunto",
   "matters.next": "Próxima acción",

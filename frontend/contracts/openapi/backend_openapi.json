@@ -652,10 +652,7 @@
             "title": "Description"
           },
           "matter_type": {
-            "maxLength": 100,
-            "minLength": 1,
-            "title": "Matter Type",
-            "type": "string"
+            "$ref": "#/components/schemas/MatterType"
           },
           "next_action": {
             "anyOf": [
@@ -992,14 +989,12 @@
       "MatterResponse": {
         "properties": {
           "client_id": {
-            "exclusiveMinimum": 0,
             "title": "Client Id",
             "type": "integer"
           },
           "counterparty": {
             "anyOf": [
               {
-                "maxLength": 255,
                 "type": "string"
               },
               {
@@ -1016,7 +1011,6 @@
           "description": {
             "anyOf": [
               {
-                "maxLength": 10000,
                 "type": "string"
               },
               {
@@ -1030,15 +1024,12 @@
             "type": "integer"
           },
           "matter_type": {
-            "maxLength": 100,
-            "minLength": 1,
             "title": "Matter Type",
             "type": "string"
           },
           "next_action": {
             "anyOf": [
               {
-                "maxLength": 500,
                 "type": "string"
               },
               {
@@ -1060,7 +1051,6 @@
             "title": "Next Action Date"
           },
           "status": {
-            "default": "active",
             "enum": [
               "active",
               "pending",
@@ -1070,8 +1060,6 @@
             "type": "string"
           },
           "title": {
-            "maxLength": 255,
-            "minLength": 1,
             "title": "Title",
             "type": "string"
           },
@@ -1082,14 +1070,45 @@
           }
         },
         "required": [
+          "id",
           "client_id",
           "title",
           "matter_type",
-          "id",
+          "status",
+          "counterparty",
+          "description",
+          "next_action",
+          "next_action_date",
           "created_at",
           "updated_at"
         ],
         "title": "MatterResponse",
+        "type": "object"
+      },
+      "MatterType": {
+        "enum": [
+          "Pensión alimenticia",
+          "Divorcio básico",
+          "Despido / asunto laboral inicial",
+          "Cobro de deuda",
+          "Convenio de pago",
+          "Arrendamiento",
+          "Sucesorio básico",
+          "Otro"
+        ],
+        "title": "MatterType",
+        "type": "string"
+      },
+      "MatterTypeResponse": {
+        "properties": {
+          "value": {
+            "$ref": "#/components/schemas/MatterType"
+          }
+        },
+        "required": [
+          "value"
+        ],
+        "title": "MatterTypeResponse",
         "type": "object"
       },
       "RBACPermission": {
@@ -1584,15 +1603,12 @@
           "matter_type": {
             "anyOf": [
               {
-                "maxLength": 100,
-                "minLength": 1,
-                "type": "string"
+                "$ref": "#/components/schemas/MatterType"
               },
               {
                 "type": "null"
               }
-            ],
-            "title": "Matter Type"
+            ]
           },
           "next_action": {
             "anyOf": [
@@ -3139,6 +3155,37 @@
           }
         ],
         "summary": "Create matter",
+        "tags": [
+          "matters"
+        ]
+      }
+    },
+    "/v1/matters/types": {
+      "get": {
+        "description": "Returns the immutable canonical matter type catalog.",
+        "operationId": "list_matter_types_v1_matters_types_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MatterTypeResponse"
+                  },
+                  "title": "Response List Matter Types V1 Matters Types Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "List matter types",
         "tags": [
           "matters"
         ]

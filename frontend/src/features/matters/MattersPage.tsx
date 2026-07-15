@@ -16,6 +16,7 @@ import {
 } from "react-router-dom";
 import {
   createMatter,
+  matterTypesQueryOptions,
   matterQueryOptions,
   MATTERS_QUERY_KEY,
   mattersQueryOptions,
@@ -181,9 +182,16 @@ const MatterForm = ({ initial }: { initial?: MatterRecord }) => {
     initial ?? { ...empty, client_id: Number(params.get("clientId")) || 0 },
   );
   const [validation, setValidation] = useState(false);
+  const matterTypes = useQuery(matterTypesQueryOptions());
   const mutation = useMutation({
-    mutationFn: (payload: MatterInput) =>
-      initial ? updateMatter(initial.id, payload) : createMatter(payload),
+    mutationFn: (payload: MatterInput) => {
+      if (!initial) return createMatter(payload);
+      if (payload.matter_type !== initial.matter_type)
+        return updateMatter(initial.id, payload);
+      const changedPayload: Partial<MatterInput> = { ...payload };
+      delete changedPayload.matter_type;
+      return updateMatter(initial.id, changedPayload);
+    },
     onSuccess: async (record) => {
       await Promise.all([
         qc.invalidateQueries({ queryKey: MATTERS_QUERY_KEY }),
@@ -225,7 +233,22 @@ const MatterForm = ({ initial }: { initial?: MatterRecord }) => {
         onChange={(clientId) => setForm({ ...form, client_id: clientId })}
       />
       {input("title", t("matters.fields.title"))}
-      {input("matter_type", t("matters.fields.type"))}
+      <label className="font-medium">
+        {t("matters.fields.type")}
+        <select
+          className="mt-1 w-full rounded-xl border p-3"
+          disabled={matterTypes.isPending || matterTypes.isError}
+          value={form.matter_type}
+          onChange={(event) => setForm({ ...form, matter_type: event.target.value })}
+        >
+          <option value="">{t("matters.fields.typePlaceholder")}</option>
+          {initial && !matterTypes.data?.some(({ value }) => value === initial.matter_type) ? (
+            <option value={initial.matter_type} disabled>{initial.matter_type}</option>
+          ) : null}
+          {matterTypes.data?.map(({ value }) => <option key={value} value={value}>{value}</option>)}
+        </select>
+      </label>
+      {matterTypes.isError ? <p role="alert">{t("matters.fields.typeError")}</p> : null}
       <label>
         {t("matters.fields.status")}
         <select

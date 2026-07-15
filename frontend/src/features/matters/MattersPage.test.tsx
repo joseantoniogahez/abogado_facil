@@ -6,13 +6,19 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { describe, expect, it, vi } from "vitest";
 import { MatterDetailPage, MatterList, NewMatterPage } from "./MattersPage";
-import { parseMatter, parseMatterList } from "./contracts";
+import { parseMatter, parseMatterList, parseMatterTypes } from "./contracts";
+
+const matterTypes = [
+  { value: "Pensión alimenticia" },
+  { value: "Divorcio básico" },
+  { value: "Otro" },
+];
 
 const matter = {
   id: 1,
   client_id: 2,
   title: "Pensión",
-  matter_type: "Familiar",
+  matter_type: "Pensión alimenticia",
   status: "active",
   counterparty: null,
   description: null,
@@ -36,6 +42,12 @@ describe("matter contracts", () => {
     expect(() =>
       parseMatterList({ items: null, total: 0, limit: 50, offset: 0 }),
     ).toThrow();
+    expect(() => parseMatterTypes({ items: [] })).toThrow();
+    expect(() => parseMatterTypes([{}])).toThrow();
+  });
+
+  it("parses the immutable matter type catalog", () => {
+    expect(parseMatterTypes(matterTypes)).toEqual(matterTypes);
   });
 });
 
@@ -79,7 +91,11 @@ const renderMatterRoute = (
   path: string,
   fetchMock: ReturnType<typeof vi.fn>,
 ) => {
-  vi.stubGlobal("fetch", fetchMock);
+  vi.stubGlobal("fetch", (url: string, options?: RequestInit) =>
+    String(url).includes("/matters/types")
+      ? Promise.resolve(response(matterTypes))
+      : (fetchMock(url, options) as Promise<Partial<Response>>),
+  );
   const queryClient = createQueryClient();
   queryClient.setQueryDefaults(["clients"], { retry: false });
   queryClient.setQueryDefaults(["matters"], { retry: false });
@@ -166,9 +182,9 @@ describe("matter client selector", () => {
       screen.getByLabelText(t("matters.fields.title")),
       "Divorcio",
     );
-    await user.type(
+    await user.selectOptions(
       screen.getByLabelText(t("matters.fields.type")),
-      "Familiar",
+      "Pensión alimenticia",
     );
     await user.click(screen.getByRole("button", { name: t("matters.save") }));
     await waitFor(() =>

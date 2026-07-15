@@ -7,7 +7,7 @@ from pydantic import ValidationError
 from app.core.errors.services import NotFoundError
 from app.features.auth.principal import CurrentPrincipal
 from app.features.matters.router import _firm_id
-from app.features.matters.schemas.api import CreateMatterRequest, UpdateMatterRequest
+from app.features.matters.schemas.api import CreateMatterRequest, MatterResponse, UpdateMatterRequest
 from app.features.matters.service import MattersService
 
 
@@ -24,7 +24,7 @@ def test_service_validates_client_and_updates() -> None:
         service, repository, clients = _service()
         clients.get_for_firm.return_value = object()
         repository.create.return_value = object()
-        await service.create(firm_id=1, payload=CreateMatterRequest(client_id=2, title=" Civil ", matter_type="Civil"))
+        await service.create(firm_id=1, payload=CreateMatterRequest(client_id=2, title=" Civil ", matter_type="Otro"))
         repository.create.assert_awaited_once()
         repository.get_for_firm.return_value = None
         with pytest.raises(NotFoundError):
@@ -38,7 +38,23 @@ def test_service_validates_client_and_updates() -> None:
 
 def test_matter_schema_rejects_invalid_changes() -> None:
     with pytest.raises(ValidationError):
-        CreateMatterRequest(client_id=1, title=" ", matter_type="Civil")
+        CreateMatterRequest(client_id=1, title=" ", matter_type="Otro")
+    with pytest.raises(ValidationError):
+        CreateMatterRequest(client_id=1, title="Civil", matter_type="Civil")
+    legacy = MatterResponse(
+        id=1,
+        client_id=1,
+        title="Legado",
+        matter_type="Civil histórico",
+        status="active",
+        counterparty=None,
+        description=None,
+        next_action=None,
+        next_action_date=None,
+        created_at="2026-07-15T00:00:00Z",
+        updated_at="2026-07-15T00:00:00Z",
+    )
+    assert legacy.matter_type == "Civil histórico"
     with pytest.raises(ValidationError):
         UpdateMatterRequest()
     principal = CurrentPrincipal(

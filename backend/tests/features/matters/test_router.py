@@ -17,7 +17,12 @@ def test_matter_crud_and_firm_isolation(mock_client: TestClient) -> None:
     created = mock_client.post(
         "/v1/matters",
         headers=reader,
-        json={"client_id": client_id, "title": "Pensión", "matter_type": "Familiar", "next_action": "Pedir actas"},
+        json={
+            "client_id": client_id,
+            "title": "Pensión",
+            "matter_type": "Pensión alimenticia",
+            "next_action": "Pedir actas",
+        },
     )
     assert created.status_code == HTTPStatus.CREATED
     matter_id = created.json()["id"]
@@ -30,7 +35,7 @@ def test_matter_crud_and_firm_isolation(mock_client: TestClient) -> None:
     assert mock_client.get(f"/v1/matters/{matter_id}", headers=admin).status_code == HTTPStatus.NOT_FOUND
     assert (
         mock_client.post(
-            "/v1/matters", headers=admin, json={"client_id": client_id, "title": "Ajeno", "matter_type": "Civil"}
+            "/v1/matters", headers=admin, json={"client_id": client_id, "title": "Ajeno", "matter_type": "Otro"}
         ).status_code
         == HTTPStatus.NOT_FOUND
     )
@@ -42,6 +47,16 @@ def test_matters_require_auth_and_validate_payload(mock_client: TestClient) -> N
     assert (
         mock_client.post(
             "/v1/matters", headers=headers, json={"client_id": 1, "title": "", "matter_type": ""}
+        ).status_code
+        == HTTPStatus.BAD_REQUEST
+    )
+    assert mock_client.get("/v1/matters/types").status_code == HTTPStatus.UNAUTHORIZED
+    catalog = mock_client.get("/v1/matters/types", headers=headers)
+    assert catalog.status_code == HTTPStatus.OK
+    assert [item["value"] for item in catalog.json()][-1] == "Otro"
+    assert (
+        mock_client.post(
+            "/v1/matters", headers=headers, json={"client_id": 1, "title": "Civil", "matter_type": "Civil"}
         ).status_code
         == HTTPStatus.BAD_REQUEST
     )

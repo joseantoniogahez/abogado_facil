@@ -15,7 +15,7 @@ def _matter(client: TestClient, headers: dict[str, str]) -> int:
     return client.post(
         "/v1/matters",
         headers=headers,
-        json={"client_id": client_id, "title": "Document case", "matter_type": "Civil"},
+        json={"client_id": client_id, "title": "Document case", "matter_type": "Otro"},
     ).json()["id"]
 
 

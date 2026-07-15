@@ -7,6 +7,8 @@ This document defines how frontend API contract artifacts stay synchronized with
 - Source of truth runtime schema: backend FastAPI OpenAPI output (`app.openapi()`).
 - Frontend artifact path: `frontend/contracts/openapi/backend_openapi.json`.
 - Artifact format: stable, sorted JSON (deterministic for review diffs).
+- The exporter forces Python stdout to UTF-8 so non-ASCII contract text remains lossless across
+  Windows and POSIX environments.
 
 ## Commands
 

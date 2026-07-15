@@ -28,6 +28,7 @@ All routes are versioned under `/v1`.
 | `PATCH`  | `/v1/clients/{client_id}`                                  | Yes  | No                        | Path `client_id` + JSON `UpdateClientRequest`           | `200` `ClientResponse`             | `400`, `401`, `404`, `500`               |
 | `POST`   | `/v1/matters`                                              | Yes  | No                        | JSON `CreateMatterRequest`                              | `201` `MatterResponse`             | `400`, `401`, `404`, `500`               |
 | `GET`    | `/v1/matters`                                              | Yes  | No                        | Query `client_id`, `limit`, `offset`                    | `200` `MatterListResponse`         | `400`, `401`, `404`, `500`               |
+| `GET`    | `/v1/matters/types`                                        | Yes  | No                        | No body                                                 | `200` `MatterTypeResponse[]`       | `401`, `500`                             |
 | `GET`    | `/v1/matters/{matter_id}`                                  | Yes  | No                        | Path `matter_id`                                        | `200` `MatterResponse`             | `400`, `401`, `404`, `500`               |
 | `PATCH`  | `/v1/matters/{matter_id}`                                  | Yes  | No                        | Path `matter_id` + JSON `UpdateMatterRequest`           | `200` `MatterResponse`             | `400`, `401`, `404`, `500`               |
 | `POST`   | `/v1/matters/{matter_id}/notes`                            | Yes  | No                        | JSON `CreateMatterNoteRequest`                          | `201` `MatterNoteResponse`         | `400`, `401`, `404`, `500`               |
@@ -75,6 +76,7 @@ This table classifies each `GET` endpoint as `public`, `authenticated`, or `perm
 | `GET`  | `/v1/clients`                                              | `authenticated` | No                        |
 | `GET`  | `/v1/clients/{client_id}`                                  | `authenticated` | No                        |
 | `GET`  | `/v1/matters`                                              | `authenticated` | No                        |
+| `GET`  | `/v1/matters/types`                                        | `authenticated` | No                        |
 | `GET`  | `/v1/matters/{matter_id}`                                  | `authenticated` | No                        |
 | `GET`  | `/v1/matters/{matter_id}/notes`                            | `authenticated` | No                        |
 | `GET`  | `/v1/matters/{matter_id}/checklist`                        | `authenticated` | No                        |

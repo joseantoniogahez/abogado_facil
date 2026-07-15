@@ -83,6 +83,7 @@ This table is contract-checked by `tests/routers/test_authorization_policy_cover
 | `GET`  | `/v1/clients`                                              | `authenticated` | No                        |
 | `GET`  | `/v1/clients/{client_id}`                                  | `authenticated` | No                        |
 | `GET`  | `/v1/matters`                                              | `authenticated` | No                        |
+| `GET`  | `/v1/matters/types`                                        | `authenticated` | No                        |
 | `GET`  | `/v1/matters/{matter_id}`                                  | `authenticated` | No                        |
 | `GET`  | `/v1/matters/{matter_id}/notes`                            | `authenticated` | No                        |
 | `GET`  | `/v1/matters/{matter_id}/checklist`                        | `authenticated` | No                        |

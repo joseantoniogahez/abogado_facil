@@ -15,7 +15,7 @@ def test_matter_note_crud_and_firm_isolation(mock_client: TestClient) -> None:
         "/v1/clients", headers=reader, json={"full_name": "Ana", "phone": "5512345678"}
     ).json()["id"]
     matter_id = mock_client.post(
-        "/v1/matters", headers=reader, json={"client_id": client_id, "title": "Civil", "matter_type": "Civil"}
+        "/v1/matters", headers=reader, json={"client_id": client_id, "title": "Civil", "matter_type": "Otro"}
     ).json()["id"]
     created = mock_client.post(
         f"/v1/matters/{matter_id}/notes", headers=reader, json={"content": "  Llamada inicial  "}
