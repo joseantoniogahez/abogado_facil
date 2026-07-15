@@ -15,6 +15,8 @@ from app.features.auth.service import AuthService, AuthServicePort
 from app.features.clients.repository import ClientsRepository
 from app.features.clients.service import ClientsService, ClientsServicePort
 from app.features.dashboard.service import DashboardService, DashboardServicePort
+from app.features.matter_checklists.repository import MatterChecklistsRepository
+from app.features.matter_checklists.service import MatterChecklistsService, MatterChecklistsServicePort
 from app.features.matter_documents.repository import MatterDocumentsRepository
 from app.features.matter_documents.service import MatterDocumentsService, MatterDocumentsServicePort
 from app.features.matter_notes.repository import MatterNotesRepository
@@ -95,6 +97,13 @@ async def get_matter_notes_repository(session: DbSessionDependency):
 
 
 MatterNotesRepositoryDependency = Annotated[MatterNotesRepository, Depends(get_matter_notes_repository)]
+
+
+async def get_matter_checklists_repository(session: DbSessionDependency):
+    return MatterChecklistsRepository(session=session)
+
+
+MatterChecklistsRepositoryDependency = Annotated[MatterChecklistsRepository, Depends(get_matter_checklists_repository)]
 
 
 async def get_matter_documents_repository(session: DbSessionDependency):
@@ -255,6 +264,19 @@ async def get_matter_notes_service(
 
 
 MatterNotesServiceDependency = Annotated[MatterNotesServicePort, Depends(get_matter_notes_service)]
+
+
+async def get_matter_checklists_service(
+    repository: MatterChecklistsRepositoryDependency,
+    matters_repository: MattersRepositoryDependency,
+    unit_of_work: UnitOfWorkDependency,
+) -> MatterChecklistsServicePort:
+    return MatterChecklistsService(
+        repository=repository, matters_repository=matters_repository, unit_of_work=unit_of_work
+    )
+
+
+MatterChecklistsServiceDependency = Annotated[MatterChecklistsServicePort, Depends(get_matter_checklists_service)]
 
 
 async def get_matter_documents_service(

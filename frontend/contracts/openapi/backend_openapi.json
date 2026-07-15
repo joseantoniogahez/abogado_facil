@@ -310,6 +310,82 @@
         "title": "Body_upload_matter_document_v1_matters__matter_id__documents_post",
         "type": "object"
       },
+      "ChecklistItemResponse": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "is_custom": {
+            "title": "Is Custom",
+            "type": "boolean"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "matter_id": {
+            "title": "Matter Id",
+            "type": "integer"
+          },
+          "position": {
+            "title": "Position",
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "complete",
+              "not_applicable"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "matter_id",
+          "label",
+          "status",
+          "is_custom",
+          "position",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "ChecklistItemResponse",
+        "type": "object"
+      },
+      "ChecklistResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ChecklistItemResponse"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "ChecklistResponse",
+        "type": "object"
+      },
       "ClientListResponse": {
         "properties": {
           "items": {
@@ -448,6 +524,21 @@
           "password"
         ],
         "title": "CreateAdminUserRequest",
+        "type": "object"
+      },
+      "CreateChecklistItemRequest": {
+        "properties": {
+          "label": {
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "label"
+        ],
+        "title": "CreateChecklistItemRequest",
         "type": "object"
       },
       "CreateClientRequest": {
@@ -1236,6 +1327,24 @@
           }
         },
         "title": "UpdateAdminUserRequest",
+        "type": "object"
+      },
+      "UpdateChecklistItemRequest": {
+        "properties": {
+          "status": {
+            "enum": [
+              "pending",
+              "complete",
+              "not_applicable"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "UpdateChecklistItemRequest",
         "type": "object"
       },
       "UpdateClientRequest": {
@@ -3116,6 +3225,147 @@
         "summary": "Update matter",
         "tags": [
           "matters"
+        ]
+      }
+    },
+    "/v1/matters/{matter_id}/checklist": {
+      "get": {
+        "description": "Initializes and lists the deterministic firm-scoped checklist.",
+        "operationId": "list_matter_checklist_v1_matters__matter_id__checklist_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "matter_id",
+            "required": true,
+            "schema": {
+              "title": "Matter Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChecklistResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "List matter checklist",
+        "tags": [
+          "matter-checklists"
+        ]
+      },
+      "post": {
+        "description": "Adds a custom item to a firm-scoped matter checklist.",
+        "operationId": "create_checklist_item_v1_matters__matter_id__checklist_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "matter_id",
+            "required": true,
+            "schema": {
+              "title": "Matter Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateChecklistItemRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChecklistItemResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Create custom checklist item",
+        "tags": [
+          "matter-checklists"
+        ]
+      }
+    },
+    "/v1/matters/{matter_id}/checklist/{item_id}": {
+      "patch": {
+        "description": "Marks an item pending, complete, or not applicable.",
+        "operationId": "update_checklist_item_v1_matters__matter_id__checklist__item_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "matter_id",
+            "required": true,
+            "schema": {
+              "title": "Matter Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "item_id",
+            "required": true,
+            "schema": {
+              "title": "Item Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateChecklistItemRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChecklistItemResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Update checklist item status",
+        "tags": [
+          "matter-checklists"
         ]
       }
     },

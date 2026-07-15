@@ -34,6 +34,9 @@ All routes are versioned under `/v1`.
 | `GET`    | `/v1/matters/{matter_id}/notes`                            | Yes  | No                        | Path `matter_id`                                        | `200` `MatterNoteListResponse`     | `400`, `401`, `404`, `500`               |
 | `PATCH`  | `/v1/matters/{matter_id}/notes/{note_id}`                  | Yes  | No                        | JSON `UpdateMatterNoteRequest`                          | `200` `MatterNoteResponse`         | `400`, `401`, `404`, `500`               |
 | `DELETE` | `/v1/matters/{matter_id}/notes/{note_id}`                  | Yes  | No                        | Path identifiers                                        | `204` no body                      | `400`, `401`, `404`, `500`               |
+| `GET`    | `/v1/matters/{matter_id}/checklist`                        | Yes  | No                        | Path `matter_id`                                        | `200` `ChecklistResponse`          | `400`, `401`, `404`, `500`               |
+| `POST`   | `/v1/matters/{matter_id}/checklist`                        | Yes  | No                        | JSON `CreateChecklistItemRequest`                       | `201` `ChecklistItemResponse`      | `400`, `401`, `404`, `500`               |
+| `PATCH`  | `/v1/matters/{matter_id}/checklist/{item_id}`              | Yes  | No                        | JSON `UpdateChecklistItemRequest`                       | `200` `ChecklistItemResponse`      | `400`, `401`, `404`, `500`               |
 | `POST`   | `/v1/matters/{matter_id}/documents`                        | Yes  | No                        | Multipart `document_type` + PDF/DOCX/TXT `file`         | `201` `MatterDocumentResponse`     | `400`, `401`, `404`, `409`, `500`        |
 | `GET`    | `/v1/matters/{matter_id}/documents`                        | Yes  | No                        | Path `matter_id`                                        | `200` `MatterDocumentListResponse` | `400`, `401`, `404`, `500`               |
 | `GET`    | `/v1/matters/{matter_id}/documents/{document_id}/download` | Yes  | No                        | Path identifiers                                        | `200` streamed attachment          | `400`, `401`, `404`, `500`               |
@@ -74,6 +77,7 @@ This table classifies each `GET` endpoint as `public`, `authenticated`, or `perm
 | `GET`  | `/v1/matters`                                              | `authenticated` | No                        |
 | `GET`  | `/v1/matters/{matter_id}`                                  | `authenticated` | No                        |
 | `GET`  | `/v1/matters/{matter_id}/notes`                            | `authenticated` | No                        |
+| `GET`  | `/v1/matters/{matter_id}/checklist`                        | `authenticated` | No                        |
 | `GET`  | `/v1/matters/{matter_id}/documents`                        | `authenticated` | No                        |
 | `GET`  | `/v1/matters/{matter_id}/documents/{document_id}/download` | `authenticated` | No                        |
 | `GET`  | `/v1/health`                                               | `public`        | No                        |
