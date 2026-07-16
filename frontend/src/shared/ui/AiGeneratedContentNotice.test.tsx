@@ -1,5 +1,5 @@
-import axe from "axe-core";
 import { render, screen } from "@testing-library/react";
+import axe from "axe-core";
 
 import { t } from "@/shared/i18n/ui-text";
 import { AiGeneratedContentNotice } from "@/shared/ui/AiGeneratedContentNotice";

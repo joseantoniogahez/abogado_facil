@@ -18,6 +18,20 @@ This document defines the automated accessibility quality gate for foundation ro
 - Engine: `axe-core` running inside the frontend Vitest workflow.
 - Violations fail the test suite and therefore fail `npm --prefix frontend run check`.
 
+## Action Hierarchy Contract
+
+- Shared action variants live in `src/shared/ui/actionStyles.ts` and preserve native link/button
+  semantics at each call site.
+- Primary, accent, secondary, quiet, destructive, compact, and navigation variants have a
+  persistent border, background, or underline cue in addition to color.
+- `INLINE_ACTION_CLASS_NAME` is reserved for contextual text links, such as login/registration and
+  matter titles, that need the persistent underline cue without the boxed `landing-link` treatment;
+  `QUIET_ACTION_CLASS_NAME` retains that base treatment for standalone contextual actions.
+- Shared focus, pressed, and disabled rules live in `src/app/styles.css`; disabled controls retain a
+  legible label and use background, border, inset shadow, and cursor cues instead of opacity alone.
+- RBAC/admin action constants delegate to the shared variants rather than defining a parallel
+  visual system.
+
 ## Commands
 
 - Focused run: `npm --prefix frontend run test:a11y`

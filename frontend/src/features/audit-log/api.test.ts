@@ -1,5 +1,5 @@
-import { buildApiUrl } from "@/shared/api/env";
 import { readAuditLogEntries } from "@/features/audit-log/api";
+import { buildApiUrl } from "@/shared/api/env";
 import { setAccessToken } from "@/shared/auth/storage";
 
 describe("audit log API client", () => {

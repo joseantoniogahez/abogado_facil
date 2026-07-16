@@ -1,5 +1,5 @@
-import { ApiContractError } from "@/shared/api/contracts";
 import { parseAuditLogEntry, parseAuditLogEntryList } from "@/features/audit-log/contracts";
+import { ApiContractError } from "@/shared/api/contracts";
 
 describe("audit log contracts", () => {
   it("parses audit log entries with nullable actor and resource fields", () => {

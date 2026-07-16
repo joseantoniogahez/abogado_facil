@@ -1,5 +1,5 @@
-import { FormEvent, useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 import {
@@ -15,8 +15,9 @@ import {
   normalizeEmail,
 } from "@/shared/auth/validation";
 import { t } from "@/shared/i18n/ui-text";
-import { CenteredMessage } from "@/shared/ui/CenteredMessage";
 import { AccountFormField } from "@/shared/ui/AccountFormField";
+import { PRIMARY_ACTION_CLASS_NAME, SECONDARY_ACTION_CLASS_NAME } from "@/shared/ui/actionStyles";
+import { CenteredMessage } from "@/shared/ui/CenteredMessage";
 
 interface ProfileFormState {
   firstName: string;
@@ -29,7 +30,14 @@ interface ProfileFormState {
   newPassword: string;
 }
 
-const buildInitialProfileState = (user?: { first_name: string; middle_name: string | null; last_name: string; display_name: string; email: string; firm_name: string }): ProfileFormState => ({
+const buildInitialProfileState = (user?: {
+  first_name: string;
+  middle_name: string | null;
+  last_name: string;
+  display_name: string;
+  email: string;
+  firm_name: string;
+}): ProfileFormState => ({
   firstName: user?.first_name ?? "",
   middleName: user?.middle_name ?? "",
   lastName: user?.last_name ?? "",
@@ -40,9 +48,24 @@ const buildInitialProfileState = (user?: { first_name: string; middle_name: stri
   newPassword: "",
 });
 
-const getProfileValidationMessage = (formState: ProfileFormState, currentUser: { first_name: string; middle_name: string | null; last_name: string; display_name: string; email: string; firm_name: string }): string | null => {
+const getProfileValidationMessage = (
+  formState: ProfileFormState,
+  currentUser: {
+    first_name: string;
+    middle_name: string | null;
+    last_name: string;
+    display_name: string;
+    email: string;
+    firm_name: string;
+  },
+): string | null => {
   const normalizedEmail = normalizeEmail(formState.email);
-  if (!formState.firstName.trim() || !formState.lastName.trim() || !formState.displayName.trim() || !formState.firmName.trim()) {
+  if (
+    !formState.firstName.trim()
+    || !formState.lastName.trim()
+    || !formState.displayName.trim()
+    || !formState.firmName.trim()
+  ) {
     return t("profile.validation.names.required");
   }
   if (!isEmailValid(normalizedEmail)) {
@@ -58,12 +81,21 @@ const getProfileValidationMessage = (formState: ProfileFormState, currentUser: {
     return t("profile.validation.newPassword.different");
   }
 
-  const [firstPasswordViolation] = getPasswordPolicyViolationKeys(formState.newPassword, normalizedEmail);
+  const [firstPasswordViolation] = getPasswordPolicyViolationKeys(
+    formState.newPassword,
+    normalizedEmail,
+  );
   if (formState.newPassword && firstPasswordViolation) {
     return t(firstPasswordViolation);
   }
 
-  const profileChanged = normalizedEmail !== normalizeEmail(currentUser.email) || formState.firstName.trim() !== currentUser.first_name || (formState.middleName.trim() || null) !== currentUser.middle_name || formState.lastName.trim() !== currentUser.last_name || formState.displayName.trim() !== currentUser.display_name || formState.firmName.trim() !== currentUser.firm_name;
+  const profileChanged
+    = normalizedEmail !== normalizeEmail(currentUser.email)
+      || formState.firstName.trim() !== currentUser.first_name
+      || (formState.middleName.trim() || null) !== currentUser.middle_name
+      || formState.lastName.trim() !== currentUser.last_name
+      || formState.displayName.trim() !== currentUser.display_name
+      || formState.firmName.trim() !== currentUser.firm_name;
   const passwordChanged = formState.newPassword.length > 0;
   if (!profileChanged && !passwordChanged) {
     return t("profile.validation.noChanges");
@@ -75,7 +107,9 @@ const getProfileValidationMessage = (formState: ProfileFormState, currentUser: {
 export const ProfilePage = () => {
   const { data: user } = useSession();
   const queryClient = useQueryClient();
-  const [formState, setFormState] = useState<ProfileFormState>(() => buildInitialProfileState(user));
+  const [formState, setFormState] = useState<ProfileFormState>(() =>
+    buildInitialProfileState(user),
+  );
   const [clientError, setClientError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const lastSyncedUserId = useRef<number | null>(null);
@@ -110,7 +144,9 @@ export const ProfilePage = () => {
   });
 
   if (!user) {
-    return <CenteredMessage title={t("welcome.noSession.title")} body={t("welcome.noSession.body")} />;
+    return (
+      <CenteredMessage title={t("welcome.noSession.title")} body={t("welcome.noSession.body")} />
+    );
   }
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
@@ -135,11 +171,15 @@ export const ProfilePage = () => {
       new_password?: string;
     } = {};
 
-    if (formState.firstName.trim() !== user.first_name) payload.first_name = formState.firstName.trim();
-    if ((formState.middleName.trim() || null) !== user.middle_name) payload.middle_name = formState.middleName.trim();
+    if (formState.firstName.trim() !== user.first_name)
+      payload.first_name = formState.firstName.trim();
+    if ((formState.middleName.trim() || null) !== user.middle_name)
+      payload.middle_name = formState.middleName.trim();
     if (formState.lastName.trim() !== user.last_name) payload.last_name = formState.lastName.trim();
-    if (formState.displayName.trim() !== user.display_name) payload.display_name = formState.displayName.trim();
-    if (normalizeEmail(formState.email) !== normalizeEmail(user.email)) payload.email = normalizeEmail(formState.email);
+    if (formState.displayName.trim() !== user.display_name)
+      payload.display_name = formState.displayName.trim();
+    if (normalizeEmail(formState.email) !== normalizeEmail(user.email))
+      payload.email = normalizeEmail(formState.email);
     if (formState.firmName.trim() !== user.firm_name) payload.firm_name = formState.firmName.trim();
     if (formState.currentPassword) {
       payload.current_password = formState.currentPassword;
@@ -153,13 +193,16 @@ export const ProfilePage = () => {
     updateMutation.mutate(payload);
   };
 
-  const mutationError =
-    clientError ??
-    (updateMutation.error instanceof ApiError
-      ? appendRequestIdDiagnostic(updateMutation.error.message, getApiErrorRequestId(updateMutation.error))
-      : updateMutation.isError
-        ? t("profile.error.generic")
-        : null);
+  const mutationError
+    = clientError
+      ?? (updateMutation.error instanceof ApiError
+        ? appendRequestIdDiagnostic(
+            updateMutation.error.message,
+            getApiErrorRequestId(updateMutation.error),
+          )
+        : updateMutation.isError
+          ? t("profile.error.generic")
+          : null);
 
   return (
     <main className="flex min-h-screen items-center justify-center px-6 py-12">
@@ -168,18 +211,87 @@ export const ProfilePage = () => {
         <h1 className="fade-rise-delay mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
           {t("profile.title")}
         </h1>
-        <p className="fade-rise-delay-2 mt-4 text-sm text-[var(--app-subtle)]">{t("profile.subtitle")}</p>
-        <p className="mt-2 text-sm font-medium text-[var(--app-ink)]">{t("profile.currentUser", { email: user.email })}</p>
+        <p className="fade-rise-delay-2 mt-4 text-sm text-[var(--app-subtle)]">
+          {t("profile.subtitle")}
+        </p>
+        <p className="mt-2 text-sm font-medium text-[var(--app-ink)]">
+          {t("profile.currentUser", { email: user.email })}
+        </p>
 
         <form className="mt-8 space-y-4" onSubmit={submit}>
-          <AccountFormField autoComplete="given-name" label={t("profile.fields.firstName")} name="firstName" onChange={(event) => setFormState((previous) => ({ ...previous, firstName: event.target.value }))} required value={formState.firstName} />
-          <AccountFormField autoComplete="additional-name" label={t("profile.fields.middleName")} name="middleName" onChange={(event) => setFormState((previous) => ({ ...previous, middleName: event.target.value }))} value={formState.middleName} />
-          <AccountFormField autoComplete="family-name" label={t("profile.fields.lastName")} name="lastName" onChange={(event) => setFormState((previous) => ({ ...previous, lastName: event.target.value }))} required value={formState.lastName} />
-          <AccountFormField autoComplete="nickname" label={t("profile.fields.displayName")} name="displayName" onChange={(event) => setFormState((previous) => ({ ...previous, displayName: event.target.value }))} required value={formState.displayName} />
-          <AccountFormField autoComplete="email" label={t("profile.fields.email")} name="email" onChange={(event) => setFormState((previous) => ({ ...previous, email: event.target.value }))} required type="email" value={formState.email} />
-          <AccountFormField autoComplete="organization" label={t("profile.fields.firmName")} name="firmName" onChange={(event) => setFormState((previous) => ({ ...previous, firmName: event.target.value }))} required value={formState.firmName} />
-          <AccountFormField autoComplete="current-password" label={t("profile.fields.currentPassword")} name="currentPassword" onChange={(event) => setFormState((previous) => ({ ...previous, currentPassword: event.target.value }))} type="password" value={formState.currentPassword} />
-          <AccountFormField autoComplete="new-password" label={t("profile.fields.newPassword")} minLength={8} name="newPassword" onChange={(event) => setFormState((previous) => ({ ...previous, newPassword: event.target.value }))} type="password" value={formState.newPassword} />
+          <AccountFormField
+            autoComplete="given-name"
+            label={t("profile.fields.firstName")}
+            name="firstName"
+            onChange={event =>
+              setFormState(previous => ({ ...previous, firstName: event.target.value }))}
+            required
+            value={formState.firstName}
+          />
+          <AccountFormField
+            autoComplete="additional-name"
+            label={t("profile.fields.middleName")}
+            name="middleName"
+            onChange={event =>
+              setFormState(previous => ({ ...previous, middleName: event.target.value }))}
+            value={formState.middleName}
+          />
+          <AccountFormField
+            autoComplete="family-name"
+            label={t("profile.fields.lastName")}
+            name="lastName"
+            onChange={event =>
+              setFormState(previous => ({ ...previous, lastName: event.target.value }))}
+            required
+            value={formState.lastName}
+          />
+          <AccountFormField
+            autoComplete="nickname"
+            label={t("profile.fields.displayName")}
+            name="displayName"
+            onChange={event =>
+              setFormState(previous => ({ ...previous, displayName: event.target.value }))}
+            required
+            value={formState.displayName}
+          />
+          <AccountFormField
+            autoComplete="email"
+            label={t("profile.fields.email")}
+            name="email"
+            onChange={event =>
+              setFormState(previous => ({ ...previous, email: event.target.value }))}
+            required
+            type="email"
+            value={formState.email}
+          />
+          <AccountFormField
+            autoComplete="organization"
+            label={t("profile.fields.firmName")}
+            name="firmName"
+            onChange={event =>
+              setFormState(previous => ({ ...previous, firmName: event.target.value }))}
+            required
+            value={formState.firmName}
+          />
+          <AccountFormField
+            autoComplete="current-password"
+            label={t("profile.fields.currentPassword")}
+            name="currentPassword"
+            onChange={event =>
+              setFormState(previous => ({ ...previous, currentPassword: event.target.value }))}
+            type="password"
+            value={formState.currentPassword}
+          />
+          <AccountFormField
+            autoComplete="new-password"
+            label={t("profile.fields.newPassword")}
+            minLength={8}
+            name="newPassword"
+            onChange={event =>
+              setFormState(previous => ({ ...previous, newPassword: event.target.value }))}
+            type="password"
+            value={formState.newPassword}
+          />
 
           <ul className="space-y-1 rounded-2xl border border-[var(--app-border)] bg-[var(--app-bg)] px-4 py-3 text-sm text-[var(--app-subtle)]">
             <li>{t("auth.shared.email.hint")}</li>
@@ -187,36 +299,37 @@ export const ProfilePage = () => {
             <li>{t("profile.password.optional")}</li>
           </ul>
 
-          {successMessage ? (
-            <p
-              className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800"
-              role="status"
-            >
-              {successMessage}
-            </p>
-          ) : null}
+          {successMessage
+            ? (
+                <p
+                  className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800"
+                  role="status"
+                >
+                  {successMessage}
+                </p>
+              )
+            : null}
 
-          {mutationError ? (
-            <p
-              className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
-              role="alert"
-            >
-              {mutationError}
-            </p>
-          ) : null}
+          {mutationError
+            ? (
+                <p
+                  className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                  role="alert"
+                >
+                  {mutationError}
+                </p>
+              )
+            : null}
 
           <div className="flex flex-col gap-3 sm:flex-row">
             <button
-              className="inline-flex flex-1 items-center justify-center rounded-full bg-[var(--app-ink)] px-5 py-3 text-sm font-semibold text-[var(--app-surface)] transition hover:bg-[var(--app-accent)] disabled:cursor-not-allowed disabled:opacity-70"
+              className={`${PRIMARY_ACTION_CLASS_NAME} flex-1`}
               disabled={updateMutation.isPending}
               type="submit"
             >
               {updateMutation.isPending ? t("profile.submit.pending") : t("profile.submit.default")}
             </button>
-            <Link
-              className="inline-flex flex-1 items-center justify-center rounded-full border border-[var(--app-border)] px-5 py-3 text-sm font-semibold text-[var(--app-ink)] transition hover:border-[var(--app-accent)] hover:text-[var(--app-accent)]"
-              to="/dashboard"
-            >
+            <Link className={`${SECONDARY_ACTION_CLASS_NAME} flex-1`} to="/dashboard">
               {t("profile.actions.cancel")}
             </Link>
           </div>

@@ -6,7 +6,7 @@ export const hasPermission = (permissions: readonly string[] | undefined, permis
 export const hasAnyPermission = (
   permissions: readonly string[] | undefined,
   requiredPermissionIds: readonly string[],
-): boolean => requiredPermissionIds.some((permissionId) => hasPermission(permissions, permissionId));
+): boolean => requiredPermissionIds.some(permissionId => hasPermission(permissions, permissionId));
 
 export const userHasPermission = (
   user: Pick<AuthenticatedUser, "permissions"> | null | undefined,

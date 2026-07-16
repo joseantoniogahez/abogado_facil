@@ -12,10 +12,10 @@ describe("browser security baseline contracts", () => {
   it("keeps required security meta policies in index.html", () => {
     const html = fs.readFileSync(INDEX_HTML_PATH, "utf8");
 
-    expect(html).toContain('http-equiv="Content-Security-Policy"');
+    expect(html).toContain("http-equiv=\"Content-Security-Policy\"");
     expect(html).toContain("frame-ancestors 'none'");
-    expect(html).toContain('name="referrer" content="strict-origin-when-cross-origin"');
-    expect(html).toContain('http-equiv="Permissions-Policy"');
+    expect(html).toContain("name=\"referrer\" content=\"strict-origin-when-cross-origin\"");
+    expect(html).toContain("http-equiv=\"Permissions-Policy\"");
     expect(html).toContain("geolocation=()");
     expect(html).toContain("microphone=()");
     expect(html).toContain("camera=()");

@@ -1,6 +1,6 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
-import { RouterProvider, createMemoryRouter } from "react-router-dom";
+import { createMemoryRouter, RouterProvider } from "react-router-dom";
 
 import { createQueryClient } from "@/app/query-client";
 import { ApiError } from "@/shared/api/errors";
@@ -36,14 +36,18 @@ describe("RouteErrorBoundary", () => {
   it("renders route error fallback", async () => {
     renderBoundaryScenario(() => new Error("boom"));
 
-    expect(await screen.findByRole("heading", { name: t("routing.error.title") })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: t("routing.error.title") }),
+    ).toBeInTheDocument();
     expect(screen.getByText(t("routing.error.body"))).toBeInTheDocument();
   });
 
   it("renders request-id diagnostic for ApiError route failures", async () => {
     renderBoundaryScenario(() => new ApiError("failed", 500, "internal_error", "req-route-500"));
 
-    expect(await screen.findByRole("heading", { name: t("routing.error.title") })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: t("routing.error.title") }),
+    ).toBeInTheDocument();
     expect(screen.getByText(/request_id=req-route-500/)).toBeInTheDocument();
   });
 
@@ -56,7 +60,9 @@ describe("RouteErrorBoundary", () => {
         }),
     );
 
-    expect(await screen.findByRole("heading", { name: t("routing.error.title") })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: t("routing.error.title") }),
+    ).toBeInTheDocument();
     expect(screen.getByText(`${t("routing.error.body")} (status=404)`)).toBeInTheDocument();
   });
 });

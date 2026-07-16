@@ -1,13 +1,18 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, waitFor } from "@testing-library/react";
-import { RouterProvider, createMemoryRouter } from "react-router-dom";
+import { createMemoryRouter, RouterProvider } from "react-router-dom";
 
-import { appRoutes } from "@/app/routes";
 import { createQueryClient } from "@/app/query-client";
+import { appRoutes } from "@/app/routes";
 import { SESSION_QUERY_KEY } from "@/shared/auth/session";
 import { t } from "@/shared/i18n/ui-text";
 
-type AdminRoutePath = "/admin/audit-log" | "/admin/assignments" | "/admin/permissions" | "/admin/users" | "/admin/roles";
+type AdminRoutePath
+  = | "/admin/audit-log"
+    | "/admin/assignments"
+    | "/admin/permissions"
+    | "/admin/users"
+    | "/admin/roles";
 
 const renderAppAt = (path: AdminRoutePath) => {
   const queryClient = createQueryClient();
@@ -37,7 +42,21 @@ const renderAppAt = (path: AdminRoutePath) => {
 };
 
 describe("PermissionRoute", () => {
-  const dashboardResponse = { ok: true, status: 200, json: () => Promise.resolve({ firm_id: 1, firm_name: "Test Legal", clients: { value: 0, available: false }, active_matters: { value: 0, available: false }, pending_tasks: { value: 0, available: false }, upcoming_tasks: [], ai_status: "not_available", actions: [] }) } satisfies Partial<Response>;
+  const dashboardResponse = {
+    ok: true,
+    status: 200,
+    json: () =>
+      Promise.resolve({
+        firm_id: 1,
+        firm_name: "Test Legal",
+        clients: { value: 0, available: false },
+        active_matters: { value: 0, available: false },
+        pending_tasks: { value: 0, available: false },
+        upcoming_tasks: [],
+        ai_status: "not_available",
+        actions: [],
+      }),
+  } satisfies Partial<Response>;
 
   it("redirects unauthorized direct navigation from /admin/users to /dashboard", async () => {
     const fetchMock = vi.fn().mockResolvedValue(dashboardResponse);
@@ -48,7 +67,9 @@ describe("PermissionRoute", () => {
       expect(router.state.location.pathname).toBe("/dashboard");
     });
     expect(
-      await screen.findByRole("heading", { name: t("dashboard.greeting", { displayName: "Test User" }) }),
+      await screen.findByRole("heading", {
+        name: t("dashboard.greeting", { displayName: "Test User" }),
+      }),
     ).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledTimes(1);
   }, 10_000);
@@ -62,7 +83,9 @@ describe("PermissionRoute", () => {
       expect(router.state.location.pathname).toBe("/dashboard");
     });
     expect(
-      await screen.findByRole("heading", { name: t("dashboard.greeting", { displayName: "Test User" }) }),
+      await screen.findByRole("heading", {
+        name: t("dashboard.greeting", { displayName: "Test User" }),
+      }),
     ).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledTimes(1);
   }, 10_000);
@@ -76,7 +99,9 @@ describe("PermissionRoute", () => {
       expect(router.state.location.pathname).toBe("/dashboard");
     });
     expect(
-      await screen.findByRole("heading", { name: t("dashboard.greeting", { displayName: "Test User" }) }),
+      await screen.findByRole("heading", {
+        name: t("dashboard.greeting", { displayName: "Test User" }),
+      }),
     ).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledTimes(1);
   }, 10_000);
@@ -90,7 +115,9 @@ describe("PermissionRoute", () => {
       expect(router.state.location.pathname).toBe("/dashboard");
     });
     expect(
-      await screen.findByRole("heading", { name: t("dashboard.greeting", { displayName: "Test User" }) }),
+      await screen.findByRole("heading", {
+        name: t("dashboard.greeting", { displayName: "Test User" }),
+      }),
     ).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledTimes(1);
   }, 10_000);
@@ -104,7 +131,9 @@ describe("PermissionRoute", () => {
       expect(router.state.location.pathname).toBe("/dashboard");
     });
     expect(
-      await screen.findByRole("heading", { name: t("dashboard.greeting", { displayName: "Test User" }) }),
+      await screen.findByRole("heading", {
+        name: t("dashboard.greeting", { displayName: "Test User" }),
+      }),
     ).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledTimes(1);
   }, 10_000);

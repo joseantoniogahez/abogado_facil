@@ -1,12 +1,12 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { RouterProvider, createMemoryRouter } from "react-router-dom";
+import { createMemoryRouter, RouterProvider } from "react-router-dom";
 
 import { createQueryClient } from "@/app/query-client";
+import { LoginPage } from "@/features/auth/LoginPage";
 import { SESSION_QUERY_KEY } from "@/shared/auth/session";
 import { t } from "@/shared/i18n/ui-text";
-import { LoginPage } from "@/features/auth/LoginPage";
 
 const renderLogin = () => {
   const queryClient = createQueryClient();
@@ -24,13 +24,13 @@ const renderLogin = () => {
     ],
     {
       initialEntries: ["/login"],
-    }
+    },
   );
 
   render(
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
-    </QueryClientProvider>
+    </QueryClientProvider>,
   );
 };
 
@@ -38,10 +38,11 @@ describe("LoginPage", () => {
   it("offers navigation to registration", async () => {
     renderLogin();
 
-    expect(await screen.findByRole("link", { name: t("auth.login.footer.createAccount") })).toHaveAttribute(
-      "href",
-      "/register",
-    );
+    const registerLink = await screen.findByRole("link", {
+      name: t("auth.login.footer.createAccount"),
+    });
+    expect(registerLink).toHaveAttribute("href", "/register");
+    expect(registerLink).toHaveAttribute("class", "app-action-quiet");
   });
 
   it("completes login flow and redirects to dashboard", async () => {
@@ -52,8 +53,8 @@ describe("LoginPage", () => {
         status: 200,
         json: () =>
           Promise.resolve({
-          access_token: "valid-token",
-          token_type: "bearer",
+            access_token: "valid-token",
+            token_type: "bearer",
           }),
       } satisfies Partial<Response>)
       .mockResolvedValueOnce({
@@ -61,15 +62,15 @@ describe("LoginPage", () => {
         status: 200,
         json: () =>
           Promise.resolve({
-          id: 1,
-          email: "admin@example.com",
-          first_name: "Test",
-          middle_name: null,
-          last_name: "User",
-          display_name: "Test User",
-          firm_name: "Test Legal",
-          disabled: false,
-          permissions: ["users:manage", "roles:manage"],
+            id: 1,
+            email: "admin@example.com",
+            first_name: "Test",
+            middle_name: null,
+            last_name: "User",
+            display_name: "Test User",
+            firm_name: "Test Legal",
+            disabled: false,
+            permissions: ["users:manage", "roles:manage"],
           }),
       } satisfies Partial<Response>)
       .mockResolvedValueOnce({
@@ -77,15 +78,15 @@ describe("LoginPage", () => {
         status: 200,
         json: () =>
           Promise.resolve({
-          id: 1,
-          email: "admin@example.com",
-          first_name: "Test",
-          middle_name: null,
-          last_name: "User",
-          display_name: "Test User",
-          firm_name: "Test Legal",
-          disabled: false,
-          permissions: ["users:manage", "roles:manage"],
+            id: 1,
+            email: "admin@example.com",
+            first_name: "Test",
+            middle_name: null,
+            last_name: "User",
+            display_name: "Test User",
+            firm_name: "Test Legal",
+            disabled: false,
+            permissions: ["users:manage", "roles:manage"],
           }),
       } satisfies Partial<Response>);
     vi.stubGlobal("fetch", fetchMock);
@@ -107,8 +108,8 @@ describe("LoginPage", () => {
       statusText: "Unauthorized",
       json: () =>
         Promise.resolve({
-        detail: "Invalid username or password",
-        code: "unauthorized",
+          detail: "Invalid username or password",
+          code: "unauthorized",
         }),
     } satisfies Partial<Response>);
     vi.stubGlobal("fetch", fetchMock);
@@ -146,6 +147,8 @@ describe("LoginPage", () => {
     await user.type(screen.getByLabelText(t("auth.login.fields.password")), "wrong");
     await user.click(screen.getByRole("button", { name: t("auth.login.submit.default") }));
 
-    expect(await screen.findByText("Unexpected error (request_id=req-login-500)")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Unexpected error (request_id=req-login-500)"),
+    ).toBeInTheDocument();
   });
 });

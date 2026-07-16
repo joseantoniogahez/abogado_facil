@@ -1,17 +1,17 @@
 import { apiRequest } from "@/shared/api/http";
 import {
-  parseAssignedRoleList,
-  parseAssignedUserList,
+  type AdminUser,
+  type AssignedRole,
+  type AssignedUser,
   parseAdminUser,
   parseAdminUserList,
+  parseAssignedRoleList,
+  parseAssignedUserList,
   parseRbacPermissionList,
   parseRbacRole,
   parseRbacRoleList,
   parseRbacRolePermission,
   parseUserRoleAssignment,
-  type AssignedRole,
-  type AssignedUser,
-  type AdminUser,
   type RbacPermission,
   type RbacPermissionScope,
   type RbacRole,
@@ -48,10 +48,14 @@ export const RBAC_USER_ROLES_ENDPOINT_PATH_TEMPLATE = "/rbac/users/{user_id}/rol
 export const RBAC_ROLE_USERS_ENDPOINT_PATH_TEMPLATE = "/rbac/roles/{role_id}/users";
 export const RBAC_USER_ROLE_ENDPOINT_PATH_TEMPLATE = "/rbac/users/{user_id}/roles/{role_id}";
 
-export const buildRbacUserPath = (userId: number): string => `${RBAC_USERS_ENDPOINT_PATH}/${userId}`;
-export const buildRbacRolePath = (roleId: number): string => `${RBAC_ROLES_ENDPOINT_PATH}/${roleId}`;
-export const buildRbacUserRolesPath = (userId: number): string => `${buildRbacUserPath(userId)}/roles`;
-export const buildRbacRoleUsersPath = (roleId: number): string => `${buildRbacRolePath(roleId)}/users`;
+export const buildRbacUserPath = (userId: number): string =>
+  `${RBAC_USERS_ENDPOINT_PATH}/${userId}`;
+export const buildRbacRolePath = (roleId: number): string =>
+  `${RBAC_ROLES_ENDPOINT_PATH}/${roleId}`;
+export const buildRbacUserRolesPath = (userId: number): string =>
+  `${buildRbacUserPath(userId)}/roles`;
+export const buildRbacRoleUsersPath = (roleId: number): string =>
+  `${buildRbacRolePath(roleId)}/users`;
 export const buildRbacUserRolePath = (userId: number, roleId: number): string =>
   `${buildRbacUserPath(userId)}/roles/${roleId}`;
 export const buildRbacRoleInheritancePath = (roleId: number, parentRoleId: number): string =>
@@ -91,7 +95,10 @@ export const createAdminUser = (payload: CreateAdminUserPayload): Promise<AdminU
     parse: parseAdminUser,
   });
 
-export const updateAdminUser = (userId: number, payload: UpdateAdminUserPayload): Promise<AdminUser> =>
+export const updateAdminUser = (
+  userId: number,
+  payload: UpdateAdminUserPayload,
+): Promise<AdminUser> =>
   apiRequest<AdminUser>(buildRbacUserPath(userId), {
     method: "PUT",
     headers: JSON_HEADERS,

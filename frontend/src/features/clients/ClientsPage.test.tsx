@@ -46,7 +46,19 @@ const renderRoute = (path: string, fetchMock: ReturnType<typeof vi.fn>) => {
   vi.stubGlobal("fetch", fetchMock);
   const queryClient = createQueryClient();
   queryClient.setQueryDefaults(["clients"], { retry: false });
-  return render(<QueryClientProvider client={queryClient}><MemoryRouter initialEntries={[path]}><Routes><Route path="/clients" element={<ClientsPage />} /><Route path="/clients/new" element={<NewClientPage />} /><Route path="/clients/:clientId" element={<ClientDetailPage />} /><Route path="/clients/:clientId/edit" element={<ClientDetailPage edit />} /></Routes><Location /></MemoryRouter></QueryClientProvider>);
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter initialEntries={[path]}>
+        <Routes>
+          <Route path="/clients" element={<ClientsPage />} />
+          <Route path="/clients/new" element={<NewClientPage />} />
+          <Route path="/clients/:clientId" element={<ClientDetailPage />} />
+          <Route path="/clients/:clientId/edit" element={<ClientDetailPage edit />} />
+        </Routes>
+        <Location />
+      </MemoryRouter>
+    </QueryClientProvider>,
+  );
 };
 
 describe("clients pages", () => {

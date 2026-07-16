@@ -1,35 +1,53 @@
-import type { RouteObject } from "react-router-dom";
 import { lazy, Suspense } from "react";
+import type { RouteObject } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 import { AdminAssignmentsPage } from "@/features/admin-assignments/AdminAssignmentsPage";
-import { AuditLogPage } from "@/features/audit-log/AuditLogPage";
 import { AdminPermissionsPage } from "@/features/admin-permissions/AdminPermissionsPage";
 import { AdminRolesPage } from "@/features/admin-roles/AdminRolesPage";
 import { AdminUsersPage } from "@/features/admin-users/AdminUsersPage";
+import { AuditLogPage } from "@/features/audit-log/AuditLogPage";
 import { LoginPage } from "@/features/auth/LoginPage";
 import { RegisterPage } from "@/features/auth/RegisterPage";
-import { LandingPage } from "@/features/landing/LandingPage";
+import { ClientDetailPage, ClientsPage, NewClientPage } from "@/features/clients/ClientsPage";
 import { DashboardPage } from "@/features/dashboard/DashboardPage";
+import { LandingPage } from "@/features/landing/LandingPage";
 import { NotFoundPage } from "@/features/not-found/NotFoundPage";
 import { ProfilePage } from "@/features/profile/ProfilePage";
-import { ClientDetailPage, ClientsPage, NewClientPage } from "@/features/clients/ClientsPage";
-import { Navigate } from "react-router-dom";
-import { ProtectedRoute } from "@/shared/routing/ProtectedRoute";
+import { IAM_PERMISSION } from "@/shared/iam/contracts";
 import { PermissionRoute } from "@/shared/routing/PermissionRoute";
+import { ProtectedRoute } from "@/shared/routing/ProtectedRoute";
 import { RootLayout } from "@/shared/routing/RootLayout";
 import { RouteErrorBoundary } from "@/shared/routing/RouteErrorBoundary";
-import { IAM_PERMISSION } from "@/shared/iam/contracts";
 
-const MattersPage = lazy(() => import("@/features/matters/MattersPage").then((module) => ({ default: module.MattersPage })));
-const NewMatterPage = lazy(() => import("@/features/matters/MattersPage").then((module) => ({ default: module.NewMatterPage })));
-const MatterDetailPage = lazy(() => import("@/features/matters/MattersPage").then((module) => ({ default: module.MatterDetailPage })));
+const MattersPage = lazy(() =>
+  import("@/features/matters/MattersPage").then(module => ({ default: module.MattersPage })),
+);
+const NewMatterPage = lazy(() =>
+  import("@/features/matters/MattersPage").then(module => ({ default: module.NewMatterPage })),
+);
+const MatterDetailPage = lazy(() =>
+  import("@/features/matters/MattersPage").then(module => ({ default: module.MatterDetailPage })),
+);
 /* eslint-disable react-refresh/only-export-components -- route adapters belong with the centralized route composition */
 /* v8 ignore next */
-const MattersRoute = () => <Suspense fallback={null}><MattersPage /></Suspense>;
+const MattersRoute = () => (
+  <Suspense fallback={null}>
+    <MattersPage />
+  </Suspense>
+);
 /* v8 ignore next */
-const NewMatterRoute = () => <Suspense fallback={null}><NewMatterPage /></Suspense>;
+const NewMatterRoute = () => (
+  <Suspense fallback={null}>
+    <NewMatterPage />
+  </Suspense>
+);
 /* v8 ignore next */
-const MatterDetailRoute = ({ edit = false }: { edit?: boolean }) => <Suspense fallback={null}><MatterDetailPage edit={edit} /></Suspense>;
+const MatterDetailRoute = ({ edit = false }: { edit?: boolean }) => (
+  <Suspense fallback={null}>
+    <MatterDetailPage edit={edit} />
+  </Suspense>
+);
 /* eslint-enable react-refresh/only-export-components */
 
 export const appRoutes: RouteObject[] = [
@@ -101,7 +119,9 @@ export const appRoutes: RouteObject[] = [
             ],
           },
           {
-            element: <PermissionRoute requiredPermission={IAM_PERMISSION.ROLE_PERMISSIONS_MANAGE} />,
+            element: (
+              <PermissionRoute requiredPermission={IAM_PERMISSION.ROLE_PERMISSIONS_MANAGE} />
+            ),
             children: [
               {
                 path: "admin/permissions",

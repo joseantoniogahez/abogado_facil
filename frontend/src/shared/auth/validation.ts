@@ -14,7 +14,7 @@ export const isEmailValid = (value: string): boolean => EMAIL_PATTERN.test(norma
 
 export const composeDisplayName = (firstName: string, middleName: string, lastName: string): string =>
   [firstName, middleName, lastName]
-    .map((part) => part.trim())
+    .map(part => part.trim())
     .filter(Boolean)
     .join(" ");
 

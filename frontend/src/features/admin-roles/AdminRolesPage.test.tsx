@@ -3,8 +3,8 @@ import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { createQueryClient } from "@/app/query-client";
-import { SESSION_QUERY_KEY } from "@/shared/auth/session";
 import { AdminRolesPage } from "@/features/admin-roles/AdminRolesPage";
+import { SESSION_QUERY_KEY } from "@/shared/auth/session";
 import { t } from "@/shared/i18n/ui-text";
 import { IAM_PERMISSION } from "@/shared/iam/contracts";
 
@@ -54,10 +54,7 @@ const jsonResponse = (status: number, payload: unknown, requestId?: string): Par
 });
 
 const renderAdminRolesPage = (
-  permissions: string[] = [
-    IAM_PERMISSION.ROLES_MANAGE,
-    IAM_PERMISSION.ROLE_PERMISSIONS_MANAGE,
-  ],
+  permissions: string[] = [IAM_PERMISSION.ROLES_MANAGE, IAM_PERMISSION.ROLE_PERMISSIONS_MANAGE],
 ) => {
   const queryClient = createQueryClient();
   queryClient.setQueryData(SESSION_QUERY_KEY, {
@@ -80,9 +77,7 @@ const renderAdminRolesPage = (
 };
 
 describe("AdminRolesPage", () => {
-  it(
-    "completes role create/update/delete and parent assignment flows",
-    async () => {
+  it("completes role create/update/delete and parent assignment flows", async () => {
     let roles: MockRole[] = [
       {
         id: 1,
@@ -115,28 +110,36 @@ describe("AdminRolesPage", () => {
 
       if (method === "PUT" && path === "/v1/rbac/roles/2") {
         const payload = readJsonBody<{ name: string }>(init);
-        roles = roles.map((role) => (role.id === 2 ? { ...role, name: payload.name } : role));
-        return jsonResponse(200, roles.find((role) => role.id === 2));
+        roles = roles.map(role => (role.id === 2 ? { ...role, name: payload.name } : role));
+        return jsonResponse(
+          200,
+          roles.find(role => role.id === 2),
+        );
       }
 
       if (method === "PUT" && path === "/v1/rbac/roles/2/inherits/1") {
-        roles = roles.map((role) =>
-          role.id === 2 ? { ...role, parent_role_ids: [...new Set([...role.parent_role_ids, 1])] } : role,
+        roles = roles.map(role =>
+          role.id === 2
+            ? { ...role, parent_role_ids: [...new Set([...role.parent_role_ids, 1])] }
+            : role,
         );
         return jsonResponse(204, null);
       }
 
       if (method === "DELETE" && path === "/v1/rbac/roles/2/inherits/1") {
-        roles = roles.map((role) =>
+        roles = roles.map(role =>
           role.id === 2
-            ? { ...role, parent_role_ids: role.parent_role_ids.filter((parentRoleId) => parentRoleId !== 1) }
+            ? {
+                ...role,
+                parent_role_ids: role.parent_role_ids.filter(parentRoleId => parentRoleId !== 1),
+              }
             : role,
         );
         return jsonResponse(204, null);
       }
 
       if (method === "DELETE" && path === "/v1/rbac/roles/2") {
-        roles = roles.filter((role) => role.id !== 2);
+        roles = roles.filter(role => role.id !== 2);
         return jsonResponse(204, null);
       }
 
@@ -163,26 +166,42 @@ describe("AdminRolesPage", () => {
       return;
     }
 
-    await user.selectOptions(within(editorRoleCard).getByLabelText(t("admin.roles.parents.select")), "1");
-    await user.click(within(editorRoleCard).getByRole("button", { name: t("admin.roles.parents.add") }));
+    await user.selectOptions(
+      within(editorRoleCard).getByLabelText(t("admin.roles.parents.select")),
+      "1",
+    );
+    await user.click(
+      within(editorRoleCard).getByRole("button", { name: t("admin.roles.parents.add") }),
+    );
     expect(await within(editorRoleCard).findByText("admin_role")).toBeInTheDocument();
-    await user.click(within(editorRoleCard).getByRole("button", { name: t("admin.roles.parents.remove") }));
+    await user.click(
+      within(editorRoleCard).getByRole("button", { name: t("admin.roles.parents.remove") }),
+    );
     await waitFor(() => {
       expect(
         fetchMock.mock.calls.some((call) => {
           const requestUrl = toRequestUrl(call[0]);
           const request = call[1];
-          return requestUrl.pathname === "/v1/rbac/roles/2/inherits/1" && request?.method === "DELETE";
+          return (
+            requestUrl.pathname === "/v1/rbac/roles/2/inherits/1" && request?.method === "DELETE"
+          );
         }),
       ).toBe(true);
     });
 
     await user.clear(within(editorRoleCard).getByLabelText(t("admin.roles.create.name")));
-    await user.type(within(editorRoleCard).getByLabelText(t("admin.roles.create.name")), "editor_role_v2");
-    await user.click(within(editorRoleCard).getByRole("button", { name: t("admin.roles.actions.update") }));
+    await user.type(
+      within(editorRoleCard).getByLabelText(t("admin.roles.create.name")),
+      "editor_role_v2",
+    );
+    await user.click(
+      within(editorRoleCard).getByRole("button", { name: t("admin.roles.actions.update") }),
+    );
     expect(await within(editorRoleCard).findByDisplayValue("editor_role_v2")).toBeInTheDocument();
 
-    await user.click(within(editorRoleCard).getByRole("button", { name: t("admin.roles.actions.delete") }));
+    await user.click(
+      within(editorRoleCard).getByRole("button", { name: t("admin.roles.actions.delete") }),
+    );
     expect(
       fetchMock.mock.calls.some((call) => {
         const requestUrl = toRequestUrl(call[0]);
@@ -190,7 +209,9 @@ describe("AdminRolesPage", () => {
         return requestUrl.pathname === "/v1/rbac/roles/2" && request?.method === "DELETE";
       }),
     ).toBe(false);
-    await user.click(within(editorRoleCard).getByRole("button", { name: t("admin.roles.actions.delete") }));
+    await user.click(
+      within(editorRoleCard).getByRole("button", { name: t("admin.roles.actions.delete") }),
+    );
 
     await waitFor(() => {
       expect(
@@ -201,9 +222,7 @@ describe("AdminRolesPage", () => {
         }),
       ).toBe(true);
     });
-    },
-    30000,
-  );
+  }, 30000);
 
   it("shows request-id diagnostics for API errors", async () => {
     const fetchMock = vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
@@ -229,7 +248,9 @@ describe("AdminRolesPage", () => {
 
     renderAdminRolesPage();
 
-    expect(await screen.findByRole("heading", { name: t("admin.common.error.title") })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: t("admin.common.error.title") }),
+    ).toBeInTheDocument();
     expect(await screen.findByText(/request_id=req-roles-forbidden/)).toBeInTheDocument();
   });
 
@@ -266,7 +287,9 @@ describe("AdminRolesPage", () => {
     await user.type(createRoleInput, "duplicate_role");
     await user.click(screen.getByRole("button", { name: t("admin.roles.create.submit") }));
 
-    expect(await screen.findByRole("heading", { name: t("admin.common.error.title") })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: t("admin.common.error.title") }),
+    ).toBeInTheDocument();
     expect(await screen.findByText(/Role name already exists/)).toBeInTheDocument();
     expect(await screen.findByText(/request_id=req-roles-conflict/)).toBeInTheDocument();
   });
@@ -300,11 +323,17 @@ describe("AdminRolesPage", () => {
 
     renderAdminRolesPage([IAM_PERMISSION.ROLES_MANAGE, IAM_PERMISSION.ROLE_PERMISSIONS_MANAGE]);
 
-    expect(await screen.findByRole("heading", { name: t("admin.roles.title") })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: t("admin.roles.title") }),
+    ).toBeInTheDocument();
     expect(screen.queryByText(t("admin.roles.card.permissions"))).not.toBeInTheDocument();
     expect(screen.queryByLabelText(t("admin.roles.permissions.select"))).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: t("admin.roles.permissions.add") })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: t("admin.roles.permissions.remove") })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: t("admin.roles.permissions.add") }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: t("admin.roles.permissions.remove") }),
+    ).not.toBeInTheDocument();
     expect(screen.queryByText("Manage users")).not.toBeInTheDocument();
   });
 
@@ -326,7 +355,9 @@ describe("AdminRolesPage", () => {
 
     await waitFor(
       () => {
-        expect(screen.getByRole("heading", { name: t("admin.common.error.title") })).toBeInTheDocument();
+        expect(
+          screen.getByRole("heading", { name: t("admin.common.error.title") }),
+        ).toBeInTheDocument();
         expect(screen.getByText(t("admin.common.error.generic"))).toBeInTheDocument();
       },
       { timeout: 4000 },

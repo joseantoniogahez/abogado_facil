@@ -119,7 +119,7 @@ export const parseRbacPermission = (payload: unknown): RbacPermission => {
 };
 
 export const parseRbacPermissionList = (payload: unknown): RbacPermission[] =>
-  expectRecordArray(payload, "RbacPermissionList").map((item) => parseRbacPermission(item));
+  expectRecordArray(payload, "RbacPermissionList").map(item => parseRbacPermission(item));
 
 export const parseRbacRolePermission = (payload: unknown): RbacRolePermission => {
   const context = "RbacRolePermission";
@@ -147,7 +147,7 @@ export const parseRbacRole = (payload: unknown): RbacRole => {
 };
 
 export const parseRbacRoleList = (payload: unknown): RbacRole[] =>
-  expectRecordArray(payload, "RbacRoleList").map((item) => parseRbacRole(item));
+  expectRecordArray(payload, "RbacRoleList").map(item => parseRbacRole(item));
 
 export const parseAdminUser = (payload: unknown): AdminUser => {
   const context = "AdminUser";
@@ -162,7 +162,7 @@ export const parseAdminUser = (payload: unknown): AdminUser => {
 };
 
 export const parseAdminUserList = (payload: unknown): AdminUser[] =>
-  expectRecordArray(payload, "AdminUserList").map((item) => parseAdminUser(item));
+  expectRecordArray(payload, "AdminUserList").map(item => parseAdminUser(item));
 
 export const parseAssignedRole = (payload: unknown): AssignedRole => {
   const context = "AssignedRole";
@@ -175,7 +175,7 @@ export const parseAssignedRole = (payload: unknown): AssignedRole => {
 };
 
 export const parseAssignedRoleList = (payload: unknown): AssignedRole[] =>
-  expectRecordArray(payload, "AssignedRoleList").map((item) => parseAssignedRole(item));
+  expectRecordArray(payload, "AssignedRoleList").map(item => parseAssignedRole(item));
 
 export const parseAssignedUser = (payload: unknown): AssignedUser => {
   const context = "AssignedUser";
@@ -189,7 +189,7 @@ export const parseAssignedUser = (payload: unknown): AssignedUser => {
 };
 
 export const parseAssignedUserList = (payload: unknown): AssignedUser[] =>
-  expectRecordArray(payload, "AssignedUserList").map((item) => parseAssignedUser(item));
+  expectRecordArray(payload, "AssignedUserList").map(item => parseAssignedUser(item));
 
 export const parseUserRoleAssignment = (payload: unknown): UserRoleAssignment => {
   const context = "UserRoleAssignment";

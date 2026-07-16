@@ -7,10 +7,10 @@ import {
   CODE_CHANGE_REQUEST_TEMPLATE_PATH,
   DOCS_DIR,
   FEATURE_REQUEST_TEMPLATE_PATH,
+  FRONTEND_DIR,
   FRONTEND_DOCS_INDEX_PATH,
   FRONTEND_FOUNDATION_STATUS_PATH,
   FRONTEND_PLAYBOOK_PATH,
-  FRONTEND_DIR,
   INTEGRATION_REQUEST_TEMPLATE_PATH,
   REPO_DIR,
   REQUIRED_FOUNDATION_STATUS_SECTIONS,
@@ -42,7 +42,8 @@ const collectMarkdownFiles = (rootPath: string): string[] => {
 
 const readMarkdown = (filePath: string): string => fs.readFileSync(filePath, "utf8");
 
-const toRelativeFrontendPath = (filePath: string): string => path.relative(FRONTEND_DIR, filePath).replace(/\\/g, "/");
+const toRelativeFrontendPath = (filePath: string): string =>
+  path.relative(FRONTEND_DIR, filePath).replace(/\\/g, "/");
 
 const extractSectionHeadings = (markdown: string): Set<string> => {
   const headings = new Set<string>();
@@ -104,12 +105,14 @@ describe("documentation contracts", () => {
     const markdown = readMarkdown(FRONTEND_PLAYBOOK_PATH);
     const headings = extractSectionHeadings(markdown);
 
-    const missingSections = REQUIRED_PLAYBOOK_SECTIONS.filter((section) => !headings.has(section));
+    const missingSections = REQUIRED_PLAYBOOK_SECTIONS.filter(section => !headings.has(section));
     expect(missingSections).toEqual([]);
   });
 
   it("enforces required sections in request templates", () => {
-    const missingTemplateFiles = TEMPLATE_PATHS.filter((templatePath) => !fs.existsSync(templatePath));
+    const missingTemplateFiles = TEMPLATE_PATHS.filter(
+      templatePath => !fs.existsSync(templatePath),
+    );
     expect(missingTemplateFiles).toEqual([]);
 
     const missingTemplateSections: string[] = [];
@@ -134,7 +137,9 @@ describe("documentation contracts", () => {
 
     const markdown = readMarkdown(FRONTEND_FOUNDATION_STATUS_PATH);
     const headings = extractSectionHeadings(markdown);
-    const missingSections = REQUIRED_FOUNDATION_STATUS_SECTIONS.filter((section) => !headings.has(section));
+    const missingSections = REQUIRED_FOUNDATION_STATUS_SECTIONS.filter(
+      section => !headings.has(section),
+    );
 
     expect(missingSections).toEqual([]);
   });

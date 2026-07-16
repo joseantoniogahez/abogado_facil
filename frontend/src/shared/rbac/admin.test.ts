@@ -1,20 +1,20 @@
 import { buildApiUrl } from "@/shared/api/env";
 import { ApiError } from "@/shared/api/errors";
+import { getAccessToken, setAccessToken } from "@/shared/auth/storage";
 import {
-  assignRbacUserRole,
   assignRbacRolePermission,
+  assignRbacUserRole,
   createAdminUser,
   readAdminUser,
   readAdminUsers,
   readRbacRoleUsers,
   readRbacUserRoles,
-  removeRbacUserRole,
   removeRbacRoleInheritance,
   removeRbacRolePermission,
+  removeRbacUserRole,
   softDeleteAdminUser,
   updateRbacRole,
 } from "@/shared/rbac/admin";
-import { getAccessToken, setAccessToken } from "@/shared/auth/storage";
 
 const errorResponse = (
   status: number,
@@ -24,7 +24,8 @@ const errorResponse = (
   status,
   statusText: "Error",
   headers: {
-    get: (name: string) => (name.toLowerCase() === "x-request-id" ? (payload.request_id ?? null) : null),
+    get: (name: string) =>
+      name.toLowerCase() === "x-request-id" ? (payload.request_id ?? null) : null,
   },
   json: () => Promise.resolve(payload),
 });
@@ -204,25 +205,28 @@ describe("rbac admin client", () => {
     expect(request.method).toBe("PUT");
   });
 
-  it.each(["own", "tenant", "any"] as const)("assigns role permission with explicit %s scope", async (scope) => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: () =>
-        Promise.resolve({
-          id: "users:manage",
-          name: "Manage users",
-          scope,
-        }),
-    } satisfies Partial<Response>);
-    vi.stubGlobal("fetch", fetchMock);
+  it.each(["own", "tenant", "any"] as const)(
+    "assigns role permission with explicit %s scope",
+    async (scope) => {
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: () =>
+          Promise.resolve({
+            id: "users:manage",
+            name: "Manage users",
+            scope,
+          }),
+      } satisfies Partial<Response>);
+      vi.stubGlobal("fetch", fetchMock);
 
-    await assignRbacRolePermission(2, "users:manage", { scope });
+      await assignRbacRolePermission(2, "users:manage", { scope });
 
-    const [, request] = fetchMock.mock.calls[0] as [string, RequestInit];
-    expect(request.method).toBe("PUT");
-    expect(request.body).toBe(JSON.stringify({ scope }));
-  });
+      const [, request] = fetchMock.mock.calls[0] as [string, RequestInit];
+      expect(request.method).toBe("PUT");
+      expect(request.body).toBe(JSON.stringify({ scope }));
+    },
+  );
 
   it("sends delete for soft-delete admin user", async () => {
     const fetchMock = vi.fn().mockResolvedValue({

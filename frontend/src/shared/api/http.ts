@@ -34,7 +34,8 @@ export const apiRequest = async <T>(path: string, options: RequestOptions<T> = {
       ...init,
       headers: requestHeaders,
     });
-  } catch {
+  }
+  catch {
     const networkError = new ApiError("Error de comunicacion con el servidor", 0, "network_error");
     emitObservabilityEvent({
       event_name: "api.request.network_error",
@@ -94,7 +95,8 @@ export const apiBlobRequest = async (
   let response: Response;
   try {
     response = await fetch(buildApiUrl(path), { ...init, headers: requestHeaders });
-  } catch {
+  }
+  catch {
     const error = new ApiError("Error de comunicacion con el servidor", 0, "network_error");
     emitObservabilityEvent({
       event_name: "api.request.network_error",

@@ -6,8 +6,8 @@ import { describe, expect, it, vi } from "vitest";
 import { createQueryClient } from "@/app/query-client";
 import { t } from "@/shared/i18n/ui-text";
 
-import { MatterNotes } from "./MatterNotes";
 import { parseMatterNote, parseMatterNoteList } from "./contracts";
+import { MatterNotes } from "./MatterNotes";
 
 const note = {
   id: 7,
@@ -70,9 +70,11 @@ describe("MatterNotes", () => {
       .mockResolvedValueOnce(response({ items: null, total: 0 }))
       .mockResolvedValueOnce(response({ items: [], total: 0 }));
     renderNotes(failed);
-    await userEvent.setup().click(
-      await screen.findByRole("button", { name: t("matterNotes.retry") }, { timeout: 5000 }),
-    );
+    await userEvent
+      .setup()
+      .click(
+        await screen.findByRole("button", { name: t("matterNotes.retry") }, { timeout: 5000 }),
+      );
     await waitFor(() => expect(failed).toHaveBeenCalledTimes(3));
   });
 
@@ -85,39 +87,59 @@ describe("MatterNotes", () => {
         return Promise.resolve(response(current, 201));
       }
       if (method === "PATCH") {
-        const payload = JSON.parse(typeof options?.body === "string" ? options.body : "{}") as Partial<
-          typeof current
-        >;
+        const payload = JSON.parse(
+          typeof options?.body === "string" ? options.body : "{}",
+        ) as Partial<typeof current>;
         current = { ...current, ...payload, updated_at: "2026-07-12T11:00:00Z" };
         return Promise.resolve(response(current));
       }
       if (method === "DELETE") return Promise.resolve(response(undefined, 204));
       return Promise.resolve(response({ items: [current], total: 1 }));
     });
-    const confirm = vi.spyOn(window, "confirm").mockReturnValueOnce(false).mockReturnValueOnce(true);
+    const confirm = vi
+      .spyOn(window, "confirm")
+      .mockReturnValueOnce(false)
+      .mockReturnValueOnce(true);
     renderNotes(fetchMock);
     const user = userEvent.setup();
 
     expect(await screen.findByText(note.content)).toBeInTheDocument();
-    await user.type(screen.getByLabelText(t("matterNotes.content"), { selector: "textarea" }), "  Nueva llamada  ");
+    await user.type(
+      screen.getByLabelText(t("matterNotes.content"), { selector: "textarea" }),
+      "  Nueva llamada  ",
+    );
     await user.click(screen.getByRole("button", { name: t("matterNotes.add") }));
-    await waitFor(() => expect(fetchMock.mock.calls.some((call) => methodForCall(call) === "POST")).toBe(true));
+    await waitFor(() =>
+      expect(fetchMock.mock.calls.some(call => methodForCall(call) === "POST")).toBe(true),
+    );
 
     await user.click(screen.getByRole("button", { name: t("matterNotes.edit") }));
-    const editField = screen.getAllByLabelText(t("matterNotes.content"), { selector: "textarea" })[1];
+    const editField = screen.getAllByLabelText(t("matterNotes.content"), {
+      selector: "textarea",
+    })[1];
     await user.clear(editField);
     await user.type(editField, "Seguimiento editado");
     await user.click(screen.getByRole("button", { name: t("matterNotes.save") }));
-    await waitFor(() => expect(fetchMock.mock.calls.filter((call) => methodForCall(call) === "PATCH")).toHaveLength(1));
+    await waitFor(() =>
+      expect(fetchMock.mock.calls.filter(call => methodForCall(call) === "PATCH")).toHaveLength(
+        1,
+      ),
+    );
 
     await user.click(screen.getByRole("button", { name: t("matterNotes.mark") }));
-    await waitFor(() => expect(fetchMock.mock.calls.filter((call) => methodForCall(call) === "PATCH")).toHaveLength(2));
+    await waitFor(() =>
+      expect(fetchMock.mock.calls.filter(call => methodForCall(call) === "PATCH")).toHaveLength(
+        2,
+      ),
+    );
 
     const deleteButton = screen.getByRole("button", { name: t("matterNotes.delete") });
     await user.click(deleteButton);
-    expect(fetchMock.mock.calls.some((call) => methodForCall(call) === "DELETE")).toBe(false);
+    expect(fetchMock.mock.calls.some(call => methodForCall(call) === "DELETE")).toBe(false);
     await user.click(deleteButton);
-    await waitFor(() => expect(fetchMock.mock.calls.some((call) => methodForCall(call) === "DELETE")).toBe(true));
+    await waitFor(() =>
+      expect(fetchMock.mock.calls.some(call => methodForCall(call) === "DELETE")).toBe(true),
+    );
     expect(confirm).toHaveBeenCalledTimes(2);
   });
 });

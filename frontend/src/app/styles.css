@@ -22,8 +22,7 @@ body {
   color: var(--app-ink);
   background:
     radial-gradient(circle at 5% 10%, rgba(15, 123, 108, 0.12), transparent 40%),
-    radial-gradient(circle at 92% 88%, rgba(23, 33, 43, 0.06), transparent 38%),
-    var(--app-bg);
+    radial-gradient(circle at 92% 88%, rgba(23, 33, 43, 0.06), transparent 38%), var(--app-bg);
 }
 
 h1,
@@ -35,6 +34,45 @@ h3 {
 
 p {
   margin: 0;
+}
+
+.landing-link:active {
+  transform: translateY(1px);
+}
+
+.landing-link:disabled {
+  background: var(--app-bg);
+  color: var(--app-subtle);
+  box-shadow: inset 0 0 0 1px var(--app-surface);
+  cursor: not-allowed;
+}
+
+.app-action-quiet {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.app-action-danger {
+  border-color: #fca5a5;
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.app-action-danger:hover {
+  background: #fee2e2;
+}
+
+.app-action-compact {
+  min-height: 2.25rem;
+  padding-inline: 0.75rem;
+  font-size: 0.75rem;
+}
+
+.app-action-nav {
+  width: 100%;
+  justify-content: flex-start;
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 
 .mono-label {

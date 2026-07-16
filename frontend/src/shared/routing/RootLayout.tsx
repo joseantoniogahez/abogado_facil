@@ -1,12 +1,17 @@
-import { startTransition, useEffect, useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { startTransition, useEffect, useMemo, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 
 import { authLogoutMutationPolicy } from "@/app/mutation-policy";
 import { logout, SESSION_QUERY_KEY, useSession } from "@/shared/auth/session";
-import { IAM_PERMISSION } from "@/shared/iam/contracts";
-import { userHasPermission } from "@/shared/iam/api";
 import { t } from "@/shared/i18n/ui-text";
+import { userHasPermission } from "@/shared/iam/api";
+import { IAM_PERMISSION } from "@/shared/iam/contracts";
+import {
+  NAV_ACTION_CLASS_NAME,
+  QUIET_ACTION_CLASS_NAME,
+  SECONDARY_ACTION_CLASS_NAME,
+} from "@/shared/ui/actionStyles";
 
 interface AdminMenuItem {
   key:
@@ -16,7 +21,12 @@ interface AdminMenuItem {
     | "routing.nav.admin.users"
     | "routing.nav.admin.roles";
   permissionId: string;
-  to: "/admin/audit-log" | "/admin/assignments" | "/admin/permissions" | "/admin/users" | "/admin/roles";
+  to:
+    | "/admin/audit-log"
+    | "/admin/assignments"
+    | "/admin/permissions"
+    | "/admin/users"
+    | "/admin/roles";
 }
 
 interface PrimaryMenuItem {
@@ -95,7 +105,7 @@ export const RootLayout = () => {
     if (!user) {
       return [];
     }
-    return ADMIN_MENU_ITEMS.filter((menuItem) => userHasPermission(user, menuItem.permissionId));
+    return ADMIN_MENU_ITEMS.filter(menuItem => userHasPermission(user, menuItem.permissionId));
   }, [user]);
 
   if (!user) {
@@ -110,8 +120,8 @@ export const RootLayout = () => {
             aria-controls="app-navigation-panel"
             aria-expanded={isMenuOpen}
             aria-label={t("routing.nav.menu.toggle")}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--app-border)]"
-            onClick={() => setIsMenuOpen((previous) => !previous)}
+            className={`${SECONDARY_ACTION_CLASS_NAME} h-11 w-11 px-0`}
+            onClick={() => setIsMenuOpen(previous => !previous)}
             type="button"
           >
             <span aria-hidden className="text-lg">
@@ -119,8 +129,15 @@ export const RootLayout = () => {
             </span>
           </button>
           <div className="flex items-center gap-4">
-            <Link className="text-sm font-semibold" to="/dashboard">{t("routing.nav.home")}</Link>
-            <button className="text-sm font-semibold" disabled={logoutMutation.isPending} onClick={() => logoutMutation.mutate()} type="button">
+            <Link className={QUIET_ACTION_CLASS_NAME} to="/dashboard">
+              {t("routing.nav.home")}
+            </Link>
+            <button
+              className={SECONDARY_ACTION_CLASS_NAME}
+              disabled={logoutMutation.isPending}
+              onClick={() => logoutMutation.mutate()}
+              type="button"
+            >
               {logoutMutation.isPending ? t("routing.logout.pending") : t("routing.logout")}
             </button>
           </div>
@@ -134,32 +151,31 @@ export const RootLayout = () => {
           id="app-navigation-panel"
         >
           <ul className="space-y-2">
-            {PRIMARY_MENU_ITEMS.map((menuItem) => (
+            {PRIMARY_MENU_ITEMS.map(menuItem => (
               <li key={menuItem.to}>
-                <Link className="block rounded-xl px-3 py-2 text-sm font-medium hover:bg-[var(--app-bg)]" to={menuItem.to}>
+                <Link className={NAV_ACTION_CLASS_NAME} to={menuItem.to}>
                   {t(menuItem.key)}
                 </Link>
               </li>
             ))}
-            {visibleAdminItems.length > 0 ? (
-              <li>
-                <p className="px-3 pt-2 text-xs font-semibold uppercase tracking-wide text-[var(--app-subtle)]">
-                  {t("routing.nav.admin.group")}
-                </p>
-                <ul className="mt-1 space-y-1">
-                  {visibleAdminItems.map((menuItem) => (
-                    <li key={menuItem.to}>
-                      <Link
-                        className="block rounded-xl px-3 py-2 text-sm font-medium hover:bg-[var(--app-bg)]"
-                        to={menuItem.to}
-                      >
-                        {t(menuItem.key)}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </li>
-            ) : null}
+            {visibleAdminItems.length > 0
+              ? (
+                  <li>
+                    <p className="px-3 pt-2 text-xs font-semibold uppercase tracking-wide text-[var(--app-subtle)]">
+                      {t("routing.nav.admin.group")}
+                    </p>
+                    <ul className="mt-1 space-y-1">
+                      {visibleAdminItems.map(menuItem => (
+                        <li key={menuItem.to}>
+                          <Link className={NAV_ACTION_CLASS_NAME} to={menuItem.to}>
+                            {t(menuItem.key)}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
+                )
+              : null}
           </ul>
         </nav>
 

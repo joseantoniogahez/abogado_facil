@@ -100,7 +100,7 @@ export const LandingPage = () => {
 
           <div className="landing-previewBody">
             <dl className="landing-meta">
-              {PREVIEW_ITEMS.map((item) => (
+              {PREVIEW_ITEMS.map(item => (
                 <div className="landing-metaItem" key={item.label}>
                   <dt>{t(item.label)}</dt>
                   <dd>{t(item.value)}</dd>
@@ -143,7 +143,7 @@ export const LandingPage = () => {
             <p>{t("landing.modules.subtitle")}</p>
           </div>
           <ul className="landing-moduleGrid">
-            {MODULES.map((module) => (
+            {MODULES.map(module => (
               <li className="landing-module" key={module.title}>
                 <h3>{t(module.title)}</h3>
                 <p>{t(module.body)}</p>

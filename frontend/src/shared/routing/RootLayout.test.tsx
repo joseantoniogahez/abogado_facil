@@ -1,10 +1,10 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { RouterProvider, createMemoryRouter } from "react-router-dom";
+import { createMemoryRouter, RouterProvider } from "react-router-dom";
 
 import { createQueryClient } from "@/app/query-client";
-import { SESSION_QUERY_KEY, type AuthenticatedUser } from "@/shared/auth/session";
+import { type AuthenticatedUser, SESSION_QUERY_KEY } from "@/shared/auth/session";
 import { t } from "@/shared/i18n/ui-text";
 import { IAM_PERMISSION } from "@/shared/iam/contracts";
 import { RootLayout } from "@/shared/routing/RootLayout";
@@ -48,7 +48,9 @@ describe("RootLayout", () => {
     renderLayout(null);
 
     expect(await screen.findByRole("heading", { name: t("welcome.badge") })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: t("routing.nav.menu.toggle") })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: t("routing.nav.menu.toggle") }),
+    ).not.toBeInTheDocument();
   });
 
   it("renders hamburger menu for authenticated session and filters admin items by permissions", async () => {
@@ -74,11 +76,19 @@ describe("RootLayout", () => {
     expect(screen.getAllByRole("link", { name: t("routing.nav.home") })).not.toHaveLength(0);
     expect(screen.getByRole("link", { name: t("routing.nav.profile") })).toBeInTheDocument();
     expect(screen.getByText(t("routing.nav.admin.group"))).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: t("routing.nav.admin.assignments") })).toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: t("routing.nav.admin.auditLog") })).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: t("routing.nav.admin.permissions") })).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: t("routing.nav.admin.assignments") }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: t("routing.nav.admin.auditLog") }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: t("routing.nav.admin.permissions") }),
+    ).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: t("routing.nav.admin.users") })).toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: t("routing.nav.admin.roles") })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: t("routing.nav.admin.roles") }),
+    ).not.toBeInTheDocument();
   });
 
   it("shows assignments nav item for user_roles:manage without users:manage", async () => {
@@ -98,9 +108,15 @@ describe("RootLayout", () => {
     const user = userEvent.setup();
     await user.click(menuTrigger);
 
-    expect(screen.getByRole("link", { name: t("routing.nav.admin.assignments") })).toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: t("routing.nav.admin.users") })).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: t("routing.nav.admin.roles") })).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: t("routing.nav.admin.assignments") }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: t("routing.nav.admin.users") }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: t("routing.nav.admin.roles") }),
+    ).not.toBeInTheDocument();
   });
 
   it("shows audit log nav item for audit_logs:read without other admin permissions", async () => {
@@ -121,8 +137,12 @@ describe("RootLayout", () => {
     await user.click(menuTrigger);
 
     expect(screen.getByRole("link", { name: t("routing.nav.admin.auditLog") })).toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: t("routing.nav.admin.users") })).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: t("routing.nav.admin.roles") })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: t("routing.nav.admin.users") }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: t("routing.nav.admin.roles") }),
+    ).not.toBeInTheDocument();
   });
 
   it("shows permissions nav item for role_permissions:manage without roles:manage", async () => {
@@ -142,9 +162,15 @@ describe("RootLayout", () => {
     const user = userEvent.setup();
     await user.click(menuTrigger);
 
-    expect(screen.getByRole("link", { name: t("routing.nav.admin.permissions") })).toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: t("routing.nav.admin.roles") })).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: t("routing.nav.admin.users") })).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: t("routing.nav.admin.permissions") }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: t("routing.nav.admin.roles") }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: t("routing.nav.admin.users") }),
+    ).not.toBeInTheDocument();
   });
 
   it("logs out from the authenticated layout and redirects to login", async () => {

@@ -5,9 +5,9 @@
 - ID: `UX-001`
 - Type: `Frontend`
 - Priority: `P1`
-- Plan status: `Ready`
-- Implementation status: `Listo`
-- Last updated: `2026-07-14`
+- Plan status: `Hecho`
+- Implementation status: `Hecho`
+- Last updated: `2026-07-15`
 - Backlog source: `docs/product/BACKLOG_ABOGADO_FACIL.md`
 
 ## Objective
@@ -59,21 +59,21 @@ sistema visual reutilizable para toda la aplicación.
 
 ## Acceptance Criteria
 
-- [ ] Toda acción primaria o secundaria se distingue visualmente del texto circundante en reposo.
-- [ ] Las acciones discretas conservan una señal persistente y no dependen exclusivamente de
+- [x] Toda acción primaria o secundaria se distingue visualmente del texto circundante en reposo.
+- [x] Las acciones discretas conservan una señal persistente y no dependen exclusivamente de
   `hover`, color o cursor para comunicar interactividad.
-- [ ] Los controles deshabilitados se reconocen como controles no disponibles y no como texto
+- [x] Los controles deshabilitados se reconocen como controles no disponibles y no como texto
   ordinario; conservan su etiqueta legible.
-- [ ] El foco de teclado es claramente visible en botones y enlaces de acción.
-- [ ] Las acciones destructivas se distinguen de las primarias y secundarias sin comunicar peligro
+- [x] El foco de teclado es claramente visible en botones y enlaces de acción.
+- [x] Las acciones destructivas se distinguen de las primarias y secundarias sin comunicar peligro
   solamente mediante color.
-- [ ] Elementos con comportamiento de navegación siguen siendo enlaces y los que ejecutan acciones
+- [x] Elementos con comportamiento de navegación siguen siendo enlaces y los que ejecutan acciones
   siguen siendo botones.
-- [ ] La auditoría cubre las rutas públicas, autenticadas y administrativas existentes.
-- [ ] No se agregan dependencias y el build permanece dentro del presupuesto vigente.
-- [ ] Required documentation is synchronized with delivered behavior.
-- [ ] Required validation gates pass and are recorded below.
-- [ ] Mandatory human approvals are recorded, or explicitly not applicable.
+- [x] La auditoría cubre las rutas públicas, autenticadas y administrativas existentes.
+- [x] No se agregan dependencias y el build permanece dentro del presupuesto vigente.
+- [x] Required documentation is synchronized with delivered behavior.
+- [x] Required validation gates pass and are recorded below.
+- [x] Mandatory human approvals are recorded, or explicitly not applicable.
 
 ## Affected Contracts and Files
 
@@ -88,72 +88,84 @@ sistema visual reutilizable para toda la aplicación.
 
 ### Implementation
 
-- [ ] Inventariar botones y enlaces de acción y clasificarlos por jerarquía y semántica.
-- [ ] Crear variantes compartidas con estados consistentes y foco visible.
-- [ ] Migrar primero navegación, dashboard y flujos de producto, y después administración.
-- [ ] Revisar acciones deshabilitadas, pendientes y destructivas en cada pantalla afectada.
-- [ ] Eliminar duplicación de estilos locales cuando la variante compartida la reemplace.
+- [x] Inventariar botones y enlaces de acción y clasificarlos por jerarquía y semántica.
+- [x] Crear variantes compartidas con estados consistentes y foco visible.
+- [x] Migrar primero navegación, dashboard y flujos de producto, y después administración.
+- [x] Revisar acciones deshabilitadas, pendientes y destructivas en cada pantalla afectada.
+- [x] Eliminar duplicación de estilos locales cuando la variante compartida la reemplace.
 
 ### Tests and Documentation
 
-- [ ] Añadir pruebas enfocadas del contrato visual/semántico de las variantes compartidas.
-- [ ] Mantener verdes y ampliar cuando corresponda las pruebas de accesibilidad de rutas.
-- [ ] Review all documentation surfaces required by `AGENTS.md`.
-- [ ] Update canonical documents affected by the code diff.
+- [x] Añadir pruebas enfocadas del contrato visual/semántico de las variantes compartidas.
+- [x] Mantener verdes y ampliar cuando corresponda las pruebas de accesibilidad de rutas.
+- [x] Review all documentation surfaces required by `AGENTS.md`.
+- [x] Update canonical documents affected by the code diff.
 
 ### Validation
 
-- [ ] `npm --prefix frontend run test:a11y`
-- [ ] `npm --prefix frontend run openapi:check`
-- [ ] `npm --prefix frontend run check`
-- [ ] `npm --prefix frontend run build`
-- [ ] Pre-commit on changed files.
+- [x] `npm --prefix frontend run test:a11y`
+- [x] `npm --prefix frontend run openapi:check`
+- [x] `npm --prefix frontend run check`
+- [x] `npm --prefix frontend run build`
+- [x] Pre-commit on changed files.
 
 ## Progress Log
 
-| Date       | State         | Completed                                       | Pending / next safe action                        |
-| ---------- | ------------- | ----------------------------------------------- | ------------------------------------------------- |
-| 2026-07-14 | Plan prepared | Problema, alcance, decisiones y gates definidos | Inventariar controles y diseñar variantes shared. |
+| Date       | State         | Completed                                                                   | Pending / next safe action                         |
+| ---------- | ------------- | --------------------------------------------------------------------------- | -------------------------------------------------- |
+| 2026-07-14 | Plan prepared | Problema, alcance, decisiones y gates definidos                             | Inventariar controles y diseñar variantes shared.  |
+| 2026-07-15 | En progreso   | Inventario completado; variantes compartidas iniciadas                      | Migrar pantallas, probar y validar.                |
+| 2026-07-15 | Hecho         | Variantes y migración completas; pruebas, a11y, OpenAPI y build verdes      | Ejecutar pre-commit y cerrar tracking.             |
+| 2026-07-15 | Refinado      | Enlaces contextuales inline separados de acciones discretas con base visual | Documentación sincronizada; sin trabajo pendiente. |
 
 ## Validation Results
 
-| Date | Command | Result | Notes |
-| ---- | ------- | ------ | ----- |
-|      |         |        |       |
+| Date       | Command                                          | Result | Notes                                                                    |
+| ---------- | ------------------------------------------------ | ------ | ------------------------------------------------------------------------ |
+| 2026-07-15 | `npm --prefix frontend run test:a11y`            | Pass   | 7/7 pruebas.                                                             |
+| 2026-07-15 | `npm --prefix frontend run check`                | Pass   | 51 archivos, 225 pruebas; branches 85.21%; incluye OpenAPI y deps audit. |
+| 2026-07-15 | `npm --prefix frontend run build`                | Pass   | JS/CSS raw y gzip dentro del presupuesto; CSS 21,117 B de 21,200 B.      |
+| 2026-07-15 | `.\.venv\Scripts\pre-commit.exe run --all-files` | Pass   | Todos los hooks pasaron en la segunda ejecución.                         |
 
 ## Pause / Handoff Record
 
-- Current state: el comportamiento y diseño runtime no cambian; el ítem está listo para iniciar.
-- Changed files and contracts: backlog y plan de UX-001; ningún contrato runtime.
-- Pending work: inventario, variantes compartidas, migración, pruebas y revisión documental.
-- Blockers or approvals: none.
-- Residual risks: una migración amplia puede producir inconsistencias temporales si se pausa a mitad;
-  debe organizarse por grupos completos de pantallas y registrar el punto de reanudación.
-- Next safe action: inventariar cada control interactivo y proponer las variantes compartidas antes
-  de modificar pantallas.
+- Current state: implementación, documentación, tracking y gates completos.
+- Changed files and contracts: variantes shared —incluida la distinción entre enlace inline y
+  acción discreta con base visual—, estilos globales, navegación, auth, dashboard, perfil, clientes,
+  asuntos, notas, checklist, documentos, RBAC, pruebas y gate de accesibilidad.
+- Pending work: none.
+- Blockers or approvals: none; human approval not applicable.
+- Residual risks: el presupuesto CSS conserva 83 B de margen raw; futuras variantes deben reutilizar
+  el sistema compartido.
+- Next safe action: none; UX-001 está cerrado.
 
 Update this section before every pause or partial handoff.
 
 ## Completion Documentation Review
 
-- [ ] Root and service READMEs reviewed.
-- [ ] Backend operation and architecture docs reviewed.
-- [ ] Frontend operation docs and inventories reviewed.
-- [ ] Foundation status files reviewed and changed only if a foundation contract moved.
-- [ ] AI governance docs, templates, and checklists reviewed.
-- [ ] Item plan and summary backlog synchronized.
+- [x] Root and service READMEs reviewed.
+- [x] Backend operation and architecture docs reviewed.
+- [x] Frontend operation docs and inventories reviewed.
+- [x] Foundation status files reviewed and changed only if a foundation contract moved.
+- [x] AI governance docs, templates, and checklists reviewed.
+- [x] Item plan and summary backlog synchronized.
 
 Record documents intentionally unchanged and why:
 
-- Pending implementation review.
+- Root/service READMEs, backend docs, route/API/runtime/security/observability/e2e inventories,
+  foundation status and AI governance docs remain unchanged because UX-001 changes no routes, API,
+  auth/RBAC policy, runtime configuration, foundation rule, or delivery workflow.
+- `frontend/docs/operations/accessibility_gate.md` changed because the shared action hierarchy is an
+  accessibility contract.
 
 ## Completion Summary
 
-- Delivered: backlog item and implementation-ready UX plan only.
-- Validation: documentation hooks pending.
-- Skipped validation: frontend runtime gates are not applicable until implementation starts.
-- Human approvals: not applicable to backlog capture.
-- Residual risk: the visual inventory must confirm the final migration surface.
+- Delivered: shared action hierarchy and migration across public, authenticated, product and admin
+  surfaces, preserving native semantics and persistent interaction cues.
+- Validation: a11y, check/coverage/OpenAPI/dependency audit and production build/budget pass.
+- Skipped validation: e2e smoke is not required because routes, auth and error journeys did not change.
+- Human approvals: not applicable.
+- Residual risk: CSS raw budget has 83 B remaining; reuse variants rather than adding parallel styles.
 
 Do not set the item to `Hecho` while any required criterion, validation, documentation update, or
 approval remains incomplete.

@@ -1,5 +1,5 @@
-import { ApiContractError } from "@/shared/api/contracts";
 import { parseDashboardSummary } from "@/features/dashboard/contracts";
+import { ApiContractError } from "@/shared/api/contracts";
 
 const validSummary = {
   firm_id: 1,
@@ -18,12 +18,14 @@ describe("parseDashboardSummary", () => {
   });
 
   it("rejects unknown AI states", () => {
-    expect(() => parseDashboardSummary({ ...validSummary, ai_status: "secret_ready" })).toThrow(ApiContractError);
+    expect(() => parseDashboardSummary({ ...validSummary, ai_status: "secret_ready" })).toThrow(
+      ApiContractError,
+    );
   });
 
   it("rejects malformed availability", () => {
-    expect(() => parseDashboardSummary({ ...validSummary, clients: { value: 0, available: "no" } })).toThrow(
-      ApiContractError,
-    );
+    expect(() =>
+      parseDashboardSummary({ ...validSummary, clients: { value: 0, available: "no" } }),
+    ).toThrow(ApiContractError);
   });
 });

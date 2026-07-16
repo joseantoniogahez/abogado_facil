@@ -1,4 +1,5 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
+
 import { t } from "../src/shared/i18n/ui-text";
 
 const ACCESS_TOKEN_STORAGE_KEY = "auth.session.access_token";
@@ -19,18 +20,21 @@ const authenticatedUser = (overrides: Record<string, unknown> = {}) => ({
 });
 
 const dashboardSummary = () => ({
-  firm_id: 1, firm_name: "Smoke User",
-  clients: { value: 0, available: false }, active_matters: { value: 0, available: false },
-  pending_tasks: { value: 0, available: false }, upcoming_tasks: [], ai_status: "not_available", actions: [],
+  firm_id: 1,
+  firm_name: "Smoke User",
+  clients: { value: 0, available: false },
+  active_matters: { value: 0, available: false },
+  pending_tasks: { value: 0, available: false },
+  upcoming_tasks: [],
+  ai_status: "not_available",
+  actions: [],
 });
 
 const mockUnhandledApiRequests = async (page: Page): Promise<void> => {
   await page.route("**/v1/**", (route) => {
     const request = route.request();
     const url = new URL(request.url());
-    throw new Error(
-      `Unhandled API request in smoke test: ${request.method()} ${url.pathname}`,
-    );
+    throw new Error(`Unhandled API request in smoke test: ${request.method()} ${url.pathname}`);
   });
 };
 
@@ -59,26 +63,61 @@ test.describe("frontend foundation smoke", () => {
       const method = request.method();
       const pathname = new URL(request.url()).pathname;
       if (method === "GET" && pathname === "/v1/users/me") {
-        await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(authenticatedUser()) });
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(authenticatedUser()),
+        });
         return;
       }
       if (method === "GET" && pathname === "/v1/matters/3") {
-        await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(matter) });
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(matter),
+        });
         return;
       }
       if (method === "GET" && pathname === "/v1/matters/3/notes") {
-        await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ items: notes, total: notes.length }) });
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({ items: notes, total: notes.length }),
+        });
         return;
       }
       if (method === "POST" && pathname === "/v1/matters/3/notes") {
         const payload = request.postDataJSON() as { content: string };
-        notes = [{ id: 7, matter_id: 3, content: payload.content, is_relevant: false, created_at: matter.created_at, updated_at: matter.updated_at }];
-        await route.fulfill({ status: 201, contentType: "application/json", body: JSON.stringify(notes[0]) });
+        notes = [
+          {
+            id: 7,
+            matter_id: 3,
+            content: payload.content,
+            is_relevant: false,
+            created_at: matter.created_at,
+            updated_at: matter.updated_at,
+          },
+        ];
+        await route.fulfill({
+          status: 201,
+          contentType: "application/json",
+          body: JSON.stringify(notes[0]),
+        });
         return;
       }
       if (method === "PATCH" && pathname === "/v1/matters/3/notes/7") {
-        notes = [{ ...notes[0], ...(request.postDataJSON() as Record<string, unknown>), updated_at: "2026-07-12T11:00:00Z" }];
-        await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(notes[0]) });
+        notes = [
+          {
+            ...notes[0],
+            ...(request.postDataJSON() as Record<string, unknown>),
+            updated_at: "2026-07-12T11:00:00Z",
+          },
+        ];
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(notes[0]),
+        });
         return;
       }
       if (method === "DELETE" && pathname === "/v1/matters/3/notes/7") {
@@ -87,16 +126,39 @@ test.describe("frontend foundation smoke", () => {
         return;
       }
       if (method === "GET" && pathname === "/v1/matters/3/documents") {
-        await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ items: documents, total: documents.length }) });
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({ items: documents, total: documents.length }),
+        });
         return;
       }
       if (method === "POST" && pathname === "/v1/matters/3/documents") {
-        documents = [{ id: "doc-7", matter_id: 3, original_filename: "relato.txt", document_type: "evidence", media_type: "text/plain", size_bytes: 18, created_at: matter.created_at }];
-        await route.fulfill({ status: 201, contentType: "application/json", body: JSON.stringify(documents[0]) });
+        documents = [
+          {
+            id: "doc-7",
+            matter_id: 3,
+            original_filename: "relato.txt",
+            document_type: "evidence",
+            media_type: "text/plain",
+            size_bytes: 18,
+            created_at: matter.created_at,
+          },
+        ];
+        await route.fulfill({
+          status: 201,
+          contentType: "application/json",
+          body: JSON.stringify(documents[0]),
+        });
         return;
       }
       if (method === "GET" && pathname === "/v1/matters/3/documents/doc-7/download") {
-        await route.fulfill({ status: 200, contentType: "text/plain", headers: { "Content-Disposition": "attachment; filename*=UTF-8''relato.txt" }, body: "Relato del cliente" });
+        await route.fulfill({
+          status: 200,
+          contentType: "text/plain",
+          headers: { "Content-Disposition": "attachment; filename*=UTF-8''relato.txt" },
+          body: "Relato del cliente",
+        });
         return;
       }
       if (method === "DELETE" && pathname === "/v1/matters/3/documents/doc-7") {
@@ -117,24 +179,26 @@ test.describe("frontend foundation smoke", () => {
     await expect(page.getByText("Seguimiento editado")).toBeVisible();
     await page.getByRole("button", { name: t("matterNotes.mark") }).click();
     await expect(page.getByText(t("matterNotes.relevant"))).toBeVisible();
-    page.once("dialog", (dialog) => void dialog.accept());
+    page.once("dialog", dialog => void dialog.accept());
     await page.getByRole("button", { name: t("matterNotes.delete") }).click();
     await expect(page.getByText(t("matterNotes.empty"))).toBeVisible();
     await page.getByLabel(t("matterDocuments.type")).selectOption("evidence");
-    await page.getByLabel(t("matterDocuments.file")).setInputFiles({ name: "relato.txt", mimeType: "text/plain", buffer: Buffer.from("Relato del cliente") });
+    await page.getByLabel(t("matterDocuments.file")).setInputFiles({
+      name: "relato.txt",
+      mimeType: "text/plain",
+      buffer: Buffer.from("Relato del cliente"),
+    });
     await page.getByRole("button", { name: t("matterDocuments.upload") }).click();
     await expect(page.getByText("relato.txt")).toBeVisible();
     const download = page.waitForEvent("download");
     await page.getByRole("button", { name: t("matterDocuments.download") }).click();
     expect((await download).suggestedFilename()).toBe("relato.txt");
-    page.once("dialog", (dialog) => void dialog.accept());
+    page.once("dialog", dialog => void dialog.accept());
     await page.getByRole("button", { name: t("matterDocuments.delete") }).click();
     await expect(page.getByText(t("matterDocuments.empty"))).toBeVisible();
   });
 
-  test("navigates to register and completes the registration flow", async ({
-    page,
-  }) => {
+  test("navigates to register and completes the registration flow", async ({ page }) => {
     await page.route("**/v1/**", async (route) => {
       const request = route.request();
       const method = request.method();
@@ -144,33 +208,30 @@ test.describe("frontend foundation smoke", () => {
         await route.fulfill({
           status: 201,
           contentType: "application/json",
-          body: JSON.stringify(authenticatedUser({ id: 11, email: "new.user@example.com", display_name: "New User", firm_name: "New User" })),
+          body: JSON.stringify(
+            authenticatedUser({
+              id: 11,
+              email: "new.user@example.com",
+              display_name: "New User",
+              firm_name: "New User",
+            }),
+          ),
         });
         return;
       }
 
-      throw new Error(
-        `Unhandled API request in register smoke: ${method} ${pathname}`,
-      );
+      throw new Error(`Unhandled API request in register smoke: ${method} ${pathname}`);
     });
 
     await page.goto("/login");
-    await page
-      .getByRole("link", { name: t("auth.login.footer.createAccount") })
-      .click();
+    await page.getByRole("link", { name: t("auth.login.footer.createAccount") }).click();
 
     await expect(page).toHaveURL(/\/register$/);
-    await page
-      .getByLabel(t("auth.register.fields.firstName"), { exact: true })
-      .fill("New");
-    await page
-      .getByLabel(t("auth.register.fields.lastName"), { exact: true })
-      .fill("User");
+    await page.getByLabel(t("auth.register.fields.firstName"), { exact: true }).fill("New");
+    await page.getByLabel(t("auth.register.fields.lastName"), { exact: true }).fill("User");
     await page.getByLabel(t("auth.login.fields.email")).fill(" New.User@Example.com ");
     await page.getByLabel(t("auth.login.fields.password")).fill("StrongPass1");
-    await page
-      .getByRole("button", { name: t("auth.register.submit.default") })
-      .click();
+    await page.getByRole("button", { name: t("auth.register.submit.default") }).click();
 
     await expect(
       page.getByRole("heading", { name: t("auth.register.success.title") }),
@@ -202,38 +263,38 @@ test.describe("frontend foundation smoke", () => {
         await route.fulfill({
           status: 200,
           contentType: "application/json",
-          body: JSON.stringify(authenticatedUser({
-            permissions: [
-              "audit_logs:read",
-              "role_permissions:manage",
-              "roles:manage",
-              "user_roles:manage",
-              "users:manage",
-            ],
-          })),
+          body: JSON.stringify(
+            authenticatedUser({
+              permissions: [
+                "audit_logs:read",
+                "role_permissions:manage",
+                "roles:manage",
+                "user_roles:manage",
+                "users:manage",
+              ],
+            }),
+          ),
         });
         return;
       }
 
       if (method === "GET" && pathname === "/v1/dashboard") {
-        await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(dashboardSummary()) });
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(dashboardSummary()),
+        });
         return;
       }
 
-      throw new Error(
-        `Unhandled API request in login smoke: ${method} ${pathname}`,
-      );
+      throw new Error(`Unhandled API request in login smoke: ${method} ${pathname}`);
     });
 
     await page.goto("/login");
 
     await page.getByLabel(t("auth.login.fields.email")).fill(SMOKE_EMAIL);
-    await page
-      .getByLabel(t("auth.login.fields.password"))
-      .fill("smoke-password");
-    await page
-      .getByRole("button", { name: t("auth.login.submit.default") })
-      .click();
+    await page.getByLabel(t("auth.login.fields.password")).fill("smoke-password");
+    await page.getByRole("button", { name: t("auth.login.submit.default") }).click();
 
     await expect(page).toHaveURL(/\/dashboard$/);
     await expect(
@@ -243,17 +304,13 @@ test.describe("frontend foundation smoke", () => {
     ).toBeVisible();
   });
 
-  test("redirects protected navigation to login when no session token exists", async ({
-    page,
-  }) => {
+  test("redirects protected navigation to login when no session token exists", async ({ page }) => {
     await mockUnhandledApiRequests(page);
 
     await page.goto("/dashboard");
 
     await expect(page).toHaveURL(/\/login$/);
-    await expect(
-      page.getByRole("heading", { name: t("auth.login.title") }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: t("auth.login.title") })).toBeVisible();
   });
 
   test("redirects authenticated legacy welcome route to dashboard", async ({ page }) => {
@@ -263,11 +320,19 @@ test.describe("frontend foundation smoke", () => {
     await page.route("**/v1/**", async (route) => {
       const pathname = new URL(route.request().url()).pathname;
       if (pathname === "/v1/users/me") {
-        await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(authenticatedUser()) });
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(authenticatedUser()),
+        });
         return;
       }
       if (pathname === "/v1/dashboard") {
-        await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(dashboardSummary()) });
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(dashboardSummary()),
+        });
         return;
       }
       throw new Error(`Unhandled API request in legacy redirect smoke: ${pathname}`);
@@ -276,12 +341,14 @@ test.describe("frontend foundation smoke", () => {
     await page.goto("/welcome");
 
     await expect(page).toHaveURL(/\/dashboard$/);
-    await expect(page.getByRole("heading", { name: t("dashboard.greeting", { displayName: SMOKE_DISPLAY_NAME }) })).toBeVisible();
+    await expect(
+      page.getByRole("heading", {
+        name: t("dashboard.greeting", { displayName: SMOKE_DISPLAY_NAME }),
+      }),
+    ).toBeVisible();
   });
 
-  test("renders protected-route error fallback with request-id diagnostics", async ({
-    page,
-  }) => {
+  test("renders protected-route error fallback with request-id diagnostics", async ({ page }) => {
     await page.addInitScript((storageKey) => {
       window.sessionStorage.setItem(storageKey, "seed-token");
     }, ACCESS_TOKEN_STORAGE_KEY);
@@ -307,9 +374,7 @@ test.describe("frontend foundation smoke", () => {
         return;
       }
 
-      throw new Error(
-        `Unhandled API request in protected-error smoke: ${method} ${pathname}`,
-      );
+      throw new Error(`Unhandled API request in protected-error smoke: ${method} ${pathname}`);
     });
 
     await page.goto("/dashboard");
@@ -320,9 +385,7 @@ test.describe("frontend foundation smoke", () => {
     await expect(page.getByText(/request_id=req-e2e-500/)).toBeVisible();
   });
 
-  test("loads protected profile route and persists updated account state", async ({
-    page,
-  }) => {
+  test("loads protected profile route and persists updated account state", async ({ page }) => {
     await page.addInitScript((storageKey) => {
       window.sessionStorage.setItem(storageKey, "seed-token");
     }, ACCESS_TOKEN_STORAGE_KEY);
@@ -350,20 +413,14 @@ test.describe("frontend foundation smoke", () => {
         return;
       }
 
-      throw new Error(
-        `Unhandled API request in profile smoke: ${method} ${pathname}`,
-      );
+      throw new Error(`Unhandled API request in profile smoke: ${method} ${pathname}`);
     });
 
     await page.goto("/profile");
 
-    await expect(
-      page.getByRole("heading", { name: t("profile.title") }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: t("profile.title") })).toBeVisible();
     await page.getByLabel(t("profile.fields.email")).fill(" smoke.user.v2@example.com ");
-    await page
-      .getByRole("button", { name: t("profile.submit.default") })
-      .click();
+    await page.getByRole("button", { name: t("profile.submit.default") }).click();
 
     await expect(
       page.getByText(t("profile.success.body", { email: "smoke.user.v2@example.com" })),
@@ -373,9 +430,7 @@ test.describe("frontend foundation smoke", () => {
     ).toBeVisible();
   });
 
-  test("renders admin-users error diagnostics on forbidden RBAC access", async ({
-    page,
-  }) => {
+  test("renders admin-users error diagnostics on forbidden RBAC access", async ({ page }) => {
     await page.addInitScript((storageKey) => {
       window.sessionStorage.setItem(storageKey, "seed-token");
     }, ACCESS_TOKEN_STORAGE_KEY);
@@ -426,9 +481,7 @@ test.describe("frontend foundation smoke", () => {
 
     await page.goto("/admin/users");
 
-    await expect(
-      page.getByRole("heading", { name: t("admin.common.error.title") }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: t("admin.common.error.title") })).toBeVisible();
     await expect(page.getByText(/request_id=req-admin-403/)).toBeVisible();
   });
 
@@ -470,22 +523,16 @@ test.describe("frontend foundation smoke", () => {
         return;
       }
 
-      throw new Error(
-        `Unhandled API request in audit-log smoke: ${method} ${pathname}`,
-      );
+      throw new Error(`Unhandled API request in audit-log smoke: ${method} ${pathname}`);
     });
 
     await page.goto("/admin/audit-log");
 
-    await expect(
-      page.getByRole("heading", { name: t("admin.auditLog.title") }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: t("admin.auditLog.title") })).toBeVisible();
     await expect(page.getByText("Seeded RBAC catalog")).toBeVisible();
   });
 
-  test("loads admin assignments workspace and shows direct-read diagnostics", async ({
-    page,
-  }) => {
+  test("loads admin assignments workspace and shows direct-read diagnostics", async ({ page }) => {
     await page.addInitScript((storageKey) => {
       window.sessionStorage.setItem(storageKey, "seed-token");
     }, ACCESS_TOKEN_STORAGE_KEY);
@@ -520,16 +567,12 @@ test.describe("frontend foundation smoke", () => {
         return;
       }
 
-      throw new Error(
-        `Unhandled API request in admin-assignments smoke: ${method} ${pathname}`,
-      );
+      throw new Error(`Unhandled API request in admin-assignments smoke: ${method} ${pathname}`);
     });
 
     await page.goto("/admin/assignments");
 
-    await expect(
-      page.getByRole("heading", { level: 1, name: t("admin.as.title") }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: t("admin.as.title") })).toBeVisible();
     await page.getByLabel(t("admin.as.uid")).fill("999");
     await expect(page.getByText(/request_id=req-assignment-404/)).toBeVisible();
   });
@@ -569,10 +612,7 @@ test.describe("frontend foundation smoke", () => {
         return;
       }
 
-      if (
-        method === "PUT" &&
-        pathname === "/v1/rbac/roles/999/permissions/users%3Amanage"
-      ) {
+      if (method === "PUT" && pathname === "/v1/rbac/roles/999/permissions/users%3Amanage") {
         await route.fulfill({
           status: 404,
           headers: {
@@ -588,32 +628,20 @@ test.describe("frontend foundation smoke", () => {
         return;
       }
 
-      throw new Error(
-        `Unhandled API request in admin-permissions smoke: ${method} ${pathname}`,
-      );
+      throw new Error(`Unhandled API request in admin-permissions smoke: ${method} ${pathname}`);
     });
 
     await page.goto("/admin/permissions");
 
-    await expect(
-      page.getByRole("heading", { name: t("admin.pm.title") }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: t("admin.pm.title") })).toBeVisible();
     await page.getByLabel(t("admin.as.rid")).fill("999");
-    await page
-      .getByLabel(t("admin.roles.permissions.select"))
-      .selectOption("users:manage");
-    await page
-      .getByLabel(t("admin.roles.permissions.scope.label"))
-      .selectOption("tenant");
-    await page
-      .getByRole("button", { name: t("admin.roles.permissions.add") })
-      .click();
+    await page.getByLabel(t("admin.roles.permissions.select")).selectOption("users:manage");
+    await page.getByLabel(t("admin.roles.permissions.scope.label")).selectOption("tenant");
+    await page.getByRole("button", { name: t("admin.roles.permissions.add") }).click();
     await expect(page.getByText(/request_id=req-permission-404/)).toBeVisible();
   });
 
-  test("redirects unauthorized direct admin routes to /dashboard", async ({
-    page,
-  }) => {
+  test("redirects unauthorized direct admin routes to /dashboard", async ({ page }) => {
     await page.addInitScript((storageKey) => {
       window.sessionStorage.setItem(storageKey, "seed-token");
     }, ACCESS_TOKEN_STORAGE_KEY);
@@ -633,13 +661,15 @@ test.describe("frontend foundation smoke", () => {
       }
 
       if (method === "GET" && pathname === "/v1/dashboard") {
-        await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(dashboardSummary()) });
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(dashboardSummary()),
+        });
         return;
       }
 
-      throw new Error(
-        `Unhandled API request in permission-redirect smoke: ${method} ${pathname}`,
-      );
+      throw new Error(`Unhandled API request in permission-redirect smoke: ${method} ${pathname}`);
     });
 
     await page.goto("/admin/users");
@@ -684,16 +714,70 @@ test.describe("frontend foundation smoke", () => {
   });
 
   test("creates, views, edits, and searches a firm-scoped client", async ({ page }) => {
-    await page.addInitScript((storageKey) => window.sessionStorage.setItem(storageKey, "clients-token"), ACCESS_TOKEN_STORAGE_KEY);
-    let storedClient = { id: 21, full_name: "María López", phone: "5512345678", email: "maria@example.com", address: null, notes: null as string | null, created_at: "2026-07-11T12:00:00Z", updated_at: "2026-07-11T12:00:00Z" };
+    await page.addInitScript(
+      storageKey => window.sessionStorage.setItem(storageKey, "clients-token"),
+      ACCESS_TOKEN_STORAGE_KEY,
+    );
+    let storedClient = {
+      id: 21,
+      full_name: "María López",
+      phone: "5512345678",
+      email: "maria@example.com",
+      address: null,
+      notes: null as string | null,
+      created_at: "2026-07-11T12:00:00Z",
+      updated_at: "2026-07-11T12:00:00Z",
+    };
     await page.route("**/v1/**", async (route) => {
-      const request = route.request(); const url = new URL(request.url());
-      if (request.method() === "GET" && url.pathname === "/v1/users/me") { await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(authenticatedUser()) }); return; }
-      if (request.method() === "POST" && url.pathname === "/v1/clients") { const payload = request.postDataJSON() as Partial<typeof storedClient>; storedClient = { ...storedClient, ...payload }; await route.fulfill({ status: 201, contentType: "application/json", body: JSON.stringify(storedClient) }); return; }
-      if (request.method() === "PATCH" && url.pathname === "/v1/clients/21") { const payload = request.postDataJSON() as Partial<typeof storedClient>; storedClient = { ...storedClient, ...payload }; await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(storedClient) }); return; }
-      if (request.method() === "GET" && url.pathname === "/v1/clients/21") { await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(storedClient) }); return; }
-      if (request.method() === "GET" && url.pathname === "/v1/clients") { await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ items: [storedClient], total: 1, limit: 50, offset: 0 }) }); return; }
-      throw new Error(`Unhandled API request in clients smoke: ${request.method()} ${url.pathname}`);
+      const request = route.request();
+      const url = new URL(request.url());
+      if (request.method() === "GET" && url.pathname === "/v1/users/me") {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(authenticatedUser()),
+        });
+        return;
+      }
+      if (request.method() === "POST" && url.pathname === "/v1/clients") {
+        const payload = request.postDataJSON() as Partial<typeof storedClient>;
+        storedClient = { ...storedClient, ...payload };
+        await route.fulfill({
+          status: 201,
+          contentType: "application/json",
+          body: JSON.stringify(storedClient),
+        });
+        return;
+      }
+      if (request.method() === "PATCH" && url.pathname === "/v1/clients/21") {
+        const payload = request.postDataJSON() as Partial<typeof storedClient>;
+        storedClient = { ...storedClient, ...payload };
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(storedClient),
+        });
+        return;
+      }
+      if (request.method() === "GET" && url.pathname === "/v1/clients/21") {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(storedClient),
+        });
+        return;
+      }
+      if (request.method() === "GET" && url.pathname === "/v1/clients") {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({ items: [storedClient], total: 1, limit: 50, offset: 0 }),
+        });
+        return;
+      }
+      throw new Error(
+        `Unhandled API request in clients smoke: ${request.method()} ${url.pathname}`,
+      );
     });
     await page.goto("/clients/new");
     await page.getByLabel(t("clients.fields.name")).fill(storedClient.full_name);

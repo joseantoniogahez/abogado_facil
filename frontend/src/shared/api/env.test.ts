@@ -1,4 +1,9 @@
-import { FrontendEnvError, buildApiUrl, getApiBaseUrl, readFrontendEnvConfig } from "@/shared/api/env";
+import {
+  buildApiUrl,
+  FrontendEnvError,
+  getApiBaseUrl,
+  readFrontendEnvConfig,
+} from "@/shared/api/env";
 
 describe("frontend env contracts", () => {
   it("normalizes valid API origin/base path values", () => {
@@ -9,9 +14,9 @@ describe("frontend env contracts", () => {
 
     expect(config.apiOrigin).toBe("https://api.example.com");
     expect(config.apiBasePath).toBe("/v1");
-    expect(getApiBaseUrl({ VITE_API_ORIGIN: "https://api.example.com/", VITE_API_BASE_PATH: "/v1/" })).toBe(
-      "https://api.example.com/v1",
-    );
+    expect(
+      getApiBaseUrl({ VITE_API_ORIGIN: "https://api.example.com/", VITE_API_BASE_PATH: "/v1/" }),
+    ).toBe("https://api.example.com/v1");
   });
 
   it("fails fast for invalid API origin", () => {

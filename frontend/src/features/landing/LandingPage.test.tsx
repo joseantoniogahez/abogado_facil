@@ -1,11 +1,11 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
-import { RouterProvider, createMemoryRouter } from "react-router-dom";
+import { createMemoryRouter, RouterProvider } from "react-router-dom";
 
 import { createQueryClient } from "@/app/query-client";
+import { LandingPage } from "@/features/landing/LandingPage";
 import { SESSION_QUERY_KEY } from "@/shared/auth/session";
 import { t } from "@/shared/i18n/ui-text";
-import { LandingPage } from "@/features/landing/LandingPage";
 
 describe("LandingPage", () => {
   it("renders the public product landing with BYOK and legal messaging", () => {
@@ -18,13 +18,13 @@ describe("LandingPage", () => {
           element: <LandingPage />,
         },
       ],
-      { initialEntries: ["/"] }
+      { initialEntries: ["/"] },
     );
 
     render(
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
-      </QueryClientProvider>
+      </QueryClientProvider>,
     );
 
     expect(screen.getByRole("heading", { name: t("landing.title") })).toBeInTheDocument();
@@ -40,7 +40,9 @@ describe("LandingPage", () => {
     expect(screen.getByText(t("landing.legal.title"))).toBeInTheDocument();
     expect(screen.getByText(t("landing.legal.body"))).toBeVisible();
     expect(screen.getByRole("heading", { name: t("landing.modules.title") })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: t("landing.modules.clients.title") })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: t("landing.modules.clients.title") }),
+    ).toBeInTheDocument();
     expect(screen.getByLabelText(t("landing.preview.label"))).toBeInTheDocument();
   });
 });

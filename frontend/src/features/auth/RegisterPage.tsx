@@ -1,18 +1,19 @@
-import { FormEvent, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
+import { FormEvent, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 
 import { ApiError, appendRequestIdDiagnostic, getApiErrorRequestId } from "@/shared/api/errors";
 import { type AuthenticatedUser, registerUser, useSession } from "@/shared/auth/session";
 import {
-  getPasswordPolicyViolationKeys,
   composeDisplayName,
+  getPasswordPolicyViolationKeys,
   isEmailValid,
   normalizeEmail,
 } from "@/shared/auth/validation";
 import { t } from "@/shared/i18n/ui-text";
-import { CenteredMessage } from "@/shared/ui/CenteredMessage";
 import { AccountFormField } from "@/shared/ui/AccountFormField";
+import { INLINE_ACTION_CLASS_NAME, PRIMARY_ACTION_CLASS_NAME } from "@/shared/ui/actionStyles";
+import { CenteredMessage } from "@/shared/ui/CenteredMessage";
 
 interface RegisterFormState {
   firstName: string;
@@ -46,7 +47,10 @@ const getRegisterValidationMessage = (formState: RegisterFormState): string | nu
     return t("auth.validation.email.format");
   }
 
-  const [firstPasswordViolation] = getPasswordPolicyViolationKeys(formState.password, normalizedEmail);
+  const [firstPasswordViolation] = getPasswordPolicyViolationKeys(
+    formState.password,
+    normalizedEmail,
+  );
   return firstPasswordViolation ? t(firstPasswordViolation) : null;
 };
 
@@ -109,19 +113,24 @@ export const RegisterPage = () => {
     });
   };
 
-  const mutationError =
-    clientError ??
-    (registerMutation.error instanceof ApiError
-      ? appendRequestIdDiagnostic(registerMutation.error.message, getApiErrorRequestId(registerMutation.error))
-      : registerMutation.isError
-        ? t("auth.register.error.generic")
-        : null);
+  const mutationError
+    = clientError
+      ?? (registerMutation.error instanceof ApiError
+        ? appendRequestIdDiagnostic(
+            registerMutation.error.message,
+            getApiErrorRequestId(registerMutation.error),
+          )
+        : registerMutation.isError
+          ? t("auth.register.error.generic")
+          : null);
 
   if (registeredUser) {
     return (
       <main className="flex min-h-screen items-center justify-center px-6 py-12">
         <section className="w-full max-w-md rounded-[var(--radius-card)] border border-[var(--app-border)] bg-[var(--app-surface)] p-8 shadow-[0_16px_40px_rgba(23,33,43,0.08)] sm:p-10">
-          <p className="mono-label fade-rise text-[var(--app-subtle)]">{t("auth.register.badge")}</p>
+          <p className="mono-label fade-rise text-[var(--app-subtle)]">
+            {t("auth.register.badge")}
+          </p>
           <h1 className="fade-rise-delay mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
             {t("auth.register.success.title")}
           </h1>
@@ -129,10 +138,7 @@ export const RegisterPage = () => {
             {t("auth.register.success.body", { email: registeredUser.email })}
           </p>
           <div className="mt-8">
-            <Link
-              className="inline-flex w-full items-center justify-center rounded-full bg-[var(--app-ink)] px-5 py-3 text-sm font-semibold text-[var(--app-surface)] transition hover:bg-[var(--app-accent)]"
-              to="/login"
-            >
+            <Link className={`${PRIMARY_ACTION_CLASS_NAME} w-full`} to="/login">
               {t("auth.register.footer.signIn")}
             </Link>
           </div>
@@ -153,40 +159,101 @@ export const RegisterPage = () => {
         </p>
 
         <form className="mt-8 space-y-4" onSubmit={submit}>
-          <AccountFormField autoComplete="given-name" label={t("auth.register.fields.firstName")} name="firstName" onChange={(event) => updateNamePart("firstName", event.target.value)} required value={formState.firstName} />
-          <AccountFormField autoComplete="additional-name" label={t("auth.register.fields.middleName")} name="middleName" onChange={(event) => updateNamePart("middleName", event.target.value)} value={formState.middleName} />
-          <AccountFormField autoComplete="family-name" label={t("auth.register.fields.lastName")} name="lastName" onChange={(event) => updateNamePart("lastName", event.target.value)} required value={formState.lastName} />
-          <AccountFormField autoComplete="nickname" label={t("auth.register.fields.displayName")} name="displayName" onChange={(event) => { setDisplayNameCustomized(true); setFormState((previous) => ({ ...previous, displayName: event.target.value })); }} required value={formState.displayName} />
-          <AccountFormField autoComplete="email" label={t("auth.login.fields.email")} name="email" onChange={(event) => setFormState((previous) => ({ ...previous, email: event.target.value }))} required type="email" value={formState.email} />
-          <AccountFormField autoComplete="organization" label={t("auth.register.fields.firmName")} name="firmName" onChange={(event) => setFormState((previous) => ({ ...previous, firmName: event.target.value }))} value={formState.firmName} />
-          <AccountFormField autoComplete="new-password" label={t("auth.login.fields.password")} minLength={8} name="password" onChange={(event) => setFormState((previous) => ({ ...previous, password: event.target.value }))} required type="password" value={formState.password} />
+          <AccountFormField
+            autoComplete="given-name"
+            label={t("auth.register.fields.firstName")}
+            name="firstName"
+            onChange={event => updateNamePart("firstName", event.target.value)}
+            required
+            value={formState.firstName}
+          />
+          <AccountFormField
+            autoComplete="additional-name"
+            label={t("auth.register.fields.middleName")}
+            name="middleName"
+            onChange={event => updateNamePart("middleName", event.target.value)}
+            value={formState.middleName}
+          />
+          <AccountFormField
+            autoComplete="family-name"
+            label={t("auth.register.fields.lastName")}
+            name="lastName"
+            onChange={event => updateNamePart("lastName", event.target.value)}
+            required
+            value={formState.lastName}
+          />
+          <AccountFormField
+            autoComplete="nickname"
+            label={t("auth.register.fields.displayName")}
+            name="displayName"
+            onChange={(event) => {
+              setDisplayNameCustomized(true);
+              setFormState(previous => ({ ...previous, displayName: event.target.value }));
+            }}
+            required
+            value={formState.displayName}
+          />
+          <AccountFormField
+            autoComplete="email"
+            label={t("auth.login.fields.email")}
+            name="email"
+            onChange={event =>
+              setFormState(previous => ({ ...previous, email: event.target.value }))}
+            required
+            type="email"
+            value={formState.email}
+          />
+          <AccountFormField
+            autoComplete="organization"
+            label={t("auth.register.fields.firmName")}
+            name="firmName"
+            onChange={event =>
+              setFormState(previous => ({ ...previous, firmName: event.target.value }))}
+            value={formState.firmName}
+          />
+          <AccountFormField
+            autoComplete="new-password"
+            label={t("auth.login.fields.password")}
+            minLength={8}
+            name="password"
+            onChange={event =>
+              setFormState(previous => ({ ...previous, password: event.target.value }))}
+            required
+            type="password"
+            value={formState.password}
+          />
 
           <ul className="space-y-1 rounded-2xl border border-[var(--app-border)] bg-[var(--app-bg)] px-4 py-3 text-sm text-[var(--app-subtle)]">
             <li>{t("auth.shared.email.hint")}</li>
             <li>{t("auth.shared.password.hint")}</li>
           </ul>
 
-          {mutationError ? (
-            <p
-              className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
-              role="alert"
-            >
-              {mutationError}
-            </p>
-          ) : null}
+          {mutationError
+            ? (
+                <p
+                  className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                  role="alert"
+                >
+                  {mutationError}
+                </p>
+              )
+            : null}
 
           <button
-            className="w-full rounded-full bg-[var(--app-ink)] px-5 py-3 text-sm font-semibold text-[var(--app-surface)] transition hover:bg-[var(--app-accent)] disabled:cursor-not-allowed disabled:opacity-70"
+            className={`${PRIMARY_ACTION_CLASS_NAME} w-full`}
             disabled={registerMutation.isPending}
             type="submit"
           >
-            {registerMutation.isPending ? t("auth.register.submit.pending") : t("auth.register.submit.default")}
+            {registerMutation.isPending
+              ? t("auth.register.submit.pending")
+              : t("auth.register.submit.default")}
           </button>
         </form>
 
         <p className="mt-6 text-sm text-[var(--app-subtle)]">
-          {t("auth.register.footer.haveAccount")}{" "}
-          <Link className="font-semibold text-[var(--app-ink)] underline underline-offset-4" to="/login">
+          {t("auth.register.footer.haveAccount")}
+          {" "}
+          <Link className={INLINE_ACTION_CLASS_NAME} to="/login">
             {t("auth.register.footer.signIn")}
           </Link>
           .

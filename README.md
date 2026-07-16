@@ -169,7 +169,7 @@ The repository uses a root virtual environment for shared tooling and hooks.
 Local `pre-commit` hooks depend on more than the root Python environment:
 
 - Python 3.14.3 for Python-based hooks
-- Node.js >=20.9.0 (Node.js 22 in Docker/CI) and npm 11+ for `frontend` ESLint and typecheck hooks
+- Node.js >=20.9.0 (Node.js 22 in Docker/CI) and npm 11+ for frontend ESLint and typecheck hooks
 - Docker Desktop (or Docker Engine + Compose plugin) for `hadolint` and `docker compose config` hooks
 - A local `.env` copied from `.env_examples`, because compose validation hooks resolve environment variables from it
 

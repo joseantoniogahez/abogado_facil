@@ -1,5 +1,5 @@
-import { FormEvent, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { FormEvent, useMemo, useState } from "react";
 
 import { t } from "@/shared/i18n/ui-text";
 import {
@@ -50,7 +50,8 @@ export const AdminRolesPage = () => {
   });
 
   const updateRoleMutation = useMutation({
-    mutationFn: ({ roleId, name }: { roleId: number; name: string }) => updateRbacRole(roleId, { name }),
+    mutationFn: ({ roleId, name }: { roleId: number; name: string }) =>
+      updateRbacRole(roleId, { name }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: RBAC_ROLES_QUERY_KEY });
     },
@@ -82,17 +83,17 @@ export const AdminRolesPage = () => {
   const roles = rolesQuery.data ?? [];
 
   const roleNameById = useMemo(
-    () => new Map((rolesQuery.data ?? []).map((role) => [role.id, role.name])),
+    () => new Map((rolesQuery.data ?? []).map(role => [role.id, role.name])),
     [rolesQuery.data],
   );
 
-  const pageError =
-    rolesQuery.error ??
-    createRoleMutation.error ??
-    updateRoleMutation.error ??
-    deleteRoleMutation.error ??
-    addParentMutation.error ??
-    removeParentMutation.error;
+  const pageError
+    = rolesQuery.error
+      ?? createRoleMutation.error
+      ?? updateRoleMutation.error
+      ?? deleteRoleMutation.error
+      ?? addParentMutation.error
+      ?? removeParentMutation.error;
 
   if (rolesQuery.isPending) {
     return <CenteredMessage title={t("admin.common.loading")} />;
@@ -135,7 +136,7 @@ export const AdminRolesPage = () => {
             <span className={ADMIN_LABEL_CLASS_NAME}>{t("admin.roles.create.name")}</span>
             <input
               className={ADMIN_FIELD_CLASS_NAME}
-              onChange={(event) => setCreateRoleName(event.target.value)}
+              onChange={event => setCreateRoleName(event.target.value)}
               required
               value={createRoleName}
             />
@@ -152,125 +153,135 @@ export const AdminRolesPage = () => {
         </form>
       </section>
 
-      {roles.length === 0 ? (
-        <section className={ADMIN_CARD_CLASS_NAME}>
-          <p className={ADMIN_MUTED_TEXT_CLASS_NAME}>{t("admin.roles.list.empty")}</p>
-        </section>
-      ) : (
-        roles.map((role) => {
-          const currentRoleNameDraft = roleNameDraftById[role.id] ?? role.name;
-          const currentParentSelection = selectedParentByRoleId[role.id] ?? "";
+      {roles.length === 0
+        ? (
+            <section className={ADMIN_CARD_CLASS_NAME}>
+              <p className={ADMIN_MUTED_TEXT_CLASS_NAME}>{t("admin.roles.list.empty")}</p>
+            </section>
+          )
+        : (
+            roles.map((role) => {
+              const currentRoleNameDraft = roleNameDraftById[role.id] ?? role.name;
+              const currentParentSelection = selectedParentByRoleId[role.id] ?? "";
 
-          return (
-            <section
-              className={ADMIN_CARD_CLASS_NAME}
-              key={role.id}
-            >
-              <div className="flex flex-wrap items-end gap-3">
-                <label className="min-w-72 flex-1">
-                  <span className={ADMIN_LABEL_CLASS_NAME}>{t("admin.roles.create.name")}</span>
-                  <input
-                    className={ADMIN_FIELD_CLASS_NAME}
-                    onChange={(event) =>
-                      setRoleNameDraftById((previous) => ({ ...previous, [role.id]: event.target.value }))
-                    }
-                    value={currentRoleNameDraft}
-                  />
-                </label>
-                <button
-                  className={ADMIN_SECONDARY_BUTTON_CLASS_NAME}
-                  disabled={updateRoleMutation.isPending}
-                  onClick={() => saveRoleName(role.id, role.name)}
-                  type="button"
-                >
-                  {updateRoleMutation.isPending
-                    ? t("admin.roles.actions.update.pending")
-                    : t("admin.roles.actions.update")}
-                </button>
-                <button
-                  className={ADMIN_DANGER_BUTTON_CLASS_NAME}
-                  disabled={deleteRoleMutation.isPending}
-                  onClick={() => confirmAndDeleteRole(role.id, role.name)}
-                  type="button"
-                >
-                  {t("admin.roles.actions.delete")}
-                </button>
-              </div>
-
-              <div className="mt-5">
-                <article className={ADMIN_SUBCARD_CLASS_NAME}>
-                  <h3 className="text-sm font-semibold">{t("admin.roles.card.parents")}</h3>
-                  <div className="mt-3 flex flex-wrap items-end gap-2">
-                    <label className="min-w-52 flex-1">
-                      <span className={ADMIN_INLINE_LABEL_CLASS_NAME}>{t("admin.roles.parents.select")}</span>
-                      <select
-                        className={`${ADMIN_FIELD_CLASS_NAME} text-sm`}
-                        onChange={(event) =>
-                          setSelectedParentByRoleId((previous) => ({
+              return (
+                <section className={ADMIN_CARD_CLASS_NAME} key={role.id}>
+                  <div className="flex flex-wrap items-end gap-3">
+                    <label className="min-w-72 flex-1">
+                      <span className={ADMIN_LABEL_CLASS_NAME}>{t("admin.roles.create.name")}</span>
+                      <input
+                        className={ADMIN_FIELD_CLASS_NAME}
+                        onChange={event =>
+                          setRoleNameDraftById(previous => ({
                             ...previous,
                             [role.id]: event.target.value,
-                          }))
-                        }
-                        value={currentParentSelection}
-                      >
-                        <option value="">-</option>
-                        {roles
-                          .filter(
-                            (candidateRole) =>
-                              candidateRole.id !== role.id && !role.parent_role_ids.includes(candidateRole.id),
-                          )
-                          .map((candidateRole) => (
-                            <option key={candidateRole.id} value={candidateRole.id}>
-                              {candidateRole.name}
-                            </option>
-                          ))}
-                      </select>
+                          }))}
+                        value={currentRoleNameDraft}
+                      />
                     </label>
                     <button
-                      className={ADMIN_COMPACT_SECONDARY_BUTTON_CLASS_NAME}
-                      disabled={!currentParentSelection || addParentMutation.isPending}
-                      onClick={() => {
-                        const parentRoleId = Number(currentParentSelection);
-                        addParentMutation.reset();
-                        addParentMutation.mutate({ roleId: role.id, parentRoleId });
-                        setSelectedParentByRoleId((previous) => ({ ...previous, [role.id]: "" }));
-                      }}
+                      className={ADMIN_SECONDARY_BUTTON_CLASS_NAME}
+                      disabled={updateRoleMutation.isPending}
+                      onClick={() => saveRoleName(role.id, role.name)}
                       type="button"
                     >
-                      {t("admin.roles.parents.add")}
+                      {updateRoleMutation.isPending
+                        ? t("admin.roles.actions.update.pending")
+                        : t("admin.roles.actions.update")}
+                    </button>
+                    <button
+                      className={ADMIN_DANGER_BUTTON_CLASS_NAME}
+                      disabled={deleteRoleMutation.isPending}
+                      onClick={() => confirmAndDeleteRole(role.id, role.name)}
+                      type="button"
+                    >
+                      {t("admin.roles.actions.delete")}
                     </button>
                   </div>
 
-                  {role.parent_role_ids.length === 0 ? (
-                    <p className={`mt-3 ${ADMIN_MUTED_TEXT_CLASS_NAME}`}>{t("admin.roles.card.noParents")}</p>
-                  ) : (
-                    <ul className="mt-3 flex flex-wrap gap-2">
-                      {role.parent_role_ids.map((parentRoleId) => (
-                        <li className="flex items-center gap-2 rounded-full border border-[var(--app-border)] px-3 py-1" key={parentRoleId}>
-                          <span className="text-xs">
-                            {roleNameById.get(parentRoleId) ?? String(parentRoleId)}
+                  <div className="mt-5">
+                    <article className={ADMIN_SUBCARD_CLASS_NAME}>
+                      <h3 className="text-sm font-semibold">{t("admin.roles.card.parents")}</h3>
+                      <div className="mt-3 flex flex-wrap items-end gap-2">
+                        <label className="min-w-52 flex-1">
+                          <span className={ADMIN_INLINE_LABEL_CLASS_NAME}>
+                            {t("admin.roles.parents.select")}
                           </span>
-                          <button
-                            className="text-xs font-semibold text-red-700"
-                            disabled={removeParentMutation.isPending}
-                            onClick={() => {
-                              removeParentMutation.reset();
-                              removeParentMutation.mutate({ roleId: role.id, parentRoleId });
-                            }}
-                            type="button"
+                          <select
+                            className={`${ADMIN_FIELD_CLASS_NAME} text-sm`}
+                            onChange={event =>
+                              setSelectedParentByRoleId(previous => ({
+                                ...previous,
+                                [role.id]: event.target.value,
+                              }))}
+                            value={currentParentSelection}
                           >
-                            {t("admin.roles.parents.remove")}
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </article>
-              </div>
-            </section>
-          );
-        })
-      )}
+                            <option value="">-</option>
+                            {roles
+                              .filter(
+                                candidateRole =>
+                                  candidateRole.id !== role.id
+                                  && !role.parent_role_ids.includes(candidateRole.id),
+                              )
+                              .map(candidateRole => (
+                                <option key={candidateRole.id} value={candidateRole.id}>
+                                  {candidateRole.name}
+                                </option>
+                              ))}
+                          </select>
+                        </label>
+                        <button
+                          className={ADMIN_COMPACT_SECONDARY_BUTTON_CLASS_NAME}
+                          disabled={!currentParentSelection || addParentMutation.isPending}
+                          onClick={() => {
+                            const parentRoleId = Number(currentParentSelection);
+                            addParentMutation.reset();
+                            addParentMutation.mutate({ roleId: role.id, parentRoleId });
+                            setSelectedParentByRoleId(previous => ({ ...previous, [role.id]: "" }));
+                          }}
+                          type="button"
+                        >
+                          {t("admin.roles.parents.add")}
+                        </button>
+                      </div>
+
+                      {role.parent_role_ids.length === 0
+                        ? (
+                            <p className={`mt-3 ${ADMIN_MUTED_TEXT_CLASS_NAME}`}>
+                              {t("admin.roles.card.noParents")}
+                            </p>
+                          )
+                        : (
+                            <ul className="mt-3 flex flex-wrap gap-2">
+                              {role.parent_role_ids.map(parentRoleId => (
+                                <li
+                                  className="flex items-center gap-2 rounded-full border border-[var(--app-border)] px-3 py-1"
+                                  key={parentRoleId}
+                                >
+                                  <span className="text-xs">
+                                    {roleNameById.get(parentRoleId) ?? String(parentRoleId)}
+                                  </span>
+                                  <button
+                                    className="text-xs font-semibold text-red-700"
+                                    disabled={removeParentMutation.isPending}
+                                    onClick={() => {
+                                      removeParentMutation.reset();
+                                      removeParentMutation.mutate({ roleId: role.id, parentRoleId });
+                                    }}
+                                    type="button"
+                                  >
+                                    {t("admin.roles.parents.remove")}
+                                  </button>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                    </article>
+                  </div>
+                </section>
+              );
+            })
+          )}
     </main>
   );
 };

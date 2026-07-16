@@ -5,11 +5,11 @@ import {
   loginWithCredentials,
   logout,
   readCurrentUser,
+  REGISTER_USER_ENDPOINT_PATH,
   registerUser,
   resolveSessionUser,
-  updateCurrentUser,
-  REGISTER_USER_ENDPOINT_PATH,
   TOKEN_ENDPOINT_PATH,
+  updateCurrentUser,
 } from "@/shared/auth/session";
 import { getAccessToken, setAccessToken } from "@/shared/auth/storage";
 
@@ -164,8 +164,8 @@ describe("session client", () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
-        json: () =>
-          Promise.resolve({
+      json: () =>
+        Promise.resolve({
           id: "1",
           email: "admin",
           first_name: "Test",

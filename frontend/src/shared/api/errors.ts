@@ -25,7 +25,8 @@ export const parseApiError = async (response: Response): Promise<ApiError> => {
 
   try {
     payload = (await response.json()) as ApiErrorPayload;
-  } catch {
+  }
+  catch {
     payload = undefined;
   }
 

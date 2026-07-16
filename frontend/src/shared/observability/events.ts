@@ -17,7 +17,7 @@ const REDACTED_FIELDS = new Set(["authorization", "password", "token", "access_t
 
 const sanitizeValue = (value: unknown): unknown => {
   if (Array.isArray(value)) {
-    return value.map((item) => sanitizeValue(item));
+    return value.map(item => sanitizeValue(item));
   }
 
   if (value && typeof value === "object") {
@@ -26,7 +26,8 @@ const sanitizeValue = (value: unknown): unknown => {
     for (const [key, entry] of Object.entries(record)) {
       if (REDACTED_FIELDS.has(key.toLowerCase())) {
         sanitizedRecord[key] = "[redacted]";
-      } else {
+      }
+      else {
         sanitizedRecord[key] = sanitizeValue(entry);
       }
     }

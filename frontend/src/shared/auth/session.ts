@@ -4,10 +4,10 @@ import { sessionQueryPolicy } from "@/app/query-policy";
 import { isUnauthorizedError } from "@/shared/api/errors";
 import { apiRequest } from "@/shared/api/http";
 import {
-  parseAccessTokenResponse,
-  parseAuthenticatedUser,
   type AccessTokenResponse,
   type AuthenticatedUser,
+  parseAccessTokenResponse,
+  parseAuthenticatedUser,
 } from "@/shared/auth/contracts";
 import { clearAccessToken, getAccessToken, setAccessToken } from "@/shared/auth/storage";
 
@@ -100,7 +100,8 @@ export const resolveSessionUser = async (): Promise<AuthenticatedUser | null> =>
 
   try {
     return await readCurrentUser();
-  } catch (error) {
+  }
+  catch (error) {
     if (isUnauthorizedError(error)) {
       clearAccessToken();
       return null;

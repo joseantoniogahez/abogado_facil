@@ -76,7 +76,7 @@ decisiones, avance, pausas, validaciones y cierre se registran en el plan corres
 | CORE-009 | Full-stack | P1        | Identificado | Calculadoras básicas sin IA.                   | Cálculos copiables y guardables en asunto con advertencia de estimación.                           |
 | CORE-010 | Frontend   | P1        | Hecho        | Interfaz de documentos de expediente.          | Cargar, listar, descargar y eliminar documentos desde el detalle del asunto.                       |
 | CORE-011 | Full-stack | P1        | Hecho        | Catálogo de tipos de asunto y checklists base. | `matter_type` se elige de un catálogo backend cerrado, incluido `Otro`, y se persiste como string. |
-| UX-001   | Frontend   | P1        | Listo        | Jerarquía visual de botones y acciones.        | Acciones y estados deshabilitados se distinguen del texto sin depender de `hover`.                 |
+| UX-001   | Frontend   | P1        | Hecho        | Jerarquía visual de botones y acciones.        | Acciones y estados deshabilitados se distinguen del texto sin depender de `hover`.                 |
 
 ## Fase 2 - BYOK y Capa de IA
 

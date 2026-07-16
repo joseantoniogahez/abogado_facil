@@ -1,17 +1,17 @@
-import { FormEvent, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { FormEvent, useState } from "react";
 
 import { useSession } from "@/shared/auth/session";
+import { t } from "@/shared/i18n/ui-text";
 import { userHasPermission } from "@/shared/iam/api";
 import { IAM_PERMISSION } from "@/shared/iam/contracts";
-import { t } from "@/shared/i18n/ui-text";
 import {
   createAdminUser,
+  type CreateAdminUserPayload,
   readAdminUsers,
   readRbacRoles,
   softDeleteAdminUser,
   updateAdminUser,
-  type CreateAdminUserPayload,
   type UpdateAdminUserPayload,
 } from "@/shared/rbac/admin";
 import { type AdminUser } from "@/shared/rbac/contracts";
@@ -56,8 +56,8 @@ const INITIAL_CREATE_USER_FORM_STATE: CreateUserFormState = {
 
 const getRoleIdsFromMultiSelect = (selectElement: HTMLSelectElement): number[] =>
   Array.from(selectElement.selectedOptions)
-    .map((option) => Number(option.value))
-    .filter((value) => Number.isInteger(value) && value > 0);
+    .map(option => Number(option.value))
+    .filter(value => Number.isInteger(value) && value > 0);
 
 const toCreateUserPayload = (
   formState: CreateUserFormState,
@@ -73,7 +73,10 @@ const toCreateUserPayload = (
   return payload;
 };
 
-const toUpdateUserPayload = (formState: EditUserFormState, includeRoleAssignments: boolean): UpdateAdminUserPayload => {
+const toUpdateUserPayload = (
+  formState: EditUserFormState,
+  includeRoleAssignments: boolean,
+): UpdateAdminUserPayload => {
   const payload: UpdateAdminUserPayload = {
     email: formState.email,
     disabled: formState.disabled,
@@ -101,7 +104,9 @@ const toEditFormState = (user: AdminUser): EditUserFormState => ({
 export const AdminUsersPage = () => {
   const queryClient = useQueryClient();
   const session = useSession();
-  const [createFormState, setCreateFormState] = useState<CreateUserFormState>(INITIAL_CREATE_USER_FORM_STATE);
+  const [createFormState, setCreateFormState] = useState<CreateUserFormState>(
+    INITIAL_CREATE_USER_FORM_STATE,
+  );
   const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
   const [editFormState, setEditFormState] = useState<EditUserFormState | null>(null);
   const canReadRoleCatalog = userHasPermission(session.data, IAM_PERMISSION.ROLES_MANAGE);
@@ -142,13 +147,14 @@ export const AdminUsersPage = () => {
   });
 
   const users = usersQuery.data ?? [];
-  const roles = canReadRoleCatalog ? rolesQuery.data ?? [] : [];
-  const roleNameById = new Map(roles.map((role) => [role.id, role.name]));
+  const roles = canReadRoleCatalog ? (rolesQuery.data ?? []) : [];
+  const roleNameById = new Map(roles.map(role => [role.id, role.name]));
   const showRoleCatalogControls = canReadRoleCatalog && rolesQuery.isSuccess;
   const isRoleCatalogLoading = canReadRoleCatalog && rolesQuery.isPending;
   const roleCatalogError = canReadRoleCatalog ? rolesQuery.error : null;
 
-  const pageError = usersQuery.error ?? createMutation.error ?? updateMutation.error ?? deleteMutation.error;
+  const pageError
+    = usersQuery.error ?? createMutation.error ?? updateMutation.error ?? deleteMutation.error;
 
   if (usersQuery.isPending) {
     return <CenteredMessage title={t("admin.common.loading")} />;
@@ -185,7 +191,9 @@ export const AdminUsersPage = () => {
   };
 
   const confirmAndDeleteUser = (user: AdminUser) => {
-    const confirmed = window.confirm(t("admin.users.actions.delete.confirm", { email: user.email }));
+    const confirmed = window.confirm(
+      t("admin.users.actions.delete.confirm", { email: user.email }),
+    );
     if (!confirmed) {
       return;
     }
@@ -198,16 +206,24 @@ export const AdminUsersPage = () => {
       <header>
         <h1 className={ADMIN_TITLE_CLASS_NAME}>{t("admin.users.title")}</h1>
         <p className={`mt-2 ${ADMIN_MUTED_TEXT_CLASS_NAME}`}>{t("admin.users.subtitle")}</p>
-        {roleCatalogError ? (
-          <div className="mt-3 space-y-2">
-            <p className={ADMIN_MUTED_TEXT_CLASS_NAME}>{t("admin.users.roles.hidden.error")}</p>
-            <AdminErrorPanel error={roleCatalogError} />
-          </div>
-        ) : !canReadRoleCatalog ? (
-          <p className={`mt-3 ${ADMIN_MUTED_TEXT_CLASS_NAME}`}>{t("admin.users.roles.hidden.permission")}</p>
-        ) : isRoleCatalogLoading ? (
-          <p className={`mt-3 ${ADMIN_MUTED_TEXT_CLASS_NAME}`}>{t("admin.users.roles.loading")}</p>
-        ) : null}
+        {roleCatalogError
+          ? (
+              <div className="mt-3 space-y-2">
+                <p className={ADMIN_MUTED_TEXT_CLASS_NAME}>{t("admin.users.roles.hidden.error")}</p>
+                <AdminErrorPanel error={roleCatalogError} />
+              </div>
+            )
+          : !canReadRoleCatalog
+              ? (
+                  <p className={`mt-3 ${ADMIN_MUTED_TEXT_CLASS_NAME}`}>
+                    {t("admin.users.roles.hidden.permission")}
+                  </p>
+                )
+              : isRoleCatalogLoading
+                ? (
+                    <p className={`mt-3 ${ADMIN_MUTED_TEXT_CLASS_NAME}`}>{t("admin.users.roles.loading")}</p>
+                  )
+                : null}
       </header>
 
       <AdminErrorPanel error={pageError} />
@@ -221,9 +237,8 @@ export const AdminUsersPage = () => {
               className={ADMIN_FIELD_CLASS_NAME}
               autoComplete="email"
               name="email"
-              onChange={(event) =>
-                setCreateFormState((previous) => ({ ...previous, email: event.target.value }))
-              }
+              onChange={event =>
+                setCreateFormState(previous => ({ ...previous, email: event.target.value }))}
               required
               type="email"
               value={createFormState.email}
@@ -235,38 +250,39 @@ export const AdminUsersPage = () => {
             <input
               className={ADMIN_FIELD_CLASS_NAME}
               name="password"
-              onChange={(event) =>
-                setCreateFormState((previous) => ({ ...previous, password: event.target.value }))
-              }
+              onChange={event =>
+                setCreateFormState(previous => ({ ...previous, password: event.target.value }))}
               required
               type="password"
               value={createFormState.password}
             />
           </label>
 
-          {showRoleCatalogControls ? (
-            <label className="block md:col-span-2">
-              <span className={ADMIN_LABEL_CLASS_NAME}>{t("admin.users.create.roles")}</span>
-              <select
-                className={`min-h-28 ${ADMIN_FIELD_CLASS_NAME}`}
-                multiple
-                onChange={(event) => {
-                  const selectedRoleIds = getRoleIdsFromMultiSelect(event.currentTarget);
-                  setCreateFormState((previous) => ({
-                    ...previous,
-                    roleIds: selectedRoleIds,
-                  }));
-                }}
-                value={createFormState.roleIds.map(String)}
-              >
-                {roles.map((role) => (
-                  <option key={role.id} value={role.id}>
-                    {role.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-          ) : null}
+          {showRoleCatalogControls
+            ? (
+                <label className="block md:col-span-2">
+                  <span className={ADMIN_LABEL_CLASS_NAME}>{t("admin.users.create.roles")}</span>
+                  <select
+                    className={`min-h-28 ${ADMIN_FIELD_CLASS_NAME}`}
+                    multiple
+                    onChange={(event) => {
+                      const selectedRoleIds = getRoleIdsFromMultiSelect(event.currentTarget);
+                      setCreateFormState(previous => ({
+                        ...previous,
+                        roleIds: selectedRoleIds,
+                      }));
+                    }}
+                    value={createFormState.roleIds.map(String)}
+                  >
+                    {roles.map(role => (
+                      <option key={role.id} value={role.id}>
+                        {role.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )
+            : null}
 
           <div className="md:col-span-2">
             <button
@@ -284,163 +300,185 @@ export const AdminUsersPage = () => {
 
       <section className={ADMIN_CARD_CLASS_NAME}>
         <h2 className="text-lg font-semibold">{t("admin.users.list.title")}</h2>
-        {users.length === 0 ? (
-          <p className={`mt-3 ${ADMIN_MUTED_TEXT_CLASS_NAME}`}>{t("admin.users.list.empty")}</p>
-        ) : (
-          <div className="mt-3 overflow-x-auto">
-            <table className="w-full min-w-[700px] border-collapse text-left text-sm">
-              <thead>
-                <tr className="border-b border-[var(--app-border)]">
-                  <th className="px-2 py-2 font-semibold">{t("admin.users.columns.email")}</th>
-                  <th className="px-2 py-2 font-semibold">{t("admin.users.columns.status")}</th>
-                  {showRoleCatalogControls ? (
-                    <th className="px-2 py-2 font-semibold">{t("admin.users.columns.roles")}</th>
-                  ) : null}
-                  <th className="px-2 py-2 font-semibold">{t("admin.users.columns.actions")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((user) => (
-                  <tr className="border-b border-[var(--app-border)]" key={user.id}>
-                    <td className="px-2 py-3">{user.email}</td>
-                    <td className="px-2 py-3">
-                      {user.disabled ? t("admin.users.status.disabled") : t("admin.users.status.active")}
-                    </td>
-                    {showRoleCatalogControls ? (
-                      <td className="px-2 py-3">
-                        {user.role_ids.length > 0
-                          ? user.role_ids.map((roleId) => roleNameById.get(roleId) ?? String(roleId)).join(", ")
-                          : "-"}
-                      </td>
-                    ) : null}
-                    <td className="px-2 py-3">
-                      <div className="flex flex-wrap gap-2">
-                        <button
-                          className={ADMIN_COMPACT_SECONDARY_BUTTON_CLASS_NAME}
-                          onClick={() => startEditingUser(user)}
-                          type="button"
-                        >
-                          {t("admin.users.actions.edit")}
-                        </button>
-                        <button
-                          className={ADMIN_COMPACT_DANGER_BUTTON_CLASS_NAME}
-                          disabled={deleteMutation.isPending}
-                          onClick={() => confirmAndDeleteUser(user)}
-                          type="button"
-                        >
-                          {t("admin.users.actions.delete")}
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+        {users.length === 0
+          ? (
+              <p className={`mt-3 ${ADMIN_MUTED_TEXT_CLASS_NAME}`}>{t("admin.users.list.empty")}</p>
+            )
+          : (
+              <div className="mt-3 overflow-x-auto">
+                <table className="w-full min-w-[700px] border-collapse text-left text-sm">
+                  <thead>
+                    <tr className="border-b border-[var(--app-border)]">
+                      <th className="px-2 py-2 font-semibold">{t("admin.users.columns.email")}</th>
+                      <th className="px-2 py-2 font-semibold">{t("admin.users.columns.status")}</th>
+                      {showRoleCatalogControls
+                        ? (
+                            <th className="px-2 py-2 font-semibold">{t("admin.users.columns.roles")}</th>
+                          )
+                        : null}
+                      <th className="px-2 py-2 font-semibold">{t("admin.users.columns.actions")}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {users.map(user => (
+                      <tr className="border-b border-[var(--app-border)]" key={user.id}>
+                        <td className="px-2 py-3">{user.email}</td>
+                        <td className="px-2 py-3">
+                          {user.disabled
+                            ? t("admin.users.status.disabled")
+                            : t("admin.users.status.active")}
+                        </td>
+                        {showRoleCatalogControls
+                          ? (
+                              <td className="px-2 py-3">
+                                {user.role_ids.length > 0
+                                  ? user.role_ids
+                                      .map(roleId => roleNameById.get(roleId) ?? String(roleId))
+                                      .join(", ")
+                                  : "-"}
+                              </td>
+                            )
+                          : null}
+                        <td className="px-2 py-3">
+                          <div className="flex flex-wrap gap-2">
+                            <button
+                              className={ADMIN_COMPACT_SECONDARY_BUTTON_CLASS_NAME}
+                              onClick={() => startEditingUser(user)}
+                              type="button"
+                            >
+                              {t("admin.users.actions.edit")}
+                            </button>
+                            <button
+                              className={ADMIN_COMPACT_DANGER_BUTTON_CLASS_NAME}
+                              disabled={deleteMutation.isPending}
+                              onClick={() => confirmAndDeleteUser(user)}
+                              type="button"
+                            >
+                              {t("admin.users.actions.delete")}
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
       </section>
 
-      {editingUser && editFormState ? (
-        <section className={ADMIN_CARD_CLASS_NAME}>
-          <h2 className="text-lg font-semibold">
-            {t("admin.users.edit.title")}: {editingUser.email}
-          </h2>
-          <form className={ADMIN_FORM_GRID_CLASS_NAME} onSubmit={submitEditForm}>
-            <label className="block">
-              <span className={ADMIN_LABEL_CLASS_NAME}>{t("admin.users.edit.email")}</span>
-              <input
-                className={ADMIN_FIELD_CLASS_NAME}
-                autoComplete="email"
-                name="edit-email"
-                onChange={(event) =>
-                  setEditFormState((previous) => ({ ...previous!, email: event.target.value }))
-                }
-                required
-                type="email"
-                value={editFormState.email}
-              />
-            </label>
+      {editingUser && editFormState
+        ? (
+            <section className={ADMIN_CARD_CLASS_NAME}>
+              <h2 className="text-lg font-semibold">
+                {t("admin.users.edit.title")}
+                :
+                {editingUser.email}
+              </h2>
+              <form className={ADMIN_FORM_GRID_CLASS_NAME} onSubmit={submitEditForm}>
+                <label className="block">
+                  <span className={ADMIN_LABEL_CLASS_NAME}>{t("admin.users.edit.email")}</span>
+                  <input
+                    className={ADMIN_FIELD_CLASS_NAME}
+                    autoComplete="email"
+                    name="edit-email"
+                    onChange={event =>
+                      setEditFormState(previous => ({ ...previous!, email: event.target.value }))}
+                    required
+                    type="email"
+                    value={editFormState.email}
+                  />
+                </label>
 
-            <label className="block">
-              <span className={ADMIN_LABEL_CLASS_NAME}>{t("admin.users.edit.currentPassword")}</span>
-              <input
-                className={ADMIN_FIELD_CLASS_NAME}
-                name="edit-current-password"
-                onChange={(event) =>
-                  setEditFormState((previous) => ({ ...previous!, currentPassword: event.target.value }))
-                }
-                type="password"
-                value={editFormState.currentPassword}
-              />
-            </label>
+                <label className="block">
+                  <span className={ADMIN_LABEL_CLASS_NAME}>
+                    {t("admin.users.edit.currentPassword")}
+                  </span>
+                  <input
+                    className={ADMIN_FIELD_CLASS_NAME}
+                    name="edit-current-password"
+                    onChange={event =>
+                      setEditFormState(previous => ({
+                        ...previous!,
+                        currentPassword: event.target.value,
+                      }))}
+                    type="password"
+                    value={editFormState.currentPassword}
+                  />
+                </label>
 
-            <label className="block">
-              <span className={ADMIN_LABEL_CLASS_NAME}>{t("admin.users.edit.newPassword")}</span>
-              <input
-                className={ADMIN_FIELD_CLASS_NAME}
-                name="edit-new-password"
-                onChange={(event) =>
-                  setEditFormState((previous) => ({ ...previous!, newPassword: event.target.value }))
-                }
-                type="password"
-                value={editFormState.newPassword}
-              />
-            </label>
+                <label className="block">
+                  <span className={ADMIN_LABEL_CLASS_NAME}>{t("admin.users.edit.newPassword")}</span>
+                  <input
+                    className={ADMIN_FIELD_CLASS_NAME}
+                    name="edit-new-password"
+                    onChange={event =>
+                      setEditFormState(previous => ({
+                        ...previous!,
+                        newPassword: event.target.value,
+                      }))}
+                    type="password"
+                    value={editFormState.newPassword}
+                  />
+                </label>
 
-            <label className="flex items-center gap-2 pt-8">
-              <input
-                checked={editFormState.disabled}
-                onChange={(event) =>
-                  setEditFormState((previous) => ({ ...previous!, disabled: event.target.checked }))
-                }
-                type="checkbox"
-              />
-              <span className="text-sm font-medium">{t("admin.users.edit.disabled")}</span>
-            </label>
+                <label className="flex items-center gap-2 pt-8">
+                  <input
+                    checked={editFormState.disabled}
+                    onChange={event =>
+                      setEditFormState(previous => ({ ...previous!, disabled: event.target.checked }))}
+                    type="checkbox"
+                  />
+                  <span className="text-sm font-medium">{t("admin.users.edit.disabled")}</span>
+                </label>
 
-            {showRoleCatalogControls ? (
-              <label className="block md:col-span-2">
-                <span className={ADMIN_LABEL_CLASS_NAME}>{t("admin.users.edit.roles")}</span>
-                <select
-                  className={`min-h-28 ${ADMIN_FIELD_CLASS_NAME}`}
-                  multiple
-                  onChange={(event) => {
-                    const selectedRoleIds = getRoleIdsFromMultiSelect(event.currentTarget);
-                    setEditFormState((previous) => ({
-                      ...previous!,
-                      roleIds: selectedRoleIds,
-                    }));
-                  }}
-                  value={editFormState.roleIds.map(String)}
-                >
-                  {roles.map((role) => (
-                    <option key={role.id} value={role.id}>
-                      {role.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            ) : null}
+                {showRoleCatalogControls
+                  ? (
+                      <label className="block md:col-span-2">
+                        <span className={ADMIN_LABEL_CLASS_NAME}>{t("admin.users.edit.roles")}</span>
+                        <select
+                          className={`min-h-28 ${ADMIN_FIELD_CLASS_NAME}`}
+                          multiple
+                          onChange={(event) => {
+                            const selectedRoleIds = getRoleIdsFromMultiSelect(event.currentTarget);
+                            setEditFormState(previous => ({
+                              ...previous!,
+                              roleIds: selectedRoleIds,
+                            }));
+                          }}
+                          value={editFormState.roleIds.map(String)}
+                        >
+                          {roles.map(role => (
+                            <option key={role.id} value={role.id}>
+                              {role.name}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                    )
+                  : null}
 
-            <div className="flex gap-3 md:col-span-2">
-              <button
-                className={ADMIN_PRIMARY_BUTTON_CLASS_NAME}
-                disabled={updateMutation.isPending}
-                type="submit"
-              >
-                {updateMutation.isPending ? t("admin.users.edit.submit.pending") : t("admin.users.edit.submit")}
-              </button>
-              <button
-                className={ADMIN_SECONDARY_BUTTON_CLASS_NAME}
-                onClick={cancelEditingUser}
-                type="button"
-              >
-                {t("admin.users.edit.cancel")}
-              </button>
-            </div>
-          </form>
-        </section>
-      ) : null}
+                <div className="flex gap-3 md:col-span-2">
+                  <button
+                    className={ADMIN_PRIMARY_BUTTON_CLASS_NAME}
+                    disabled={updateMutation.isPending}
+                    type="submit"
+                  >
+                    {updateMutation.isPending
+                      ? t("admin.users.edit.submit.pending")
+                      : t("admin.users.edit.submit")}
+                  </button>
+                  <button
+                    className={ADMIN_SECONDARY_BUTTON_CLASS_NAME}
+                    onClick={cancelEditingUser}
+                    type="button"
+                  >
+                    {t("admin.users.edit.cancel")}
+                  </button>
+                </div>
+              </form>
+            </section>
+          )
+        : null}
     </main>
   );
 };

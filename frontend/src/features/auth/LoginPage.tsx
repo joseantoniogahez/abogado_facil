@@ -1,11 +1,17 @@
-import { FormEvent, startTransition, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { FormEvent, startTransition, useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 
 import { authLoginMutationPolicy } from "@/app/mutation-policy";
 import { ApiError, appendRequestIdDiagnostic, getApiErrorRequestId } from "@/shared/api/errors";
-import { SESSION_QUERY_KEY, loginWithCredentials, readCurrentUser, useSession } from "@/shared/auth/session";
+import {
+  loginWithCredentials,
+  readCurrentUser,
+  SESSION_QUERY_KEY,
+  useSession,
+} from "@/shared/auth/session";
 import { t } from "@/shared/i18n/ui-text";
+import { INLINE_ACTION_CLASS_NAME, PRIMARY_ACTION_CLASS_NAME } from "@/shared/ui/actionStyles";
 import { CenteredMessage } from "@/shared/ui/CenteredMessage";
 
 interface LoginFormState {
@@ -53,9 +59,12 @@ export const LoginPage = () => {
     loginMutation.mutate(formState);
   };
 
-  const mutationError =
-    loginMutation.error instanceof ApiError
-      ? appendRequestIdDiagnostic(loginMutation.error.message, getApiErrorRequestId(loginMutation.error))
+  const mutationError
+    = loginMutation.error instanceof ApiError
+      ? appendRequestIdDiagnostic(
+          loginMutation.error.message,
+          getApiErrorRequestId(loginMutation.error),
+        )
       : t("auth.login.error.generic");
 
   return (
@@ -78,9 +87,8 @@ export const LoginPage = () => {
               autoComplete="username"
               className="w-full rounded-2xl border border-[var(--app-border)] bg-white px-4 py-3 text-base outline-none transition focus:border-[var(--app-accent)]"
               name="email"
-              onChange={(event) =>
-                setFormState((previous) => ({ ...previous, email: event.target.value }))
-              }
+              onChange={event =>
+                setFormState(previous => ({ ...previous, email: event.target.value }))}
               required
               type="email"
               value={formState.email}
@@ -95,36 +103,40 @@ export const LoginPage = () => {
               autoComplete="current-password"
               className="w-full rounded-2xl border border-[var(--app-border)] bg-white px-4 py-3 text-base outline-none transition focus:border-[var(--app-accent)]"
               name="password"
-              onChange={(event) =>
-                setFormState((previous) => ({ ...previous, password: event.target.value }))
-              }
+              onChange={event =>
+                setFormState(previous => ({ ...previous, password: event.target.value }))}
               required
               type="password"
               value={formState.password}
             />
           </label>
 
-          {loginMutation.isError ? (
-            <p
-              className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
-              role="alert"
-            >
-              {mutationError}
-            </p>
-          ) : null}
+          {loginMutation.isError
+            ? (
+                <p
+                  className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                  role="alert"
+                >
+                  {mutationError}
+                </p>
+              )
+            : null}
 
           <button
-            className="w-full rounded-full bg-[var(--app-ink)] px-5 py-3 text-sm font-semibold text-[var(--app-surface)] transition hover:bg-[var(--app-accent)] disabled:cursor-not-allowed disabled:opacity-70"
+            className={`${PRIMARY_ACTION_CLASS_NAME} w-full`}
             disabled={loginMutation.isPending}
             type="submit"
           >
-            {loginMutation.isPending ? t("auth.login.submit.pending") : t("auth.login.submit.default")}
+            {loginMutation.isPending
+              ? t("auth.login.submit.pending")
+              : t("auth.login.submit.default")}
           </button>
         </form>
 
         <p className="mt-6 text-sm text-[var(--app-subtle)]">
-          {t("auth.login.footer.firstTime")}{" "}
-          <Link className="font-semibold text-[var(--app-ink)] underline underline-offset-4" to="/register">
+          {t("auth.login.footer.firstTime")}
+          {" "}
+          <Link className={INLINE_ACTION_CLASS_NAME} to="/register">
             {t("auth.login.footer.createAccount")}
           </Link>
           .

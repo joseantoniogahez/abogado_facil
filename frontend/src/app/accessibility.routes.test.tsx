@@ -1,7 +1,7 @@
 import { QueryClientProvider } from "@tanstack/react-query";
-import axe from "axe-core";
 import { render, screen } from "@testing-library/react";
-import { RouterProvider, createMemoryRouter } from "react-router-dom";
+import axe from "axe-core";
+import { createMemoryRouter, RouterProvider } from "react-router-dom";
 
 import { createQueryClient } from "@/app/query-client";
 import { appRoutes } from "@/app/routes";
@@ -74,7 +74,9 @@ describe("accessibility route baseline", () => {
 
     const view = renderRoute(["/welcome"]);
 
-    expect(await screen.findByRole("heading", { name: t("routing.protected.error.title") })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: t("routing.protected.error.title") }),
+    ).toBeInTheDocument();
     expect((await axe.run(view.container, AXE_RUN_OPTIONS)).violations).toHaveLength(0);
   });
 
@@ -124,7 +126,9 @@ describe("accessibility route baseline", () => {
 
     const view = renderRoute(["/admin/users"]);
 
-    expect(await screen.findByRole("heading", { name: t("admin.users.title") })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: t("admin.users.title") }),
+    ).toBeInTheDocument();
     expect((await axe.run(view.container, AXE_RUN_OPTIONS)).violations).toHaveLength(0);
   });
 
@@ -177,7 +181,9 @@ describe("accessibility route baseline", () => {
 
     const view = renderRoute(["/admin/audit-log"]);
 
-    expect(await screen.findByRole("heading", { name: t("admin.auditLog.title") })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: t("admin.auditLog.title") }),
+    ).toBeInTheDocument();
     expect((await axe.run(view.container, AXE_RUN_OPTIONS)).violations).toHaveLength(0);
   });
 

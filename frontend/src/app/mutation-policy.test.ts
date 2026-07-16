@@ -1,20 +1,25 @@
-import { ApiError } from "@/shared/api/errors";
-
 import {
-  MUTATION_POLICY_MATRIX,
   authLoginMutationPolicy,
   authLogoutMutationPolicy,
+  MUTATION_POLICY_MATRIX,
   shouldRetryDefaultMutation,
 } from "@/app/mutation-policy";
+import { ApiError } from "@/shared/api/errors";
 
 describe("mutation policy", () => {
   it("retries transient mutation failures once", () => {
-    expect(shouldRetryDefaultMutation(0, new ApiError("Temporary", 503, "internal_error"))).toBe(true);
-    expect(shouldRetryDefaultMutation(1, new ApiError("Temporary", 503, "internal_error"))).toBe(false);
+    expect(shouldRetryDefaultMutation(0, new ApiError("Temporary", 503, "internal_error"))).toBe(
+      true,
+    );
+    expect(shouldRetryDefaultMutation(1, new ApiError("Temporary", 503, "internal_error"))).toBe(
+      false,
+    );
   });
 
   it("does not retry unauthorized or conflict mutation failures", () => {
-    expect(shouldRetryDefaultMutation(0, new ApiError("Unauthorized", 401, "unauthorized"))).toBe(false);
+    expect(shouldRetryDefaultMutation(0, new ApiError("Unauthorized", 401, "unauthorized"))).toBe(
+      false,
+    );
     expect(shouldRetryDefaultMutation(0, new ApiError("Conflict", 409, "conflict"))).toBe(false);
   });
 

@@ -1,11 +1,11 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, waitFor } from "@testing-library/react";
-import { RouterProvider, createMemoryRouter } from "react-router-dom";
+import { createMemoryRouter, RouterProvider } from "react-router-dom";
 
-import { appRoutes } from "@/app/routes";
 import { createQueryClient } from "@/app/query-client";
+import { appRoutes } from "@/app/routes";
+import { getAccessToken, setAccessToken } from "@/shared/auth/storage";
 import { t } from "@/shared/i18n/ui-text";
-import { setAccessToken, getAccessToken } from "@/shared/auth/storage";
 
 const toRequestPathname = (input: RequestInfo | URL): string => {
   if (input instanceof URL) {
@@ -27,8 +27,8 @@ describe("routing integration", () => {
       statusText: "Unauthorized",
       json: () =>
         Promise.resolve({
-        detail: "Could not validate credentials",
-        code: "unauthorized",
+          detail: "Could not validate credentials",
+          code: "unauthorized",
         }),
     } satisfies Partial<Response>);
     vi.stubGlobal("fetch", fetchMock);
@@ -41,7 +41,7 @@ describe("routing integration", () => {
     render(
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
-      </QueryClientProvider>
+      </QueryClientProvider>,
     );
 
     await waitFor(
@@ -50,7 +50,9 @@ describe("routing integration", () => {
       },
       { timeout: 5_000 },
     );
-    expect(await screen.findByRole("button", { name: t("auth.login.submit.default") })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("button", { name: t("auth.login.submit.default") }),
+    ).toBeInTheDocument();
     expect(getAccessToken()).toBeNull();
   }, 10_000);
 
@@ -83,7 +85,9 @@ describe("routing integration", () => {
       </QueryClientProvider>,
     );
 
-    expect(await screen.findByRole("heading", { name: t("routing.protected.error.title") })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: t("routing.protected.error.title") }),
+    ).toBeInTheDocument();
     expect(await screen.findByText(/request_id=req-protected-500/)).toBeInTheDocument();
   });
 
@@ -99,7 +103,9 @@ describe("routing integration", () => {
       </QueryClientProvider>,
     );
 
-    expect(await screen.findByRole("heading", { name: t("routing.notFound.title") })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: t("routing.notFound.title") }),
+    ).toBeInTheDocument();
     expect(screen.getByText(t("routing.notFound.body"))).toBeInTheDocument();
   });
 
@@ -238,7 +244,9 @@ describe("routing integration", () => {
       </QueryClientProvider>,
     );
 
-    expect(await screen.findByRole("heading", { name: t("admin.users.title") })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: t("admin.users.title") }),
+    ).toBeInTheDocument();
   });
 
   it("renders audit log route when session has audit_logs:read", async () => {
@@ -289,7 +297,9 @@ describe("routing integration", () => {
       </QueryClientProvider>,
     );
 
-    expect(await screen.findByRole("heading", { name: t("admin.auditLog.title") })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: t("admin.auditLog.title") }),
+    ).toBeInTheDocument();
   });
 
   it("renders admin assignments route when session has user_roles:manage", async () => {

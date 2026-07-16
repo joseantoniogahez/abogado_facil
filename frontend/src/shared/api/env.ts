@@ -49,7 +49,8 @@ const validateOrigin = (origin: string): string => {
     if (url.protocol !== "http:" && url.protocol !== "https:") {
       throw new FrontendEnvError(`VITE_API_ORIGIN must use http/https protocol, received '${url.protocol}'`);
     }
-  } catch (error) {
+  }
+  catch (error) {
     if (error instanceof FrontendEnvError) {
       throw error;
     }

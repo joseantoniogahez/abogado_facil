@@ -1,9 +1,9 @@
 import { ApiContractError } from "@/shared/api/contracts";
 import {
-  parseAssignedRoleList,
-  parseAssignedUserList,
   parseAdminUser,
   parseAdminUserList,
+  parseAssignedRoleList,
+  parseAssignedUserList,
   parseRbacPermissionList,
   parseRbacRole,
   parseRbacRolePermission,
@@ -90,7 +90,9 @@ describe("rbac contracts", () => {
         scope: "team",
       }),
     ).toThrowError(
-      new ApiContractError("RbacRolePermission: field 'scope' must be one of own, tenant, any, received 'team'"),
+      new ApiContractError(
+        "RbacRolePermission: field 'scope' must be one of own, tenant, any, received 'team'",
+      ),
     );
   });
 

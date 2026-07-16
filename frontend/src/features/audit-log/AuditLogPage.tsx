@@ -42,40 +42,44 @@ export const AuditLogPage = () => {
 
       <AdminErrorPanel error={entriesQuery.error} />
 
-      {entriesQuery.isError ? null : (
-        <section className={ADMIN_CARD_CLASS_NAME}>
-          {entries.length === 0 ? (
-            <p className={ADMIN_MUTED_TEXT_CLASS_NAME}>{t("admin.auditLog.empty")}</p>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[780px] border-collapse text-left text-sm">
-                <thead>
-                  <tr className="border-b border-[var(--app-border)]">
-                    <th className="px-2 py-2 font-semibold">{t("admin.auditLog.columns.createdAt")}</th>
-                    <th className="px-2 py-2 font-semibold">{t("admin.auditLog.columns.actor")}</th>
-                    <th className="px-2 py-2 font-semibold">{t("admin.auditLog.columns.action")}</th>
-                    <th className="px-2 py-2 font-semibold">{t("admin.auditLog.columns.resource")}</th>
-                    <th className="px-2 py-2 font-semibold">{t("admin.auditLog.columns.summary")}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {entries.map((entry) => (
-                    <tr className="border-b border-[var(--app-border)]" key={entry.id}>
-                      <td className="px-2 py-3">
-                        <time dateTime={entry.created_at}>{formatAuditLogTimestamp(entry.created_at)}</time>
-                      </td>
-                      <td className="px-2 py-3">{formatAuditLogActor(entry)}</td>
-                      <td className="px-2 py-3 font-medium">{entry.action}</td>
-                      <td className="px-2 py-3">{formatAuditLogResource(entry)}</td>
-                      <td className="px-2 py-3">{entry.summary}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+      {entriesQuery.isError
+        ? null
+        : (
+            <section className={ADMIN_CARD_CLASS_NAME}>
+              {entries.length === 0
+                ? (
+                    <p className={ADMIN_MUTED_TEXT_CLASS_NAME}>{t("admin.auditLog.empty")}</p>
+                  )
+                : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full min-w-[780px] border-collapse text-left text-sm">
+                        <thead>
+                          <tr className="border-b border-[var(--app-border)]">
+                            <th className="px-2 py-2 font-semibold">{t("admin.auditLog.columns.createdAt")}</th>
+                            <th className="px-2 py-2 font-semibold">{t("admin.auditLog.columns.actor")}</th>
+                            <th className="px-2 py-2 font-semibold">{t("admin.auditLog.columns.action")}</th>
+                            <th className="px-2 py-2 font-semibold">{t("admin.auditLog.columns.resource")}</th>
+                            <th className="px-2 py-2 font-semibold">{t("admin.auditLog.columns.summary")}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {entries.map(entry => (
+                            <tr className="border-b border-[var(--app-border)]" key={entry.id}>
+                              <td className="px-2 py-3">
+                                <time dateTime={entry.created_at}>{formatAuditLogTimestamp(entry.created_at)}</time>
+                              </td>
+                              <td className="px-2 py-3">{formatAuditLogActor(entry)}</td>
+                              <td className="px-2 py-3 font-medium">{entry.action}</td>
+                              <td className="px-2 py-3">{formatAuditLogResource(entry)}</td>
+                              <td className="px-2 py-3">{entry.summary}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+            </section>
           )}
-        </section>
-      )}
     </main>
   );
 };

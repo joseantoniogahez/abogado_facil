@@ -1,31 +1,30 @@
-import { defaultQueryPolicy } from "@/app/query-policy";
-import {
-  expectNumberField,
-  expectRecord,
-  expectStringField,
-} from "@/shared/api/contracts";
-import { apiRequest } from "@/shared/api/http";
-import { t } from "@/shared/i18n/ui-text";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { type FormEvent, useState } from "react";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+
+import { defaultQueryPolicy } from "@/app/query-policy";
+import { expectNumberField, expectRecord, expectStringField } from "@/shared/api/contracts";
+import { apiRequest } from "@/shared/api/http";
+import { t } from "@/shared/i18n/ui-text";
 import {
-  Link,
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from "react-router-dom";
+  ACCENT_ACTION_CLASS_NAME,
+  INLINE_ACTION_CLASS_NAME,
+  QUIET_ACTION_CLASS_NAME,
+  SECONDARY_ACTION_CLASS_NAME,
+} from "@/shared/ui/actionStyles";
+
 import {
   createMatter,
-  matterTypesQueryOptions,
   matterQueryOptions,
   MATTERS_QUERY_KEY,
   mattersQueryOptions,
+  matterTypesQueryOptions,
   updateMatter,
 } from "./api";
 import type { MatterInput, MatterRecord, MatterStatus } from "./contracts";
-import { MatterNotes } from "./matter-notes/MatterNotes";
-import { MatterDocuments } from "./matter-documents/MatterDocuments";
 import { MatterChecklist } from "./matter-checklist/MatterChecklist";
+import { MatterDocuments } from "./matter-documents/MatterDocuments";
+import { MatterNotes } from "./matter-notes/MatterNotes";
 
 const DASHBOARD_QUERY_KEY = ["dashboard"] as const;
 
@@ -35,8 +34,7 @@ interface MatterClientOption {
 }
 const parseMatterClientOptions = (payload: unknown): MatterClientOption[] => {
   const list = expectRecord(payload, "MatterClientList");
-  if (!Array.isArray(list.items))
-    throw new Error("MatterClientList: invalid items");
+  if (!Array.isArray(list.items)) throw new Error("MatterClientList: invalid items");
   return list.items.map((item) => {
     const client = expectRecord(item, "MatterClientOption");
     return {
@@ -47,9 +45,7 @@ const parseMatterClientOptions = (payload: unknown): MatterClientOption[] => {
     };
   });
 };
-const readMatterClientOptions = (
-  search: string,
-): Promise<MatterClientOption[]> =>
+const readMatterClientOptions = (search: string): Promise<MatterClientOption[]> =>
   apiRequest<MatterClientOption[]>(
     `/clients?limit=100${search ? `&search=${encodeURIComponent(search)}` : ""}`,
     { parse: parseMatterClientOptions },
@@ -62,20 +58,26 @@ export const MatterList = ({ clientId }: { clientId?: number }) => {
   if (!query.data.items.length) return <p>{t("matters.empty")}</p>;
   return (
     <ul className="mt-4 grid gap-3">
-      {query.data.items.map((matter) => (
+      {query.data.items.map(matter => (
         <li className="rounded-xl border p-4" key={matter.id}>
-          <Link className="font-semibold" to={`/matters/${matter.id}`}>
+          <Link className={INLINE_ACTION_CLASS_NAME} to={`/matters/${matter.id}`}>
             {matter.title}
           </Link>
           <p>
-            {t(`matters.status.${matter.status}` as const)} ·{" "}
+            {t(`matters.status.${matter.status}` as const)}
+            {" "}
+            ·
             {matter.matter_type}
           </p>
-          {matter.next_action ? (
-            <p>
-              {t("matters.next")}: {matter.next_action}
-            </p>
-          ) : null}
+          {matter.next_action
+            ? (
+                <p>
+                  {t("matters.next")}
+                  :
+                  {matter.next_action}
+                </p>
+              )
+            : null}
         </li>
       ))}
     </ul>
@@ -108,7 +110,7 @@ const ClientCombobox = ({
     ...defaultQueryPolicy,
   });
   const clientOptions = clients.data ?? [];
-  const selected = clientOptions.find((client) => client.id === value);
+  const selected = clientOptions.find(client => client.id === value);
   const choose = (client: MatterClientOption) => {
     onChange(client.id);
     setSearch(client.full_name);
@@ -135,41 +137,41 @@ const ClientCombobox = ({
         role="combobox"
         value={search !== "" ? search : (selected?.full_name ?? "")}
       />
-      {open ? (
-        <ul
-          className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-xl border bg-white p-1 shadow-lg"
-          id="matter-client-options"
-          role="listbox"
-        >
-          {clients.isPending ? (
-            <li className="p-3">{t("matters.fields.clientLoading")}</li>
-          ) : null}
-          {clients.isError ? (
-            <li className="p-3" role="alert">
-              {t("matters.fields.clientError")}
-            </li>
-          ) : null}
-          {clients.data && !clientOptions.length ? (
-            <li className="p-3">{t("matters.fields.clientEmpty")}</li>
-          ) : null}
-          {clientOptions.map((client) => (
-            <li
-              key={client.id}
-              role="option"
-              aria-selected={client.id === value}
+      {open
+        ? (
+            <ul
+              className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-xl border bg-white p-1 shadow-lg"
+              id="matter-client-options"
+              role="listbox"
             >
-              <button
-                className="w-full rounded-lg p-3 text-left hover:bg-slate-100"
-                onMouseDown={(event) => event.preventDefault()}
-                onClick={() => choose(client)}
-                type="button"
-              >
-                {client.full_name}
-              </button>
-            </li>
-          ))}
-        </ul>
-      ) : null}
+              {clients.isPending ? <li className="p-3">{t("matters.fields.clientLoading")}</li> : null}
+              {clients.isError
+                ? (
+                    <li className="p-3" role="alert">
+                      {t("matters.fields.clientError")}
+                    </li>
+                  )
+                : null}
+              {clients.data && !clientOptions.length
+                ? (
+                    <li className="p-3">{t("matters.fields.clientEmpty")}</li>
+                  )
+                : null}
+              {clientOptions.map(client => (
+                <li key={client.id} role="option" aria-selected={client.id === value}>
+                  <button
+                    className={`${SECONDARY_ACTION_CLASS_NAME} w-full justify-start text-left`}
+                    onMouseDown={event => event.preventDefault()}
+                    onClick={() => choose(client)}
+                    type="button"
+                  >
+                    {client.full_name}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )
+        : null}
     </div>
   );
 };
@@ -186,8 +188,7 @@ const MatterForm = ({ initial }: { initial?: MatterRecord }) => {
   const mutation = useMutation({
     mutationFn: (payload: MatterInput) => {
       if (!initial) return createMatter(payload);
-      if (payload.matter_type !== initial.matter_type)
-        return updateMatter(initial.id, payload);
+      if (payload.matter_type !== initial.matter_type) return updateMatter(initial.id, payload);
       const changedPayload: Partial<MatterInput> = { ...payload };
       delete changedPayload.matter_type;
       return updateMatter(initial.id, changedPayload);
@@ -207,9 +208,9 @@ const MatterForm = ({ initial }: { initial?: MatterRecord }) => {
       return;
     }
     if (
-      initial &&
-      form.client_id !== initial.client_id &&
-      !window.confirm(t("matters.fields.clientChangeConfirm"))
+      initial
+      && form.client_id !== initial.client_id
+      && !window.confirm(t("matters.fields.clientChangeConfirm"))
     )
       return;
     setValidation(false);
@@ -222,7 +223,7 @@ const MatterForm = ({ initial }: { initial?: MatterRecord }) => {
         className="mt-1 w-full rounded-xl border p-3"
         type={type}
         value={String(form[key] ?? "")}
-        onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+        onChange={e => setForm({ ...form, [key]: e.target.value })}
       />
     </label>
   );
@@ -230,7 +231,7 @@ const MatterForm = ({ initial }: { initial?: MatterRecord }) => {
     <form className="mt-6 grid gap-4" onSubmit={submit}>
       <ClientCombobox
         value={form.client_id}
-        onChange={(clientId) => setForm({ ...form, client_id: clientId })}
+        onChange={clientId => setForm({ ...form, client_id: clientId })}
       />
       {input("title", t("matters.fields.title"))}
       <label className="font-medium">
@@ -239,13 +240,21 @@ const MatterForm = ({ initial }: { initial?: MatterRecord }) => {
           className="mt-1 w-full rounded-xl border p-3"
           disabled={matterTypes.isPending || matterTypes.isError}
           value={form.matter_type}
-          onChange={(event) => setForm({ ...form, matter_type: event.target.value })}
+          onChange={event => setForm({ ...form, matter_type: event.target.value })}
         >
           <option value="">{t("matters.fields.typePlaceholder")}</option>
-          {initial && !matterTypes.data?.some(({ value }) => value === initial.matter_type) ? (
-            <option value={initial.matter_type} disabled>{initial.matter_type}</option>
-          ) : null}
-          {matterTypes.data?.map(({ value }) => <option key={value} value={value}>{value}</option>)}
+          {initial && !matterTypes.data?.some(({ value }) => value === initial.matter_type)
+            ? (
+                <option value={initial.matter_type} disabled>
+                  {initial.matter_type}
+                </option>
+              )
+            : null}
+          {matterTypes.data?.map(({ value }) => (
+            <option key={value} value={value}>
+              {value}
+            </option>
+          ))}
         </select>
       </label>
       {matterTypes.isError ? <p role="alert">{t("matters.fields.typeError")}</p> : null}
@@ -254,9 +263,7 @@ const MatterForm = ({ initial }: { initial?: MatterRecord }) => {
         <select
           className="mt-1 w-full rounded-xl border p-3"
           value={form.status}
-          onChange={(e) =>
-            setForm({ ...form, status: e.target.value as MatterStatus })
-          }
+          onChange={e => setForm({ ...form, status: e.target.value as MatterStatus })}
         >
           <option value="active">{t("matters.status.active")}</option>
           <option value="pending">{t("matters.status.pending")}</option>
@@ -271,15 +278,12 @@ const MatterForm = ({ initial }: { initial?: MatterRecord }) => {
         <textarea
           className="mt-1 min-h-28 w-full rounded-xl border p-3"
           value={form.description ?? ""}
-          onChange={(e) => setForm({ ...form, description: e.target.value })}
+          onChange={e => setForm({ ...form, description: e.target.value })}
         />
       </label>
       {validation ? <p role="alert">{t("matters.validation")}</p> : null}
       {mutation.isError ? <p role="alert">{t("matters.error")}</p> : null}
-      <button
-        className="rounded-full bg-[var(--app-accent)] px-5 py-3 text-white"
-        disabled={mutation.isPending}
-      >
+      <button className={ACCENT_ACTION_CLASS_NAME} disabled={mutation.isPending}>
         {t("matters.save")}
       </button>
     </form>
@@ -293,6 +297,7 @@ export const MattersPage = () => {
       <div className="flex justify-between">
         <h1 className="text-4xl font-semibold">{t("matters.title")}</h1>
         <Link
+          className={ACCENT_ACTION_CLASS_NAME}
           to={clientId ? `/matters/new?clientId=${clientId}` : "/matters/new"}
         >
           {t("matters.new")}
@@ -311,8 +316,7 @@ export const NewMatterPage = () => (
 export const MatterDetailPage = ({ edit = false }: { edit?: boolean }) => {
   const id = Number(useParams().matterId);
   const query = useQuery(matterQueryOptions(id));
-  if (query.isPending)
-    return <main className="p-8">{t("matters.loading")}</main>;
+  if (query.isPending) return <main className="p-8">{t("matters.loading")}</main>;
   if (query.isError)
     return (
       <main className="p-8" role="alert">
@@ -329,26 +333,39 @@ export const MatterDetailPage = ({ edit = false }: { edit?: boolean }) => {
   const m = query.data;
   return (
     <main className="mx-auto max-w-4xl p-6 sm:p-10">
-      <Link to="/matters">{t("matters.back")}</Link>
+      <Link className={QUIET_ACTION_CLASS_NAME} to="/matters">
+        {t("matters.back")}
+      </Link>
       <h1 className="mt-5 text-4xl font-semibold">{m.title}</h1>
       <p>
-        {m.matter_type} · {t(`matters.status.${m.status}` as const)}
+        {m.matter_type}
+        {" "}
+        ·
+        {t(`matters.status.${m.status}` as const)}
       </p>
-      {m.counterparty ? (
-        <p>
-          {t("matters.fields.counterparty")}: {m.counterparty}
-        </p>
-      ) : null}
-      {m.next_action ? (
-        <p>
-          {t("matters.next")}: {m.next_action}
-          {m.next_action_date ? ` · ${m.next_action_date}` : ""}
-        </p>
-      ) : null}
-      {m.description ? (
-        <p className="whitespace-pre-wrap">{m.description}</p>
-      ) : null}
-      <Link to={`/matters/${id}/edit`}>{t("matters.edit")}</Link>
+      {m.counterparty
+        ? (
+            <p>
+              {t("matters.fields.counterparty")}
+              :
+              {m.counterparty}
+            </p>
+          )
+        : null}
+      {m.next_action
+        ? (
+            <p>
+              {t("matters.next")}
+              :
+              {m.next_action}
+              {m.next_action_date ? ` · ${m.next_action_date}` : ""}
+            </p>
+          )
+        : null}
+      {m.description ? <p className="whitespace-pre-wrap">{m.description}</p> : null}
+      <Link className={`${SECONDARY_ACTION_CLASS_NAME} mt-5`} to={`/matters/${id}/edit`}>
+        {t("matters.edit")}
+      </Link>
       <MatterNotes matterId={id} />
       <MatterChecklist matterId={id} />
       <MatterDocuments matterId={id} />

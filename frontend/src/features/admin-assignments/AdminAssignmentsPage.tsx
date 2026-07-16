@@ -1,15 +1,15 @@
-import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 
 import { useSession } from "@/shared/auth/session";
+import { t } from "@/shared/i18n/ui-text";
 import { userHasPermission } from "@/shared/iam/api";
 import { IAM_PERMISSION } from "@/shared/iam/contracts";
-import { t } from "@/shared/i18n/ui-text";
 import {
   assignRbacUserRole,
   readAdminUsers,
-  readRbacRoleUsers,
   readRbacRoles,
+  readRbacRoleUsers,
   readRbacUserRoles,
   removeRbacUserRole,
 } from "@/shared/rbac/admin";
@@ -52,8 +52,10 @@ const parsePositiveId = (value: string): number | null => {
   return Number.isInteger(parsedValue) && parsedValue > 0 ? parsedValue : null;
 };
 
-const toCatalogValue = <T extends { id: number }>(items: readonly T[], selectedValue: string): string =>
-  items.some((item) => String(item.id) === selectedValue) ? selectedValue : "";
+const toCatalogValue = <T extends { id: number },>(
+  items: readonly T[],
+  selectedValue: string,
+): string => (items.some(item => String(item.id) === selectedValue) ? selectedValue : "");
 
 export const AdminAssignmentsPage = () => {
   const queryClient = useQueryClient();
@@ -91,14 +93,16 @@ export const AdminAssignmentsPage = () => {
   });
 
   const assignMutation = useMutation({
-    mutationFn: ({ userId, roleId }: { userId: number; roleId: number }) => assignRbacUserRole(userId, roleId),
+    mutationFn: ({ userId, roleId }: { userId: number; roleId: number }) =>
+      assignRbacUserRole(userId, roleId),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: RBAC_ASSIGNMENTS_QUERY_KEY });
     },
   });
 
   const removeMutation = useMutation({
-    mutationFn: ({ userId, roleId }: { userId: number; roleId: number }) => removeRbacUserRole(userId, roleId),
+    mutationFn: ({ userId, roleId }: { userId: number; roleId: number }) =>
+      removeRbacUserRole(userId, roleId),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: RBAC_ASSIGNMENTS_QUERY_KEY });
     },
@@ -109,8 +113,8 @@ export const AdminAssignmentsPage = () => {
   const userRoles = userRolesQuery.data ?? [];
   const roleUsers = roleUsersQuery.data ?? [];
   const isMutating = assignMutation.isPending || removeMutation.isPending;
-  const assignSelection =
-    selectedUserId !== null && selectedRoleId !== null
+  const assignSelection
+    = selectedUserId !== null && selectedRoleId !== null
       ? () => {
           assignMutation.reset();
           assignMutation.mutate({ userId: selectedUserId, roleId: selectedRoleId });
@@ -130,33 +134,41 @@ export const AdminAssignmentsPage = () => {
       <section className="grid gap-6 md:grid-cols-2">
         <article className={ADMIN_CARD_CLASS_NAME}>
           <h2 className="text-lg font-semibold">{t(UI.userLabel)}</h2>
-          {canReadUsersCatalog ? (
-            usersQuery.isPending ? (
-              <p className={`mt-3 ${ADMIN_MUTED_TEXT_CLASS_NAME}`}>{t(UI.loading)}</p>
-            ) : usersQuery.error ? (
-              <div className="mt-3">
-                <AdminErrorPanel error={usersQuery.error} />
-              </div>
-            ) : users.length > 0 ? (
-              <label className="mt-3 block">
-                <span className={ADMIN_LABEL_CLASS_NAME}>{t(UI.userLabel)}</span>
-                <select
-                  className={ADMIN_FIELD_CLASS_NAME}
-                  onChange={(event) => setSelectedUserIdInput(event.target.value)}
-                  value={toCatalogValue(users, selectedUserIdInput)}
-                >
-                  <option value="">-</option>
-                  {users.map((user) => (
-                    <option key={user.id} value={user.id}>
-                      {user.email}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            ) : (
-              <p className={`mt-3 ${ADMIN_MUTED_TEXT_CLASS_NAME}`}>{t(UI.usersEmpty)}</p>
-            )
-          ) : null}
+          {canReadUsersCatalog
+            ? (
+                usersQuery.isPending
+                  ? (
+                      <p className={`mt-3 ${ADMIN_MUTED_TEXT_CLASS_NAME}`}>{t(UI.loading)}</p>
+                    )
+                  : usersQuery.error
+                    ? (
+                        <div className="mt-3">
+                          <AdminErrorPanel error={usersQuery.error} />
+                        </div>
+                      )
+                    : users.length > 0
+                      ? (
+                          <label className="mt-3 block">
+                            <span className={ADMIN_LABEL_CLASS_NAME}>{t(UI.userLabel)}</span>
+                            <select
+                              className={ADMIN_FIELD_CLASS_NAME}
+                              onChange={event => setSelectedUserIdInput(event.target.value)}
+                              value={toCatalogValue(users, selectedUserIdInput)}
+                            >
+                              <option value="">-</option>
+                              {users.map(user => (
+                                <option key={user.id} value={user.id}>
+                                  {user.email}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                        )
+                      : (
+                          <p className={`mt-3 ${ADMIN_MUTED_TEXT_CLASS_NAME}`}>{t(UI.usersEmpty)}</p>
+                        )
+              )
+            : null}
 
           <label className="mt-4 block">
             <span className={ADMIN_LABEL_CLASS_NAME}>{t(UI.uid)}</span>
@@ -164,7 +176,7 @@ export const AdminAssignmentsPage = () => {
               className={ADMIN_FIELD_CLASS_NAME}
               inputMode="numeric"
               min="1"
-              onChange={(event) => setSelectedUserIdInput(event.target.value)}
+              onChange={event => setSelectedUserIdInput(event.target.value)}
               type="number"
               value={selectedUserIdInput}
             />
@@ -173,33 +185,41 @@ export const AdminAssignmentsPage = () => {
 
         <article className={ADMIN_CARD_CLASS_NAME}>
           <h2 className="text-lg font-semibold">{t(UI.roleLabel)}</h2>
-          {canReadRolesCatalog ? (
-            rolesQuery.isPending ? (
-              <p className={`mt-3 ${ADMIN_MUTED_TEXT_CLASS_NAME}`}>{t(UI.loading)}</p>
-            ) : rolesQuery.error ? (
-              <div className="mt-3">
-                <AdminErrorPanel error={rolesQuery.error} />
-              </div>
-            ) : roles.length > 0 ? (
-              <label className="mt-3 block">
-                <span className={ADMIN_LABEL_CLASS_NAME}>{t(UI.roleLabel)}</span>
-                <select
-                  className={ADMIN_FIELD_CLASS_NAME}
-                  onChange={(event) => setSelectedRoleIdInput(event.target.value)}
-                  value={toCatalogValue(roles, selectedRoleIdInput)}
-                >
-                  <option value="">-</option>
-                  {roles.map((role) => (
-                    <option key={role.id} value={role.id}>
-                      {role.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            ) : (
-              <p className={`mt-3 ${ADMIN_MUTED_TEXT_CLASS_NAME}`}>{t(UI.rolesEmpty)}</p>
-            )
-          ) : null}
+          {canReadRolesCatalog
+            ? (
+                rolesQuery.isPending
+                  ? (
+                      <p className={`mt-3 ${ADMIN_MUTED_TEXT_CLASS_NAME}`}>{t(UI.loading)}</p>
+                    )
+                  : rolesQuery.error
+                    ? (
+                        <div className="mt-3">
+                          <AdminErrorPanel error={rolesQuery.error} />
+                        </div>
+                      )
+                    : roles.length > 0
+                      ? (
+                          <label className="mt-3 block">
+                            <span className={ADMIN_LABEL_CLASS_NAME}>{t(UI.roleLabel)}</span>
+                            <select
+                              className={ADMIN_FIELD_CLASS_NAME}
+                              onChange={event => setSelectedRoleIdInput(event.target.value)}
+                              value={toCatalogValue(roles, selectedRoleIdInput)}
+                            >
+                              <option value="">-</option>
+                              {roles.map(role => (
+                                <option key={role.id} value={role.id}>
+                                  {role.name}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                        )
+                      : (
+                          <p className={`mt-3 ${ADMIN_MUTED_TEXT_CLASS_NAME}`}>{t(UI.rolesEmpty)}</p>
+                        )
+              )
+            : null}
 
           <label className="mt-4 block">
             <span className={ADMIN_LABEL_CLASS_NAME}>{t(UI.rid)}</span>
@@ -207,7 +227,7 @@ export const AdminAssignmentsPage = () => {
               className={ADMIN_FIELD_CLASS_NAME}
               inputMode="numeric"
               min="1"
-              onChange={(event) => setSelectedRoleIdInput(event.target.value)}
+              onChange={event => setSelectedRoleIdInput(event.target.value)}
               type="number"
               value={selectedRoleIdInput}
             />
@@ -229,80 +249,96 @@ export const AdminAssignmentsPage = () => {
       <section className="grid gap-6 lg:grid-cols-2">
         <article className={ADMIN_CARD_CLASS_NAME}>
           <h2 className="text-lg font-semibold">{t(UI.userList)}</h2>
-          {selectedUserId === null ? (
-            <p className={`mt-3 ${ADMIN_MUTED_TEXT_CLASS_NAME}`}>{t(UI.placeholder)}</p>
-          ) : userRolesQuery.isPending ? (
-            <p className={`mt-3 ${ADMIN_MUTED_TEXT_CLASS_NAME}`}>{t(UI.loading)}</p>
-          ) : userRolesQuery.error ? (
-            <div className="mt-3">
-              <AdminErrorPanel error={userRolesQuery.error} />
-            </div>
-          ) : userRoles.length === 0 ? (
-            <p className={`mt-3 ${ADMIN_MUTED_TEXT_CLASS_NAME}`}>{t(UI.userEmpty)}</p>
-          ) : (
-            <ul className="mt-4 space-y-3">
-              {userRoles.map((role) => (
-                <li
-                  className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[var(--app-border)] px-3 py-3"
-                  key={role.id}
-                >
-                  <div className="text-sm">
-                    <p className="font-semibold">{role.name}</p>
-                    <p className="text-xs text-[var(--app-subtle)]">{role.id}</p>
-                  </div>
-                  <button
-                    className={ADMIN_COMPACT_DANGER_BUTTON_CLASS_NAME}
-                    onClick={() => {
-                      removeMutation.reset();
-                      removeMutation.mutate({ userId: selectedUserId, roleId: role.id });
-                    }}
-                    type="button"
-                  >
-                    {t(UI.remove)}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
+          {selectedUserId === null
+            ? (
+                <p className={`mt-3 ${ADMIN_MUTED_TEXT_CLASS_NAME}`}>{t(UI.placeholder)}</p>
+              )
+            : userRolesQuery.isPending
+              ? (
+                  <p className={`mt-3 ${ADMIN_MUTED_TEXT_CLASS_NAME}`}>{t(UI.loading)}</p>
+                )
+              : userRolesQuery.error
+                ? (
+                    <div className="mt-3">
+                      <AdminErrorPanel error={userRolesQuery.error} />
+                    </div>
+                  )
+                : userRoles.length === 0
+                  ? (
+                      <p className={`mt-3 ${ADMIN_MUTED_TEXT_CLASS_NAME}`}>{t(UI.userEmpty)}</p>
+                    )
+                  : (
+                      <ul className="mt-4 space-y-3">
+                        {userRoles.map(role => (
+                          <li
+                            className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[var(--app-border)] px-3 py-3"
+                            key={role.id}
+                          >
+                            <div className="text-sm">
+                              <p className="font-semibold">{role.name}</p>
+                              <p className="text-xs text-[var(--app-subtle)]">{role.id}</p>
+                            </div>
+                            <button
+                              className={ADMIN_COMPACT_DANGER_BUTTON_CLASS_NAME}
+                              onClick={() => {
+                                removeMutation.reset();
+                                removeMutation.mutate({ userId: selectedUserId, roleId: role.id });
+                              }}
+                              type="button"
+                            >
+                              {t(UI.remove)}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
         </article>
 
         <article className={ADMIN_CARD_CLASS_NAME}>
           <h2 className="text-lg font-semibold">{t(UI.roleList)}</h2>
-          {selectedRoleId === null ? (
-            <p className={`mt-3 ${ADMIN_MUTED_TEXT_CLASS_NAME}`}>{t(UI.placeholder)}</p>
-          ) : roleUsersQuery.isPending ? (
-            <p className={`mt-3 ${ADMIN_MUTED_TEXT_CLASS_NAME}`}>{t(UI.loading)}</p>
-          ) : roleUsersQuery.error ? (
-            <div className="mt-3">
-              <AdminErrorPanel error={roleUsersQuery.error} />
-            </div>
-          ) : roleUsers.length === 0 ? (
-            <p className={`mt-3 ${ADMIN_MUTED_TEXT_CLASS_NAME}`}>{t(UI.roleEmpty)}</p>
-          ) : (
-            <ul className="mt-4 space-y-3">
-              {roleUsers.map((user) => (
-                <li
-                  className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[var(--app-border)] px-3 py-3"
-                  key={user.id}
-                >
-                  <div className="text-sm">
-                    <p className="font-semibold">{user.email}</p>
-                    <p className="text-xs text-[var(--app-subtle)]">{user.id}</p>
-                  </div>
-                  <button
-                    className={ADMIN_COMPACT_DANGER_BUTTON_CLASS_NAME}
-                    onClick={() => {
-                      removeMutation.reset();
-                      removeMutation.mutate({ userId: user.id, roleId: selectedRoleId });
-                    }}
-                    type="button"
-                  >
-                    {t(UI.remove)}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
+          {selectedRoleId === null
+            ? (
+                <p className={`mt-3 ${ADMIN_MUTED_TEXT_CLASS_NAME}`}>{t(UI.placeholder)}</p>
+              )
+            : roleUsersQuery.isPending
+              ? (
+                  <p className={`mt-3 ${ADMIN_MUTED_TEXT_CLASS_NAME}`}>{t(UI.loading)}</p>
+                )
+              : roleUsersQuery.error
+                ? (
+                    <div className="mt-3">
+                      <AdminErrorPanel error={roleUsersQuery.error} />
+                    </div>
+                  )
+                : roleUsers.length === 0
+                  ? (
+                      <p className={`mt-3 ${ADMIN_MUTED_TEXT_CLASS_NAME}`}>{t(UI.roleEmpty)}</p>
+                    )
+                  : (
+                      <ul className="mt-4 space-y-3">
+                        {roleUsers.map(user => (
+                          <li
+                            className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[var(--app-border)] px-3 py-3"
+                            key={user.id}
+                          >
+                            <div className="text-sm">
+                              <p className="font-semibold">{user.email}</p>
+                              <p className="text-xs text-[var(--app-subtle)]">{user.id}</p>
+                            </div>
+                            <button
+                              className={ADMIN_COMPACT_DANGER_BUTTON_CLASS_NAME}
+                              onClick={() => {
+                                removeMutation.reset();
+                                removeMutation.mutate({ userId: user.id, roleId: selectedRoleId });
+                              }}
+                              type="button"
+                            >
+                              {t(UI.remove)}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
         </article>
       </section>
     </main>

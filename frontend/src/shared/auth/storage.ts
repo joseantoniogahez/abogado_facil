@@ -13,7 +13,8 @@ const canUseStorage = (storage: Storage | undefined): storage is Storage => {
     storage.setItem(STORAGE_PROBE_KEY, "ok");
     storage.removeItem(STORAGE_PROBE_KEY);
     return true;
-  } catch {
+  }
+  catch {
     return false;
   }
 };

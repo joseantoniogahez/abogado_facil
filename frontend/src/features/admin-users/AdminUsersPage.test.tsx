@@ -153,7 +153,7 @@ describe("AdminUsersPage", () => {
           new_password?: string;
         }>(init);
         updatedPayload = payload;
-        users = users.map((user) =>
+        users = users.map(user =>
           user.id === 99
             ? {
                 ...user,
@@ -163,12 +163,12 @@ describe("AdminUsersPage", () => {
               }
             : user,
         );
-        const updatedUser = users.find((user) => user.id === 99);
+        const updatedUser = users.find(user => user.id === 99);
         return jsonResponse(200, updatedUser);
       }
 
       if (method === "DELETE" && path === "/v1/rbac/users/99") {
-        users = users.map((user) =>
+        users = users.map(user =>
           user.id === 99 ? { ...user, disabled: true } : user,
         );
         return jsonResponse(204, null);
@@ -334,8 +334,8 @@ describe("AdminUsersPage", () => {
         const requestUrl = toRequestUrl(call[0]);
         const request = call[1];
         return (
-          requestUrl.pathname === "/v1/rbac/users/99" &&
-          request?.method === "DELETE"
+          requestUrl.pathname === "/v1/rbac/users/99"
+          && request?.method === "DELETE"
         );
       }),
     ).toBe(false);
@@ -352,8 +352,8 @@ describe("AdminUsersPage", () => {
           const requestUrl = toRequestUrl(call[0]);
           const request = call[1];
           return (
-            requestUrl.pathname === "/v1/rbac/users/99" &&
-            request?.method === "DELETE"
+            requestUrl.pathname === "/v1/rbac/users/99"
+            && request?.method === "DELETE"
           );
         }),
       ).toBe(true);

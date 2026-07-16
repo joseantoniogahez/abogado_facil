@@ -5,8 +5,8 @@ import userEvent from "@testing-library/user-event";
 import { createQueryClient } from "@/app/query-client";
 import { AdminPermissionsPage } from "@/features/admin-permissions/AdminPermissionsPage";
 import { SESSION_QUERY_KEY } from "@/shared/auth/session";
-import { IAM_PERMISSION } from "@/shared/iam/contracts";
 import { t } from "@/shared/i18n/ui-text";
+import { IAM_PERMISSION } from "@/shared/iam/contracts";
 
 interface MockRolePermission {
   id: string;
@@ -115,7 +115,7 @@ describe("AdminPermissionsPage", () => {
 
         if (method === "PUT" && path === "/v1/rbac/roles/2/permissions/users%3Amanage") {
           const payload = readJsonBody<{ scope: string }>(init);
-          roles = roles.map((role) =>
+          roles = roles.map(role =>
             role.id === 2
               ? {
                   ...role,
@@ -137,9 +137,7 @@ describe("AdminPermissionsPage", () => {
         }
 
         if (method === "DELETE" && path === "/v1/rbac/roles/2/permissions/users%3Amanage") {
-          roles = roles.map((role) =>
-            role.id === 2 ? { ...role, permissions: [] } : role,
-          );
+          roles = roles.map(role => (role.id === 2 ? { ...role, permissions: [] } : role));
           return jsonResponse(204, null);
         }
 
@@ -175,9 +173,9 @@ describe("AdminPermissionsPage", () => {
             const requestUrl = toRequestUrl(call[0]);
             const request = call[1];
             return (
-              requestUrl.pathname === "/v1/rbac/roles/2/permissions/users%3Amanage" &&
-              request?.method === "PUT" &&
-              request.body === JSON.stringify({ scope })
+              requestUrl.pathname === "/v1/rbac/roles/2/permissions/users%3Amanage"
+              && request?.method === "PUT"
+              && request.body === JSON.stringify({ scope })
             );
           }),
         ).toBe(true);
@@ -190,7 +188,9 @@ describe("AdminPermissionsPage", () => {
       }
 
       expect(await within(listCard).findByText("Manage users")).toBeInTheDocument();
-      expect(await within(listCard).findByText(new RegExp(`Alcance: ${scope}`))).toBeInTheDocument();
+      expect(
+        await within(listCard).findByText(new RegExp(`Alcance: ${scope}`)),
+      ).toBeInTheDocument();
 
       const permissionRow = within(listCard).getByText("Manage users").closest("li");
       expect(permissionRow).not.toBeNull();
@@ -198,14 +198,19 @@ describe("AdminPermissionsPage", () => {
         throw new Error("Expected permission row");
       }
 
-      await user.click(within(permissionRow).getByRole("button", { name: t("admin.roles.permissions.remove") }));
+      await user.click(
+        within(permissionRow).getByRole("button", { name: t("admin.roles.permissions.remove") }),
+      );
 
       await waitFor(() => {
         expect(
           fetchMock.mock.calls.some((call) => {
             const requestUrl = toRequestUrl(call[0]);
             const request = call[1];
-            return requestUrl.pathname === "/v1/rbac/roles/2/permissions/users%3Amanage" && request?.method === "DELETE";
+            return (
+              requestUrl.pathname === "/v1/rbac/roles/2/permissions/users%3Amanage"
+              && request?.method === "DELETE"
+            );
           }),
         ).toBe(true);
       });
@@ -260,18 +265,27 @@ describe("AdminPermissionsPage", () => {
     expect(screen.getByText(t("admin.pm.manual"))).toBeInTheDocument();
 
     await user.type(screen.getByLabelText(t("admin.as.rid")), "999");
-    await user.selectOptions(screen.getByLabelText(t("admin.roles.permissions.select")), "users:manage");
+    await user.selectOptions(
+      screen.getByLabelText(t("admin.roles.permissions.select")),
+      "users:manage",
+    );
     await user.click(screen.getByRole("button", { name: t("admin.roles.permissions.remove") }));
     await waitFor(() => {
       expect(
         fetchMock.mock.calls.some((call) => {
           const requestUrl = toRequestUrl(call[0]);
           const request = call[1];
-          return requestUrl.pathname === "/v1/rbac/roles/999/permissions/users%3Amanage" && request?.method === "DELETE";
+          return (
+            requestUrl.pathname === "/v1/rbac/roles/999/permissions/users%3Amanage"
+            && request?.method === "DELETE"
+          );
         }),
       ).toBe(true);
     });
-    await user.selectOptions(screen.getByLabelText(t("admin.roles.permissions.scope.label")), "tenant");
+    await user.selectOptions(
+      screen.getByLabelText(t("admin.roles.permissions.scope.label")),
+      "tenant",
+    );
     await user.click(screen.getByRole("button", { name: t("admin.roles.permissions.add") }));
 
     expect(await screen.findByText(/request_id=req-permissions-404/)).toBeInTheDocument();

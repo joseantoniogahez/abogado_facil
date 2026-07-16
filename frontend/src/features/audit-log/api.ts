@@ -1,5 +1,5 @@
+import { type AuditLogEntry, parseAuditLogEntryList } from "@/features/audit-log/contracts";
 import { apiRequest } from "@/shared/api/http";
-import { parseAuditLogEntryList, type AuditLogEntry } from "@/features/audit-log/contracts";
 
 export const AUDIT_LOG_ENDPOINT_PATH = "/audit-log";
 

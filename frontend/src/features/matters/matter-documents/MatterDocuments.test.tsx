@@ -1,26 +1,40 @@
-import { createQueryClient } from "@/app/query-client";
-import { t } from "@/shared/i18n/ui-text";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import axe from "axe-core";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { MatterDocuments } from "./MatterDocuments";
+
+import { createQueryClient } from "@/app/query-client";
+import { t } from "@/shared/i18n/ui-text";
+
 import { parseMatterDocument, parseMatterDocumentList } from "./contracts";
+import { MatterDocuments } from "./MatterDocuments";
 
 const documentRecord = {
-  id: "doc-1", matter_id: 7, original_filename: "demanda.pdf", document_type: "filing",
-  media_type: "application/pdf", size_bytes: 2048, created_at: "2026-07-14T12:00:00Z",
+  id: "doc-1",
+  matter_id: 7,
+  original_filename: "demanda.pdf",
+  document_type: "filing",
+  media_type: "application/pdf",
+  size_bytes: 2048,
+  created_at: "2026-07-14T12:00:00Z",
 };
 const jsonResponse = (payload: unknown, status = 200): Partial<Response> => ({
-  ok: status >= 200 && status < 300, status, statusText: status === 200 ? "OK" : "Error",
-  headers: new Headers(), json: () => Promise.resolve(payload),
+  ok: status >= 200 && status < 300,
+  status,
+  statusText: status === 200 ? "OK" : "Error",
+  headers: new Headers(),
+  json: () => Promise.resolve(payload),
 });
 const renderDocuments = (fetchMock: ReturnType<typeof vi.fn>) => {
   vi.stubGlobal("fetch", fetchMock);
   const client = createQueryClient();
   client.setQueryDefaults(["matter-documents"], { retry: false });
-  return render(<QueryClientProvider client={client}><MatterDocuments matterId={7} /></QueryClientProvider>);
+  return render(
+    <QueryClientProvider client={client}>
+      <MatterDocuments matterId={7} />
+    </QueryClientProvider>,
+  );
 };
 
 afterEach(() => vi.restoreAllMocks());
@@ -40,12 +54,18 @@ describe("MatterDocuments", () => {
   it("has no obvious accessibility violations in its empty state", async () => {
     const view = renderDocuments(vi.fn().mockResolvedValue(jsonResponse({ items: [], total: 0 })));
     await screen.findByText(t("matterDocuments.empty"));
-    expect((await axe.run(view.container, { rules: { "color-contrast": { enabled: false } } })).violations).toHaveLength(0);
+    expect(
+      (await axe.run(view.container, { rules: { "color-contrast": { enabled: false } } }))
+        .violations,
+    ).toHaveLength(0);
   });
   it("shows empty, required, format, size, upload and list states", async () => {
-    let items: typeof documentRecord[] = [];
+    let items: (typeof documentRecord)[] = [];
     const fetchMock = vi.fn((_url: string, options?: RequestInit) => {
-      if (options?.method === "POST") { items = [documentRecord]; return Promise.resolve(jsonResponse(documentRecord, 201)); }
+      if (options?.method === "POST") {
+        items = [documentRecord];
+        return Promise.resolve(jsonResponse(documentRecord, 201));
+      }
       return Promise.resolve(jsonResponse({ items, total: items.length }));
     });
     renderDocuments(fetchMock);
@@ -57,7 +77,10 @@ describe("MatterDocuments", () => {
     await user.upload(input, new File(["bad"], "bad.exe"));
     await user.click(screen.getByRole("button", { name: t("matterDocuments.upload") }));
     expect(screen.getByRole("alert")).toHaveTextContent(t("matterDocuments.validation.format"));
-    await user.upload(input, new File([new Uint8Array(10 * 1024 * 1024 + 1)], "large.pdf", { type: "application/pdf" }));
+    await user.upload(
+      input,
+      new File([new Uint8Array(10 * 1024 * 1024 + 1)], "large.pdf", { type: "application/pdf" }),
+    );
     await user.click(screen.getByRole("button", { name: t("matterDocuments.upload") }));
     expect(screen.getByRole("alert")).toHaveTextContent(t("matterDocuments.validation.size"));
     await user.selectOptions(screen.getByLabelText(t("matterDocuments.type")), "filing");
@@ -69,7 +92,8 @@ describe("MatterDocuments", () => {
   });
 
   it("retries list errors", async () => {
-    const fetchMock = vi.fn()
+    const fetchMock = vi
+      .fn()
       .mockResolvedValueOnce(jsonResponse({ detail: "bad" }, 400))
       .mockResolvedValueOnce(jsonResponse({ items: [], total: 0 }));
     renderDocuments(fetchMock);
@@ -82,14 +106,27 @@ describe("MatterDocuments", () => {
     let items = [documentRecord];
     const blob = new Blob(["pdf"]);
     const fetchMock = vi.fn((url: string, options?: RequestInit) => {
-      if (String(url).endsWith("/download")) return Promise.resolve({ ok: true, status: 200, headers: new Headers({ "Content-Disposition": "attachment; filename*=UTF-8''escrito%20final.pdf" }), blob: () => Promise.resolve(blob) });
-      if (options?.method === "DELETE") { items = []; return Promise.resolve(jsonResponse(undefined, 204)); }
+      if (String(url).endsWith("/download"))
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          headers: new Headers({
+            "Content-Disposition": "attachment; filename*=UTF-8''escrito%20final.pdf",
+          }),
+          blob: () => Promise.resolve(blob),
+        });
+      if (options?.method === "DELETE") {
+        items = [];
+        return Promise.resolve(jsonResponse(undefined, 204));
+      }
       return Promise.resolve(jsonResponse({ items, total: items.length }));
     });
     const createObjectURL = vi.fn(() => "blob:test");
     const revokeObjectURL = vi.fn();
     vi.stubGlobal("URL", Object.assign(URL, { createObjectURL, revokeObjectURL }));
-    const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => undefined);
+    const click = vi
+      .spyOn(HTMLAnchorElement.prototype, "click")
+      .mockImplementation(() => undefined);
     vi.spyOn(window, "confirm").mockReturnValue(true);
     renderDocuments(fetchMock);
     await screen.findByText("demanda.pdf");
@@ -103,15 +140,21 @@ describe("MatterDocuments", () => {
   });
 
   it("keeps a document when deletion is cancelled and exposes action errors", async () => {
-    const fetchMock = vi.fn((url: string) => String(url).endsWith("/download")
-      ? Promise.resolve(jsonResponse({ detail: "failure" }, 400))
-      : Promise.resolve(jsonResponse({ items: [documentRecord], total: 1 })));
+    const fetchMock = vi.fn((url: string) =>
+      String(url).endsWith("/download")
+        ? Promise.resolve(jsonResponse({ detail: "failure" }, 400))
+        : Promise.resolve(jsonResponse({ items: [documentRecord], total: 1 })),
+    );
     vi.spyOn(window, "confirm").mockReturnValue(false);
     renderDocuments(fetchMock);
     await screen.findByText("demanda.pdf");
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: t("matterDocuments.delete") }));
-    expect(fetchMock.mock.calls.some(([, options]) => (options as RequestInit | undefined)?.method === "DELETE")).toBe(false);
+    expect(
+      fetchMock.mock.calls.some(
+        ([, options]) => (options as RequestInit | undefined)?.method === "DELETE",
+      ),
+    ).toBe(false);
     await user.click(screen.getByRole("button", { name: t("matterDocuments.download") }));
     expect(await screen.findByRole("alert")).toHaveTextContent(t("matterDocuments.actionError"));
   });

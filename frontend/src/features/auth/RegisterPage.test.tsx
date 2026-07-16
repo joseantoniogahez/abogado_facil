@@ -1,8 +1,8 @@
 import { QueryClientProvider } from "@tanstack/react-query";
-import axe from "axe-core";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { RouterProvider, createMemoryRouter } from "react-router-dom";
+import axe from "axe-core";
+import { createMemoryRouter, RouterProvider } from "react-router-dom";
 
 import { createQueryClient } from "@/app/query-client";
 import { appRoutes } from "@/app/routes";
@@ -68,7 +68,13 @@ describe("RegisterPage", () => {
       </QueryClientProvider>,
     );
 
-    expect(await screen.findByRole("heading", { name: t("auth.register.title") })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: t("auth.register.title") }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: t("auth.register.footer.signIn") })).toHaveAttribute(
+      "class",
+      "app-action-quiet",
+    );
   });
 
   it("creates a new account and shows success state without mutating session", async () => {
@@ -100,8 +106,12 @@ describe("RegisterPage", () => {
     await user.type(screen.getByLabelText(t("auth.login.fields.password")), "StrongPass1");
     await user.click(screen.getByRole("button", { name: t("auth.register.submit.default") }));
 
-    expect(await screen.findByRole("heading", { name: t("auth.register.success.title") })).toBeInTheDocument();
-    expect(screen.getByText(t("auth.register.success.body", { email: "new.user@example.com" }))).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: t("auth.register.success.title") }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(t("auth.register.success.body", { email: "new.user@example.com" })),
+    ).toBeInTheDocument();
     expect(queryClient.getQueryData(SESSION_QUERY_KEY)).toBeNull();
   });
 
@@ -139,16 +149,31 @@ describe("RegisterPage", () => {
   it("keeps the registration form accessible", async () => {
     const { view } = renderRegisterPage();
 
-    expect(await screen.findByRole("heading", { name: t("auth.register.title") })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: t("auth.register.title") }),
+    ).toBeInTheDocument();
     expect((await axe.run(view.container, AXE_RUN_OPTIONS)).violations).toHaveLength(0);
   });
 
   it("redirects authenticated users away from /register", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: () => Promise.resolve({ firm_id: 1, firm_name: "Test Legal", clients: { value: 0, available: false }, active_matters: { value: 0, available: false }, pending_tasks: { value: 0, available: false }, upcoming_tasks: [], ai_status: "not_available", actions: [] }),
-    } satisfies Partial<Response>));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: () =>
+          Promise.resolve({
+            firm_id: 1,
+            firm_name: "Test Legal",
+            clients: { value: 0, available: false },
+            active_matters: { value: 0, available: false },
+            pending_tasks: { value: 0, available: false },
+            upcoming_tasks: [],
+            ai_status: "not_available",
+            actions: [],
+          }),
+      } satisfies Partial<Response>),
+    );
     const queryClient = createQueryClient();
     queryClient.setQueryData(SESSION_QUERY_KEY, {
       id: 1,

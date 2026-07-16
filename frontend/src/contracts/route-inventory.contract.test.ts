@@ -73,8 +73,8 @@ const collectRouteRows = (
     const routeOwner = routeElementName ? ROUTE_OWNER_BY_COMPONENT[routeElementName] : undefined;
     const access = routeElementName === ProtectedRoute.name ? "protected" : context.access;
 
-    const routePath =
-      route.index === true
+    const routePath
+      = route.index === true
         ? context.path
         : typeof route.path === "string"
           ? normalizePath(context.path, route.path)
@@ -122,11 +122,11 @@ describe("route inventory contracts", () => {
   it("keeps route inventory docs aligned with the router configuration", () => {
     const markdown = fs.readFileSync(ROUTE_INVENTORY_PATH, "utf8");
     const documentedRows = parseDocumentedRows(markdown)
-      .map((row) => `${row.path}|${row.access}|${row.owner}`)
+      .map(row => `${row.path}|${row.access}|${row.owner}`)
       .sort();
 
     const actualRows = collectRouteRows(appRoutes, { path: "/", access: "public" })
-      .map((row) => `${row.path}|${row.access}|${row.owner}`)
+      .map(row => `${row.path}|${row.access}|${row.owner}`)
       .sort();
 
     expect(documentedRows).toEqual(actualRows);

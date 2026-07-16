@@ -1,9 +1,9 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
-import { RouterProvider, createMemoryRouter } from "react-router-dom";
+import { createMemoryRouter, RouterProvider } from "react-router-dom";
 
 import { createQueryClient } from "@/app/query-client";
-import { SESSION_QUERY_KEY, type AuthenticatedUser } from "@/shared/auth/session";
+import { type AuthenticatedUser, SESSION_QUERY_KEY } from "@/shared/auth/session";
 import { ProtectedRoute } from "@/shared/routing/ProtectedRoute";
 
 const renderRoute = (sessionValue: AuthenticatedUser | null) => {
@@ -28,13 +28,13 @@ const renderRoute = (sessionValue: AuthenticatedUser | null) => {
     ],
     {
       initialEntries: ["/welcome"],
-    }
+    },
   );
 
   render(
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
-    </QueryClientProvider>
+    </QueryClientProvider>,
   );
 };
 
