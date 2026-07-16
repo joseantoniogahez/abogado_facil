@@ -6,7 +6,7 @@ export interface DashboardSummary {
   clients: { value: number; available: boolean };
   active_matters: { value: number; available: boolean };
   pending_tasks: { value: number; available: boolean };
-  upcoming_tasks: unknown[];
+  upcoming_tasks: { id: number; matter_id: number; matter_title: string; title: string; due_date: string }[];
   ai_status: "not_available" | "not_configured" | "configured" | "error";
   actions: { id: string; available: boolean }[];
 }
@@ -32,7 +32,16 @@ export const parseDashboardSummary = (payload: unknown): DashboardSummary => {
     clients: parseMetric(record.clients, "DashboardSummary.clients"),
     active_matters: parseMetric(record.active_matters, "DashboardSummary.active_matters"),
     pending_tasks: parseMetric(record.pending_tasks, "DashboardSummary.pending_tasks"),
-    upcoming_tasks: record.upcoming_tasks,
+    upcoming_tasks: record.upcoming_tasks.map((item) => {
+      const task = expectRecord(item, "DashboardUpcomingTask");
+      return {
+        id: expectNumberField(task, "id", "DashboardUpcomingTask"),
+        matter_id: expectNumberField(task, "matter_id", "DashboardUpcomingTask"),
+        matter_title: expectStringField(task, "matter_title", "DashboardUpcomingTask"),
+        title: expectStringField(task, "title", "DashboardUpcomingTask"),
+        due_date: expectStringField(task, "due_date", "DashboardUpcomingTask"),
+      };
+    }),
     ai_status: aiStatus as DashboardSummary["ai_status"],
     actions: record.actions.map((item) => {
       const action = expectRecord(item, "DashboardAction");

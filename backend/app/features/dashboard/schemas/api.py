@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Literal
 
 from pydantic import Field
@@ -15,12 +16,20 @@ class DashboardAction(ApiSchema):
     available: bool
 
 
+class DashboardUpcomingTask(ApiSchema):
+    id: int
+    matter_id: int
+    matter_title: str
+    title: str
+    due_date: date
+
+
 class DashboardSummaryResponse(ApiSchema):
     firm_id: int
     firm_name: str
     clients: DashboardMetric
     active_matters: DashboardMetric
     pending_tasks: DashboardMetric
-    upcoming_tasks: list[object]
+    upcoming_tasks: list[DashboardUpcomingTask]
     ai_status: Literal["not_available", "not_configured", "configured", "error"]
     actions: list[DashboardAction]

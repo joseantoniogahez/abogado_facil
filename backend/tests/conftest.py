@@ -16,6 +16,7 @@ from app.features.auth.models import Firm, User
 from app.features.clients.models import Client
 from app.features.matter_documents.models import MatterDocument
 from app.features.matter_notes.models import MatterNote
+from app.features.matter_tasks.models import MatterTask
 from app.features.matters.models import Matter
 from app.features.outbox.models import OutboxEvent
 from app.features.rbac.models import Permission, Role, RoleInheritance, RolePermission, UserRole
@@ -144,6 +145,7 @@ def mock_data(
         {"class": Client, "json": []},
         {"class": Matter, "json": []},
         {"class": MatterNote, "json": []},
+        {"class": MatterTask, "json": []},
         {"class": MatterDocument, "json": []},
     ]
 

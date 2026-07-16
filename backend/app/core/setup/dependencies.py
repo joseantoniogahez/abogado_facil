@@ -21,6 +21,8 @@ from app.features.matter_documents.repository import MatterDocumentsRepository
 from app.features.matter_documents.service import MatterDocumentsService, MatterDocumentsServicePort
 from app.features.matter_notes.repository import MatterNotesRepository
 from app.features.matter_notes.service import MatterNotesService, MatterNotesServicePort
+from app.features.matter_tasks.repository import MatterTasksRepository
+from app.features.matter_tasks.service import MatterTasksService, MatterTasksServicePort
 from app.features.matters.repository import MattersRepository
 from app.features.matters.service import MattersService, MattersServicePort
 from app.features.outbox.repository import OutboxRepository
@@ -97,6 +99,13 @@ async def get_matter_notes_repository(session: DbSessionDependency):
 
 
 MatterNotesRepositoryDependency = Annotated[MatterNotesRepository, Depends(get_matter_notes_repository)]
+
+
+async def get_matter_tasks_repository(session: DbSessionDependency):
+    return MatterTasksRepository(session=session)
+
+
+MatterTasksRepositoryDependency = Annotated[MatterTasksRepository, Depends(get_matter_tasks_repository)]
 
 
 async def get_matter_checklists_repository(session: DbSessionDependency):
@@ -227,9 +236,15 @@ AuditLogServiceDependency = Annotated[AuditLogServicePort, Depends(get_audit_log
 
 
 async def get_dashboard_service(
-    clients_repository: ClientsRepositoryDependency, matters_repository: MattersRepositoryDependency
+    clients_repository: ClientsRepositoryDependency,
+    matters_repository: MattersRepositoryDependency,
+    tasks_repository: MatterTasksRepositoryDependency,
 ) -> DashboardServicePort:
-    return DashboardService(clients_repository=clients_repository, matters_repository=matters_repository)
+    return DashboardService(
+        clients_repository=clients_repository,
+        matters_repository=matters_repository,
+        tasks_repository=tasks_repository,
+    )
 
 
 DashboardServiceDependency = Annotated[DashboardServicePort, Depends(get_dashboard_service)]
@@ -264,6 +279,17 @@ async def get_matter_notes_service(
 
 
 MatterNotesServiceDependency = Annotated[MatterNotesServicePort, Depends(get_matter_notes_service)]
+
+
+async def get_matter_tasks_service(
+    repository: MatterTasksRepositoryDependency,
+    matters_repository: MattersRepositoryDependency,
+    unit_of_work: UnitOfWorkDependency,
+) -> MatterTasksServicePort:
+    return MatterTasksService(repository=repository, matters_repository=matters_repository, unit_of_work=unit_of_work)
+
+
+MatterTasksServiceDependency = Annotated[MatterTasksServicePort, Depends(get_matter_tasks_service)]
 
 
 async def get_matter_checklists_service(

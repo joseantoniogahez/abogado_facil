@@ -71,7 +71,7 @@ decisiones, avance, pausas, validaciones y cierre se registran en el plan corres
 | CORE-004 | Backend    | P1        | Hecho        | API y metadata de documentos de expediente.    | API aislada para subir, listar, descargar y eliminar PDF/DOCX/TXT usando object storage.           |
 | CORE-005 | Backend    | P1        | Hecho        | Extracción de texto de PDF cuando sea viable.  | Texto extraído queda disponible para futuros flujos de IA.                                         |
 | CORE-006 | Full-stack | P1        | Hecho        | Checklists base por tipo de asunto.            | Checklist determinístico con completo/pendiente/no aplica y elementos personalizados.              |
-| CORE-007 | Full-stack | P1        | Identificado | Tareas y recordatorios simples.                | Tareas por asunto con fecha límite y estado completado.                                            |
+| CORE-007 | Full-stack | P1        | Hecho        | Tareas y recordatorios simples.                | Tareas por asunto con fecha límite y estado completado.                                            |
 | CORE-008 | Full-stack | P1        | Identificado | Control básico de pagos.                       | Honorarios, anticipos, pagos parciales, saldo y notas.                                             |
 | CORE-009 | Full-stack | P1        | Identificado | Calculadoras básicas sin IA.                   | Cálculos copiables y guardables en asunto con advertencia de estimación.                           |
 | CORE-010 | Frontend   | P1        | Hecho        | Interfaz de documentos de expediente.          | Cargar, listar, descargar y eliminar documentos desde el detalle del asunto.                       |

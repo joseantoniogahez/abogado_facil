@@ -88,4 +88,28 @@ describe("DashboardPage", () => {
       }),
     ).toBeInTheDocument();
   });
+
+  it("renders upcoming tasks linked to their matters", async () => {
+    renderPage(
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({
+          ...summary,
+          pending_tasks: { value: 1, available: true },
+          upcoming_tasks: [{
+            id: 8,
+            matter_id: 9,
+            matter_title: "Divorcio",
+            title: "Presentar escrito",
+            due_date: "2026-07-20",
+          }],
+        }),
+      }),
+    );
+    expect(await screen.findByRole("link", { name: /Presentar escrito/ })).toHaveAttribute(
+      "href",
+      "/matters/9",
+    );
+  });
 });

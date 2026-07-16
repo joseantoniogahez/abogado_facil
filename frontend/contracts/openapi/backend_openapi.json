@@ -703,6 +703,27 @@
         "title": "CreateMatterRequest",
         "type": "object"
       },
+      "CreateMatterTaskRequest": {
+        "properties": {
+          "due_date": {
+            "format": "date",
+            "title": "Due Date",
+            "type": "string"
+          },
+          "title": {
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "due_date"
+        ],
+        "title": "CreateMatterTaskRequest",
+        "type": "object"
+      },
       "CreateRoleRequest": {
         "properties": {
           "name": {
@@ -797,7 +818,9 @@
             "$ref": "#/components/schemas/DashboardMetric"
           },
           "upcoming_tasks": {
-            "items": {},
+            "items": {
+              "$ref": "#/components/schemas/DashboardUpcomingTask"
+            },
             "title": "Upcoming Tasks",
             "type": "array"
           }
@@ -813,6 +836,40 @@
           "actions"
         ],
         "title": "DashboardSummaryResponse",
+        "type": "object"
+      },
+      "DashboardUpcomingTask": {
+        "properties": {
+          "due_date": {
+            "format": "date",
+            "title": "Due Date",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "matter_id": {
+            "title": "Matter Id",
+            "type": "integer"
+          },
+          "matter_title": {
+            "title": "Matter Title",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "matter_id",
+          "matter_title",
+          "title",
+          "due_date"
+        ],
+        "title": "DashboardUpcomingTask",
         "type": "object"
       },
       "DocumentType": {
@@ -1083,6 +1140,73 @@
           "updated_at"
         ],
         "title": "MatterResponse",
+        "type": "object"
+      },
+      "MatterTaskListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MatterTaskResponse"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "MatterTaskListResponse",
+        "type": "object"
+      },
+      "MatterTaskResponse": {
+        "properties": {
+          "completed": {
+            "title": "Completed",
+            "type": "boolean"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "due_date": {
+            "format": "date",
+            "title": "Due Date",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "matter_id": {
+            "title": "Matter Id",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "matter_id",
+          "title",
+          "due_date",
+          "completed",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "MatterTaskResponse",
         "type": "object"
       },
       "MatterType": {
@@ -1665,6 +1789,48 @@
           }
         },
         "title": "UpdateMatterRequest",
+        "type": "object"
+      },
+      "UpdateMatterTaskRequest": {
+        "properties": {
+          "completed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed"
+          },
+          "due_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due Date"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "title": "UpdateMatterTaskRequest",
         "type": "object"
       },
       "UpdateRoleRequest": {
@@ -3757,6 +3923,147 @@
         "summary": "Update matter note",
         "tags": [
           "matter-notes"
+        ]
+      }
+    },
+    "/v1/matters/{matter_id}/tasks": {
+      "get": {
+        "description": "Lists firm-scoped tasks ordered by completion and due date.",
+        "operationId": "list_matter_tasks_v1_matters__matter_id__tasks_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "matter_id",
+            "required": true,
+            "schema": {
+              "title": "Matter Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatterTaskListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "List matter tasks",
+        "tags": [
+          "matter-tasks"
+        ]
+      },
+      "post": {
+        "description": "Creates a task with a required due date in a firm-scoped matter.",
+        "operationId": "create_matter_task_v1_matters__matter_id__tasks_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "matter_id",
+            "required": true,
+            "schema": {
+              "title": "Matter Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMatterTaskRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatterTaskResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Create matter task",
+        "tags": [
+          "matter-tasks"
+        ]
+      }
+    },
+    "/v1/matters/{matter_id}/tasks/{task_id}": {
+      "patch": {
+        "description": "Updates task details or completion state.",
+        "operationId": "update_matter_task_v1_matters__matter_id__tasks__task_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "matter_id",
+            "required": true,
+            "schema": {
+              "title": "Matter Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "task_id",
+            "required": true,
+            "schema": {
+              "title": "Task Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMatterTaskRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatterTaskResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Update matter task",
+        "tags": [
+          "matter-tasks"
         ]
       }
     },

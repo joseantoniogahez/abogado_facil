@@ -65,7 +65,25 @@ export const DashboardPage = () => {
       </section>
       <section className="mt-8 rounded-2xl border border-[var(--app-border)] p-5">
         <h2 className="text-xl font-semibold">{t("dashboard.upcoming")}</h2>
-        <p className="mt-3 text-[var(--app-subtle)]">{t("dashboard.upcoming.empty")}</p>
+        {summary.data.upcoming_tasks.length
+          ? (
+              <ul className="mt-3 grid gap-3">
+                {summary.data.upcoming_tasks.map(task => (
+                  <li key={task.id}>
+                    <a className={SECONDARY_ACTION_CLASS_NAME} href={`/matters/${task.matter_id}`}>
+                      {task.title}
+                      {" "}
+                      ·
+                      {task.due_date}
+                      {" "}
+                      ·
+                      {task.matter_title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )
+          : <p className="mt-3 text-[var(--app-subtle)]">{t("dashboard.upcoming.empty")}</p>}
       </section>
       <section className="mt-8 rounded-2xl border border-[var(--app-border)] p-5">
         <h2 className="text-xl font-semibold">{t("dashboard.ai")}</h2>

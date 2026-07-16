@@ -15,6 +15,7 @@ This document defines deterministic mutation retry and invalidation behavior by 
 | Matter note mutation       | Default mutation policy                          | Invalidate only the note list for its matter           |
 | Matter document mutation   | Default mutation policy                          | Invalidate only the document list for its matter       |
 | Matter checklist mutation  | Default mutation policy                          | Invalidate only the checklist for its matter           |
+| Matter task mutation       | Default mutation policy                          | Invalidate its matter task list and dashboard summary  |
 
 ## Implementation References
 
@@ -26,6 +27,7 @@ This document defines deterministic mutation retry and invalidation behavior by 
 - Logout mutation consumer: `src/shared/routing/RootLayout.tsx`
 - Matter document mutations: `src/features/matters/matter-documents/api.ts`
 - Matter checklist mutations: `src/features/matters/matter-checklist/api.ts`
+- Matter task mutations: `src/features/matters/matter-tasks/api.ts`
 
 ## Failure Behavior Contract
 

@@ -28,6 +28,9 @@ This document is the canonical consumer-side inventory of backend endpoints used
 | `/matters/{matter_id}/checklist`                        | `GET`    | `features/matters/matter-checklist/api.ts`                    | `matterChecklistQueryOptions`                    | `bearer`  | `ChecklistResponse`                            |
 | `/matters/{matter_id}/checklist`                        | `POST`   | `features/matters/matter-checklist/api.ts`                    | `createChecklistItem`                            | `bearer`  | `ChecklistItem`                                |
 | `/matters/{matter_id}/checklist/{item_id}`              | `PATCH`  | `features/matters/matter-checklist/api.ts`                    | `updateChecklistItem`                            | `bearer`  | `ChecklistItem`                                |
+| `/matters/{matter_id}/tasks`                            | `GET`    | `features/matters/matter-tasks/api.ts`                        | `matterTasksQueryOptions`                        | `bearer`  | `MatterTaskList`                               |
+| `/matters/{matter_id}/tasks`                            | `POST`   | `features/matters/matter-tasks/api.ts`                        | `createMatterTask`                               | `bearer`  | `MatterTask`                                   |
+| `/matters/{matter_id}/tasks/{task_id}`                  | `PATCH`  | `features/matters/matter-tasks/api.ts`                        | `updateMatterTask`                               | `bearer`  | `MatterTask`                                   |
 | `/matters/{matter_id}/documents`                        | `GET`    | `features/matters/matter-documents/api.ts`                    | `matterDocumentsQueryOptions`                    | `bearer`  | `MatterDocumentList`                           |
 | `/matters/{matter_id}/documents`                        | `POST`   | `features/matters/matter-documents/api.ts`                    | `uploadMatterDocument`                           | `bearer`  | `MatterDocumentRecord`                         |
 | `/matters/{matter_id}/documents/{document_id}/download` | `GET`    | `features/matters/matter-documents/api.ts`                    | `downloadMatterDocument`                         | `bearer`  | Authenticated binary attachment                |
@@ -71,6 +74,9 @@ This document is the canonical consumer-side inventory of backend endpoints used
 - Matter create and edit forms consume the firm-scoped client list as a name-searchable selector;
   the selected record contributes `client_id` to the matter mutation, and reassignment during edit
   requires explicit user confirmation.
+
+- Matter task mutations invalidate the task list for that matter and the dashboard summary so its
+  pending count and upcoming list stay current.
 
 - `readAuditLogEntries` is routed through `/admin/audit-log`, which requires `audit_logs:read` before the page can request the endpoint.
 
