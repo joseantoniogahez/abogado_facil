@@ -1,7 +1,7 @@
 # Backlog - Abogado Fácil
 
 Estado inicial: 2026-07-08
-Fuente principal: `docs/REQUERIMIENTOS_ABOGADO_FACIL_IA.md`
+Fuente principal: `docs/product/REQUERIMIENTOS_ABOGADO_FACIL_IA.md`
 Repositorio base: template FastAPI + React + PostgreSQL + Docker
 
 Este archivo conserva únicamente el estado resumido de cada elemento. El alcance detallado,
@@ -14,7 +14,13 @@ decisiones, avance, pausas, validaciones y cierre se registran en el plan corres
 - Prioridad: `P0` imprescindible para arrancar, `P1` MVP, `P2` posterior al MVP
 - Tipo: `Setup`, `Producto`, `Backend`, `Frontend`, `Full-stack`, `IA`, `Docs`, `Legal`, `Ops`
 
-## Punto de Partida
+## Punto de Partida Histórico
+
+Este bloque conserva el contexto del bootstrap inicial y no representa el estado operativo actual.
+La identidad de Abogado Fácil ya fue aplicada y las features marcadas como `Hecho` abajo ya fueron
+implementadas y validadas en sus planes individuales.
+
+Las viñetas siguientes describen exclusivamente el estado inicial del 2026-07-08.
 
 - El repositorio todavía conserva identidad de template en `README.md`, Compose, JWT, env y package
   metadata.
@@ -141,9 +147,10 @@ decisiones, avance, pausas, validaciones y cierre se registran en el plan corres
 - Facturación electrónica.
 - Multi-despacho avanzado.
 
-## Orden Recomendado Inmediato
+## Siguiente Trabajo del Backlog
 
-1. Validar Docker Compose, backend y frontend.
-1. Empezar Fase 0 funcional: landing, auth alineado, dashboard vacío.
-1. Abrir el primer feature slice real: clientes + asuntos, porque desbloquea notas, documentos,
-   tareas, pagos e IA contextual.
+El siguiente trabajo priorizado permanece en la Fase 2:
+
+1. Implementar la configuración de credenciales BYOK y su almacenamiento seguro (`AI-001`, `AI-002`).
+1. Crear la abstracción multi-provider y las validaciones obligatorias (`AI-003`, `AI-004`).
+1. Mantener pendientes las políticas operativas y de privacidad de IA (`AI-005`, `AI-006`, `SEC-002`).

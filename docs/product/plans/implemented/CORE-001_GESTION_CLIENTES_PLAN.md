@@ -214,15 +214,15 @@ acción rápida del dashboard navegará a `/clients/new` y el contador será rea
 
 ## Matriz inicial de archivos afectados
 
-| Superficie     | Archivos o áreas esperadas                                            |
-| -------------- | --------------------------------------------------------------------- |
-| Tracking       | `docs/product/CORE-001_GESTION_CLIENTES_PLAN.md`, backlog de producto |
-| Backend        | `app/features/clients`, DI, router catalog, errores y dashboard       |
-| Persistencia   | modelo `clients`, metadata y migración Alembic                        |
-| Backend tests  | repositories, services, routers, arquitectura, OpenAPI y aislamiento  |
-| Frontend       | `src/features/clients`, rutas, dashboard, navegación y textos         |
-| Frontend tests | contratos, páginas, rutas, accesibilidad y e2e                        |
-| Contrato       | artefacto OpenAPI y matrices operativas backend/frontend              |
+| Superficie     | Archivos o áreas esperadas                                                              |
+| -------------- | --------------------------------------------------------------------------------------- |
+| Tracking       | `docs/product/plans/implemented/CORE-001_GESTION_CLIENTES_PLAN.md`, backlog de producto |
+| Backend        | `app/features/clients`, DI, router catalog, errores y dashboard                         |
+| Persistencia   | modelo `clients`, metadata y migración Alembic                                          |
+| Backend tests  | repositories, services, routers, arquitectura, OpenAPI y aislamiento                    |
+| Frontend       | `src/features/clients`, rutas, dashboard, navegación y textos                           |
+| Frontend tests | contratos, páginas, rutas, accesibilidad y e2e                                          |
+| Contrato       | artefacto OpenAPI y matrices operativas backend/frontend                                |
 
 ## Riesgos y mitigaciones
 

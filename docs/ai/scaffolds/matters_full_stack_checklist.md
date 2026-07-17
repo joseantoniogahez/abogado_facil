@@ -1,7 +1,7 @@
 # Matters Full-Stack Scaffold Checklist
 
 - [x] Read `AGENTS.md`.
-- [x] Use `docs/product/CORE-002_GESTION_ASUNTOS_PLAN.md` as the scoped full-stack request and
+- [x] Use `docs/product/plans/implemented/CORE-002_GESTION_ASUNTOS_PLAN.md` as the scoped full-stack request and
   execution record; a duplicate request document was not needed.
 - [x] Confirm backend API, data, auth, RBAC, errors, docs, and validation impact.
 - [x] Confirm frontend route, state, UX, a11y, e2e, docs, and validation impact.

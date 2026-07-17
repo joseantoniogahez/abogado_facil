@@ -8,7 +8,7 @@
 - Estado del plan: Completado
 - Estado de implementación: Hecho
 - Última actualización: 2026-07-11
-- Fuente: `docs/REQUERIMIENTOS_ABOGADO_FACIL_IA.md`, sección 6.4
+- Fuente: `docs/product/REQUERIMIENTOS_ABOGADO_FACIL_IA.md`, sección 6.4
 
 ## Objetivo
 
@@ -173,7 +173,7 @@ disponibilidad falsa, nunca registros ficticios.
   `api_consumer_matrix.md`, `mutation_policy.md` si cambia el consumidor de logout y
   `e2e_smoke_suite.md`.
 - [x] Actualizar pruebas de contrato documental y todas las referencias canónicas de `/welcome`.
-- [x] Actualizar `docs/BACKLOG_ABOGADO_FACIL.md` a `En progreso` al comenzar implementación y a
+- [x] Actualizar `docs/product/BACKLOG_ABOGADO_FACIL.md` a `En progreso` al comenzar implementación y a
   `Hecho` únicamente tras cumplir todos los gates.
 - [x] Mantener este archivo al día con avances, decisiones, validaciones y riesgos.
 
@@ -182,7 +182,7 @@ disponibilidad falsa, nunca registros ficticios.
 PROD-003 no podrá marcarse como `Hecho` hasta revisar y, cuando aplique, actualizar estos archivos:
 
 - `docs/PROD-003_DASHBOARD_PLAN.md`: estado, criterios, avance, validaciones y riesgos residuales.
-- `docs/BACKLOG_ABOGADO_FACIL.md`: transición de `En progreso` a `Hecho` solo al superar los gates.
+- `docs/product/BACKLOG_ABOGADO_FACIL.md`: transición de `En progreso` a `Hecho` solo al superar los gates.
 - `backend/docs/operations/api_endpoints.md`: contrato de `GET /v1/dashboard`.
 - `backend/docs/operations/authorization_matrix.md`: clasificación de acceso autenticado y frontera de despacho.
 - `backend/docs/operations/authentication.md`: destino canónico posterior al login, si el contrato lo documenta.

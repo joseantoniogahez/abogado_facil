@@ -193,13 +193,24 @@ Stop production stack:
 docker compose -f compose.yaml -f compose.prod.yaml down
 ```
 
-## Template Shape
+## Current Backend Layout
 
-Current backend layout:
+The backend keeps shared runtime concerns in `app/core`, integrations in `app/integrations`, and
+vertical product slices in `app/features`:
 
 - `app/core`: shared runtime, config, security, authorization, db, setup
+- `app/integrations`: S3-compatible storage, PDF text extraction, jobs, broker, search, and outbox adapters
 - `app/features/auth`: register, login, current-user profile
 - `app/features/audit_log`: administrator audit log review
 - `app/features/health`: health endpoint
 - `app/features/rbac`: roles, permissions, user-role assignment
+- `app/features/dashboard`: firm-scoped dashboard summary
+- `app/features/clients`: client management
+- `app/features/matters`: matter management
+- `app/features/matter_notes`: matter notes
+- `app/features/matter_checklists`: matter checklists
+- `app/features/matter_tasks`: matter tasks and upcoming reminders
+- `app/features/matter_payments`: matter fees and payments
+- `app/features/matter_calculations`: deterministic matter calculations
+- `app/features/matter_documents`: matter document metadata and storage operations
 - `app/features/outbox`: outbox capability

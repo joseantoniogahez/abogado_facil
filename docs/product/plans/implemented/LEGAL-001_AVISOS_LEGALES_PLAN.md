@@ -8,7 +8,7 @@
 - Estado del plan: Completo
 - Estado de implementación: Hecho
 - Última actualización: 2026-07-11
-- Fuente: `docs/REQUERIMIENTOS_ABOGADO_FACIL_IA.md`, secciones 5, 6.1, 7.7, 8.2, 12,
+- Fuente: `docs/product/REQUERIMIENTOS_ABOGADO_FACIL_IA.md`, secciones 5, 6.1, 7.7, 8.2, 12,
   15 y 17.2
 
 ## Objetivo
@@ -197,7 +197,7 @@ disponible en la misma vista, asociado inequívocamente al resultado.
 
 ### 4. Documentación y tracking
 
-- [x] Actualizar `docs/BACKLOG_ABOGADO_FACIL.md` a `En progreso` al iniciar implementación y a
+- [x] Actualizar `docs/product/BACKLOG_ABOGADO_FACIL.md` a `En progreso` al iniciar implementación y a
   `Hecho` solo después de aprobar textos y superar los gates.
 - [x] Mantener este archivo actualizado con decisiones, aprobación, validaciones y riesgos.
 - [x] Actualizar `frontend/docs/operations/accessibility_gate.md` solo si cambia su regla o cobertura
@@ -213,21 +213,21 @@ disponible en la misma vista, asociado inequívocamente al resultado.
 - [x] Ejecutar pruebas enfocadas de la landing y del catálogo de textos.
 - [x] `npm --prefix frontend run check`
 - [x] `npm --prefix frontend run build`
-- [x] `pre-commit run --files docs/LEGAL-001_AVISOS_LEGALES_PLAN.md docs/BACKLOG_ABOGADO_FACIL.md`
+- [x] `pre-commit run --files docs/LEGAL-001_AVISOS_LEGALES_PLAN.md docs/product/BACKLOG_ABOGADO_FACIL.md`
 - [x] Revisar manualmente el aviso en móvil y escritorio, zoom al 200 %, teclado y lector de pantalla.
 - [x] Mantener la revisión jurídica humana como gate pendiente de `SEC-002`; los gates técnicos no la
   sustituyen.
 
 ## Matriz inicial de archivos afectados
 
-| Superficie    | Archivos o áreas esperadas                                                   |
-| ------------- | ---------------------------------------------------------------------------- |
-| Tracking      | `docs/LEGAL-001_AVISOS_LEGALES_PLAN.md`, `docs/BACKLOG_ABOGADO_FACIL.md`     |
-| Textos        | `frontend/src/shared/i18n/ui-text.ts` y pruebas del catálogo                 |
-| Landing       | `frontend/src/features/landing` y pruebas asociadas                          |
-| Accesibilidad | pruebas de ruta y contrato aplicables; documentación solo si cambia la regla |
-| IA futura     | componentes de resultado de cada feature y sus pruebas, cuando existan       |
-| Legal futuro  | coordinación con `SEC-002`, sin cerrarlo desde este ticket                   |
+| Superficie    | Archivos o áreas esperadas                                                       |
+| ------------- | -------------------------------------------------------------------------------- |
+| Tracking      | `docs/LEGAL-001_AVISOS_LEGALES_PLAN.md`, `docs/product/BACKLOG_ABOGADO_FACIL.md` |
+| Textos        | `frontend/src/shared/i18n/ui-text.ts` y pruebas del catálogo                     |
+| Landing       | `frontend/src/features/landing` y pruebas asociadas                              |
+| Accesibilidad | pruebas de ruta y contrato aplicables; documentación solo si cambia la regla     |
+| IA futura     | componentes de resultado de cada feature y sus pruebas, cuando existan           |
+| Legal futuro  | coordinación con `SEC-002`, sin cerrarlo desde este ticket                       |
 
 La lista es orientativa. Este plan no autoriza implementar funciones de IA, aceptación de términos
 ni páginas legales completas.
@@ -281,7 +281,7 @@ la estructura inicial de LEGAL-001.
 
 Estado al 2026-07-11:
 
-- Revisión documental de `docs/REQUERIMIENTOS_ABOGADO_FACIL_IA.md`: completada.
+- Revisión documental de `docs/product/REQUERIMIENTOS_ABOGADO_FACIL_IA.md`: completada.
 - Verificación de los textos actuales y su prueba en la landing: completada.
 - Pruebas enfocadas de landing, catálogo, aviso compartido y accesibilidad: 15 pruebas aprobadas.
 - `npm --prefix frontend run check`: aprobado; 45 archivos y 190 pruebas, coverage, OpenAPI y

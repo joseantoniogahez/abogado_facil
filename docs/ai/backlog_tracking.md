@@ -2,19 +2,20 @@
 
 ## Purpose
 
-Define the required lifecycle for every item in `docs/BACKLOG_ABOGADO_FACIL.md`. The backlog is the
+Define the required lifecycle for every item in `docs/product/BACKLOG_ABOGADO_FACIL.md`. The backlog is the
 concise status index; each item plan is the detailed source of truth for execution and handoff.
 
 ## Required Artifacts
 
-- Summary tracker: `docs/BACKLOG_ABOGADO_FACIL.md`.
-- Item plan: `docs/<TICKET>_<DESCRIPTIVE_NAME>_PLAN.md`.
+- Summary tracker: `docs/product/BACKLOG_ABOGADO_FACIL.md`.
+- Pending item plan: `docs/product/plans/pending/<TICKET>_<DESCRIPTIVE_NAME>_PLAN.md`.
+- Implemented item plan: `docs/product/plans/implemented/<TICKET>_<DESCRIPTIVE_NAME>_PLAN.md`.
 - Plan template: `docs/ai/templates/backlog_item_plan.md`.
 - Canonical backend, frontend, and AI governance docs affected by the implementation.
 
-Use uppercase ticket IDs and uppercase snake case for the descriptive plan filename, for example
-`docs/CORE-001_GESTION_CLIENTES_PLAN.md`. Reuse an existing item plan instead of creating a second
-tracker for the same ticket.
+Use uppercase ticket IDs and uppercase snake case for the descriptive plan filename. Create new
+plans under `plans/pending/`; move the same file to `plans/implemented/` when the item is complete. Reuse an
+existing item plan instead of creating a second tracker for the same ticket.
 
 ## Lifecycle
 
@@ -67,7 +68,7 @@ when progress genuinely depends on unavailable input or an external state change
 
 ## Backlog Content Boundary
 
-`docs/BACKLOG_ABOGADO_FACIL.md` contains only concise planning fields such as ticket, type,
+`docs/product/BACKLOG_ABOGADO_FACIL.md` contains only concise planning fields such as ticket, type,
 priority, status, work summary, and deliverable. Do not add chronological logs, implementation
 details, command output, file lists, or pause notes there; those belong in the item plan.
 

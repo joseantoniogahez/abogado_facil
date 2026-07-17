@@ -8,7 +8,7 @@
 - Plan status: `<Draft | Ready | Complete>`
 - Implementation status: `<Identificado | Listo | En progreso | Bloqueado | Hecho>`
 - Last updated: `<YYYY-MM-DD>`
-- Backlog source: `docs/BACKLOG_ABOGADO_FACIL.md`
+- Backlog source: `docs/product/BACKLOG_ABOGADO_FACIL.md`
 
 ## Objective
 

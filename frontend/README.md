@@ -1,6 +1,6 @@
 # frontend (Vite + React)
 
-Frontend SPA for landing, login, session validation, and RBAC admin flows.
+Frontend SPA for landing, authentication, client and matter management, and RBAC administration.
 
 For full-stack orchestration and shared environment setup, see `../README.md`.
 For backend API behavior and authentication rules, see `../backend/README.md`.
@@ -75,13 +75,16 @@ Frontend URL: `http://localhost:3000`
 - `/login`: public credential entry flow
 - `/register`: public self-service registration
 - `/welcome`: authenticated session entry point
+- `/dashboard`: authenticated dashboard with firm-scoped metrics and upcoming tasks
 - `/profile`: authenticated current-user profile management
+- `/clients`, `/clients/new`, `/clients/:clientId`, `/clients/:clientId/edit`: authenticated client management
+- `/matters`, `/matters/new`, `/matters/:matterId`, `/matters/:matterId/edit`: authenticated matter management
 - `/admin/audit-log`: authenticated administrator audit log review
 - `/admin/assignments`: authenticated RBAC user-role assignments
 - `/admin/permissions`: authenticated RBAC role-permission assignments
 - `/admin/users`: authenticated RBAC user administration
 - `/admin/roles`: authenticated RBAC role and permission administration
-- `/matters/:matterId`: authenticated matter detail with notes and document management
+- Matter detail includes notes, checklists, tasks, payments, calculations, and document management.
 
 ## Testing and Quality Gates
 

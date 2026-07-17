@@ -17,4 +17,4 @@
 - [x] Run the backend coverage gate (328 passed, 100.00%).
 
 Completed for CORE-002 on 2026-07-12. Detailed evidence is recorded in
-`docs/product/CORE-002_GESTION_ASUNTOS_PLAN.md`.
+`docs/product/plans/implemented/CORE-002_GESTION_ASUNTOS_PLAN.md`.

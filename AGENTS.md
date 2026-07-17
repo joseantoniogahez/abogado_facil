@@ -204,9 +204,9 @@ New app bootstrap:
 For every backlog item, follow `docs/ai/backlog_tracking.md` and use
 `docs/ai/templates/backlog_item_plan.md` as the default plan shape.
 
-1. Before implementation, create or locate `docs/<TICKET>_<NAME>_PLAN.md` and keep it as the
-   detailed source of truth for scope, decisions, progress, validations, and remaining work.
-1. When implementation starts, set the item in `docs/BACKLOG_ABOGADO_FACIL.md` to `En progreso`.
+1. Before implementation, create or locate `docs/product/plans/pending/<TICKET>_<NAME>_PLAN.md` and keep it
+   as the detailed source of truth for scope, decisions, progress, validations, and remaining work.
+1. When implementation starts, set the item in `docs/product/BACKLOG_ABOGADO_FACIL.md` to `En progreso`.
 1. Before every pause or partial handoff, update the item plan with completed work, pending work,
    decisions, validation results, blockers, and the exact safe resume point; keep the backlog status
    synchronized.
@@ -214,8 +214,9 @@ For every backlog item, follow `docs/ai/backlog_tracking.md` and use
    architecture docs, contract inventories, foundation status, and other canonical documentation.
 1. Mark an item `Hecho` only after acceptance criteria, required validations, documentation updates,
    and mandatory human approvals are complete.
-1. Keep `docs/BACKLOG_ABOGADO_FACIL.md` concise: it stores summary status, priority, work, and the
-   deliverable; detailed history belongs in the item plan.
+1. Keep `docs/product/BACKLOG_ABOGADO_FACIL.md` concise: it stores summary status, priority, work, and the
+   deliverable; detailed history belongs in the item plan. Move a completed plan to
+   `docs/product/plans/implemented/` only after the item reaches `Hecho`.
 
 ## When to Ask Before Acting
 

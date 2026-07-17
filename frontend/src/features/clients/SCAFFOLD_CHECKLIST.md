@@ -1,21 +1,18 @@
 # Clients Frontend Scaffold Checklist
 
-- [ ] Read `AGENTS.md`.
-- [ ] Read `frontend/docs/frontend_playbook.md`.
-- [ ] Confirm route, API, auth, state, UX, a11y, observability, performance, and validation impact.
-- [ ] Import `ClientsPage` in `frontend/src/app/routes.tsx` when the route is ready.
-- [ ] Add route path `/clients` in `frontend/src/app/routes.tsx` with the right guard.
-- [ ] Add user-facing text keys to `frontend/src/shared/i18n/ui-text.ts`.
-- [ ] Update `frontend/docs/operations/route_inventory.md` when route behavior changes.
-- [ ] Update `frontend/docs/operations/api_consumer_matrix.md` when API consumers change.
-- [ ] Update `frontend/docs/operations/e2e_smoke_suite.md` when auth/routing/error journeys change.
-- [ ] Add page, route guard, API consumer, a11y, and e2e tests as applicable.
-- [ ] Run `npm --prefix frontend run check`.
-- [ ] Run `npm --prefix frontend run test:e2e:ci` when auth, routing, or error journeys change.
-- [ ] Run `npm --prefix frontend run build`.
+- [x] Read `AGENTS.md`.
+- [x] Read `frontend/docs/frontend_playbook.md`.
+- [x] Confirm route, API, auth, state, UX, accessibility, observability, performance, and validation impact.
+- [x] Register `ClientsPage` in `frontend/src/app/routes.tsx`.
+- [x] Add protected client list, create, detail, and edit routes.
+- [x] Add user-facing text keys to `frontend/src/shared/i18n/ui-text.ts`.
+- [x] Update `frontend/docs/operations/route_inventory.md`.
+- [x] Update `frontend/docs/operations/api_consumer_matrix.md`.
+- [x] Update `frontend/docs/operations/e2e_smoke_suite.md`.
+- [x] Add page, route, API consumer, accessibility, and e2e tests.
+- [x] Run frontend check validation.
+- [x] Run frontend e2e validation.
+- [x] Run frontend build validation.
 
-Suggested route import:
-
-```tsx
-import { ClientsPage } from "@/features/clients/ClientsPage";
-```
+Completed for CORE-001 on 2026-07-12. Detailed evidence is recorded in
+`docs/product/plans/implemented/CORE-001_GESTION_CLIENTES_PLAN.md`.

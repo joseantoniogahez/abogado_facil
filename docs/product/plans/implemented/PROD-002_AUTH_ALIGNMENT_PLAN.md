@@ -8,7 +8,7 @@
 - Estado del plan: Listo para implementación
 - Estado de implementación: Hecha; validación final completada
 - Última actualización: 2026-07-10
-- Fuente: `docs/REQUERIMIENTOS_ABOGADO_FACIL_IA.md`, sección 6.2
+- Fuente: `docs/product/REQUERIMIENTOS_ABOGADO_FACIL_IA.md`, sección 6.2
 
 ## Objetivo
 
@@ -146,7 +146,7 @@ nueva pueda crear las tablas y restricciones correctas.
   `backend/docs/operations/authorization_matrix.md`.
 - [x] Actualizar `frontend/docs/operations/route_inventory.md`,
   `api_consumer_matrix.md`, `mutation_policy.md` y `e2e_smoke_suite.md` cuando corresponda.
-- [x] Actualizar `docs/BACKLOG_ABOGADO_FACIL.md` a `En progreso` al comenzar implementación y a
+- [x] Actualizar `docs/product/BACKLOG_ABOGADO_FACIL.md` a `En progreso` al comenzar implementación y a
   `Hecho` únicamente tras cumplir todos los gates.
 - [x] Mantener este archivo al día con avances, decisiones, validaciones y riesgos.
 
