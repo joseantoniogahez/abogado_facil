@@ -14,6 +14,7 @@ from app.core.setup.dependencies import get_db_session, get_file_storage
 from app.features.audit_log.models import AuditLogEntry
 from app.features.auth.models import Firm, User
 from app.features.clients.models import Client
+from app.features.matter_calculations.models import MatterCalculation
 from app.features.matter_documents.models import MatterDocument
 from app.features.matter_notes.models import MatterNote
 from app.features.matter_payments.models import MatterBilling, MatterPayment
@@ -150,6 +151,7 @@ def mock_data(
         {"class": MatterBilling, "json": []},
         {"class": MatterPayment, "json": []},
         {"class": MatterDocument, "json": []},
+        {"class": MatterCalculation, "json": []},
     ]
 
 

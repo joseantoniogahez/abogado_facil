@@ -44,6 +44,9 @@ All routes are versioned under `/v1`.
 | `GET`    | `/v1/matters/{matter_id}/payments`                         | Yes  | No                        | Path `matter_id`                                        | `200` `MatterBillingResponse`      | `400`, `401`, `404`, `500`               |
 | `PUT`    | `/v1/matters/{matter_id}/payments`                         | Yes  | No                        | JSON `UpdateMatterBillingRequest`                       | `200` `MatterBillingResponse`      | `400`, `401`, `404`, `500`               |
 | `POST`   | `/v1/matters/{matter_id}/payments`                         | Yes  | No                        | JSON `CreateMatterPaymentRequest`                       | `201` `MatterBillingResponse`      | `400`, `401`, `404`, `500`               |
+| `POST`   | `/v1/matters/{matter_id}/calculations/preview`             | Yes  | No                        | JSON `CalculateMatterRequest`                           | `200` `MatterCalculationResponse`  | `400`, `401`, `404`, `500`               |
+| `POST`   | `/v1/matters/{matter_id}/calculations`                     | Yes  | No                        | JSON `CalculateMatterRequest`                           | `201` `MatterCalculationResponse`  | `400`, `401`, `404`, `500`               |
+| `GET`    | `/v1/matters/{matter_id}/calculations`                     | Yes  | No                        | Path `matter_id`                                        | `200` saved calculation list       | `400`, `401`, `404`, `500`               |
 | `POST`   | `/v1/matters/{matter_id}/documents`                        | Yes  | No                        | Multipart `document_type` + PDF/DOCX/TXT `file`         | `201` `MatterDocumentResponse`     | `400`, `401`, `404`, `409`, `500`        |
 | `GET`    | `/v1/matters/{matter_id}/documents`                        | Yes  | No                        | Path `matter_id`                                        | `200` `MatterDocumentListResponse` | `400`, `401`, `404`, `500`               |
 | `GET`    | `/v1/matters/{matter_id}/documents/{document_id}/download` | Yes  | No                        | Path identifiers                                        | `200` streamed attachment          | `400`, `401`, `404`, `500`               |
@@ -88,6 +91,7 @@ This table classifies each `GET` endpoint as `public`, `authenticated`, or `perm
 | `GET`  | `/v1/matters/{matter_id}/checklist`                        | `authenticated` | No                        |
 | `GET`  | `/v1/matters/{matter_id}/tasks`                            | `authenticated` | No                        |
 | `GET`  | `/v1/matters/{matter_id}/payments`                         | `authenticated` | No                        |
+| `GET`  | `/v1/matters/{matter_id}/calculations`                     | `authenticated` | No                        |
 | `GET`  | `/v1/matters/{matter_id}/documents`                        | `authenticated` | No                        |
 | `GET`  | `/v1/matters/{matter_id}/documents/{document_id}/download` | `authenticated` | No                        |
 | `GET`  | `/v1/health`                                               | `public`        | No                        |

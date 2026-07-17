@@ -15,6 +15,8 @@ from app.features.auth.service import AuthService, AuthServicePort
 from app.features.clients.repository import ClientsRepository
 from app.features.clients.service import ClientsService, ClientsServicePort
 from app.features.dashboard.service import DashboardService, DashboardServicePort
+from app.features.matter_calculations.repository import MatterCalculationsRepository
+from app.features.matter_calculations.service import MatterCalculationsService
 from app.features.matter_checklists.repository import MatterChecklistsRepository
 from app.features.matter_checklists.service import MatterChecklistsService, MatterChecklistsServicePort
 from app.features.matter_documents.repository import MatterDocumentsRepository
@@ -115,6 +117,15 @@ async def get_matter_payments_repository(session: DbSessionDependency):
 
 
 MatterPaymentsRepositoryDependency = Annotated[MatterPaymentsRepository, Depends(get_matter_payments_repository)]
+
+
+async def get_matter_calculations_repository(session: DbSessionDependency):
+    return MatterCalculationsRepository(session=session)
+
+
+MatterCalculationsRepositoryDependency = Annotated[
+    MatterCalculationsRepository, Depends(get_matter_calculations_repository)
+]
 
 
 async def get_matter_checklists_repository(session: DbSessionDependency):
@@ -312,6 +323,17 @@ async def get_matter_payments_service(
 
 
 MatterPaymentsServiceDependency = Annotated[MatterPaymentsServicePort, Depends(get_matter_payments_service)]
+
+
+async def get_matter_calculations_service(
+    repository: MatterCalculationsRepositoryDependency,
+    matters_repository: MattersRepositoryDependency,
+    unit_of_work: UnitOfWorkDependency,
+):
+    return MatterCalculationsService(repository, matters_repository, unit_of_work)
+
+
+MatterCalculationsServiceDependency = Annotated[MatterCalculationsService, Depends(get_matter_calculations_service)]
 
 
 async def get_matter_checklists_service(

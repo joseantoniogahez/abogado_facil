@@ -310,6 +310,98 @@
         "title": "Body_upload_matter_document_v1_matters__matter_id__documents_post",
         "type": "object"
       },
+      "CalculateMatterRequest": {
+        "properties": {
+          "annual_rate": {
+            "anyOf": [
+              {
+                "maximum": 10000,
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              }
+            ],
+            "title": "Annual Rate"
+          },
+          "calculation_type": {
+            "enum": [
+              "debt_balance",
+              "overdue_rent",
+              "simple_interest"
+            ],
+            "title": "Calculation Type",
+            "type": "string"
+          },
+          "days": {
+            "maximum": 36500,
+            "minimum": 0,
+            "title": "Days",
+            "type": "integer"
+          },
+          "monthly_rent": {
+            "anyOf": [
+              {
+                "exclusiveMaximum": 1000000000000,
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              }
+            ],
+            "title": "Monthly Rent"
+          },
+          "overdue_months": {
+            "maximum": 1200,
+            "minimum": 0,
+            "title": "Overdue Months",
+            "type": "integer"
+          },
+          "payments": {
+            "anyOf": [
+              {
+                "exclusiveMaximum": 1000000000000,
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              }
+            ],
+            "title": "Payments"
+          },
+          "principal": {
+            "anyOf": [
+              {
+                "exclusiveMaximum": 1000000000000,
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              }
+            ],
+            "title": "Principal"
+          }
+        },
+        "required": [
+          "calculation_type",
+          "principal",
+          "payments",
+          "monthly_rent",
+          "overdue_months",
+          "annual_rate",
+          "days"
+        ],
+        "title": "CalculateMatterRequest",
+        "type": "object"
+      },
       "ChecklistItemResponse": {
         "properties": {
           "created_at": {
@@ -990,6 +1082,105 @@
           "payments"
         ],
         "title": "MatterBillingResponse",
+        "type": "object"
+      },
+      "MatterCalculationListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MatterCalculationResponse"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "MatterCalculationListResponse",
+        "type": "object"
+      },
+      "MatterCalculationResponse": {
+        "properties": {
+          "calculation_type": {
+            "enum": [
+              "debt_balance",
+              "overdue_rent",
+              "simple_interest"
+            ],
+            "title": "Calculation Type",
+            "type": "string"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "currency": {
+            "const": "MXN",
+            "default": "MXN",
+            "title": "Currency",
+            "type": "string"
+          },
+          "disclaimer": {
+            "title": "Disclaimer",
+            "type": "string"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "inputs": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Inputs",
+            "type": "object"
+          },
+          "matter_id": {
+            "title": "Matter Id",
+            "type": "integer"
+          },
+          "result_amount": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Result Amount",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          }
+        },
+        "required": [
+          "matter_id",
+          "calculation_type",
+          "inputs",
+          "result_amount",
+          "summary",
+          "disclaimer"
+        ],
+        "title": "MatterCalculationResponse",
         "type": "object"
       },
       "MatterDocumentListResponse": {
@@ -3639,6 +3830,135 @@
         "summary": "Update matter",
         "tags": [
           "matters"
+        ]
+      }
+    },
+    "/v1/matters/{matter_id}/calculations": {
+      "get": {
+        "operationId": "list_calculations_v1_matters__matter_id__calculations_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "matter_id",
+            "required": true,
+            "schema": {
+              "title": "Matter Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatterCalculationListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "List Calculations",
+        "tags": [
+          "matter-calculations"
+        ]
+      },
+      "post": {
+        "operationId": "save_calculation_v1_matters__matter_id__calculations_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "matter_id",
+            "required": true,
+            "schema": {
+              "title": "Matter Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CalculateMatterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatterCalculationResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Save Calculation",
+        "tags": [
+          "matter-calculations"
+        ]
+      }
+    },
+    "/v1/matters/{matter_id}/calculations/preview": {
+      "post": {
+        "operationId": "preview_calculation_v1_matters__matter_id__calculations_preview_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "matter_id",
+            "required": true,
+            "schema": {
+              "title": "Matter Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CalculateMatterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatterCalculationResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Preview Calculation",
+        "tags": [
+          "matter-calculations"
         ]
       }
     },

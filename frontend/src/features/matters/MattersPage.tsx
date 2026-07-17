@@ -22,6 +22,7 @@ import {
   updateMatter,
 } from "./api";
 import type { MatterInput, MatterRecord, MatterStatus } from "./contracts";
+import { MatterCalculations } from "./matter-calculations/MatterCalculations";
 import { MatterChecklist } from "./matter-checklist/MatterChecklist";
 import { MatterDocuments } from "./matter-documents/MatterDocuments";
 import { MatterNotes } from "./matter-notes/MatterNotes";
@@ -371,6 +372,7 @@ export const MatterDetailPage = ({ edit = false }: { edit?: boolean }) => {
       <MatterNotes matterId={id} />
       <MatterTasks matterId={id} />
       <MatterPayments matterId={id} />
+      <MatterCalculations matterId={id} />
       <MatterChecklist matterId={id} />
       <MatterDocuments matterId={id} />
     </main>

@@ -17,6 +17,7 @@ This document defines deterministic mutation retry and invalidation behavior by 
 | Matter checklist mutation  | Default mutation policy                          | Invalidate only the checklist for its matter           |
 | Matter task mutation       | Default mutation policy                          | Invalidate its matter task list and dashboard summary  |
 | Matter payment mutation    | Default mutation policy                          | Invalidate the payment summary for its matter          |
+| Matter calculation save    | Default mutation policy                          | Invalidate saved calculations for its matter           |
 
 ## Implementation References
 

@@ -82,6 +82,10 @@ This document is the canonical consumer-side inventory of backend endpoints used
   invalidate the matter-scoped billing summary. Monetary decimal values are transported as strings
   and the backend owns paid-total and balance calculation.
 
+- Matter calculation consumers preview deterministic estimates without persistence and explicitly
+  save immutable snapshots under `/matters/{matter_id}/calculations`; successful saves invalidate
+  only that matter's calculation history.
+
 - `readAuditLogEntries` is routed through `/admin/audit-log`, which requires `audit_logs:read` before the page can request the endpoint.
 
 - `readRbacRoles` is permission-gated on `/admin/users`: the page only requests `/rbac/roles` when the current session has `roles:manage`; otherwise it hides role-related controls and does not send `role_ids`.
