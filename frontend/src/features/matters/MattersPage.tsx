@@ -25,6 +25,7 @@ import type { MatterInput, MatterRecord, MatterStatus } from "./contracts";
 import { MatterChecklist } from "./matter-checklist/MatterChecklist";
 import { MatterDocuments } from "./matter-documents/MatterDocuments";
 import { MatterNotes } from "./matter-notes/MatterNotes";
+import { MatterPayments } from "./matter-payments/MatterPayments";
 import { MatterTasks } from "./matter-tasks/MatterTasks";
 
 const DASHBOARD_QUERY_KEY = ["dashboard"] as const;
@@ -369,6 +370,7 @@ export const MatterDetailPage = ({ edit = false }: { edit?: boolean }) => {
       </Link>
       <MatterNotes matterId={id} />
       <MatterTasks matterId={id} />
+      <MatterPayments matterId={id} />
       <MatterChecklist matterId={id} />
       <MatterDocuments matterId={id} />
     </main>

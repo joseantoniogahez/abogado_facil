@@ -88,6 +88,7 @@ This table is contract-checked by `tests/routers/test_authorization_policy_cover
 | `GET`  | `/v1/matters/{matter_id}/notes`                            | `authenticated` | No                        |
 | `GET`  | `/v1/matters/{matter_id}/checklist`                        | `authenticated` | No                        |
 | `GET`  | `/v1/matters/{matter_id}/tasks`                            | `authenticated` | No                        |
+| `GET`  | `/v1/matters/{matter_id}/payments`                         | `authenticated` | No                        |
 | `GET`  | `/v1/matters/{matter_id}/documents`                        | `authenticated` | No                        |
 | `GET`  | `/v1/matters/{matter_id}/documents/{document_id}/download` | `authenticated` | No                        |
 | `GET`  | `/v1/health`                                               | `public`        | No                        |

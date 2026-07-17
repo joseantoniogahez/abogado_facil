@@ -16,6 +16,7 @@ from app.features.auth.models import Firm, User
 from app.features.clients.models import Client
 from app.features.matter_documents.models import MatterDocument
 from app.features.matter_notes.models import MatterNote
+from app.features.matter_payments.models import MatterBilling, MatterPayment
 from app.features.matter_tasks.models import MatterTask
 from app.features.matters.models import Matter
 from app.features.outbox.models import OutboxEvent
@@ -146,6 +147,8 @@ def mock_data(
         {"class": Matter, "json": []},
         {"class": MatterNote, "json": []},
         {"class": MatterTask, "json": []},
+        {"class": MatterBilling, "json": []},
+        {"class": MatterPayment, "json": []},
         {"class": MatterDocument, "json": []},
     ]
 

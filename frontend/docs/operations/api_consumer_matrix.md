@@ -78,6 +78,10 @@ This document is the canonical consumer-side inventory of backend endpoints used
 - Matter task mutations invalidate the task list for that matter and the dashboard summary so its
   pending count and upcoming list stay current.
 
+- Matter payment consumers read and mutate `/matters/{matter_id}/payments`; successful writes
+  invalidate the matter-scoped billing summary. Monetary decimal values are transported as strings
+  and the backend owns paid-total and balance calculation.
+
 - `readAuditLogEntries` is routed through `/admin/audit-log`, which requires `audit_logs:read` before the page can request the endpoint.
 
 - `readRbacRoles` is permission-gated on `/admin/users`: the page only requests `/rbac/roles` when the current session has `roles:manage`; otherwise it hides role-related controls and does not send `role_ids`.

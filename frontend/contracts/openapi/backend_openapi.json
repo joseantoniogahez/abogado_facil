@@ -620,6 +620,54 @@
         "title": "CreateMatterNoteRequest",
         "type": "object"
       },
+      "CreateMatterPaymentRequest": {
+        "properties": {
+          "amount": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              }
+            ],
+            "title": "Amount"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "paid_on": {
+            "format": "date",
+            "title": "Paid On",
+            "type": "string"
+          },
+          "payment_type": {
+            "enum": [
+              "advance",
+              "partial"
+            ],
+            "title": "Payment Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "amount",
+          "payment_type",
+          "paid_on"
+        ],
+        "title": "CreateMatterPaymentRequest",
+        "type": "object"
+      },
       "CreateMatterRequest": {
         "properties": {
           "client_id": {
@@ -887,6 +935,63 @@
         "title": "DocumentType",
         "type": "string"
       },
+      "MatterBillingResponse": {
+        "properties": {
+          "agreed_fee": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Agreed Fee",
+            "type": "string"
+          },
+          "balance": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Balance",
+            "type": "string"
+          },
+          "currency": {
+            "const": "MXN",
+            "default": "MXN",
+            "title": "Currency",
+            "type": "string"
+          },
+          "matter_id": {
+            "title": "Matter Id",
+            "type": "integer"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "payments": {
+            "items": {
+              "$ref": "#/components/schemas/MatterPaymentResponse"
+            },
+            "title": "Payments",
+            "type": "array"
+          },
+          "total_paid": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Total Paid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "matter_id",
+          "agreed_fee",
+          "total_paid",
+          "balance",
+          "notes",
+          "payments"
+        ],
+        "title": "MatterBillingResponse",
+        "type": "object"
+      },
       "MatterDocumentListResponse": {
         "properties": {
           "items": {
@@ -1041,6 +1146,69 @@
           "updated_at"
         ],
         "title": "MatterNoteResponse",
+        "type": "object"
+      },
+      "MatterPaymentResponse": {
+        "properties": {
+          "amount": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Amount",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "matter_id": {
+            "title": "Matter Id",
+            "type": "integer"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "paid_on": {
+            "format": "date",
+            "title": "Paid On",
+            "type": "string"
+          },
+          "payment_type": {
+            "enum": [
+              "advance",
+              "partial"
+            ],
+            "title": "Payment Type",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "matter_id",
+          "amount",
+          "payment_type",
+          "paid_on",
+          "note",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "MatterPaymentResponse",
         "type": "object"
       },
       "MatterResponse": {
@@ -1666,6 +1834,39 @@
           }
         },
         "title": "UpdateCurrentUserRequest",
+        "type": "object"
+      },
+      "UpdateMatterBillingRequest": {
+        "properties": {
+          "agreed_fee": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              }
+            ],
+            "title": "Agreed Fee"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          }
+        },
+        "required": [
+          "agreed_fee"
+        ],
+        "title": "UpdateMatterBillingRequest",
         "type": "object"
       },
       "UpdateMatterNoteRequest": {
@@ -3923,6 +4124,136 @@
         "summary": "Update matter note",
         "tags": [
           "matter-notes"
+        ]
+      }
+    },
+    "/v1/matters/{matter_id}/payments": {
+      "get": {
+        "description": "Returns firm-scoped agreed fees, payment history, paid total and calculated balance.",
+        "operationId": "get_matter_payments_v1_matters__matter_id__payments_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "matter_id",
+            "required": true,
+            "schema": {
+              "title": "Matter Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatterBillingResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Get matter billing and payments",
+        "tags": [
+          "matter-payments"
+        ]
+      },
+      "post": {
+        "description": "Records an immutable advance or partial payment for a firm-scoped matter.",
+        "operationId": "create_matter_payment_v1_matters__matter_id__payments_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "matter_id",
+            "required": true,
+            "schema": {
+              "title": "Matter Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMatterPaymentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatterBillingResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Record a matter payment",
+        "tags": [
+          "matter-payments"
+        ]
+      },
+      "put": {
+        "description": "Sets the agreed fee and optional financial notes for a firm-scoped matter.",
+        "operationId": "update_matter_billing_v1_matters__matter_id__payments_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "matter_id",
+            "required": true,
+            "schema": {
+              "title": "Matter Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMatterBillingRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatterBillingResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Update matter agreed fee and billing notes",
+        "tags": [
+          "matter-payments"
         ]
       }
     },
