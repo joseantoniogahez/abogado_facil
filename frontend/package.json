@@ -2,10 +2,10 @@
   "name": "abogado-facil-frontend",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "npm@11.10.0",
+  "packageManager": "npm@12.0.1",
   "engines": {
-    "node": ">=22.0.0",
-    "npm": ">=11"
+    "node": ">=22.23.1",
+    "npm": ">=12.0.1"
   },
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 3000",
@@ -58,5 +58,8 @@
     "typescript-eslint": "^8.46.4",
     "vite": "^7.1.12",
     "vitest": "^4.0.8"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true
   }
 }

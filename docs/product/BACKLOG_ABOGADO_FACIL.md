@@ -84,6 +84,8 @@ Las viñetas siguientes describen exclusivamente el estado inicial del 2026-07-0
 | CORE-011 | Full-stack | P1        | Hecho  | Catálogo de tipos de asunto y checklists base. | `matter_type` se elige de un catálogo backend cerrado, incluido `Otro`, y se persiste como string. |
 | UX-001   | Frontend   | P1        | Hecho  | Jerarquía visual de botones y acciones.        | Acciones y estados deshabilitados se distinguen del texto sin depender de `hover`.                 |
 
+| UX-002 | Frontend | P1 | Listo | Reorganizar el detalle de asuntos por tabs. | El detalle conserva un resumen visible y agrupa seguimiento, finanzas, documentos y notas sin scroll excesivo. |
+
 ## Fase 2 - BYOK y Capa de IA
 
 | ID     | Tipo       | Prioridad | Estado       | Trabajo                                         | Entregable / Criterio                                                           |
@@ -149,8 +151,12 @@ Las viñetas siguientes describen exclusivamente el estado inicial del 2026-07-0
 
 ## Siguiente Trabajo del Backlog
 
-El siguiente trabajo priorizado permanece en la Fase 2:
+El siguiente trabajo priorizado es cerrar la mejora de usabilidad de la Fase 1 y después continuar con la Fase 2:
+
+1. Reorganizar el detalle de asuntos por tabs (`UX-002`).
 
 1. Implementar la configuración de credenciales BYOK y su almacenamiento seguro (`AI-001`, `AI-002`).
+
 1. Crear la abstracción multi-provider y las validaciones obligatorias (`AI-003`, `AI-004`).
+
 1. Mantener pendientes las políticas operativas y de privacidad de IA (`AI-005`, `AI-006`, `SEC-002`).

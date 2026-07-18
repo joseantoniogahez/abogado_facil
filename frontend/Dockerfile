@@ -1,6 +1,6 @@
-FROM node:22-alpine AS base
+FROM node:22.23.1-alpine AS base
 WORKDIR /app
-RUN npm install -g npm@11.10.0
+RUN npm install -g npm@12.0.1
 
 FROM base AS deps
 WORKDIR /app
