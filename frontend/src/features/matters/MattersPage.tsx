@@ -316,6 +316,91 @@ export const NewMatterPage = () => (
     <MatterForm />
   </main>
 );
+
+const MATTER_TABS = ["summary", "follow-up", "finance", "documents-notes"] as const;
+type MatterTab = typeof MATTER_TABS[number];
+
+const isMatterTab = (value: string | null): value is MatterTab =>
+  value !== null && (MATTER_TABS as readonly string[]).includes(value);
+
+const MATTER_TAB_LABELS: Record<MatterTab, Parameters<typeof t>[0]> = {
+  "summary": "matters.tabs.summary",
+  "follow-up": "matters.tabs.followUp",
+  "finance": "matters.tabs.finance",
+  "documents-notes": "matters.tabs.documentsNotes",
+};
+
+export const MatterDetailTabs = ({ matterId }: { matterId: number }) => {
+  const [params, setParams] = useSearchParams();
+  const requestedTab = params.get("tab");
+  const activeTab: MatterTab = isMatterTab(requestedTab) ? requestedTab : "summary";
+
+  const selectTab = (tab: MatterTab) => {
+    const nextParams = new URLSearchParams(params);
+    nextParams.set("tab", tab);
+    setParams(nextParams, { replace: true });
+  };
+
+  return (
+    <>
+      <div className="mt-8 overflow-x-auto border-b" role="tablist" aria-label={t("matters.title")}>
+        <div className="flex min-w-max gap-2 pb-2">
+          {MATTER_TABS.map(tab => (
+            <button
+              aria-controls={`matter-tabpanel-${tab}`}
+              aria-selected={activeTab === tab}
+              className={activeTab === tab ? ACCENT_ACTION_CLASS_NAME : SECONDARY_ACTION_CLASS_NAME}
+              id={`matter-tab-${tab}`}
+              key={tab}
+              onClick={() => selectTab(tab)}
+              role="tab"
+              tabIndex={activeTab === tab ? 0 : -1}
+              type="button"
+            >
+              {t(MATTER_TAB_LABELS[tab])}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div
+        aria-labelledby={`matter-tab-${activeTab}`}
+        className="pt-2"
+        id={`matter-tabpanel-${activeTab}`}
+        role="tabpanel"
+        tabIndex={0}
+      >
+        {activeTab === "follow-up"
+          ? (
+              <>
+                <MatterTasks matterId={matterId} />
+                <MatterChecklist matterId={matterId} />
+              </>
+            )
+          : null}
+        {activeTab === "finance"
+          ? (
+              <>
+                <MatterPayments matterId={matterId} />
+                <MatterCalculations matterId={matterId} />
+              </>
+            )
+          : null}
+        {activeTab === "documents-notes"
+          ? (
+              <>
+                <MatterDocuments matterId={matterId} />
+                <MatterNotes matterId={matterId} />
+              </>
+            )
+          : null}
+        {activeTab === "summary"
+          ? <p className="mt-6 text-slate-600">{t("matters.tabs.summary")}</p>
+          : null}
+      </div>
+    </>
+  );
+};
+
 export const MatterDetailPage = ({ edit = false }: { edit?: boolean }) => {
   const id = Number(useParams().matterId);
   const query = useQuery(matterQueryOptions(id));
@@ -369,12 +454,7 @@ export const MatterDetailPage = ({ edit = false }: { edit?: boolean }) => {
       <Link className={`${SECONDARY_ACTION_CLASS_NAME} mt-5`} to={`/matters/${id}/edit`}>
         {t("matters.edit")}
       </Link>
-      <MatterNotes matterId={id} />
-      <MatterTasks matterId={id} />
-      <MatterPayments matterId={id} />
-      <MatterCalculations matterId={id} />
-      <MatterChecklist matterId={id} />
-      <MatterDocuments matterId={id} />
+      <MatterDetailTabs matterId={id} />
     </main>
   );
 };

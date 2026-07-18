@@ -5,8 +5,8 @@
 - ID: `UX-002`
 - Type: `Frontend`
 - Priority: `P1`
-- Plan status: `Ready`
-- Implementation status: `Listo`
+- Plan status: `Complete`
+- Implementation status: `Hecho`
 - Last updated: `2026-07-18`
 - Backlog source: `docs/product/BACKLOG_ABOGADO_FACIL.md`
 
@@ -68,65 +68,70 @@ más información.
 
 ### Implementation
 
-- [ ] Crear el componente o patrón de tabs dentro del feature de asuntos.
-- [ ] Separar los módulos actuales en los cuatro grupos definidos.
-- [ ] Persistir y validar la tab activa con `useSearchParams`.
-- [ ] Ajustar estilos responsive y estados de foco/selección.
+- [x] Crear el componente o patrón de tabs dentro del feature de asuntos.
+- [x] Separar los módulos actuales en los cuatro grupos definidos.
+- [x] Persistir y validar la tab activa con `useSearchParams`.
+- [x] Ajustar estilos responsive y estados de foco/selección.
 
 ### Tests and Documentation
 
-- [ ] Add or update tests with the behavior change.
-- [ ] Review all documentation surfaces required by `AGENTS.md`.
-- [ ] Update canonical documents affected by the code diff.
+- [x] Add or update tests with the behavior change.
+- [x] Review all documentation surfaces required by `AGENTS.md`.
+- [x] Update canonical documents affected by the code diff.
 
 ### Validation
 
-- [ ] `npm --prefix frontend run check`
-- [ ] `npm --prefix frontend run build`
-- [ ] `pre-commit run --files <changed-files>`
+- [x] `npm --prefix frontend run check`
+- [x] `npm --prefix frontend run build`
+- [x] `pre-commit run --files <changed-files>`
 
 ## Progress Log
 
-| Date       | State         | Completed                                     | Pending / next safe action                                          |
-| ---------- | ------------- | --------------------------------------------- | ------------------------------------------------------------------- |
-| 2026-07-18 | Plan prepared | Backlog item and executable scope registered. | Implement tabs, tests, responsive behavior, and run frontend gates. |
+| Date       | State       | Completed                                                                                               | Pending / next safe action |
+| ---------- | ----------- | ------------------------------------------------------------------------------------------------------- | -------------------------- |
+| 2026-07-18 | Implemented | Tabs, URL state, responsive overflow, accessibility semantics, focused tests, and route docs delivered. | Complete.                  |
 
 ## Validation Results
 
-| Date | Command | Result | Notes                                                                         |
-| ---- | ------- | ------ | ----------------------------------------------------------------------------- |
-|      |         |        | No implementation validation run; this turn only registered the backlog item. |
+| Date       | Command                     | Result | Notes                                                                                                        |
+| ---------- | --------------------------- | ------ | ------------------------------------------------------------------------------------------------------------ |
+| 2026-07-18 | Focused matter tests        | Pass   | 10 tests passed.                                                                                             |
+| 2026-07-18 | Lint and typecheck          | Pass   | Both completed successfully.                                                                                 |
+| 2026-07-18 | Build                       | Pass   | TypeScript/Vite compilation and approved performance budgets pass.                                           |
+| 2026-07-18 | Full check                  | Pass   | Full frontend check passes after the approved CSS budget increase.                                           |
+| 2026-07-18 | Pre-commit on changed files | Pass   | Hooks pass after Markdown normalization.                                                                     |
+| 2026-07-18 | CSS budget approval         | Pass   | `max_total_css_bytes` increased from 21,200 to 21,400 with explicit owner approval; build uses 21,333 bytes. |
 
 ## Pause / Handoff Record
 
-- Current state: Scope and plan are ready; no code implementation has started.
+- Current state: UX-002 implementation and required validation are complete.
 - Changed files and contracts: Backlog summary and this pending plan.
-- Pending work: Implement UX-002 and validate the frontend behavior.
+- Pending work: None.
 - Blockers or approvals: None.
 - Residual risks: Exact visual treatment may need adjustment after testing at mobile widths.
-- Next safe action: Read the affected matter tests and implement the tabs in the existing matter detail feature.
+- Next safe action: None.
 
 ## Completion Documentation Review
 
-- [ ] Root and service READMEs reviewed.
-- [ ] Backend operation and architecture docs reviewed.
-- [ ] Frontend operation docs and inventories reviewed.
-- [ ] Foundation status files reviewed and changed only if a foundation contract moved.
+- [x] Root and service READMEs reviewed.
+- [x] Backend operation and architecture docs reviewed.
+- [x] Frontend operation docs and inventories reviewed.
+- [x] Foundation status files reviewed and changed only if a foundation contract moved.
 - [x] AI governance docs, templates, and checklists reviewed.
 - [x] Item plan and summary backlog synchronized.
 
 Record documents intentionally unchanged and why:
 
-- Frontend route inventory: no route path changes are made by this backlog item; review again during implementation if query-parameter behavior must be documented.
+- Frontend route inventory: updated because the matter detail now documents the supported `tab` query parameter values.
 - Backend docs: no API or backend behavior is in scope.
 
 ## Completion Summary
 
-- Delivered: Backlog registration and pending implementation plan for the matter-detail tabs redesign.
-- Validation: Not applicable; no code changed.
-- Skipped validation: Frontend tests/build/pre-commit, because implementation has not started.
-- Human approvals: Not applicable at planning stage.
-- Residual risk: The final grouping and responsive presentation should be confirmed during implementation.
+- Delivered: Matter detail tabs with visible summary, grouped modules, URL persistence/fallback, accessible semantics, and responsive navigation.
+- Validation: Focused tests, lint, typecheck, full check, build, performance budget, and pre-commit pass.
+- Skipped validation: E2E was not required because auth/routing/error journeys did not change.
+- Human approvals: Not applicable.
+- Residual risk: The approved CSS budget retains 67 bytes of raw headroom.
 
 Do not set the item to `Hecho` while any required criterion, validation, documentation update, or
 approval remains incomplete.

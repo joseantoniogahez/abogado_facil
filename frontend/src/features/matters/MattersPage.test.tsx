@@ -1,14 +1,14 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import { describe, expect, it, vi } from "vitest";
 
 import { createQueryClient } from "@/app/query-client";
 import { t } from "@/shared/i18n/ui-text";
 
 import { parseMatter, parseMatterList, parseMatterTypes } from "./contracts";
-import { MatterDetailPage, MatterList, NewMatterPage } from "./MattersPage";
+import { MatterDetailPage, MatterDetailTabs, MatterList, NewMatterPage } from "./MattersPage";
 
 const matterTypes = [
   { value: "Pensión alimenticia" },
@@ -260,4 +260,39 @@ it("renders a matter list item without an optional next action", async () => {
   );
   expect(await screen.findByRole("link", { name: matter.title })).toBeInTheDocument();
   expect(screen.queryByText(t("matters.next"), { exact: false })).not.toBeInTheDocument();
+});
+
+describe("matter detail tabs", () => {
+  const LocationProbe = () => <output data-testid="location">{useLocation().search}</output>;
+
+  it("uses summary for an invalid tab and preserves the active tab in the URL", async () => {
+    const user = userEvent.setup();
+    render(
+      <QueryClientProvider client={createQueryClient()}>
+        <MemoryRouter initialEntries={["/matters/1?tab=unknown&from=client"]}>
+          <MatterDetailTabs matterId={1} />
+          <LocationProbe />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    );
+
+    expect(screen.getByRole("tab", { name: t("matters.tabs.summary") })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    expect(screen.getByRole("tab", { name: t("matters.tabs.finance") })).toHaveAttribute(
+      "aria-selected",
+      "false",
+    );
+    expect(screen.getByRole("tabpanel")).toHaveAttribute("id", "matter-tabpanel-summary");
+
+    await user.click(screen.getByRole("tab", { name: t("matters.tabs.finance") }));
+
+    expect(screen.getByRole("tab", { name: t("matters.tabs.finance") })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    expect(screen.getByRole("tabpanel")).toHaveAttribute("id", "matter-tabpanel-finance");
+    expect(screen.getByTestId("location")).toHaveTextContent("?tab=finance&from=client");
+  });
 });

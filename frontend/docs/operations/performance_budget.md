@@ -59,6 +59,9 @@ The gate evaluates production artifacts in `dist/assets`:
   capacity for the remaining product backlog. Limits are now `836000` raw bytes and `247000` gzip
   bytes. This capacity decision does not waive route-level lazy loading, dependency review, bundle
   impact assessment, or the enforced build gate. CSS limits remain unchanged.
+- On 2026-07-18 the owner explicitly approved increasing the raw CSS limit from `21200` to `21400`
+  bytes for UX-002. The measured build is `21333` raw CSS bytes, retaining `67` bytes of headroom;
+  the CSS gzip limit remains `6000`.
 
 ## Commands
 

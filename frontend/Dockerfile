@@ -24,7 +24,7 @@ ARG VITE_API_BASE_PATH=/v1
 ENV NODE_ENV=production
 ENV VITE_API_ORIGIN=${VITE_API_ORIGIN}
 ENV VITE_API_BASE_PATH=${VITE_API_BASE_PATH}
-RUN npm install -g serve@14.2.4
+RUN npm install -g serve@14.2.6
 COPY --from=builder /app/dist /app/dist
 EXPOSE 3000
 CMD ["sh", "-c", "serve -s dist -l ${PORT:-3000}"]
