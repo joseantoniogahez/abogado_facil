@@ -298,7 +298,7 @@
             "$ref": "#/components/schemas/DocumentType"
           },
           "file": {
-            "format": "binary",
+            "contentMediaType": "application/octet-stream",
             "title": "File",
             "type": "string"
           }

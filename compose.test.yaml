@@ -24,7 +24,7 @@ services:
     command: ["mc alias set local http://object-storage:9000 test-access-key test-secret-key && mc mb --ignore-existing local/documents && mc anonymous set none local/documents"]
 
   backend-test:
-    image: python:${PYTHON_VERSION:-3.14.3}-slim
+    image: python:${PYTHON_VERSION:-3.14}-slim
     working_dir: /workspace/backend
     environment:
       APP_ENV: test
