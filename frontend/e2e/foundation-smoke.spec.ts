@@ -210,6 +210,7 @@ test.describe("frontend foundation smoke", () => {
     });
 
     await page.goto("/matters/3");
+    await page.getByRole("tab", { name: t("matters.tabs.documentsNotes") }).click();
     await page.getByLabel(t("matterNotes.content")).fill("Llamada inicial");
     await page.getByRole("button", { name: t("matterNotes.add") }).click();
     await expect(page.getByText("Llamada inicial")).toBeVisible();
