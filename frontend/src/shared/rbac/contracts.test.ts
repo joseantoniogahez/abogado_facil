@@ -1,5 +1,6 @@
 import { ApiContractError } from "@/shared/api/contracts";
 import {
+  isRbacPermissionScope,
   parseAdminUser,
   parseAdminUserList,
   parseAssignedRoleList,
@@ -11,6 +12,12 @@ import {
 } from "@/shared/rbac/contracts";
 
 describe("rbac contracts", () => {
+  it("recognizes supported and unsupported permission scopes", () => {
+    expect(isRbacPermissionScope("own")).toBe(true);
+    expect(isRbacPermissionScope("tenant")).toBe(true);
+    expect(isRbacPermissionScope("any")).toBe(true);
+    expect(isRbacPermissionScope("team")).toBe(false);
+  });
   it("parses admin user payload", () => {
     expect(
       parseAdminUser({

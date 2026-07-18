@@ -60,4 +60,17 @@ describe("api errors", () => {
     expect(getApiErrorRequestId(new ApiError("Error", 500, "internal_error", "req-999"))).toBe("req-999");
     expect(getApiErrorRequestId(new Error("Other"))).toBeNull();
   });
+
+  it("falls back when an error response has no usable JSON or status text", async () => {
+    const response = new Response("not-json", { status: 503 });
+    const error = await parseApiError(response);
+    expect(error.message).toBe("Error de comunicacion con el servidor");
+    expect(error.status).toBe(503);
+    expect(getApiErrorRequestId(new ApiError("Error", 500))).toBeNull();
+  });
+
+  it("uses the HTTP status text when the payload has no detail", async () => {
+    const response = new Response("", { status: 400, statusText: "Bad Request" });
+    await expect(parseApiError(response)).resolves.toMatchObject({ message: "Bad Request", status: 400 });
+  });
 });

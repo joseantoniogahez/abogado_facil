@@ -22,6 +22,13 @@ describe("token storage", () => {
     expect(sessionStorage.getItem(ACCESS_TOKEN_STORAGE_KEY)).toBe("legacy-token");
   });
 
+  it("removes a legacy token when a session token already exists", () => {
+    sessionStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, "session-token");
+    localStorage.setItem(ACCESS_TOKEN_LEGACY_STORAGE_KEY, "legacy-token");
+    expect(getAccessToken()).toBe("session-token");
+    expect(localStorage.getItem(ACCESS_TOKEN_LEGACY_STORAGE_KEY)).toBeNull();
+  });
+
   it("removes token on clear from both storages", () => {
     localStorage.setItem(ACCESS_TOKEN_LEGACY_STORAGE_KEY, "legacy-token");
     setAccessToken("token-123");

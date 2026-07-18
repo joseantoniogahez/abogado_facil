@@ -45,4 +45,22 @@ describe("frontend env contracts", () => {
       }),
     ).toBe("https://api.example.com/v1/users/me");
   });
+
+  it("uses defaults and normalizes an empty base path", () => {
+    expect(readFrontendEnvConfig({})).toEqual({
+      apiOrigin: "http://localhost:8000",
+      apiBasePath: "/v1",
+    });
+    expect(getApiBaseUrl({ VITE_API_ORIGIN: "https://api.example.com", VITE_API_BASE_PATH: " / " }))
+      .toBe("https://api.example.com");
+    expect(buildApiUrl("/users/me", { VITE_API_ORIGIN: "https://api.example.com", VITE_API_BASE_PATH: "/" }))
+      .toBe("https://api.example.com/users/me");
+  });
+
+  it("rejects non-string, empty and unsupported origin values", () => {
+    expect(() => readFrontendEnvConfig({ VITE_API_ORIGIN: 42 })).toThrow("must be a string");
+    expect(() => readFrontendEnvConfig({ VITE_API_BASE_PATH: "   " })).toThrow("must not be empty");
+    expect(() => readFrontendEnvConfig({ VITE_API_ORIGIN: "ftp://api.example.com" }))
+      .toThrow("must use http/https protocol");
+  });
 });

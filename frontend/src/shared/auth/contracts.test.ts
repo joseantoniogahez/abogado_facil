@@ -59,6 +59,24 @@ describe("auth contracts", () => {
     ).toThrow(ApiContractError);
   });
 
+  it("parses a middle name and rejects invalid permission entries", () => {
+    expect(parseAuthenticatedUser({
+      id: 1, email: "admin@example.com", first_name: "Test", middle_name: "Middle",
+      last_name: "User", display_name: "Test User", firm_name: "Test Legal",
+      disabled: false, permissions: ["users:manage", "clients:read"],
+    }).middle_name).toBe("Middle");
+    expect(() => parseAuthenticatedUser({
+      id: 1, email: "admin@example.com", first_name: "Test", middle_name: null,
+      last_name: "User", display_name: "Test User", firm_name: "Test Legal",
+      disabled: false, permissions: [""],
+    })).toThrow(ApiContractError);
+    expect(() => parseAuthenticatedUser({
+      id: 1, email: "admin@example.com", first_name: "Test", middle_name: null,
+      last_name: "User", display_name: "Test User", firm_name: "Test Legal",
+      disabled: false, permissions: [1],
+    })).toThrow(ApiContractError);
+  });
+
   it("parses access token payload", () => {
     expect(
       parseAccessTokenResponse({

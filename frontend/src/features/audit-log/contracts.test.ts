@@ -36,6 +36,16 @@ describe("audit log contracts", () => {
         },
       ]),
     ).toHaveLength(1);
+
+    expect(parseAuditLogEntry({
+      id: 3,
+      actor_user_id: 2,
+      action: "matter.updated",
+      resource_type: "matter",
+      resource_id: "44",
+      summary: "Updated matter",
+      created_at: "2026-05-01T12:10:00Z",
+    }).actor_user_id).toBe(2);
   });
 
   it("rejects invalid audit log entry payloads", () => {
