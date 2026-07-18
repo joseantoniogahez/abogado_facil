@@ -78,6 +78,46 @@ test.describe("frontend foundation smoke", () => {
         });
         return;
       }
+      if (method === "GET" && pathname === "/v1/matters/3/tasks") {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({ items: [], total: 0 }),
+        });
+        return;
+      }
+      if (method === "GET" && pathname === "/v1/matters/3/payments") {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            matter_id: 3,
+            currency: "MXN",
+            agreed_fee: "0.00",
+            total_paid: "0.00",
+            balance: "0.00",
+            notes: null,
+            payments: [],
+          }),
+        });
+        return;
+      }
+      if (method === "GET" && pathname === "/v1/matters/3/calculations") {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({ items: [] }),
+        });
+        return;
+      }
+      if (method === "GET" && pathname === "/v1/matters/3/checklist") {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({ items: [], total: 0 }),
+        });
+        return;
+      }
       if (method === "GET" && pathname === "/v1/matters/3/notes") {
         await route.fulfill({
           status: 200,
