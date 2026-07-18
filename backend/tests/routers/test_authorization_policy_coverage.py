@@ -1,5 +1,6 @@
 import re
 from collections.abc import Callable, Iterable
+from copy import copy
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -141,12 +142,28 @@ def _route_has_dependency_callable(route: APIRoute, dependency_callable: Callabl
     return any(dependent.call is dependency_callable for dependent in _iter_dependants(route.dependant))
 
 
+def _iter_api_routes(routes: Iterable[object], prefix: str = "") -> Iterable[APIRoute]:
+    """Yield application routes from FastAPI's included-router tree."""
+    for route in routes:
+        if isinstance(route, APIRoute):
+            route_with_effective_path = copy(route)
+            route_with_effective_path.path = f"{prefix}{route.path}"
+            yield route_with_effective_path
+            continue
+
+        include_context = getattr(route, "include_context", None)
+        original_router = getattr(route, "original_router", None)
+        if include_context is not None and original_router is not None:
+            yield from _iter_api_routes(
+                original_router.routes,
+                prefix=f"{prefix}{include_context.prefix}",
+            )
+
+
 def _collect_protected_endpoints_from_routes() -> dict[EndpointKey, ProtectedEndpointPolicyRow]:
     protected_endpoints: dict[EndpointKey, ProtectedEndpointPolicyRow] = {}
 
-    for route in app.routes:
-        if not isinstance(route, APIRoute):
-            continue
+    for route in _iter_api_routes(app.routes):
         if not _is_application_router_route(route):
             continue
 
@@ -191,9 +208,7 @@ def _collect_protected_endpoints_from_routes() -> dict[EndpointKey, ProtectedEnd
 def _collect_read_endpoint_policies_from_routes() -> dict[EndpointKey, ReadAccessPolicyRow]:
     read_policies: dict[EndpointKey, ReadAccessPolicyRow] = {}
 
-    for route in app.routes:
-        if not isinstance(route, APIRoute):
-            continue
+    for route in _iter_api_routes(app.routes):
         if not _is_application_router_route(route):
             continue
         if "GET" not in (route.methods or set()):

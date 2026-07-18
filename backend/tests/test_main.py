@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from collections.abc import Iterable
 from types import SimpleNamespace
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock, call, patch
@@ -26,6 +27,21 @@ from app.core.setup.factory import (
 )
 from app.core.setup.routers import ROUTER_MODULES, _load_router, get_registered_routers
 from app.main import app
+
+
+def _iter_api_route_paths(routes: Iterable[object], prefix: str = "") -> Iterable[str]:
+    for route in routes:
+        if isinstance(route, APIRoute):
+            yield f"{prefix}{route.path}"
+            continue
+
+        include_context = getattr(route, "include_context", None)
+        original_router = getattr(route, "original_router", None)
+        if include_context is not None and original_router is not None:
+            yield from _iter_api_route_paths(
+                original_router.routes,
+                prefix=f"{prefix}{include_context.prefix}",
+            )
 
 
 def test_configure_logging_warns_on_invalid_level() -> None:
@@ -95,7 +111,7 @@ def test_validate_auth_settings_allows_secure_values_in_production(
 
 
 def test_auth_settings_validators_for_blank_values() -> None:
-    settings = AuthSettings(APP_ENV="   ", JWT_SECRET_KEY="unit-test-secret", JWT_ALGORITHM="HS256")
+    settings = AuthSettings(APP_ENV="   ", JWT_SECRET_KEY="unit-test-jwt-secret-change-me-now", JWT_ALGORITHM="HS256")
     assert settings.APP_ENV == "local"
 
     with pytest.raises(ValidationError):
@@ -333,7 +349,7 @@ def test_get_registered_routers_loads_catalog_modules_and_supports_fqcn() -> Non
 
 
 def test_app_registers_routes_from_dynamic_catalog() -> None:
-    paths = {route.path for route in app.routes if isinstance(route, APIRoute)}
+    paths = set(_iter_api_route_paths(app.routes))
     expected_paths = {
         "/v1/health",
         "/v1/audit-log",

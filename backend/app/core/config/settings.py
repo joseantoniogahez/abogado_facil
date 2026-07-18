@@ -19,6 +19,7 @@ class AuthSettings(BaseSettings):
         "default",
         "password",
         "local-dev-jwt-secret",
+        "local-dev-jwt-secret-change-me-now",
     }
     _PRODUCTION_ENV_VALUES: ClassVar[set[str]] = {"prod", "production", "staging"}
     _JWT_REQUIRED_ENV_VARS: ClassVar[tuple[str, ...]] = (
@@ -30,7 +31,7 @@ class AuthSettings(BaseSettings):
     )
 
     APP_ENV: str = "local"
-    JWT_SECRET_KEY: str = "local-dev-jwt-secret"
+    JWT_SECRET_KEY: str = "local-dev-jwt-secret-change-me-now"
     JWT_ALGORITHM: str = "HS256"
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(30, gt=0)
     JWT_ISSUER: str = "abogado-facil"

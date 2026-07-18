@@ -55,7 +55,7 @@ Default local profile when backend environment variables are unset outside Docke
 
 JWT defaults for `local/test`:
 
-- `JWT_SECRET_KEY=local-dev-jwt-secret`
+- `JWT_SECRET_KEY=local-dev-jwt-secret-change-me-now`
 - `JWT_ALGORITHM=HS256`
 - `JWT_ACCESS_TOKEN_EXPIRE_MINUTES=30`
 - `JWT_ISSUER=abogado-facil`
