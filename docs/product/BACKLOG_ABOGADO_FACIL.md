@@ -11,8 +11,18 @@ decisiones, avance, pausas, validaciones y cierre se registran en el plan corres
 ## Leyenda
 
 - Estado: `Identificado`, `Listo`, `En progreso`, `Bloqueado`, `Hecho`
-- Prioridad: `P0` imprescindible para arrancar, `P1` MVP, `P2` posterior al MVP
+- Prioridad: `P0` imprescindible para arrancar, `P1` MVP, `P2` posterior al MVP, `P0-IA` release gate que bloquea el lanzamiento de cualquier función que llame a un proveedor de IA
 - Tipo: `Setup`, `Producto`, `Backend`, `Frontend`, `Full-stack`, `IA`, `Docs`, `Legal`, `Ops`
+- Competencia de portafolio: `BE-AI`, `AI-PRODUCT`, `AMBAS`, `FOUNDATION`
+
+### Release gates de IA
+
+Una función que envíe información a OpenAI, Gemini u otro proveedor no puede pasar a `Hecho` ni
+liberarse mientras permanezca pendiente cualquiera de estos gates: aislamiento general por
+despacho, aislamiento del contexto enviado, pruebas negativas multiusuario, cifrado de credenciales,
+logs sin datos sensibles, consentimiento y privacidad, minimización del contexto y validación de
+salidas estructuradas. Estos gates son `P0-IA` para la Fase 2 y las fases posteriores de IA; no
+bloquean el uso del núcleo del producto sin IA.
 
 ## Punto de Partida Histórico
 
@@ -86,25 +96,42 @@ Las viñetas siguientes describen exclusivamente el estado inicial del 2026-07-0
 
 | UX-002 | Frontend | P1 | Hecho | Reorganizar el detalle de asuntos por tabs. | El detalle conserva un resumen visible y agrupa seguimiento, finanzas, documentos y notas sin scroll excesivo. |
 
+Cada ticket de IA debe registrar en su plan la competencia principal y la evidencia verificable
+esperada: pruebas de contrato, métricas, ADR, threat model, caso de fallo o demo del flujo.
+
 ## Fase 2 - BYOK y Capa de IA
 
-| ID     | Tipo       | Prioridad | Estado       | Trabajo                                         | Entregable / Criterio                                                           |
-| ------ | ---------- | --------- | ------------ | ----------------------------------------------- | ------------------------------------------------------------------------------- |
-| AI-001 | Backend    | P1        | Identificado | Modelo y servicio para credenciales BYOK.       | API keys cifradas, no expuestas al frontend y eliminables por usuario.          |
-| AI-002 | Full-stack | P1        | Identificado | Pantalla de configuración IA.                   | Seleccionar proveedor, guardar key, probar conexión, eliminar key y ver estado. |
-| AI-003 | Backend    | P1        | Identificado | Abstracción multi-provider.                     | `OpenAIProvider`, `GeminiProvider` y `MockProvider` detrás de un puerto común.  |
-| AI-004 | Backend    | P1        | Identificado | Validación obligatoria de BYOK en funciones IA. | Sin credencial válida no se ejecutan llamadas reales.                           |
-| AI-005 | Ops        | P1        | Identificado | Política de logs y datos sensibles de IA.       | Prompts/API keys no aparecen en logs técnicos sin protección.                   |
-| AI-006 | Backend    | P1        | Identificado | Registro de uso/errores por función IA.         | Métricas iniciales por proveedor, función, error y tiempo de respuesta.         |
+| ID     | Tipo       | Prioridad | Estado       | Trabajo                                         | Entregable / Criterio                                                             |
+| ------ | ---------- | --------- | ------------ | ----------------------------------------------- | --------------------------------------------------------------------------------- |
+| AI-001 | Backend    | P0-IA     | Identificado | Modelo y servicio para credenciales BYOK.       | API keys cifradas, no expuestas al frontend y eliminables por usuario.            |
+| AI-002 | Full-stack | P1        | Identificado | Pantalla de configuración IA.                   | Seleccionar proveedor, guardar key, probar conexión, eliminar key y ver estado.   |
+| AI-003 | Backend    | P1        | Identificado | Abstracción multi-provider.                     | `OpenAIProvider`, `GeminiProvider` y `MockProvider` detrás de un puerto común.    |
+| AI-004 | Backend    | P0-IA     | Identificado | Validación obligatoria de BYOK en funciones IA. | Sin credencial válida no se ejecutan llamadas reales.                             |
+| AI-005 | Ops        | P0-IA     | Identificado | Política de logs y datos sensibles de IA.       | Prompts/API keys no aparecen en logs técnicos sin protección.                     |
+| AI-006 | Backend    | P1        | Identificado | Registro de uso/errores por función IA.         | Métricas iniciales por proveedor, función, error y tiempo de respuesta.           |
+| AI-007 | Backend    | P0-IA     | Identificado | Validación de salidas estructuradas.            | JSON/schema validado antes de guardar, mostrar, copiar o exportar resultados IA.  |
+| AI-008 | Backend    | P0-IA     | Identificado | Minimización del contexto enviado a IA.         | Cada llamada envía únicamente el contexto autorizado y necesario para la función. |
+
+| AI-009 | Backend | P0-IA | Identificado | Ciclo de vida de ejecuciones de IA. | `AIJob` con estados, intentos, versiones, resultado, error y correlación. |
+| AI-010 | Backend | P1 | Identificado | Resiliencia de proveedores. | Timeouts, reintentos recuperables, backoff, rate limits y prevención de duplicados. |
+| AI-011 | Backend | P1 | Identificado | Taxonomía normalizada de errores. | OpenAI, Gemini y mock mapean errores al contrato común y seguro para frontend. |
+| OBS-001 | Ops | P1 | Identificado | Observabilidad correlacionada. | `request_id` permite seguir API → `AIJob` → proveedor → resultado sin datos sensibles. |
+| TEST-AI-001 | Backend | P1 | Identificado | Pruebas de contrato y fallos multi-provider. | Contratos OpenAI/Gemini/mock y escenarios de timeout, rate limit, JSON inválido y reintentos. |
 
 ## Fase 3 - IA Inicial Controlada
 
-| ID        | Tipo       | Prioridad | Estado       | Trabajo                                   | Entregable / Criterio                                                                                        |
-| --------- | ---------- | --------- | ------------ | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| AI-101    | Full-stack | P1        | Identificado | Analizador de relato inicial.             | Entrada libre, salida JSON validada y guardable en asunto.                                                   |
-| AI-102    | Full-stack | P1        | Identificado | Generador de preguntas para cliente.      | Lista editable/copiable de preguntas, datos críticos y documentos faltantes.                                 |
-| AI-103    | Full-stack | P1        | Identificado | Generador de mensajes para cliente.       | Mensajes para WhatsApp/email copiables y editables antes de enviar.                                          |
-| LEGAL-002 | Frontend   | P1        | Identificado | Validar avisos en funciones reales de IA. | Después de 2 o 3 funciones IA, todas conservan identificación, aviso y revisión humana en sus flujos reales. |
+| ID         | Tipo       | Prioridad | Estado       | Trabajo                                  | Entregable / Criterio                                                        |
+| ---------- | ---------- | --------- | ------------ | ---------------------------------------- | ---------------------------------------------------------------------------- |
+| AI-101     | Full-stack | P1        | Identificado | Analizador de relato inicial.            | Entrada libre, salida JSON validada y guardable en asunto.                   |
+| AI-102     | Full-stack | P1        | Identificado | Generador de preguntas para cliente.     | Lista editable/copiable de preguntas, datos críticos y documentos faltantes. |
+| AI-103     | Full-stack | P1        | Identificado | Generador de mensajes para cliente.      | Mensajes para WhatsApp/email copiables y editables antes de enviar.          |
+| LEGAL-002A | Frontend   | P0-IA     | Listo        | Patrón obligatorio de revisión humana.   | Aviso, etiqueta, edición y aceptación explícita sin envío automático.        |
+| LEGAL-002B | Frontend   | P1        | Identificado | Auditoría de consistencia del patrón IA. | Varias funciones reales cumplen `LEGAL-002A` y sus pruebas consumidoras.     |
+
+| UX-AI-001 | Full-stack | P1 | Identificado | Vista previa del contexto. | Usuario revisa, incluye o excluye fuentes, proveedor y posible costo antes de ejecutar. |
+| AI-104 | Full-stack | P1 | Identificado | Revisión y aceptación de resultados. | Editar, aceptar parcial o totalmente, rechazar, regenerar y reportar problemas. |
+| AI-105 | Full-stack | P1 | Identificado | Convertir resultados en acciones. | Salida se convierte en nota, tarea, pregunta, checklist, documento faltante o mensaje. |
+| AI-106 | Full-stack | P1 | Identificado | Procedencia y estado de actualización. | Fuentes/versiones y aviso cuando un resultado guardado queda desactualizado. |
 
 ## Fase 4 - Expediente Asistido
 
@@ -124,15 +151,41 @@ Las viñetas siguientes describen exclusivamente el estado inicial del 2026-07-0
 
 ## Seguridad, Privacidad y Operación
 
-| ID      | Tipo    | Prioridad | Estado       | Trabajo                                                           | Entregable / Criterio                                                              |
-| ------- | ------- | --------- | ------------ | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| SEC-001 | Backend | P1        | Identificado | Aislamiento estricto por usuario/propietario.                     | Ningún usuario ve clientes, asuntos, documentos o IA de otro usuario.              |
-| SEC-002 | Legal   | P1        | Identificado | Aviso de privacidad, términos y aprobación jurídica para IA BYOK. | Explica el envío al proveedor y registra revisión jurídica antes del lanzamiento.  |
-| SEC-003 | Backend | P1        | Identificado | Eliminación de datos del usuario.                                 | Usuario puede eliminar documentos/asuntos según política definida.                 |
-| OPS-001 | Ops     | P1        | Identificado | Límites configurables de archivos y análisis.                     | Tamaño, número de documentos y entrada IA controlados por config.                  |
-| OPS-002 | Ops     | P1        | Identificado | Backups básicos de PostgreSQL.                                    | Procedimiento documentado antes de despliegue productivo.                          |
-| OPS-003 | Docs    | P1        | Identificado | Mantener matrices de operaciones actualizadas.                    | Docs backend/frontend reflejan rutas, permisos, runtime, errores y e2e.            |
-| OPS-004 | Ops     | P1        | Hecho        | Base S3-compatible con MinIO.                                     | Compose levanta bucket privado persistente y backend dispone de un puerto probado. |
+| ID       | Tipo    | Prioridad | Estado       | Trabajo                                                           | Entregable / Criterio                                                                                      |
+| -------- | ------- | --------- | ------------ | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| SEC-001A | Backend | P1        | En progreso  | Aislamiento general por despacho.                                 | Matriz de pruebas confirma aislamiento de clientes, asuntos, documentos y resultados por `firm_id`.        |
+| SEC-001B | Backend | P0-IA     | Identificado | Aislamiento del contexto enviado a IA.                            | El contexto de cada llamada se construye solo desde recursos autorizados del despacho actual.              |
+| SEC-001C | Backend | P0-IA     | Identificado | Pruebas negativas multiusuario.                                   | Accesos cruzados a clientes, asuntos, documentos y resultados devuelven rechazo o `404` opaco.             |
+| SEC-002  | Legal   | P0-IA     | Identificado | Aviso de privacidad, términos y aprobación jurídica para IA BYOK. | Explica el envío al proveedor, solicita consentimiento y registra revisión jurídica antes del lanzamiento. |
+| SEC-003  | Backend | P1        | Identificado | Eliminación de datos del usuario.                                 | Usuario puede eliminar documentos/asuntos según política definida.                                         |
+| OPS-001  | Ops     | P1        | Identificado | Límites configurables de archivos y análisis.                     | Tamaño, número de documentos y entrada IA controlados por config.                                          |
+| OPS-002  | Ops     | P1        | Identificado | Backups básicos de PostgreSQL.                                    | Procedimiento documentado antes de despliegue productivo.                                                  |
+| OPS-003  | Docs    | P1        | Identificado | Mantener matrices de operaciones actualizadas.                    | Docs backend/frontend reflejan rutas, permisos, runtime, errores y e2e.                                    |
+| OPS-004  | Ops     | P1        | Hecho        | Base S3-compatible con MinIO.                                     | Compose levanta bucket privado persistente y backend dispone de un puerto probado.                         |
+
+| PROD-AI-001 | Full-stack | P1 | Identificado | Hero flow de incorporación de cliente. | Relato inicial convertido en expediente accionable con revisión y guardado. |
+| OBS-002 | Ops | P1 | Identificado | Métricas operativas de IA. | Dashboard reproducible con éxito, errores, latencia, tokens, costo, reintentos y jobs atascados. |
+| PROD-AI-002 | Full-stack | P1 | Identificado | Retroalimentación de utilidad. | Usuario clasifica utilidad, corrección, invención o información faltante. |
+| PROD-AI-003 | Full-stack | P1 | Identificado | Métricas de producto de IA. | Medición de valor, aceptación, edición, conversión, regeneración y abandono. |
+| UX-AI-002 | Frontend | P1 | Identificado | Onboarding BYOK guiado. | Guía por proveedor, validación accionable y modo demostrativo explícito con mock. |
+
+### Gate adicional de seguridad de IA
+
+| ID      | Tipo    | Prioridad | Estado       | Trabajo                                        | Entregable / Criterio                                                                                               |
+| ------- | ------- | --------- | ------------ | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| SEC-004 | Backend | P0-IA     | Identificado | Protección contra prompt injection documental. | Documentos son datos no confiables, delimitados y sin capacidad de modificar instrucciones o ejecutar herramientas. |
+
+## Evidencia pública de portafolio
+
+| ID          | Tipo | Prioridad | Estado       | Trabajo                              | Entregable / Criterio                                                                 |
+| ----------- | ---- | --------- | ------------ | ------------------------------------ | ------------------------------------------------------------------------------------- |
+| DOCS-AI-001 | Docs | P1        | Identificado | Arquitectura de integración IA.      | Diagrama de puertos, adaptadores, jobs, resultados y límites de confianza.            |
+| DOCS-AI-002 | Docs | P1        | Identificado | Flujo de datos y threat model.       | Contexto, aislamiento, prompt injection, credenciales y datos sensibles documentados. |
+| DOCS-AI-003 | Docs | P1        | Identificado | ADR de BYOK y multi-provider.        | Decisiones, alternativas y trade-offs registrados.                                    |
+| DOCS-AI-004 | Docs | P1        | Identificado | Catálogo de errores y reintentos.    | Taxonomía, política de retry y ejemplos de fallos reproducibles.                      |
+| DOCS-AI-005 | Docs | P1        | Identificado | Evaluación de prompts y schemas.     | Casos de evaluación, resultados y cambios documentados.                               |
+| DOCS-AI-006 | Docs | P1        | Identificado | Caso de estudio del hero flow.       | Problema, flujo, decisiones, riesgos, métricas y resultado observado.                 |
+| DEMO-AI-001 | Docs | P1        | Identificado | Guion de demo técnica y de producto. | Recorrido reproducible del hero flow y sus escenarios de fallo.                       |
 
 ## Fuera del MVP
 
@@ -151,12 +204,17 @@ Las viñetas siguientes describen exclusivamente el estado inicial del 2026-07-0
 
 ## Siguiente Trabajo del Backlog
 
-El siguiente trabajo priorizado es cerrar la mejora de usabilidad de la Fase 1 y después continuar con la Fase 2:
+La secuencia de portafolio prioriza primero la plataforma confiable y después el hero flow:
 
-1. Reorganizar el detalle de asuntos por tabs (`UX-002`).
+1. Plataforma: `AI-009`, `AI-010`, `AI-011`, `OBS-001` y `TEST-AI-001`.
+1. Seguridad adicional: `SEC-004` y `LEGAL-002A`.
+1. Hero flow: `UX-AI-001`, `AI-101`, `AI-104`, `AI-105` y `PROD-AI-001`.
+1. Medición: `AI-006`, `OBS-002`, `PROD-AI-002` y `PROD-AI-003`.
 
-1. Implementar la configuración de credenciales BYOK y su almacenamiento seguro (`AI-001`, `AI-002`).
+El siguiente trabajo priorizado es continuar con la Fase 2:
 
-1. Crear la abstracción multi-provider y las validaciones obligatorias (`AI-003`, `AI-004`).
+1. Cerrar los release gates de IA y la configuración segura de BYOK (`AI-001`, `AI-004`, `AI-005`, `AI-007`, `AI-008`, `SEC-001A`, `SEC-001B`, `SEC-001C`, `SEC-002`).
+
+1. Implementar la pantalla de configuración y la abstracción multi-provider (`AI-002`, `AI-003`).
 
 1. Mantener pendientes las políticas operativas y de privacidad de IA (`AI-005`, `AI-006`, `SEC-002`).

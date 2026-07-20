@@ -10,6 +10,7 @@
 - Configurar honorarios, registrar anticipos y pagos parciales, y consultar saldo.
 - Ejecutar calculadoras determinísticas de adeudos, rentas vencidas e interés simple.
 - Guardar y listar resultados de cálculo como instantáneas inmutables.
+- Consultar el detalle del asunto organizado en tabs de resumen, seguimiento, finanzas y documentos y notas.
 
 ## Reglas funcionales
 
@@ -18,6 +19,7 @@
 - Los cálculos son estimaciones y no sustituyen asesoría jurídica.
 - Los importes del MVP usan MXN y precisión de dos decimales.
 - Los abonos son inmutables y los resultados guardados no se editan ni eliminan.
+- El tab activo del detalle se conserva en la URL mediante el parámetro `tab`; valores inválidos vuelven a `summary`.
 
 ## Referencias técnicas
 
@@ -28,3 +30,4 @@
 - [CORE-008](../plans/implemented/CORE-008_CONTROL_PAGOS_PLAN.md)
 - [CORE-009](../plans/implemented/CORE-009_CALCULADORAS_BASICAS_PLAN.md)
 - [CORE-011](../plans/implemented/CORE-011_CATALOGO_TIPOS_ASUNTO_PLAN.md)
+- [UX-002](../plans/implemented/UX-002_TABS_DETALLE_ASUNTOS_PLAN.md)

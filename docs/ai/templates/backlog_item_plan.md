@@ -4,7 +4,7 @@
 
 - ID: `<TICKET>`
 - Type: `<Backend | Frontend | Full-stack | AI | Legal | Docs | Ops | Product | Setup>`
-- Priority: `<P0 | P1 | P2>`
+- Priority: `<P0 | P0-IA | P1 | P2>`
 - Plan status: `<Draft | Ready | Complete>`
 - Implementation status: `<Identificado | Listo | En progreso | Bloqueado | Hecho>`
 - Last updated: `<YYYY-MM-DD>`

@@ -2,9 +2,9 @@
 
 **Nombre de la app:** Abogado Fácil
 **Tipo de producto:** SaaS web para abogados independientes y despachos pequeños
-**Versión del documento:** 0.1
-**Estado:** Borrador inicial para MVP
-**Fecha:** 2026-07-08
+**Versión del documento:** 0.2
+**Estado:** En desarrollo
+**Fecha de actualización:** 2026-07-19
 **Autor:** José Antonio García Hernández / ITAÑUU
 
 ______________________________________________________________________
@@ -26,6 +26,58 @@ Construir una primera versión funcional que permita demostrar tres cosas:
 1. **Valor real para abogados pequeños:** organizar casos, reducir trabajo repetitivo y preparar información/documentos más rápido.
 1. **Integración profesional de IA en flujos de trabajo:** no un chatbot genérico, sino funciones puntuales dentro de procesos legales cotidianos.
 1. **Sostenibilidad operativa:** mantener bajos costos de servidor y evitar absorber costos variables de IA mediante BYOK obligatorio.
+
+______________________________________________________________________
+
+## 2.1 Objetivos de portafolio técnico
+
+### Capacidad A — Backend Engineer con integraciones de IA
+
+El proyecto deberá demostrar una integración de IA segura, multi-provider, observable y resiliente
+ante errores externos, aislada por despacho, con salidas validadas, consumo trazable, pruebas
+automatizadas y protección de información sensible.
+
+### Capacidad B — Software Engineer, AI Products
+
+El proyecto deberá demostrar que las capacidades generativas se convierten en flujos comprensibles
+para usuarios no técnicos, integrados en tareas reales, con revisión humana, resultados editables y
+reutilizables, señales de confianza y procedencia, medición de utilidad y fricción controlada.
+
+La evidencia se clasificará en el backlog mediante `BE-AI`, `AI-PRODUCT`, `AMBAS` o `FOUNDATION`.
+Cada ticket de IA deberá indicar la evidencia esperada: pruebas de contrato, métricas reproducibles,
+ADR, threat model o demostración de un escenario de fallo.
+
+| Ticket                                                                                                             | Competencia principal |
+| ------------------------------------------------------------------------------------------------------------------ | --------------------- |
+| `AI-001`, `AI-003`, `AI-006`, `AI-009`–`AI-011`, `OBS-001`                                                         | `BE-AI`               |
+| `AI-002`, `AI-102`, `AI-103`, `AI-104`, `AI-105`, `AI-203`, `UX-AI-001`, `UX-AI-002`, `PROD-AI-002`, `PROD-AI-003` | `AI-PRODUCT`          |
+| `AI-007`, `AI-008`, `AI-101`, `AI-106`, `AI-201`, `AI-202`, `PROD-AI-001`                                          | `AMBAS`               |
+| `AI-004`, `AI-005`, `SEC-001A/B/C`, `SEC-002`, `SEC-004`, `LEGAL-002A/B`                                           | `BE-AI`               |
+
+### Hero flow del portafolio
+
+La vertical demostrable prioritaria será **relato inicial → expediente accionable**: el abogado pega
+el relato, revisa contexto y proveedor, recibe una salida estructurada, la corrige o confirma y la
+convierte en asunto, preguntas, checklist, documentos faltantes y mensaje para el cliente. El flujo
+deberá guardar procedencia, estado de actualización, señales de utilidad y revisión humana.
+
+______________________________________________________________________
+
+## Estado actual del producto
+
+La Fase 0 y la Fase 1 del núcleo sin IA están implementadas y validadas en el repositorio. El
+producto actual permite:
+
+- Registro, inicio/cierre de sesión, perfil y dashboard autenticado por despacho.
+- Gestión aislada de clientes y asuntos, incluyendo catálogo de tipos de asunto.
+- Notas, checklists, tareas, pagos y calculadoras determinísticas dentro del expediente.
+- Subida, listado, descarga, eliminación y extracción local de texto de documentos PDF, DOCX y TXT.
+- Avisos legales, jerarquía visual de acciones y detalle de asuntos organizado por tabs.
+
+La configuración BYOK, las llamadas reales a proveedores y las funciones de IA permanecen
+pendientes. Ninguna función que envíe datos a OpenAI, Gemini u otro proveedor puede liberarse sin
+cumplir los release gates de seguridad, privacidad y validación definidos en la sección 8.3 y en el
+backlog de producto.
 
 ______________________________________________________________________
 
@@ -84,6 +136,18 @@ ______________________________________________________________________
 1. **Privacidad desde el diseño:** los expedientes y documentos deben tratarse como información sensible.
 1. **Revisión humana obligatoria:** cualquier contenido generado por IA será borrador o apoyo, nunca resultado final automático.
 1. **Portafolio técnico:** el producto debe demostrar integración real de IA, SaaS multiusuario, seguridad, límites y flujos de negocio.
+
+### 5.1 Decisiones posteriores al documento inicial
+
+- El límite de propiedad del MVP es el despacho (`firm_id`), resuelto desde la sesión y no elegido
+  por el frontend.
+- Cada alta crea un despacho y asigna al usuario como `account_owner` inicial.
+- Los documentos usan almacenamiento S3-compatible privado; PostgreSQL conserva la metadata.
+- El MVP no hace OCR de PDFs escaneados; la extracción local de texto es tolerante a fallos.
+- El dashboard autenticado es `/dashboard`; `/welcome` se conserva solo como redirección temporal.
+- El detalle de asuntos conserva el tab activo en la URL mediante `?tab=`.
+- La IA seguirá un modelo BYOK y sus gates de lanzamiento se consideran requisitos de release, no
+  funcionalidades opcionales posteriores.
 
 ______________________________________________________________________
 
@@ -677,14 +741,29 @@ ______________________________________________________________________
 - Solicitar aceptación de términos antes de usar IA.
 - Permitir al usuario eliminar documentos y asuntos.
 
-## 8.3 Rendimiento
+## 8.3 Release gates para funciones de IA
+
+Antes de habilitar cualquier función que envíe contexto a OpenAI, Gemini u otro proveedor deben
+estar completos y validados todos estos controles:
+
+- Aislamiento general por despacho para clientes, asuntos, documentos y resultados.
+- Pruebas negativas multiusuario que intenten acceder a recursos de otro despacho.
+- Aislamiento y minimización del contexto enviado; cada llamada recibe únicamente datos autorizados
+  y necesarios para su propósito.
+- API keys cifradas, no expuestas al frontend y ausentes de logs.
+- Política de logs que excluya prompts completos y otros datos sensibles sin protección.
+- Consentimiento, aviso de privacidad, términos y aprobación jurídica aplicables al flujo.
+- Validación de schema/salida estructurada antes de guardar, mostrar, copiar o exportar resultados.
+- Aviso contextual y revisión humana antes de usar cualquier resultado generado.
+
+## 8.4 Rendimiento
 
 - La landing debe cargar rápidamente.
 - El dashboard debe responder en menos de 2 segundos en uso normal.
 - Las llamadas de IA pueden ser asíncronas si tardan demasiado.
 - Los resultados de IA deben guardarse para evitar recomputación.
 
-## 8.4 Costos operativos
+## 8.5 Costos operativos
 
 El sistema debe diseñarse para operar con bajo costo mientras no existan ventas.
 
@@ -699,13 +778,13 @@ Medidas obligatorias:
 - Cacheo/guardado de resultados IA.
 - Workers apagables o escalables bajo demanda.
 
-## 8.5 Disponibilidad
+## 8.6 Disponibilidad
 
 - El MVP no requiere alta disponibilidad empresarial.
 - Debe poder correr en infraestructura económica.
 - Debe contar con respaldos básicos de base de datos.
 
-## 8.6 Escalabilidad
+## 8.7 Escalabilidad
 
 El diseño debe permitir evolucionar a:
 
@@ -868,7 +947,23 @@ ______________________________________________________________________
 - Funciones IA más usadas.
 - Resultados guardados vs regenerados.
 
-## 13.3 Negocio
+## 13.3 Evidencia de valor de IA
+
+- Tiempo hasta el primer resultado útil.
+- Porcentaje de resultados aceptados, editados y descartados.
+- Resultados convertidos en tareas, notas, checklists o documentos faltantes.
+- Regeneraciones y abandono antes de ejecutar.
+- Señales de utilidad: útil sin cambios, útil con cambios, no útil, incorrecto,
+  inventado o incompleto.
+
+## 13.4 Evidencia operativa de IA
+
+- Éxito por proveedor y función.
+- Errores por categoría, fallos de validación y reintentos.
+- Latencia p50/p95, tokens y costo estimado.
+- Jobs atascados y solicitudes rechazadas por límites.
+
+## 13.5 Negocio
 
 - Usuarios activos semanales.
 - Conversión de landing a registro.

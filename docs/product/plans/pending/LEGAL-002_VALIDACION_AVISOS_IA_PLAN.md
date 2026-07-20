@@ -1,10 +1,10 @@
-# LEGAL-002 - Validación de avisos en funciones reales de IA
+# LEGAL-002B - Auditoría de consistencia de avisos IA
 
 ## Estado del tracking
 
-- ID: `LEGAL-002`
+- ID: `LEGAL-002B`
 - Tipo: Frontend
-- Prioridad: P1
+- Prioridad: P0-IA
 - Estado del plan: Listo
 - Estado de implementación: Identificado
 - Última actualización: 2026-07-11
@@ -17,6 +17,8 @@ preferentemente tres funciones de IA. Cada resultado debe conservar su identific
 contextual y relación accesible antes de copiar, guardar, exportar o utilizar el contenido.
 
 ## Condición de inicio
+
+`LEGAL-002A` debe existir como patrón compartido antes de iniciar esta auditoría.
 
 - Al menos dos de `AI-101`, `AI-102` y `AI-103` están implementados con resultados utilizables.
 - Los flujos incluyen las acciones reales que deban validarse, sin crear pantallas ficticias para
@@ -90,5 +92,5 @@ No ejecutadas: el ticket está identificado y sus funciones consumidoras todaví
 - Trabajo pendiente: esperar dos o tres funciones reales de IA y ejecutar la integración.
 - Bloqueos o aprobaciones: dependencias funcionales `AI-101` a `AI-103`.
 - Riesgo residual: futuras funciones podrían crear avisos propios si no consultan este ticket.
-- Próxima acción segura: referenciar `LEGAL-002` al planificar cada ticket `AI-101` a `AI-103` e
+- Próxima acción segura: referenciar `LEGAL-002A` al planificar cada ticket `AI-101` a `AI-103` e
   iniciarlo cuando al menos dos estén implementados.

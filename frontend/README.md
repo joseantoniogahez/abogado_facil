@@ -26,7 +26,7 @@ For backend API behavior and authentication rules, see `../backend/README.md`.
 ## Prerequisites
 
 - Node.js `>=22.0.0`
-- npm `>=11` (`11.10.0` in Docker/CI)
+- npm `>=12.0.1` (`12.0.1` in Docker/CI)
 - Python environment with backend dependencies installed when running `npm run check` (required by `openapi:check`).
 
 ## Environment Variables

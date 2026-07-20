@@ -105,7 +105,7 @@ más información.
 ## Pause / Handoff Record
 
 - Current state: UX-002 implementation and required validation are complete.
-- Changed files and contracts: Backlog summary and this pending plan.
+- Changed files and contracts: Backlog summary, capability catalog, frontend route inventory, and this implemented plan.
 - Pending work: None.
 - Blockers or approvals: None.
 - Residual risks: Exact visual treatment may need adjustment after testing at mobile widths.

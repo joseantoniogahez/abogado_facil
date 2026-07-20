@@ -38,7 +38,7 @@ SaaS web para abogados independientes y despachos pequeños con expedientes, tar
 - Optional for local non-Docker workflows:
   - Python 3.14
   - Node.js >=22.0.0 (Node.js 22 is used by Docker/CI)
-  - npm >=11
+  - npm >=12.0.1
 
 ## Environment Setup
 
@@ -169,7 +169,7 @@ The repository uses a root virtual environment for shared tooling and hooks.
 Local `pre-commit` hooks depend on more than the root Python environment:
 
 - Python 3.14 for Python-based hooks
-- Node.js >=22.0.0 (Node.js 22 in Docker/CI) and npm 11+ for frontend ESLint and typecheck hooks
+- Node.js >=22.0.0 (Node.js 22 in Docker/CI) and npm 12.0.1+ for frontend ESLint and typecheck hooks
 - Docker Desktop (or Docker Engine + Compose plugin) for `hadolint` and `docker compose config` hooks
 - A local `.env` copied from `.env_examples`, because compose validation hooks resolve environment variables from it
 
