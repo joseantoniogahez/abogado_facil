@@ -13,6 +13,10 @@ All routes are versioned under `/v1`.
 - Normalized error responses echo the same `request_id` in the `X-Request-ID` response header.
 - Request validation errors are normalized to `400 invalid_input` (not exposed as `422`).
 - Write endpoints (`POST`/`PUT`/`PATCH`/`DELETE`) run inside a Unit of Work transaction scope.
+- Browser cross-origin access is disabled when `API_CORS_ORIGINS` is empty. When configured, only
+  explicit origins are accepted; allowed methods are `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, and
+  `OPTIONS`, allowed request headers are `Accept`, `Authorization`, and `Content-Type`, credentials
+  are enabled, and `X-Request-ID` is exposed for client-side correlation. Wildcard origins are invalid.
 
 ## Endpoint Summary
 

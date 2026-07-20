@@ -1,5 +1,6 @@
 import os
 from typing import ClassVar
+from urllib.parse import urlsplit
 
 from pydantic import Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings
@@ -20,6 +21,24 @@ class ApiSettings(BaseSettings):
         if not normalized:
             return "local"
         return normalized
+
+    @field_validator("API_CORS_ORIGINS")
+    @classmethod
+    def validate_cors_origins(cls, value: str) -> str:
+        origins = [origin.strip().rstrip("/") for origin in value.split(",") if origin.strip()]
+        for origin in origins:
+            if origin == "*":
+                raise ValueError("API_CORS_ORIGINS must contain explicit browser origins.")
+            parsed = urlsplit(origin)
+            if parsed.scheme not in {"http", "https"} or not parsed.netloc or parsed.path not in {"", "/"}:
+                raise ValueError("API_CORS_ORIGINS must contain HTTP(S) origins without paths.")
+            if parsed.query or parsed.fragment or parsed.username or parsed.password:
+                raise ValueError("API_CORS_ORIGINS must contain bare browser origins.")
+        return ",".join(origins)
+
+    @property
+    def cors_origins(self) -> list[str]:
+        return [origin for origin in self.API_CORS_ORIGINS.split(",") if origin]
 
     @property
     def openapi_enabled(self) -> bool:

@@ -139,6 +139,22 @@ def test_api_settings_normalizes_environment_and_controls_openapi_visibility() -
     assert production_settings.openapi_enabled is False
 
 
+def test_api_settings_validates_cors_origins_and_rejects_production_wildcard() -> None:
+    settings = ApiSettings(API_CORS_ORIGINS=" http://localhost:3000/ , https://example.com ")
+
+    assert settings.API_CORS_ORIGINS == "http://localhost:3000,https://example.com"
+    assert settings.cors_origins == ["http://localhost:3000", "https://example.com"]
+
+    with pytest.raises(ValidationError):
+        ApiSettings(API_CORS_ORIGINS="https://example.com/app")
+    with pytest.raises(ValidationError):
+        ApiSettings(API_CORS_ORIGINS="https://example.com?source=test")
+    with pytest.raises(ValidationError):
+        ApiSettings(API_CORS_ORIGINS="*")
+    with pytest.raises(ValidationError):
+        ApiSettings(APP_ENV="production", API_CORS_ORIGINS="*")
+
+
 def test_create_app_keeps_openapi_routes_outside_production() -> None:
     test_app = create_app(ApiSettings(APP_ENV="test"))
 
@@ -404,9 +420,37 @@ def test_configure_cors_adds_cors_middleware_when_origins_are_provided() -> None
         CORSMiddleware,
         allow_origins=["http://localhost:3000", "https://example.com"],
         allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
+        allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+        allow_headers=["Accept", "Authorization", "Content-Type"],
+        expose_headers=["X-Request-ID"],
     )
+
+
+def test_configure_cors_allows_configured_origin_and_rejects_other_preflight_origins() -> None:
+    test_app = FastAPI()
+
+    @test_app.get("/resource")
+    def read_resource() -> dict[str, bool]:
+        return {"ok": True}
+
+    configure_cors(test_app, ApiSettings(API_CORS_ORIGINS="https://frontend.example"))
+
+    with TestClient(test_app) as client:
+        allowed = client.get("/resource", headers={"Origin": "https://frontend.example"})
+        rejected = client.options(
+            "/resource",
+            headers={
+                "Origin": "https://untrusted.example",
+                "Access-Control-Request-Method": "POST",
+                "Access-Control-Request-Headers": "authorization",
+            },
+        )
+
+    assert allowed.status_code == 200
+    assert allowed.headers["access-control-allow-origin"] == "https://frontend.example"
+    assert allowed.headers["access-control-expose-headers"] == "X-Request-ID"
+    assert rejected.status_code == 400
+    assert "access-control-allow-origin" not in rejected.headers
 
 
 def test_get_db_session_yields_session_from_create_async_session() -> None:

@@ -53,6 +53,12 @@ Default local profile when backend environment variables are unset outside Docke
 - `API_CORS_ORIGINS=`
 - `LOG_LEVEL=WARNING`
 
+When configured, `API_CORS_ORIGINS` is a comma-separated list of explicit `http`/`https` browser
+origins without paths. The API permits only `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, and `OPTIONS`,
+and only `Accept`, `Authorization`, and `Content-Type` request headers. Credentials are enabled for
+those explicit origins and `X-Request-ID` is exposed for frontend error correlation. Wildcard origins
+are rejected in every environment.
+
 JWT defaults for `local/test`:
 
 - `JWT_SECRET_KEY=local-dev-jwt-secret-change-me-now`
