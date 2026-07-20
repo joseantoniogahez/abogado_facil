@@ -28,6 +28,12 @@ class S3FileStorage:
             ),
         )
 
+    async def check(self, *, bucket: str) -> None:
+        try:
+            await asyncio.to_thread(self._client.head_bucket, Bucket=bucket)
+        except (BotoCoreError, ClientError) as exc:
+            raise FileStorageError("Object storage health check failed.") from exc
+
     async def store(self, command: StoreFileCommand) -> StoredFileResult:
         try:
             response = await asyncio.to_thread(

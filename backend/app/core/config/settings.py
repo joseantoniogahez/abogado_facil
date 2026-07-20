@@ -13,6 +13,7 @@ class ApiSettings(BaseSettings):
     API_PATH: str = ""
     API_CORS_ORIGINS: str = ""
     LOG_LEVEL: str = "WARNING"
+    READINESS_TIMEOUT_SECONDS: float = Field(2.0, gt=0)
 
     @field_validator("APP_ENV")
     @classmethod

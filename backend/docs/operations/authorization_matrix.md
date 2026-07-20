@@ -93,6 +93,7 @@ This table is contract-checked by `tests/routers/test_authorization_policy_cover
 | `GET`  | `/v1/matters/{matter_id}/documents`                        | `authenticated` | No                        |
 | `GET`  | `/v1/matters/{matter_id}/documents/{document_id}/download` | `authenticated` | No                        |
 | `GET`  | `/v1/health`                                               | `public`        | No                        |
+| `GET`  | `/v1/readiness`                                            | `public`        | No                        |
 | `GET`  | `/v1/users/me`                                             | `authenticated` | No                        |
 | `GET`  | `/v1/rbac/roles`                                           | `permission`    | `roles:manage`            |
 | `GET`  | `/v1/rbac/permissions`                                     | `permission`    | `role_permissions:manage` |

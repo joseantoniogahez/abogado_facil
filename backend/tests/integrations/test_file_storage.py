@@ -48,6 +48,7 @@ def test_s3_storage_put_stream_delete_contract() -> None:
         client.get_object.return_value = {"Body": BytesIO(b"stored-bytes")}
         storage = S3FileStorage(ObjectStorageSettings(), client=client)
 
+        await storage.check(bucket="documents")
         result = await storage.store(_command())
         assert result.etag == '"etag"'
         assert await _collect(storage) == b"stored-bytes"
@@ -83,6 +84,11 @@ def test_s3_storage_translates_not_found_and_provider_failures() -> None:
         with pytest.raises(FileStorageError, match="write failed") as exc_info:
             await storage.store(_command())
         assert "secret-host" not in str(exc_info.value)
+
+        client.head_bucket.side_effect = _client_error("AccessDenied", "HeadBucket")
+        with pytest.raises(FileStorageError, match="health check failed") as exc_info:
+            await storage.check(bucket="documents")
+        assert "provider detail" not in str(exc_info.value)
 
         client.head_object.side_effect = _client_error("404", "HeadObject")
         assert await storage.delete(bucket="documents", path="missing") is False

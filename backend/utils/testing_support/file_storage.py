@@ -9,6 +9,9 @@ class FakeFileStorage:
     def __init__(self) -> None:
         self.objects: dict[tuple[str, str], bytes] = {}
 
+    async def check(self, *, bucket: str) -> None:
+        return None
+
     async def store(self, command: StoreFileCommand) -> StoredFileResult:
         body = command.body if isinstance(command.body, bytes) else command.body.read()
         self.objects[(command.bucket, command.path)] = body
