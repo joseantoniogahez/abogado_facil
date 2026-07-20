@@ -6,9 +6,24 @@ from pydantic_settings import BaseSettings
 
 
 class ApiSettings(BaseSettings):
+    _PRODUCTION_ENV_VALUES: ClassVar[set[str]] = {"prod", "production", "staging"}
+
+    APP_ENV: str = "local"
     API_PATH: str = ""
     API_CORS_ORIGINS: str = ""
     LOG_LEVEL: str = "WARNING"
+
+    @field_validator("APP_ENV")
+    @classmethod
+    def normalize_app_env(cls, value: str) -> str:
+        normalized = value.strip().lower()
+        if not normalized:
+            return "local"
+        return normalized
+
+    @property
+    def openapi_enabled(self) -> bool:
+        return self.APP_ENV not in self._PRODUCTION_ENV_VALUES
 
 
 class AuthSettings(BaseSettings):

@@ -7,6 +7,8 @@ All routes are versioned under `/v1`.
 ## Global Conventions
 
 - Bearer auth header: `Authorization: Bearer <access_token>`.
+- Interactive OpenAPI documentation is available in local/test environments and disabled in
+  `prod`, `production`, and `staging` for `/docs`, `/redoc`, and `/openapi.json`.
 - Standard error payload: `{ detail, status, code, meta?, request_id }`.
 - Normalized error responses echo the same `request_id` in the `X-Request-ID` response header.
 - Request validation errors are normalized to `400 invalid_input` (not exposed as `422`).

@@ -136,7 +136,15 @@ def create_app(settings: ApiSettings | None = None) -> FastAPI:
     api_settings = settings or ApiSettings()
     configure_logging(api_settings)
 
-    app = _NormalizedOpenAPIFastAPI(root_path=api_settings.API_PATH, lifespan=app_lifespan)
+    openapi_urls: dict[str, str | None] = (
+        {} if api_settings.openapi_enabled else {"docs_url": None, "redoc_url": None, "openapi_url": None}
+    )
+
+    app = _NormalizedOpenAPIFastAPI(
+        root_path=api_settings.API_PATH,
+        lifespan=app_lifespan,
+        **openapi_urls,
+    )
     configure_request_context_middleware(app)
     configure_cors(app, api_settings)
     configure_exception_handlers(app)

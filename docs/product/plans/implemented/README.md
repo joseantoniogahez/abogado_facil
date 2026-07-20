@@ -26,3 +26,4 @@ derivarse de esa carpeta, no de estos planes técnicos.
 | Dashboard                  | [`PROD-003`](PROD-003_DASHBOARD_PLAN.md)                      |
 | Jerarquía visual           | [`UX-001`](UX-001_JERARQUIA_VISUAL_ACCIONES_PLAN.md)          |
 | Tabs de detalle de asuntos | [`UX-002`](UX-002_TABS_DETALLE_ASUNTOS_PLAN.md)               |
+| OpenAPI en producción      | [`OPS-005`](OPS-005_OPENAPI_PRODUCCION_PLAN.md)               |

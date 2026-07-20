@@ -127,6 +127,34 @@ def test_auth_settings_validators_for_blank_values() -> None:
         AuthSettings(JWT_AUDIENCE="   ")
 
 
+def test_api_settings_normalizes_environment_and_controls_openapi_visibility() -> None:
+    blank_settings = ApiSettings(APP_ENV="   ")
+    local_settings = ApiSettings(APP_ENV=" LOCAL ")
+    production_settings = ApiSettings(APP_ENV=" Production ")
+
+    assert blank_settings.APP_ENV == "local"
+    assert local_settings.APP_ENV == "local"
+    assert local_settings.openapi_enabled is True
+    assert production_settings.APP_ENV == "production"
+    assert production_settings.openapi_enabled is False
+
+
+def test_create_app_keeps_openapi_routes_outside_production() -> None:
+    test_app = create_app(ApiSettings(APP_ENV="test"))
+
+    assert test_app.docs_url == "/docs"
+    assert test_app.redoc_url == "/redoc"
+    assert test_app.openapi_url == "/openapi.json"
+
+
+def test_create_app_disables_openapi_routes_in_production() -> None:
+    production_app = create_app(ApiSettings(APP_ENV="prod"))
+
+    assert production_app.docs_url is None
+    assert production_app.redoc_url is None
+    assert production_app.openapi_url is None
+
+
 def test_app_lifespan_logs_startup_and_shutdown() -> None:
     logger = MagicMock()
 

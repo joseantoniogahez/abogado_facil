@@ -4,6 +4,13 @@
 
 Keep routers readable while preserving explicit endpoint documentation.
 
+## Runtime exposure policy
+
+Interactive documentation is enabled in non-production environments. It is disabled explicitly in
+`prod`, `production`, and `staging` by setting `docs_url`, `redoc_url`, and `openapi_url` to
+`None` when the application is created. Production deployments therefore do not expose the
+complete API schema through `/docs`, `/redoc`, or `/openapi.json`.
+
 ## Current structure
 
 OpenAPI metadata is owned by the feature that exposes the endpoint.
