@@ -17,6 +17,7 @@ ERROR_HTTP_STATUS_MAP: dict[DomainErrorType, int] = {
     DomainErrorType.NOT_FOUND: status.HTTP_404_NOT_FOUND,
     DomainErrorType.CONFLICT: status.HTTP_409_CONFLICT,
     DomainErrorType.INTERNAL_ERROR: status.HTTP_500_INTERNAL_SERVER_ERROR,
+    DomainErrorType.RATE_LIMITED: status.HTTP_429_TOO_MANY_REQUESTS,
 }
 REQUEST_ID_HEADER = "X-Request-ID"
 logger = logging.getLogger(__name__)

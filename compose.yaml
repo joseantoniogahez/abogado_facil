@@ -1,6 +1,14 @@
 name: abogado-facil-dev
 
 services:
+  redis:
+    image: redis:8.2-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   object-storage:
     image: minio/minio:RELEASE.2025-09-07T16-13-09Z
     command: server /data --console-address ":9001"
@@ -56,6 +64,8 @@ services:
         condition: service_healthy
       object-storage-init:
         condition: service_completed_successfully
+      redis:
+        condition: service_healthy
     healthcheck:
       test:
         [
@@ -84,6 +94,13 @@ services:
       JWT_AUDIENCE: "${JWT_AUDIENCE:-abogado-facil-api}"
       JWT_SECRET_KEY: "${JWT_SECRET_KEY:-local-dev-jwt-secret-change-me-now}"
       LOG_LEVEL: "${LOG_LEVEL:-INFO}"
+      RATE_LIMIT_ENABLED: "${RATE_LIMIT_ENABLED:-true}"
+      RATE_LIMIT_STORAGE: "${RATE_LIMIT_STORAGE:-redis}"
+      REDIS_URL: "${REDIS_URL:-redis://redis:6379/0}"
+      RATE_LIMIT_LOGIN: "${RATE_LIMIT_LOGIN:-10}"
+      RATE_LIMIT_REGISTER: "${RATE_LIMIT_REGISTER:-5}"
+      RATE_LIMIT_UPLOAD: "${RATE_LIMIT_UPLOAD:-30}"
+      RATE_LIMIT_WINDOW_SECONDS: "${RATE_LIMIT_WINDOW_SECONDS:-60}"
       S3_ACCESS_KEY: "${S3_ACCESS_KEY:-minioadmin}"
       S3_BUCKET: "${S3_BUCKET:-documents}"
       S3_CONNECT_TIMEOUT_SECONDS: "${S3_CONNECT_TIMEOUT_SECONDS:-3}"

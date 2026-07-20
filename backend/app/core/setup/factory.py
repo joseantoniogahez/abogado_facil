@@ -12,6 +12,7 @@ from pydantic import ValidationError
 from app.core.common.openapi import normalize_generated_openapi_schema
 from app.core.config.settings import ApiSettings, AuthSettings, ObjectStorageSettings
 from app.core.errors.setup.handlers import REQUEST_ID_HEADER, configure_exception_handlers
+from app.core.rate_limit import RateLimiter
 from app.core.setup.cors import configure_cors
 from app.core.setup.routers import configure_routers
 
@@ -103,6 +104,8 @@ def configure_request_context_middleware(app: FastAPI) -> None:
         duration_ms = (perf_counter() - started_at) * 1000
 
         response.headers.setdefault(REQUEST_ID_HEADER, request_id)
+        for header, value in getattr(request.state, "rate_limit_headers", {}).items():
+            response.headers.setdefault(header, value)
 
         log_level = logging.INFO
         if response.status_code >= 500:
@@ -145,6 +148,7 @@ def create_app(settings: ApiSettings | None = None) -> FastAPI:
         lifespan=app_lifespan,
         **openapi_urls,
     )
+    app.state.rate_limiter = RateLimiter(api_settings)
     configure_request_context_middleware(app)
     configure_cors(app, api_settings)
     configure_exception_handlers(app)

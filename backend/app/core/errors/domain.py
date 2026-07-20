@@ -19,6 +19,7 @@ class DomainErrorType(StrEnum):
     NOT_FOUND = "not_found"
     CONFLICT = "conflict"
     INTERNAL_ERROR = "internal_error"
+    RATE_LIMITED = "rate_limited"
 
 
 class DomainError(AppError):

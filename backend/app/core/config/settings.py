@@ -14,6 +14,13 @@ class ApiSettings(BaseSettings):
     API_CORS_ORIGINS: str = ""
     LOG_LEVEL: str = "WARNING"
     READINESS_TIMEOUT_SECONDS: float = Field(2.0, gt=0)
+    RATE_LIMIT_ENABLED: bool = False
+    RATE_LIMIT_STORAGE: str = "memory"
+    REDIS_URL: str = "redis://localhost:6379/0"
+    RATE_LIMIT_LOGIN: int = Field(10, gt=0)
+    RATE_LIMIT_REGISTER: int = Field(5, gt=0)
+    RATE_LIMIT_UPLOAD: int = Field(30, gt=0)
+    RATE_LIMIT_WINDOW_SECONDS: int = Field(60, gt=0)
 
     @field_validator("APP_ENV")
     @classmethod
@@ -36,6 +43,32 @@ class ApiSettings(BaseSettings):
             if parsed.query or parsed.fragment or parsed.username or parsed.password:
                 raise ValueError("API_CORS_ORIGINS must contain bare browser origins.")
         return ",".join(origins)
+
+    @field_validator("RATE_LIMIT_STORAGE")
+    @classmethod
+    def validate_rate_limit_storage(cls, value: str) -> str:
+        normalized = value.strip().lower()
+        if normalized not in {"memory", "redis"}:
+            raise ValueError("RATE_LIMIT_STORAGE must be memory or redis.")
+        return normalized
+
+    @field_validator("REDIS_URL")
+    @classmethod
+    def validate_redis_url(cls, value: str) -> str:
+        normalized = value.strip()
+        if not normalized.startswith(("redis://", "rediss://")):
+            raise ValueError("REDIS_URL must use redis:// or rediss://.")
+        return normalized
+
+    @model_validator(mode="after")
+    def validate_production_rate_limit_storage(self) -> ApiSettings:
+        if (
+            self.APP_ENV in self._PRODUCTION_ENV_VALUES
+            and self.RATE_LIMIT_ENABLED
+            and self.RATE_LIMIT_STORAGE != "redis"
+        ):
+            raise ValueError("Production rate limiting must use shared Redis storage.")
+        return self
 
     @property
     def cors_origins(self) -> list[str]:

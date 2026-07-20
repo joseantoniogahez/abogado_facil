@@ -1,10 +1,11 @@
 from typing import Annotated
 from urllib.parse import quote
 
-from fastapi import APIRouter, File, Form, Response, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, Response, UploadFile, status
 from fastapi.responses import StreamingResponse
 
 from app.core.authorization.dependencies import AuthenticatedReadAccessDependency
+from app.core.rate_limit import UPLOAD_RATE_LIMIT, rate_limit_dependency
 from app.core.setup.dependencies import MatterDocumentsServiceDependency
 from app.features.matter_documents.openapi import (
     CREATE_MATTER_DOCUMENT_DOC,
@@ -24,7 +25,11 @@ def _firm_id(user: AuthenticatedReadAccessDependency) -> int:
 
 
 @router.post(
-    "", response_model=MatterDocumentResponse, status_code=status.HTTP_201_CREATED, **CREATE_MATTER_DOCUMENT_DOC
+    "",
+    response_model=MatterDocumentResponse,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(rate_limit_dependency(UPLOAD_RATE_LIMIT))],
+    **CREATE_MATTER_DOCUMENT_DOC,
 )
 async def upload_matter_document(
     matter_id: int,

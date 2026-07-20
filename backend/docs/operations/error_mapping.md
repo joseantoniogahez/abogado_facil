@@ -22,6 +22,7 @@ Notes:
 - `request_id` is always included in normalized error payloads.
 - The same value is also returned in the `X-Request-ID` response header.
 - `401` responses include `WWW-Authenticate: Bearer`.
+- Rate-limited responses use `429 rate_limited`, include `Retry-After`, and expose only numeric quota headers.
 - FastAPI request validation errors are converted to `400 invalid_input`.
 - API request completion logs include a consistent structured shape with `request_id`, `method`, `path`, `status_code`, and `duration_ms`.
 - Authorization decisions are logged as `event=api_authorization_decision` with `request_id`, `user_id`, `permission_id`, `required_scope`, `decision`, `method`, `path`, and `route`.
@@ -56,6 +57,7 @@ value is the account email; the product has no separate username identity.
 | `not_found`       | `404 Not Found`             |
 | `conflict`        | `409 Conflict`              |
 | `internal_error`  | `500 Internal Server Error` |
+| `rate_limited`    | `429 Too Many Requests`     |
 
 Matter document uploads use `400 invalid_input` for unsupported, empty, oversized, or content-mismatched
 files; `409 conflict` when the per-matter quota is reached; opaque `404 not_found` for missing or foreign
