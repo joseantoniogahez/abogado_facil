@@ -23,6 +23,8 @@ scope before implementation.
 ## Skills
 
 - `../../skills/README.md`: repository-local skill catalog and manual activation guide.
+- `../../skills/fastapi-agents/SKILL.md`: adapter that loads the official FastAPI library skill
+  from the installed package and applies this repository's overlay rules.
 - `../../scripts/install_project_skills.py`: previews or installs repository-local skills into the
   active Codex skills directory. It writes only when `--write` is passed.
 

@@ -264,6 +264,10 @@ Project skill pack:
 - `skills/frontend-feature-builder`
 - `skills/project-reviewer`
 - `skills/new-app-bootstrapper`
+- `skills/fastapi-agents` as the repository adapter for the official FastAPI library Agent Skill;
+  use it when implementing or reviewing FastAPI endpoints, dependencies, middleware, lifecycle,
+  OpenAPI, security, responses, or Starlette-backed behavior. It must load the official skill from
+  the installed FastAPI package before applying repository-specific rules.
 
 ## Scaffolds
 

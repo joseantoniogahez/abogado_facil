@@ -25,15 +25,15 @@ Already available:
   - `skills/frontend-feature-builder`
   - `skills/project-reviewer`
   - `skills/new-app-bootstrapper`
+  - `skills/fastapi-agents`
 - Repository scripts:
   - `scripts/bootstrap_new_app.py`
   - `scripts/scaffold_feature.py`
   - `scripts/install_project_skills.py`
 
-Known gap:
+Known gaps:
 
-- The skills exist locally, but a fresh Codex environment may not auto-discover or install them.
-- There is no repository-local catalog explaining when to use each skill.
+- A fresh Codex environment may not auto-discover or install local skills.
 - There is no plugin packaging yet.
 - There is no MCP need yet; local scripts cover the current workflow.
 
@@ -58,6 +58,8 @@ Deliverables:
 - [x] Document each existing skill, trigger cases, required reading, and validation expectations.
 - [x] Add manual fallback instructions for agents when skills are not auto-discovered.
 - [x] Link `skills/README.md` from `AGENTS.md` and `docs/ai/README.md`.
+- [x] Add `skills/fastapi-agents` as a repository-local adapter that loads the official FastAPI
+  package skill and routes it from `AGENTS.md` without copying or duplicating that skill.
 
 Acceptance criteria:
 
@@ -68,6 +70,7 @@ Acceptance criteria:
 Validation:
 
 - `pre-commit run --files AGENTS.md docs/ai/README.md skills/README.md`
+- `quick_validate.py skills/fastapi-agents`
 
 ## Phase 2: New App Bootstrapper Skill
 

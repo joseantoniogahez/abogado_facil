@@ -96,6 +96,22 @@ Las viñetas siguientes describen exclusivamente el estado inicial del 2026-07-0
 
 | UX-002 | Frontend | P1 | Hecho | Reorganizar el detalle de asuntos por tabs. | El detalle conserva un resumen visible y agrupa seguimiento, finanzas, documentos y notas sin scroll excesivo. |
 
+### Cierre FastAPI de Fase 1
+
+Los siguientes tickets deben ejecutarse en orden. `AUDIT-001` establece la línea base, los cinco
+tickets de hardening implementan las mejoras priorizadas y `AUDIT-002` verifica el resultado antes
+de iniciar la siguiente fase funcional.
+
+| ID        | Tipo    | Prioridad | Estado       | Trabajo                                                             | Entregable / Criterio                                                                                                                                                                                                            |
+| --------- | ------- | --------- | ------------ | ------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| AUDIT-001 | Backend | P1        | Listo        | Auditoría formal inicial del backend con el agente de programación. | Informe con hallazgos ordenados por severidad sobre FastAPI, API/OpenAPI, auth/RBAC, aislamiento, errores, configuración, observabilidad, pruebas y documentación; cada hallazgo tiene evidencia, archivo/línea y recomendación. |
+| OPS-005   | Backend | P1        | Identificado | Proteger la documentación OpenAPI en producción.                    | `/docs`, `/redoc` y `/openapi.json` se deshabilitan o protegen explícitamente según `APP_ENV`, con pruebas de configuración y decisión documentada.                                                                              |
+| OPS-006   | Backend | P1        | Identificado | Endurecer CORS.                                                     | Orígenes, métodos y headers permitidos son explícitos por entorno; credenciales solo se habilitan con una configuración segura y quedan cubiertos por pruebas.                                                                   |
+| OPS-007   | Backend | P1        | Identificado | Separar health y readiness checks.                                  | Liveness confirma proceso; readiness verifica dependencias críticas como base de datos y object storage sin filtrar secretos.                                                                                                    |
+| OPS-008   | Backend | P1        | Identificado | Añadir rate limiting para superficies sensibles.                    | Login, registro, uploads y futuras llamadas IA tienen límites configurables, respuesta normalizada y pruebas de exceso, sin romper tests locales.                                                                                |
+| OPS-009   | Backend | P1        | Identificado | Preparar streaming/SSE y observabilidad para funciones IA.          | Existe un patrón probado de streaming cancelable y eventos correlacionados con `request_id`, sin datos sensibles, listo para consumidores IA y con métricas de latencia/errores.                                                 |
+| AUDIT-002 | Backend | P1        | Identificado | Auditoría formal posterior con el agente de programación.           | Revisión de cierre confirma cada criterio, detecta regresiones y actualiza el informe; no quedan hallazgos P0/P1 abiertos sin decisión explícita antes de Fase 2.                                                                |
+
 Cada ticket de IA debe registrar en su plan la competencia principal y la evidencia verificable
 esperada: pruebas de contrato, métricas, ADR, threat model, caso de fallo o demo del flujo.
 

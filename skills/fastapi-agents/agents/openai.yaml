@@ -1,0 +1,4 @@
+interface:
+  display_name: "FastAPI Agents"
+  short_description: "FastAPI guidance for coding agents"
+  default_prompt: "Use $fastapi-agents to implement or review FastAPI code against the official framework guidance and this repository's canonical contracts."
