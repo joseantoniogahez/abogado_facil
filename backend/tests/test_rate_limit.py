@@ -1,5 +1,6 @@
 import asyncio
 from types import SimpleNamespace
+from typing import cast
 
 import pytest
 from fastapi import FastAPI, Request
@@ -11,10 +12,13 @@ from app.core.rate_limit import MemoryCounterStore, RateLimiter, RateLimitRule, 
 from app.core.setup.factory import configure_request_context_middleware
 
 
-def _request() -> SimpleNamespace:
-    return SimpleNamespace(
-        client=SimpleNamespace(host="198.51.100.10"),
-        state=SimpleNamespace(),
+def _request() -> Request:
+    return cast(
+        Request,
+        SimpleNamespace(
+            client=SimpleNamespace(host="198.51.100.10"),
+            state=SimpleNamespace(),
+        ),
     )
 
 

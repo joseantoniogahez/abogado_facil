@@ -5,8 +5,8 @@
 - ID: `AUDIT-002`
 - Type: `Backend`
 - Priority: `P1`
-- Plan status: `Ready`
-- Implementation status: `Identificado`
+- Plan status: `Complete`
+- Implementation status: `Hecho`
 - Last updated: `2026-07-19`
 - Backlog source: `docs/product/BACKLOG_ABOGADO_FACIL.md`
 
@@ -40,10 +40,10 @@ Depende del informe de `AUDIT-001` y de la implementación de los cinco tickets 
 
 ## Acceptance Criteria
 
-- [ ] Cada finding inicial tiene estado y evidencia de cierre.
-- [ ] Se verifica el comportamiento integrado de los cinco tickets.
-- [ ] No hay regresiones de contratos, auth/RBAC, aislamiento o errores.
-- [ ] Informe final y backlog quedan sincronizados.
+- [x] Cada finding inicial tiene estado y evidencia de cierre.
+- [x] Se verifica el comportamiento integrado de los cinco tickets.
+- [x] No hay regresiones de contratos, auth/RBAC, aislamiento o errores.
+- [x] Informe final y backlog quedan sincronizados.
 
 ## Affected Contracts and Files
 
@@ -55,16 +55,16 @@ Depende del informe de `AUDIT-001` y de la implementación de los cinco tickets 
 
 ## Work Plan
 
-- [ ] Leer informe `AUDIT-001` y planes implementados.
-- [ ] Ejecutar revisión formal y validaciones de cierre.
-- [ ] Actualizar findings, backlog y decisión de entrada a Fase 2.
+- [x] Leer informe `AUDIT-001` y planes implementados.
+- [x] Ejecutar revisión formal y validaciones de cierre.
+- [x] Actualizar findings, backlog y decisión de entrada a Fase 2.
 
 ## Validation
 
-- [ ] `python -m pytest backend/tests`
-- [ ] backend coverage gate
-- [ ] frontend OpenAPI check si el contrato cambió
-- [ ] pre-commit sobre archivos modificados
+- [x] `.venv\\Scripts\\python.exe -m pytest backend/tests` (397 passed)
+- [x] backend coverage gate (100%)
+- [x] `npm --prefix frontend run openapi:check`
+- [x] `git diff --check`; pre-commit quedó limitado por falta de red para descargar hooks.
 
 ## Progress Log
 
@@ -78,11 +78,11 @@ No ejecutadas: dependencias aún no completadas.
 
 ## Pause / Handoff Record
 
-- Current state: plan preparado.
-- Pending work: ejecutar auditoría de salida.
+- Current state: auditoría de salida completada.
+- Pending work: ninguno dentro de AUDIT-002.
 - Blockers or approvals: depende de los cinco tickets de hardening.
 - Residual risks: Fase 2 no debe iniciar sin revisión de salida.
-- Next safe action: iniciar cuando `OPS-005`–`OPS-009` estén en `Hecho`.
+- Next safe action: aplicar los gates específicos antes de iniciar cada función IA de Fase 2.
 
 ## Completion Summary
 

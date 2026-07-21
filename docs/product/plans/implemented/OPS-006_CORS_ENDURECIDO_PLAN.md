@@ -5,7 +5,7 @@
 - ID: `OPS-006`
 - Type: `Backend`
 - Priority: `P1`
-- Plan status: `Ready`
+- Plan status: `Complete`
 - Implementation status: `Hecho`
 - Last updated: `2026-07-19`
 - Backlog source: `docs/product/BACKLOG_ABOGADO_FACIL.md`
@@ -60,9 +60,9 @@ de credenciales.
 
 ## Validation
 
-- [ ] `python -m pytest backend/tests`
-- [ ] `npm --prefix frontend run check` si cambia el contrato de runtime
-- [ ] pre-commit sobre archivos modificados
+- [x] `.venv\\Scripts\\python.exe -m pytest backend/tests` (397 passed in final audit)
+- [x] Frontend check not required: runtime API contract did not change.
+- [x] `git diff --check`; pre-commit attempted but hook initialization requires unavailable network.
 
 ## Progress Log
 
@@ -81,10 +81,10 @@ de credenciales.
 - Pending work: none for implementation; pre-commit remains an environment validation limitation.
 - Blockers or approvals: la lista final de orígenes productivos debe configurarse por despliegue.
 - Residual risks: no se permiten orígenes con rutas; reverse proxy permanece fuera de alcance.
-- Next safe action: validar backend y cerrar el ticket.
+- Next safe action: configurar los orígenes productivos concretos durante el despliegue.
 
 ## Completion Summary
 
 - Delivered: CORS explícito, validación segura de orígenes, credenciales y correlación `X-Request-ID`.
-- Validation: suite focalizada aprobada; suite completa y pre-commit pendientes.
+- Validation: suite backend y diff limpio aprobados; pre-commit limitado por falta de red para descargar hooks.
 - Residual risk: lista productiva concreta aún depende del entorno de despliegue.

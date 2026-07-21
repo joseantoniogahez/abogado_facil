@@ -139,7 +139,7 @@ def create_app(settings: ApiSettings | None = None) -> FastAPI:
     api_settings = settings or ApiSettings()
     configure_logging(api_settings)
 
-    openapi_urls: dict[str, str | None] = (
+    openapi_urls: dict[str, Any] = (
         {} if api_settings.openapi_enabled else {"docs_url": None, "redoc_url": None, "openapi_url": None}
     )
 

@@ -5,7 +5,7 @@
 - ID: `OPS-008`
 - Type: `Backend`
 - Priority: `P1`
-- Plan status: `Ready`
+- Plan status: `Complete`
 - Implementation status: `Hecho`
 - Last updated: `2026-07-19`
 - Backlog source: `docs/product/BACKLOG_ABOGADO_FACIL.md`
@@ -40,10 +40,10 @@ No se encontró una política de rate limiting explícita en el backend actual.
 
 ## Acceptance Criteria
 
-- [ ] Login, registro y uploads tienen límites definidos.
-- [ ] La respuesta excedida usa el contrato de errores y no filtra secretos.
-- [ ] Tests cubren límites y bypasses obvios.
-- [ ] Dependencia nueva, si existe, está aprobada y auditada.
+- [x] Login, registro y uploads tienen límites definidos.
+- [x] La respuesta excedida usa el contrato de errores y no filtra secretos.
+- [x] Tests cubren límites y bypasses obvios.
+- [x] No se añadió dependencia nueva sin aprobación.
 
 ## Affected Contracts and Files
 
@@ -55,15 +55,15 @@ No se encontró una política de rate limiting explícita en el backend actual.
 
 ## Work Plan
 
-- [ ] Medir superficies y elegir estrategia.
-- [ ] Implementar límites y configuración.
-- [ ] Probar abuso, autenticación y workers.
+- [x] Medir superficies y elegir estrategia.
+- [x] Implementar límites y configuración.
+- [x] Probar abuso, autenticación y workers.
 
 ## Validation
 
-- [ ] `python -m pytest backend/tests`
-- [ ] coverage gate backend
-- [ ] dependency audit y pre-commit si se añade dependencia
+- [x] `.venv\\Scripts\\python.exe -m pytest backend/tests` (397 passed in final audit)
+- [x] backend coverage gate (100% in final audit)
+- [x] No se añadió dependencia nueva; pre-commit quedó limitado por falta de red.
 
 ## Progress Log
 
@@ -84,10 +84,10 @@ No se encontró una política de rate limiting explícita en el backend actual.
 ## Pause / Handoff Record
 
 - Current state: completed and confirmed by the user.
-- Pending work: estrategia compartida, implementación y tests.
+- Pending work: ninguno; la política Redis para producción sigue siendo una responsabilidad de despliegue.
 - Blockers or approvals: provider/infraestructura para producción.
 - Residual risks: abuso y fuerza bruta sin límite.
-- Next safe action: iniciar después de `AUDIT-001`.
+- Next safe action: configurar y monitorizar Redis en el entorno productivo.
 
 ## Completion Summary
 
