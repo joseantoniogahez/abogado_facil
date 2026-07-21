@@ -3,11 +3,14 @@ from typing import Annotated, cast
 from fastapi import Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.config.settings import AuthSettings, MatterDocumentSettings, ObjectStorageSettings
+from app.core.config.settings import AiCredentialSettings, AuthSettings, MatterDocumentSettings, ObjectStorageSettings
 from app.core.db.database import get_async_session_factory
 from app.core.db.ports import UnitOfWorkPort
 from app.core.db.uow import UnitOfWork
 from app.core.security.service import Argon2PasswordService, JwtTokenService, PasswordServicePort, TokenServicePort
+from app.core.security.service.encryption import AesGcmSecretEncryption, SecretEncryptionPort
+from app.features.ai_credentials.repository import AiCredentialsRepository
+from app.features.ai_credentials.service import AiCredentialsService
 from app.features.audit_log.repository import AuditLogRepository
 from app.features.audit_log.service import AuditLogService, AuditLogServicePort
 from app.features.auth.repository import AuthRepository
@@ -231,6 +234,33 @@ async def get_auth_service(
 
 
 AuthServiceDependency = Annotated[AuthServicePort, Depends(get_auth_service)]
+
+
+async def get_ai_credential_settings() -> AiCredentialSettings:
+    return AiCredentialSettings()
+
+
+async def get_secret_encryption(
+    settings: Annotated[AiCredentialSettings, Depends(get_ai_credential_settings)],
+) -> SecretEncryptionPort:
+    import base64
+
+    return AesGcmSecretEncryption(base64.urlsafe_b64decode(settings.AI_CREDENTIAL_ENCRYPTION_KEY.get_secret_value()))
+
+
+async def get_ai_credentials_repository(session: DbSessionDependency) -> AiCredentialsRepository:
+    return AiCredentialsRepository(session=session)
+
+
+async def get_ai_credentials_service(
+    repository: Annotated[AiCredentialsRepository, Depends(get_ai_credentials_repository)],
+    unit_of_work: UnitOfWorkDependency,
+    encryption: Annotated[SecretEncryptionPort, Depends(get_secret_encryption)],
+) -> AiCredentialsService:
+    return AiCredentialsService(repository=repository, unit_of_work=unit_of_work, encryption=encryption)
+
+
+AiCredentialsServiceDependency = Annotated[AiCredentialsService, Depends(get_ai_credentials_service)]
 
 
 async def get_rbac_service(

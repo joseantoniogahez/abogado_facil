@@ -6,6 +6,7 @@ from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import create_async_engine
 
 from app.core.db.database import Base, get_database_url
+from app.features.ai_credentials.models import AiCredential
 from app.features.audit_log.models import AuditLogEntry
 from app.features.auth.models import User
 from app.features.clients.models import Client
@@ -27,6 +28,7 @@ if config.config_file_name is not None:
 # Keep explicit model references so Alembic sees all tables in metadata.
 _MODEL_REGISTRY = (
     User,
+    AiCredential,
     Role,
     Permission,
     UserRole,

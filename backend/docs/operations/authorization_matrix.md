@@ -76,31 +76,34 @@ Canonical read-access definitions live in `READ_ACCESS_POLICY_CATALOG` in
 `app/core/authorization/catalog.py`.
 This table is contract-checked by `tests/routers/test_authorization_policy_coverage.py`.
 
-| Method | Path                                                       | Access Level    | Permission                |
-| ------ | ---------------------------------------------------------- | --------------- | ------------------------- |
-| `GET`  | `/v1/audit-log`                                            | `permission`    | `audit_logs:read`         |
-| `GET`  | `/v1/dashboard`                                            | `authenticated` | No                        |
-| `GET`  | `/v1/clients`                                              | `authenticated` | No                        |
-| `GET`  | `/v1/clients/{client_id}`                                  | `authenticated` | No                        |
-| `GET`  | `/v1/matters`                                              | `authenticated` | No                        |
-| `GET`  | `/v1/matters/types`                                        | `authenticated` | No                        |
-| `GET`  | `/v1/matters/{matter_id}`                                  | `authenticated` | No                        |
-| `GET`  | `/v1/matters/{matter_id}/notes`                            | `authenticated` | No                        |
-| `GET`  | `/v1/matters/{matter_id}/checklist`                        | `authenticated` | No                        |
-| `GET`  | `/v1/matters/{matter_id}/tasks`                            | `authenticated` | No                        |
-| `GET`  | `/v1/matters/{matter_id}/payments`                         | `authenticated` | No                        |
-| `GET`  | `/v1/matters/{matter_id}/calculations`                     | `authenticated` | No                        |
-| `GET`  | `/v1/matters/{matter_id}/documents`                        | `authenticated` | No                        |
-| `GET`  | `/v1/matters/{matter_id}/documents/{document_id}/download` | `authenticated` | No                        |
-| `GET`  | `/v1/health`                                               | `public`        | No                        |
-| `GET`  | `/v1/readiness`                                            | `public`        | No                        |
-| `GET`  | `/v1/users/me`                                             | `authenticated` | No                        |
-| `GET`  | `/v1/rbac/roles`                                           | `permission`    | `roles:manage`            |
-| `GET`  | `/v1/rbac/permissions`                                     | `permission`    | `role_permissions:manage` |
-| `GET`  | `/v1/rbac/users`                                           | `permission`    | `users:manage`            |
-| `GET`  | `/v1/rbac/users/{user_id}`                                 | `permission`    | `users:manage`            |
-| `GET`  | `/v1/rbac/users/{user_id}/roles`                           | `permission`    | `user_roles:manage`       |
-| `GET`  | `/v1/rbac/roles/{role_id}/users`                           | `permission`    | `user_roles:manage`       |
+| Method   | Path                                                       | Access Level    | Permission                |
+| -------- | ---------------------------------------------------------- | --------------- | ------------------------- |
+| `GET`    | `/v1/audit-log`                                            | `permission`    | `audit_logs:read`         |
+| `GET`    | `/v1/dashboard`                                            | `authenticated` | No                        |
+| `GET`    | `/v1/clients`                                              | `authenticated` | No                        |
+| `GET`    | `/v1/clients/{client_id}`                                  | `authenticated` | No                        |
+| `GET`    | `/v1/matters`                                              | `authenticated` | No                        |
+| `GET`    | `/v1/matters/types`                                        | `authenticated` | No                        |
+| `GET`    | `/v1/matters/{matter_id}`                                  | `authenticated` | No                        |
+| `GET`    | `/v1/matters/{matter_id}/notes`                            | `authenticated` | No                        |
+| `GET`    | `/v1/matters/{matter_id}/checklist`                        | `authenticated` | No                        |
+| `GET`    | `/v1/matters/{matter_id}/tasks`                            | `authenticated` | No                        |
+| `GET`    | `/v1/matters/{matter_id}/payments`                         | `authenticated` | No                        |
+| `GET`    | `/v1/matters/{matter_id}/calculations`                     | `authenticated` | No                        |
+| `GET`    | `/v1/matters/{matter_id}/documents`                        | `authenticated` | No                        |
+| `GET`    | `/v1/matters/{matter_id}/documents/{document_id}/download` | `authenticated` | No                        |
+| `GET`    | `/v1/health`                                               | `public`        | No                        |
+| `GET`    | `/v1/readiness`                                            | `public`        | No                        |
+| `GET`    | `/v1/ai/credentials`                                       | `authenticated` | No                        |
+| `PUT`    | `/v1/ai/credentials/{provider}`                            | `authenticated` | No                        |
+| `DELETE` | `/v1/ai/credentials/{provider}`                            | `authenticated` | No                        |
+| `GET`    | `/v1/users/me`                                             | `authenticated` | No                        |
+| `GET`    | `/v1/rbac/roles`                                           | `permission`    | `roles:manage`            |
+| `GET`    | `/v1/rbac/permissions`                                     | `permission`    | `role_permissions:manage` |
+| `GET`    | `/v1/rbac/users`                                           | `permission`    | `users:manage`            |
+| `GET`    | `/v1/rbac/users/{user_id}`                                 | `permission`    | `users:manage`            |
+| `GET`    | `/v1/rbac/users/{user_id}/roles`                           | `permission`    | `user_roles:manage`       |
+| `GET`    | `/v1/rbac/roles/{role_id}/users`                           | `permission`    | `user_roles:manage`       |
 
 ## Base Role Catalog (Bootstrap)
 

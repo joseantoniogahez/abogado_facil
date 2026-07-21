@@ -44,6 +44,9 @@ Access tokens now include:
 - standard claims `sub`, `iss`, `aud`, `iat`, `exp`, and `jti`,
 - a custom `rbac_version` claim derived from the caller's current effective permissions (including inherited roles).
 
+Authenticated users may manage their own encrypted BYOK credentials at `/v1/ai/credentials`.
+Responses expose only the provider and configured timestamps; API keys are never returned.
+
 In plain terms:
 
 - `iss` tells who created the token.

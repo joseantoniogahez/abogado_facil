@@ -197,3 +197,29 @@ class ObjectStorageSettings(BaseSettings):
 class MatterDocumentSettings(BaseSettings):
     MATTER_DOCUMENT_MAX_SIZE_BYTES: int = Field(10 * 1024 * 1024, gt=0)
     MATTER_DOCUMENT_MAX_PER_MATTER: int = Field(50, gt=0)
+
+
+class AiCredentialSettings(BaseSettings):
+    _PRODUCTION_ENV_VALUES: ClassVar[set[str]] = {"prod", "production", "staging"}
+
+    APP_ENV: str = "local"
+    AI_CREDENTIAL_ENCRYPTION_KEY: SecretStr = SecretStr("MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDE=")
+
+    @field_validator("APP_ENV")
+    @classmethod
+    def normalize_app_env(cls, value: str) -> str:
+        return value.strip().lower() or "local"
+
+    @model_validator(mode="after")
+    def validate_encryption_key(self) -> AiCredentialSettings:
+        import base64
+
+        try:
+            key = base64.urlsafe_b64decode(self.AI_CREDENTIAL_ENCRYPTION_KEY.get_secret_value())
+        except Exception as exc:
+            raise ValueError("AI_CREDENTIAL_ENCRYPTION_KEY must be urlsafe base64.") from exc
+        if len(key) != 32:
+            raise ValueError("AI_CREDENTIAL_ENCRYPTION_KEY must decode to 32 bytes.")
+        if self.APP_ENV in self._PRODUCTION_ENV_VALUES and not os.getenv("AI_CREDENTIAL_ENCRYPTION_KEY", "").strip():
+            raise ValueError("AI_CREDENTIAL_ENCRYPTION_KEY is required in production.")
+        return self

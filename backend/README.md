@@ -220,3 +220,4 @@ vertical product slices in `app/features`:
 - `app/features/matter_calculations`: deterministic matter calculations
 - `app/features/matter_documents`: matter document metadata and storage operations
 - `app/features/outbox`: outbox capability
+- `app/features/ai_credentials`: encrypted per-user BYOK credential management
