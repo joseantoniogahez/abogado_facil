@@ -4,15 +4,22 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from starlette.requests import Request
 
+from app.core.config.settings import AiCredentialSettings
+from app.core.security.service.encryption import AesGcmSecretEncryption
 from app.core.setup import dependencies
 from app.core.setup.dependencies import (
+    get_ai_credentials_repository,
+    get_ai_credentials_service,
     get_audit_log_repository,
     get_audit_log_service,
     get_file_storage,
     get_outbox_repository,
     get_outbox_service,
     get_request_permission_scope_cache,
+    get_secret_encryption,
 )
+from app.features.ai_credentials.repository import AiCredentialsRepository
+from app.features.ai_credentials.service import AiCredentialsService
 from app.features.audit_log.repository import AuditLogRepository
 from app.features.audit_log.service import AuditLogService
 from app.features.outbox.repository import OutboxRepository
@@ -110,3 +117,26 @@ def test_get_file_storage_builds_configured_adapter(monkeypatch: pytest.MonkeyPa
         assert await get_file_storage() is fake_storage
 
     asyncio.run(run_test())
+
+
+def test_ai_credential_dependencies_build_expected_components() -> None:
+    session = MagicMock()
+    repository = asyncio.run(get_ai_credentials_repository(session))
+    assert isinstance(repository, AiCredentialsRepository)
+    assert repository.session is session
+
+    encryption = asyncio.run(get_secret_encryption(AiCredentialSettings()))
+    assert isinstance(encryption, AesGcmSecretEncryption)
+
+    unit_of_work = MagicMock()
+    service = asyncio.run(get_ai_credentials_service(repository, unit_of_work, encryption))
+    assert isinstance(service, AiCredentialsService)
+    assert service.repository is repository
+    assert service.unit_of_work is unit_of_work
+
+
+def test_get_ai_credential_settings_returns_settings() -> None:
+    from app.core.setup.dependencies import get_ai_credential_settings
+
+    settings = asyncio.run(get_ai_credential_settings())
+    assert isinstance(settings, AiCredentialSettings)

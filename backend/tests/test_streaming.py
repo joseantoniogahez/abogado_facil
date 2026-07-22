@@ -130,3 +130,21 @@ def test_stream_rejects_non_positive_heartbeat_interval() -> None:
 async def _test_stream_rejects_non_positive_heartbeat_interval() -> None:
     with pytest.raises(ValueError, match="greater than zero"):
         await stream_ai_events(_source(), request_id="req-5", heartbeat_interval_seconds=0).__anext__()
+
+
+def test_stream_closes_pending_provider_read_after_heartbeat() -> None:
+    async def run() -> None:
+        release = asyncio.Event()
+
+        async def blocked_source() -> AsyncIterator[dict[str, str]]:
+            await release.wait()
+            yield {"text": "never"}
+
+        consumer = stream_ai_events(
+            blocked_source(), request_id="req-6", execution_id="exec-6", heartbeat_interval_seconds=0.001
+        )
+        assert (await consumer.__anext__()).event == "started"
+        assert (await consumer.__anext__()).event == "heartbeat"
+        await consumer.aclose()
+
+    asyncio.run(run())

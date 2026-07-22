@@ -53,6 +53,11 @@ async def _test_list_save_replace_get_and_delete() -> None:
     repository.get_for_user.return_value = None
     with pytest.raises(NotFoundError):
         await target.get_secret(user_id=1, firm_id=2, provider="gemini")
+    stored = item()
+    stored.encrypted_api_key, stored.nonce = target.encryption.encrypt("secret")
+    repository.get_for_user.side_effect = None
+    repository.get_for_user.return_value = stored
+    assert await target.get_secret(user_id=1, firm_id=2, provider="openai") == "secret"
     await target.delete(user_id=1, firm_id=2, provider="openai")
 
 

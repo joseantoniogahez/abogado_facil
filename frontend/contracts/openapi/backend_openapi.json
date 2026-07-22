@@ -53,6 +53,56 @@
         "title": "AdminUserResponse",
         "type": "object"
       },
+      "AiCredentialListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AiCredentialResponse"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "AiCredentialListResponse",
+        "type": "object"
+      },
+      "AiCredentialResponse": {
+        "properties": {
+          "configured": {
+            "default": true,
+            "title": "Configured",
+            "type": "boolean"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "provider": {
+            "enum": [
+              "openai",
+              "gemini"
+            ],
+            "title": "Provider",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "provider",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "AiCredentialResponse",
+        "type": "object"
+      },
       "AssignedRole": {
         "properties": {
           "id": {
@@ -1746,6 +1796,21 @@
         "title": "RegisterUserRequest",
         "type": "object"
       },
+      "SaveAiCredentialRequest": {
+        "properties": {
+          "api_key": {
+            "maxLength": 4096,
+            "minLength": 10,
+            "title": "Api Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "api_key"
+        ],
+        "title": "SaveAiCredentialRequest",
+        "type": "object"
+      },
       "SetRolePermissionRequest": {
         "properties": {
           "scope": {
@@ -2277,6 +2342,107 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/v1/ai/credentials": {
+      "get": {
+        "operationId": "list_credentials_v1_ai_credentials_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiCredentialListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "List Credentials",
+        "tags": [
+          "ai-credentials"
+        ]
+      }
+    },
+    "/v1/ai/credentials/{provider}": {
+      "delete": {
+        "operationId": "delete_credential_v1_ai_credentials__provider__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "provider",
+            "required": true,
+            "schema": {
+              "title": "Provider",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Delete Credential",
+        "tags": [
+          "ai-credentials"
+        ]
+      },
+      "put": {
+        "operationId": "save_credential_v1_ai_credentials__provider__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "provider",
+            "required": true,
+            "schema": {
+              "title": "Provider",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveAiCredentialRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiCredentialResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Save Credential",
+        "tags": [
+          "ai-credentials"
+        ]
+      }
+    },
     "/v1/audit-log": {
       "get": {
         "description": "Return the most recent audit log entries for administrator review. Requires `audit_logs:read`.",

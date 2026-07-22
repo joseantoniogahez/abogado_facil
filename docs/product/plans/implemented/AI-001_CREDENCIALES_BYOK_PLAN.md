@@ -5,8 +5,8 @@
 - ID: `AI-001`
 - Type: Backend
 - Priority: P0-IA
-- Plan status: Draft
-- Implementation status: En progreso
+- Plan status: Complete
+- Implementation status: Hecho
 - Last updated: 2026-07-20
 - Backlog source: `docs/product/BACKLOG_ABOGADO_FACIL.md`
 
@@ -44,12 +44,12 @@ de puertos/adaptadores, pero no tiene almacenamiento de credenciales IA ni clave
 
 ## Acceptance Criteria
 
-- [ ] Credenciales se almacenan cifradas y con nonce/tag autenticados.
-- [ ] Crear/reemplazar, estado y eliminar están protegidos y aislados.
-- [ ] Ninguna respuesta, log o error contiene la clave.
-- [ ] Producción rechaza configuración sin clave maestra válida.
-- [ ] Pruebas cubren aislamiento multiusuario, reemplazo, eliminación y descifrado.
-- [ ] Documentación de API, authz, runtime y errores queda sincronizada.
+- [x] Credenciales se almacenan cifradas y con nonce/tag autenticados.
+- [x] Crear/reemplazar, estado y eliminar están protegidos y aislados.
+- [x] Ninguna respuesta, log o error contiene la clave.
+- [x] Producción rechaza configuración sin clave maestra válida.
+- [x] Pruebas cubren aislamiento multiusuario, reemplazo, eliminación y descifrado.
+- [x] Documentación de API, authz, runtime y errores queda sincronizada.
 
 ## Affected Contracts and Files
 
@@ -71,39 +71,41 @@ de puertos/adaptadores, pero no tiene almacenamiento de credenciales IA ni clave
 
 - [x] Añadir pruebas unitarias de cifrado, configuración y servicio.
 - [x] Actualizar contratos canónicos y backlog.
-- [ ] Completar cobertura de repositorio, router y proveedores DI.
+- [x] Completar cobertura de repositorio, router y proveedores DI.
 
 ### Validation
 
-- [x] `python -m pytest backend/tests` (402 tests funcionales; coverage gate pendiente)
-- [ ] Coverage backend al 100%.
-- [ ] Pre-commit sobre archivos modificados.
+- [x] `python -m pytest backend/tests --cov=app --cov-fail-under=100` (411 tests; 100% coverage)
+- [x] Coverage backend al 100%.
+- [x] Pre-commit sobre archivos modificados.
 
 ## Progress Log
 
-| Date       | State       | Completed                                                              | Pending / next safe action                                |
-| ---------- | ----------- | ---------------------------------------------------------------------- | --------------------------------------------------------- |
-| 2026-07-20 | En progreso | Slice vertical, migración, contratos y pruebas enfocadas implementados | Completar pruebas de cobertura y revisar OpenAPI generado |
+| Date       | State | Completed                                                                             | Pending / next safe action          |
+| ---------- | ----- | ------------------------------------------------------------------------------------- | ----------------------------------- |
+| 2026-07-21 | Hecho | Slice vertical, pruebas de repositorio/router/DI, coverage 100% y OpenAPI completados | Sin trabajo pendiente en este slice |
 
 ## Validation Results
 
-| Date | Command | Result | Notes |
-| ---- | ------- | ------ | ----- |
-|      |         |        |       |
+| Date       | Command                                                         | Result | Notes                       |
+| ---------- | --------------------------------------------------------------- | ------ | --------------------------- |
+| 2026-07-21 | `python -m pytest backend/tests --cov=app --cov-fail-under=100` | Passed | 411 tests, 100% coverage    |
+| 2026-07-21 | `npm --prefix frontend run openapi:check`                       | Passed | OpenAPI artifact up to date |
+| 2026-07-21 | `pre-commit run --files ...`                                    | Passed | All configured hooks passed |
 
 ## Pause / Handoff Record
 
-- Current state: slice backend implementado y pruebas enfocadas verdes.
+- Current state: slice backend implementado y todos los gates requeridos verdes.
 - Changed files and contracts: feature `ai_credentials`, configuración, migración, contratos backend, backlog y este plan.
-- Pending work: pruebas de repositorio/router/DI, coverage 100%, sincronización OpenAPI y revisión final.
+- Pending work: ninguna funcional dentro de AI-001.
 - Blockers or approvals: ninguno.
 - Residual risks: la clave maestra debe gestionarse fuera de la base de datos.
-- Next safe action: añadir pruebas directas para las líneas pendientes y ejecutar el coverage gate completo.
+- Next safe action: continuar con AI-002 o AI-003.
 
 ## Completion Summary
 
-- Delivered: pendiente.
-- Validation: pendiente.
-- Skipped validation: pendiente.
+- Delivered: BYOK credential storage with AES-GCM, protected endpoints, firm isolation, and secret-free responses.
+- Validation: backend 411 tests with 100% coverage; OpenAPI artifact synchronized and checked.
+- Skipped validation: frontend check/build did not complete because Vite/esbuild could not resolve its config in the environment; this ticket has no UI changes.
 - Human approvals: no aplicables al código; queda pendiente aprobación jurídica de `SEC-002`.
-- Residual risk: pendiente.
+- Residual risk: the master key must be managed outside the database and must not be lost; UI and real provider connectivity belong to later tickets.

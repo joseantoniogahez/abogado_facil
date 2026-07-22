@@ -1,4 +1,7 @@
+from typing import Any, cast
+
 from sqlalchemy import delete, select
+from sqlalchemy.engine import CursorResult
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.features.ai_credentials.models import AiCredential
@@ -35,11 +38,14 @@ class AiCredentialsRepository:
         return item
 
     async def delete(self, *, user_id: int, firm_id: int, provider: str) -> bool:
-        result = await self.session.execute(
-            delete(AiCredential).where(
-                AiCredential.user_id == user_id,
-                AiCredential.firm_id == firm_id,
-                AiCredential.provider == provider,
-            )
+        result = cast(
+            CursorResult[Any],
+            await self.session.execute(
+                delete(AiCredential).where(
+                    AiCredential.user_id == user_id,
+                    AiCredential.firm_id == firm_id,
+                    AiCredential.provider == provider,
+                )
+            ),
         )
         return bool(result.rowcount)
