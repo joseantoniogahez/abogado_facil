@@ -31,6 +31,17 @@ Current top-level shape:
   are outside this adapter.
 - Parser exceptions are wrapped and never expose document content or parser details through the API.
 
+## AI provider port and adapters
+
+- `app/integrations/ai_providers.py` owns the provider-neutral `AiProviderPort`, request/response
+  contracts, and `OpenAIProvider`, `GeminiProvider`, and `MockProvider` adapters.
+- OpenAI and Gemini use an injected HTTP transport so tests never call external providers and future
+  runtime wiring can own timeouts, retries, and observability.
+- Provider errors are normalized to `AiProviderError`; API keys, response bodies, and provider error
+  details are never included in the exception message.
+- This port does not decide whether a user has a valid BYOK credential or persist results; those
+  policies belong to `AI-004` and future feature services.
+
 ## Ownership
 
 `app/core` owns cross-feature concerns only:
