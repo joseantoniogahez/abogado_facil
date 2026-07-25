@@ -271,12 +271,12 @@ export const AdminAssignmentsPage = () => {
                       <ul className="mt-4 space-y-3">
                         {userRoles.map(role => (
                           <li
-                            className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[var(--app-border)] px-3 py-3"
+                            className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-(--app-border) px-3 py-3"
                             key={role.id}
                           >
                             <div className="text-sm">
                               <p className="font-semibold">{role.name}</p>
-                              <p className="text-xs text-[var(--app-subtle)]">{role.id}</p>
+                              <p className="text-xs text-(--app-subtle)">{role.id}</p>
                             </div>
                             <button
                               className={ADMIN_COMPACT_DANGER_BUTTON_CLASS_NAME}
@@ -318,12 +318,12 @@ export const AdminAssignmentsPage = () => {
                       <ul className="mt-4 space-y-3">
                         {roleUsers.map(user => (
                           <li
-                            className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[var(--app-border)] px-3 py-3"
+                            className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-(--app-border) px-3 py-3"
                             key={user.id}
                           >
                             <div className="text-sm">
                               <p className="font-semibold">{user.email}</p>
-                              <p className="text-xs text-[var(--app-subtle)]">{user.id}</p>
+                              <p className="text-xs text-(--app-subtle)">{user.id}</p>
                             </div>
                             <button
                               className={ADMIN_COMPACT_DANGER_BUTTON_CLASS_NAME}

@@ -11,14 +11,14 @@ import {
 
 export const ADMIN_PAGE_CLASS_NAME = "mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-10";
 export const ADMIN_CARD_CLASS_NAME
-  = "rounded-2xl border border-[var(--app-border)] bg-[var(--app-surface)] p-5";
+  = "rounded-2xl border border-(--app-border) bg-(--app-surface) p-5";
 export const ADMIN_FIELD_CLASS_NAME
-  = "w-full rounded-xl border border-[var(--app-border)] px-3 py-2";
+  = "w-full rounded-xl border border-(--app-border) px-3 py-2";
 export const ADMIN_FORM_GRID_CLASS_NAME = "mt-4 grid gap-4 md:grid-cols-2";
 export const ADMIN_LABEL_CLASS_NAME = "mb-2 block text-sm font-medium";
 export const ADMIN_INLINE_LABEL_CLASS_NAME = "mb-1 block text-xs font-medium";
-export const ADMIN_MUTED_TEXT_CLASS_NAME = "text-sm text-[var(--app-subtle)]";
-export const ADMIN_SUBCARD_CLASS_NAME = "rounded-xl border border-[var(--app-border)] p-4";
+export const ADMIN_MUTED_TEXT_CLASS_NAME = "text-sm text-(--app-subtle)";
+export const ADMIN_SUBCARD_CLASS_NAME = "rounded-xl border border-(--app-border) p-4";
 export const ADMIN_TITLE_CLASS_NAME = "text-3xl font-semibold tracking-tight";
 export const ADMIN_PRIMARY_BUTTON_CLASS_NAME = PRIMARY_ACTION_CLASS_NAME;
 export const ADMIN_SECONDARY_BUTTON_CLASS_NAME = SECONDARY_ACTION_CLASS_NAME;

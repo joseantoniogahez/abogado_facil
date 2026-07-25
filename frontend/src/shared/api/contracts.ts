@@ -70,15 +70,15 @@ export const expectBooleanField = (record: ContractRecord, field: string, contex
   return value;
 };
 
-export const expectLiteralStringField = (
+export const expectLiteralStringField = <Literal extends string>(
   record: ContractRecord,
   field: string,
   context: string,
-  literal: string,
-): string => {
+  literal: Literal,
+): Literal => {
   const value = expectStringField(record, field, context, { minLength: 1 });
   if (value !== literal) {
     throw new ApiContractError(`${context}: field '${field}' must equal '${literal}', received '${value}'`);
   }
-  return value;
+  return literal;
 };

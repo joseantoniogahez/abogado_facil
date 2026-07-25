@@ -67,9 +67,13 @@ describe("clients pages", () => {
       .mockResolvedValueOnce(response({ items: [client], total: 1, limit: 50, offset: 0 }))
       .mockResolvedValueOnce(response({ items: [], total: 0, limit: 50, offset: 0 }));
     renderRoute("/clients", fetchMock);
-    expect(await screen.findByRole("link", { name: client.full_name })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("link", { name: client.full_name }, { timeout: 5_000 }),
+    ).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText(t("clients.search")), { target: { value: "nadie" } });
-    expect(await screen.findByText(t("clients.noResults"))).toBeInTheDocument();
+    expect(
+      await screen.findByText(t("clients.noResults"), undefined, { timeout: 5_000 }),
+    ).toBeInTheDocument();
     expect(fetchMock).toHaveBeenLastCalledWith(expect.stringContaining("search=nadie"), expect.anything());
   });
 

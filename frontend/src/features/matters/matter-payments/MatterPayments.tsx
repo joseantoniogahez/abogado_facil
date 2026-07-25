@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { type FormEvent, useState } from "react";
+import { type SyntheticEvent, useState } from "react";
 
 import { t } from "@/shared/i18n/ui-text";
 import { ACCENT_ACTION_CLASS_NAME, SECONDARY_ACTION_CLASS_NAME } from "@/shared/ui/actionStyles";
@@ -43,7 +43,7 @@ const MatterPaymentsContent = ({ data, matterId }: { data: MatterBilling; matter
     mutationFn: () => createMatterPayment(matterId, { amount, payment_type: type, paid_on: paidOn, note: note || null }),
     onSuccess: async () => { setAmount(""); setNote(""); await refresh(); },
   });
-  const submitPayment = (event: FormEvent) => {
+  const submitPayment = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (Number(amount) > 0 && paidOn) payment.mutate();
   };

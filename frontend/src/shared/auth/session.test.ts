@@ -60,6 +60,9 @@ describe("session client", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     const registeredUser = await registerUser({
+      first_name: "Test",
+      last_name: "User",
+      display_name: "Test User",
       email: " new_user ",
       password: "StrongPass1", // pragma: allowlist secret
     });
@@ -71,6 +74,9 @@ describe("session client", () => {
     expect(new Headers(request.headers).get("Authorization")).toBeNull();
     expect(request.body).toBe(
       JSON.stringify({
+        first_name: "Test",
+        last_name: "User",
+        display_name: "Test User",
         email: " new_user ",
         password: "StrongPass1", // pragma: allowlist secret
       }),

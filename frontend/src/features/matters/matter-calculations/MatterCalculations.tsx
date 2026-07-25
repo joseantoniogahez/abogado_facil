@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { type FormEvent, useState } from "react";
+import { type SyntheticEvent, useState } from "react";
 
 import { apiRequest } from "@/shared/api/http";
 import { t } from "@/shared/i18n/ui-text";
@@ -23,7 +23,7 @@ export const MatterCalculations = ({ matterId }: { matterId: number }) => {
   const history = useQuery({ queryKey: key(matterId), queryFn: () => apiRequest(`/matters/${matterId}/calculations`, { parse: value => value as { items: Result[] } }) });
   const preview = useMutation({ mutationFn: () => apiRequest(`/matters/${matterId}/calculations/preview`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), parse: parseResult }) });
   const save = useMutation({ mutationFn: () => apiRequest(`/matters/${matterId}/calculations`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), parse: parseResult }), onSuccess: () => client.invalidateQueries({ queryKey: key(matterId) }) });
-  const submit = (event: FormEvent) => { event.preventDefault(); preview.mutate(); };
+  const submit = (event: SyntheticEvent<HTMLFormElement>) => { event.preventDefault(); preview.mutate(); };
   const field = "mt-1 w-full rounded-xl border p-3";
   return (
     <section aria-labelledby="calculations-title" className="mt-10">

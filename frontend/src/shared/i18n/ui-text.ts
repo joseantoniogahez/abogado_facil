@@ -490,7 +490,7 @@ export const t = (
     return template;
   }
 
-  let resolvedText = template;
+  let resolvedText: string = template;
   for (const match of template.matchAll(PARAM_PATTERN)) {
     const [placeholder, paramName] = match;
     if (!paramName) {

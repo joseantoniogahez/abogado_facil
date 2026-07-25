@@ -98,7 +98,7 @@ const RootLayoutContent = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const logoutMutation = useMutation({
     ...authLogoutMutationPolicy,
-    mutationFn: () => logout(),
+    mutationFn: () => Promise.resolve(logout()),
     onSuccess: async () => {
       queryClient.setQueryData(SESSION_QUERY_KEY, null);
       await queryClient.invalidateQueries({ queryKey: SESSION_QUERY_KEY });
@@ -119,7 +119,7 @@ const RootLayoutContent = () => {
 
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-20 border-b border-[var(--app-border)] bg-[var(--app-surface)]">
+      <header className="sticky top-0 z-20 border-b border-(--app-border) bg-(--app-surface)">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-3">
           <button
             aria-controls="app-navigation-panel"
@@ -151,7 +151,7 @@ const RootLayoutContent = () => {
 
       <div className="mx-auto flex w-full max-w-6xl">
         <nav
-          className="w-64 shrink-0 border-r border-[var(--app-border)] bg-[var(--app-surface)] p-4"
+          className="w-64 shrink-0 border-r border-(--app-border) bg-(--app-surface) p-4"
           hidden={!isMenuOpen}
           id="app-navigation-panel"
         >
@@ -166,7 +166,7 @@ const RootLayoutContent = () => {
             {visibleAdminItems.length > 0
               ? (
                   <li>
-                    <p className="px-3 pt-2 text-xs font-semibold uppercase tracking-wide text-[var(--app-subtle)]">
+                    <p className="px-3 pt-2 text-xs font-semibold uppercase tracking-wide text-(--app-subtle)">
                       {t("routing.nav.admin.group")}
                     </p>
                     <ul className="mt-1 space-y-1">

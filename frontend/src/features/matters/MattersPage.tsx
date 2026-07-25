@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { type FormEvent, useState } from "react";
+import { type SyntheticEvent, useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router";
 
 import { defaultQueryPolicy } from "@/app/query-policy";
@@ -204,7 +204,7 @@ const MatterForm = ({ initial }: { initial?: MatterRecord }) => {
       void navigate(`/matters/${record.id}`);
     },
   });
-  const submit = (event: FormEvent) => {
+  const submit = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!form.client_id || !form.title.trim() || !form.matter_type.trim()) {
       setValidation(true);

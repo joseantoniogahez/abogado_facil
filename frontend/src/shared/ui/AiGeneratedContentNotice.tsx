@@ -25,13 +25,13 @@ export const AiGeneratedContentNotice = ({
     <aside
       aria-describedby={descriptionId}
       aria-labelledby={titleId}
-      className={`rounded-[var(--radius-card)] border border-[var(--app-border)] bg-[var(--app-surface)] p-8 ${className}`.trim()}
+      className={`rounded-(--radius-card) border border-(--app-border) bg-(--app-surface) p-8 ${className}`.trim()}
       id={id}
     >
-      <h2 className="mono-label text-[var(--app-subtle)]" id={titleId}>
+      <h2 className="mono-label text-(--app-subtle)" id={titleId}>
         {t(STATUS_KEYS[kind])}
       </h2>
-      <p className="mt-4 text-base text-[var(--app-subtle)]" id={descriptionId}>
+      <p className="mt-4 text-base text-(--app-subtle)" id={descriptionId}>
         {t("legal.ai.disclaimer.contextual")}
       </p>
     </aside>

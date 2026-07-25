@@ -58,9 +58,9 @@ export const AiSettingsPage = () => {
 
   return (
     <main className="mx-auto max-w-4xl p-6 sm:p-10">
-      <p className="mono-label text-[var(--app-subtle)]">{t("aiSettings.badge")}</p>
+      <p className="mono-label text-(--app-subtle)">{t("aiSettings.badge")}</p>
       <h1 className="mt-3 text-4xl font-semibold">{t("aiSettings.title")}</h1>
-      <p className="mt-3 max-w-2xl text-[var(--app-subtle)]">{t("aiSettings.subtitle")}</p>
+      <p className="mt-3 max-w-2xl text-(--app-subtle)">{t("aiSettings.subtitle")}</p>
       <p className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900" role="note">
         {t("aiSettings.notice")}
       </p>
@@ -87,11 +87,11 @@ export const AiSettingsPage = () => {
               {PROVIDERS.map((provider) => {
                 const configured = credentials.data.some(item => item.provider === provider && item.configured);
                 return (
-                  <article className="rounded-2xl border border-[var(--app-border)] bg-[var(--app-surface)] p-5" key={provider}>
+                  <article className="rounded-2xl border border-(--app-border) bg-(--app-surface) p-5" key={provider}>
                     <h2 className="text-xl font-semibold">{t(`aiSettings.provider.${provider}`)}</h2>
-                    <p className="mt-2 text-sm text-[var(--app-subtle)]">{configured ? t("aiSettings.configured") : t("aiSettings.notConfigured")}</p>
+                    <p className="mt-2 text-sm text-(--app-subtle)">{configured ? t("aiSettings.configured") : t("aiSettings.notConfigured")}</p>
                     <label className="mt-5 block text-sm font-medium" htmlFor={`${provider}-key`}>{t("aiSettings.key")}</label>
-                    <input className="mt-2 w-full rounded-xl border border-[var(--app-border)] px-3 py-3" id={`${provider}-key`} onChange={event => setKeys(previous => ({ ...previous, [provider]: event.target.value }))} type="password" value={keys[provider]} />
+                    <input className="mt-2 w-full rounded-xl border border-(--app-border) px-3 py-3" id={`${provider}-key`} onChange={event => setKeys(previous => ({ ...previous, [provider]: event.target.value }))} type="password" value={keys[provider]} />
                     <div className="mt-4 flex flex-wrap gap-3">
                       <button className={PRIMARY_ACTION_CLASS_NAME} disabled={!keys[provider].trim() || isActionPending} onClick={() => saveMutation.mutate({ provider, apiKey: keys[provider].trim() })} type="button">{t("aiSettings.save")}</button>
                       <button className={SECONDARY_ACTION_CLASS_NAME} disabled={!configured || isActionPending} onClick={() => deleteMutation.mutate(provider)} type="button">{t("aiSettings.delete")}</button>

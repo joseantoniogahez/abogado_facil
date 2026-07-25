@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { type SyntheticEvent, useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 
 import {
@@ -30,14 +30,14 @@ interface ProfileFormState {
   newPassword: string;
 }
 
-const buildInitialProfileState = (user?: {
+const buildInitialProfileState = (user: {
   first_name: string;
   middle_name: string | null;
   last_name: string;
   display_name: string;
   email: string;
   firm_name: string;
-}): ProfileFormState => ({
+} | null | undefined): ProfileFormState => ({
   firstName: user?.first_name ?? "",
   middleName: user?.middle_name ?? "",
   lastName: user?.last_name ?? "",
@@ -149,7 +149,7 @@ export const ProfilePage = () => {
     );
   }
 
-  const submit = (event: FormEvent<HTMLFormElement>) => {
+  const submit = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     updateMutation.reset();
 
@@ -206,15 +206,15 @@ export const ProfilePage = () => {
 
   return (
     <main className="flex min-h-screen items-center justify-center px-6 py-12">
-      <section className="w-full max-w-2xl rounded-[var(--radius-card)] border border-[var(--app-border)] bg-[var(--app-surface)] p-8 shadow-[0_16px_40px_rgba(23,33,43,0.08)] sm:p-10">
-        <p className="mono-label fade-rise text-[var(--app-subtle)]">{t("profile.badge")}</p>
+      <section className="w-full max-w-2xl rounded-(--radius-card) border border-(--app-border) bg-(--app-surface) p-8 shadow-[0_16px_40px_rgba(23,33,43,0.08)] sm:p-10">
+        <p className="mono-label fade-rise text-(--app-subtle)">{t("profile.badge")}</p>
         <h1 className="fade-rise-delay mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
           {t("profile.title")}
         </h1>
-        <p className="fade-rise-delay-2 mt-4 text-sm text-[var(--app-subtle)]">
+        <p className="fade-rise-delay-2 mt-4 text-sm text-(--app-subtle)">
           {t("profile.subtitle")}
         </p>
-        <p className="mt-2 text-sm font-medium text-[var(--app-ink)]">
+        <p className="mt-2 text-sm font-medium text-(--app-ink)">
           {t("profile.currentUser", { email: user.email })}
         </p>
 
@@ -293,7 +293,7 @@ export const ProfilePage = () => {
             value={formState.newPassword}
           />
 
-          <ul className="space-y-1 rounded-2xl border border-[var(--app-border)] bg-[var(--app-bg)] px-4 py-3 text-sm text-[var(--app-subtle)]">
+          <ul className="space-y-1 rounded-2xl border border-(--app-border) bg-(--app-bg) px-4 py-3 text-sm text-(--app-subtle)">
             <li>{t("auth.shared.email.hint")}</li>
             <li>{t("auth.shared.password.hint")}</li>
             <li>{t("profile.password.optional")}</li>

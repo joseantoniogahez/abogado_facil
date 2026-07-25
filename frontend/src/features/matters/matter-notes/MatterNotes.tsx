@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { type FormEvent, useState } from "react";
+import { type SyntheticEvent, useState } from "react";
 
 import { t } from "@/shared/i18n/ui-text";
 import {
@@ -35,7 +35,7 @@ const Note = ({ matterId, note }: { matterId: number; note: MatterNoteRecord }) 
     onSuccess: async () => refresh(),
   });
 
-  const submitEdit = (event: FormEvent) => {
+  const submitEdit = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     const normalized = content.trim();
     if (normalized) update.mutate({ content: normalized });
@@ -84,7 +84,7 @@ const Note = ({ matterId, note }: { matterId: number; note: MatterNoteRecord }) 
             </form>
           )
         : (
-            <p className="mt-3 whitespace-pre-wrap break-words">{note.content}</p>
+            <p className="mt-3 whitespace-pre-wrap wrap-break-word">{note.content}</p>
           )}
       <div className="mt-3 flex flex-wrap gap-3">
         <button
@@ -131,7 +131,7 @@ export const MatterNotes = ({ matterId }: { matterId: number }) => {
       await queryClient.invalidateQueries({ queryKey: matterNotesQueryKey(matterId) });
     },
   });
-  const submit = (event: FormEvent) => {
+  const submit = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (content.trim()) create.mutate();
   };

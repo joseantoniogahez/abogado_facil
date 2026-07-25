@@ -152,6 +152,10 @@ describe("route inventory contracts", () => {
 
   it("keeps root route error boundary ownership explicit in route tree", () => {
     const [rootRoute] = appRoutes;
+    if (!rootRoute) {
+      throw new Error("Expected appRoutes to contain a root route");
+    }
+
     const errorElement = rootRoute.errorElement;
 
     expect(errorElement).toBeTruthy();

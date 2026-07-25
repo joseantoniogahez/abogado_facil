@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { type FormEvent, useRef, useState } from "react";
+import { type SyntheticEvent, useRef, useState } from "react";
 
 import { t } from "@/shared/i18n/ui-text";
 import {
@@ -124,7 +124,7 @@ export const MatterDocuments = ({ matterId }: { matterId: number }) => {
       await queryClient.invalidateQueries({ queryKey: matterDocumentsQueryKey(matterId) });
     },
   });
-  const submit = (event: FormEvent) => {
+  const submit = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!file) {
       setValidation(t("matterDocuments.validation.required"));

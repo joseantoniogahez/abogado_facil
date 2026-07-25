@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { FormEvent, useMemo, useState } from "react";
+import { type SyntheticEvent, useMemo, useState } from "react";
 
 import { t } from "@/shared/i18n/ui-text";
 import {
@@ -99,7 +99,7 @@ export const AdminRolesPage = () => {
     return <CenteredMessage title={t("admin.common.loading")} />;
   }
 
-  const submitCreateRole = (event: FormEvent<HTMLFormElement>) => {
+  const submitCreateRole = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     createRoleMutation.reset();
     createRoleMutation.mutate(createRoleName);
@@ -255,7 +255,7 @@ export const AdminRolesPage = () => {
                             <ul className="mt-3 flex flex-wrap gap-2">
                               {role.parent_role_ids.map(parentRoleId => (
                                 <li
-                                  className="flex items-center gap-2 rounded-full border border-[var(--app-border)] px-3 py-1"
+                                  className="flex items-center gap-2 rounded-full border border-(--app-border) px-3 py-1"
                                   key={parentRoleId}
                                 >
                                   <span className="text-xs">

@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { FormEvent, useState } from "react";
+import { type SyntheticEvent, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 
 import { defaultMutationPolicy } from "@/app/mutation-policy";
@@ -118,7 +118,7 @@ const ClientForm = ({ initial, clientId }: { initial?: ClientRecord; clientId?: 
     const trimmed = value?.trim();
     return trimmed === "" || trimmed === undefined ? null : trimmed;
   };
-  const submit = (event: FormEvent) => {
+  const submit = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!form.full_name.trim() || !form.phone.trim()) {
       setValidation(t("clients.validation.required"));
@@ -161,7 +161,7 @@ const ClientForm = ({ initial, clientId }: { initial?: ClientRecord; clientId?: 
           value={form.phone}
           onChange={event => setForm({ ...form, phone: normalizePhoneInput(event.target.value) })}
         />
-        <span className="mt-1 block text-sm text-[var(--app-subtle)]">
+        <span className="mt-1 block text-sm text-(--app-subtle)">
           {t("clients.fields.phone.help")}
         </span>
       </label>

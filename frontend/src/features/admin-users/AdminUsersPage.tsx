@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { FormEvent, useState } from "react";
+import { type SyntheticEvent, useState } from "react";
 
 import { useSession } from "@/shared/auth/session";
 import { t } from "@/shared/i18n/ui-text";
@@ -160,13 +160,13 @@ export const AdminUsersPage = () => {
     return <CenteredMessage title={t("admin.common.loading")} />;
   }
 
-  const submitCreateForm = (event: FormEvent<HTMLFormElement>) => {
+  const submitCreateForm = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     createMutation.reset();
     createMutation.mutate(toCreateUserPayload(createFormState, showRoleCatalogControls));
   };
 
-  const submitEditForm = (event: FormEvent<HTMLFormElement>) => {
+  const submitEditForm = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!editingUser || !editFormState) {
       return;
@@ -306,9 +306,9 @@ export const AdminUsersPage = () => {
             )
           : (
               <div className="mt-3 overflow-x-auto">
-                <table className="w-full min-w-[700px] border-collapse text-left text-sm">
+                <table className="w-full min-w-175 border-collapse text-left text-sm">
                   <thead>
-                    <tr className="border-b border-[var(--app-border)]">
+                    <tr className="border-b border-(--app-border)">
                       <th className="px-2 py-2 font-semibold">{t("admin.users.columns.email")}</th>
                       <th className="px-2 py-2 font-semibold">{t("admin.users.columns.status")}</th>
                       {showRoleCatalogControls
@@ -321,7 +321,7 @@ export const AdminUsersPage = () => {
                   </thead>
                   <tbody>
                     {users.map(user => (
-                      <tr className="border-b border-[var(--app-border)]" key={user.id}>
+                      <tr className="border-b border-(--app-border)" key={user.id}>
                         <td className="px-2 py-3">{user.email}</td>
                         <td className="px-2 py-3">
                           {user.disabled

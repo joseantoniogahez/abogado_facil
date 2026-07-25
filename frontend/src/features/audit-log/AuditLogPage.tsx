@@ -52,9 +52,9 @@ export const AuditLogPage = () => {
                   )
                 : (
                     <div className="overflow-x-auto">
-                      <table className="w-full min-w-[780px] border-collapse text-left text-sm">
+                      <table className="w-full min-w-195 border-collapse text-left text-sm">
                         <thead>
-                          <tr className="border-b border-[var(--app-border)]">
+                          <tr className="border-b border-(--app-border)">
                             <th className="px-2 py-2 font-semibold">{t("admin.auditLog.columns.createdAt")}</th>
                             <th className="px-2 py-2 font-semibold">{t("admin.auditLog.columns.actor")}</th>
                             <th className="px-2 py-2 font-semibold">{t("admin.auditLog.columns.action")}</th>
@@ -64,7 +64,7 @@ export const AuditLogPage = () => {
                         </thead>
                         <tbody>
                           {entries.map(entry => (
-                            <tr className="border-b border-[var(--app-border)]" key={entry.id}>
+                            <tr className="border-b border-(--app-border)" key={entry.id}>
                               <td className="px-2 py-3">
                                 <time dateTime={entry.created_at}>{formatAuditLogTimestamp(entry.created_at)}</time>
                               </td>

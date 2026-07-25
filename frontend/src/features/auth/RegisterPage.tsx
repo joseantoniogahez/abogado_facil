@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { FormEvent, useState } from "react";
+import { type SyntheticEvent, useState } from "react";
 import { Link, Navigate } from "react-router";
 
 import { ApiError, appendRequestIdDiagnostic, getApiErrorRequestId } from "@/shared/api/errors";
@@ -80,7 +80,7 @@ export const RegisterPage = () => {
     return <Navigate replace to="/dashboard" />;
   }
 
-  const submit = (event: FormEvent<HTMLFormElement>) => {
+  const submit = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     registerMutation.reset();
     setRegisteredUser(null);
@@ -127,14 +127,14 @@ export const RegisterPage = () => {
   if (registeredUser) {
     return (
       <main className="flex min-h-screen items-center justify-center px-6 py-12">
-        <section className="w-full max-w-md rounded-[var(--radius-card)] border border-[var(--app-border)] bg-[var(--app-surface)] p-8 shadow-[0_16px_40px_rgba(23,33,43,0.08)] sm:p-10">
-          <p className="mono-label fade-rise text-[var(--app-subtle)]">
+        <section className="w-full max-w-md rounded-(--radius-card) border border-(--app-border) bg-(--app-surface) p-8 shadow-[0_16px_40px_rgba(23,33,43,0.08)] sm:p-10">
+          <p className="mono-label fade-rise text-(--app-subtle)">
             {t("auth.register.badge")}
           </p>
           <h1 className="fade-rise-delay mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
             {t("auth.register.success.title")}
           </h1>
-          <p className="fade-rise-delay-2 mt-4 text-sm text-[var(--app-subtle)]">
+          <p className="fade-rise-delay-2 mt-4 text-sm text-(--app-subtle)">
             {t("auth.register.success.body", { email: registeredUser.email })}
           </p>
           <div className="mt-8">
@@ -149,12 +149,12 @@ export const RegisterPage = () => {
 
   return (
     <main className="flex min-h-screen items-center justify-center px-6 py-12">
-      <section className="w-full max-w-md rounded-[var(--radius-card)] border border-[var(--app-border)] bg-[var(--app-surface)] p-8 shadow-[0_16px_40px_rgba(23,33,43,0.08)] sm:p-10">
-        <p className="mono-label fade-rise text-[var(--app-subtle)]">{t("auth.register.badge")}</p>
+      <section className="w-full max-w-md rounded-(--radius-card) border border-(--app-border) bg-(--app-surface) p-8 shadow-[0_16px_40px_rgba(23,33,43,0.08)] sm:p-10">
+        <p className="mono-label fade-rise text-(--app-subtle)">{t("auth.register.badge")}</p>
         <h1 className="fade-rise-delay mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
           {t("auth.register.title")}
         </h1>
-        <p className="fade-rise-delay-2 mt-4 text-sm text-[var(--app-subtle)]">
+        <p className="fade-rise-delay-2 mt-4 text-sm text-(--app-subtle)">
           {t("auth.register.subtitle")}
         </p>
 
@@ -223,7 +223,7 @@ export const RegisterPage = () => {
             value={formState.password}
           />
 
-          <ul className="space-y-1 rounded-2xl border border-[var(--app-border)] bg-[var(--app-bg)] px-4 py-3 text-sm text-[var(--app-subtle)]">
+          <ul className="space-y-1 rounded-2xl border border-(--app-border) bg-(--app-bg) px-4 py-3 text-sm text-(--app-subtle)">
             <li>{t("auth.shared.email.hint")}</li>
             <li>{t("auth.shared.password.hint")}</li>
           </ul>
@@ -250,7 +250,7 @@ export const RegisterPage = () => {
           </button>
         </form>
 
-        <p className="mt-6 text-sm text-[var(--app-subtle)]">
+        <p className="mt-6 text-sm text-(--app-subtle)">
           {t("auth.register.footer.haveAccount")}
           {" "}
           <Link className={INLINE_ACTION_CLASS_NAME} to="/login">

@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { FormEvent, startTransition, useState } from "react";
+import { startTransition, type SyntheticEvent, useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router";
 
 import { authLoginMutationPolicy } from "@/app/mutation-policy";
@@ -53,7 +53,7 @@ export const LoginPage = () => {
     return <Navigate replace to="/dashboard" />;
   }
 
-  const submit = (event: FormEvent<HTMLFormElement>) => {
+  const submit = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     loginMutation.reset();
     loginMutation.mutate(formState);
@@ -69,23 +69,23 @@ export const LoginPage = () => {
 
   return (
     <main className="flex min-h-screen items-center justify-center px-6 py-12">
-      <section className="w-full max-w-md rounded-[var(--radius-card)] border border-[var(--app-border)] bg-[var(--app-surface)] p-8 shadow-[0_16px_40px_rgba(23,33,43,0.08)] sm:p-10">
-        <p className="mono-label fade-rise text-[var(--app-subtle)]">{t("auth.login.badge")}</p>
+      <section className="w-full max-w-md rounded-(--radius-card) border border-(--app-border) bg-(--app-surface) p-8 shadow-[0_16px_40px_rgba(23,33,43,0.08)] sm:p-10">
+        <p className="mono-label fade-rise text-(--app-subtle)">{t("auth.login.badge")}</p>
         <h1 className="fade-rise-delay mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
           {t("auth.login.title")}
         </h1>
-        <p className="fade-rise-delay-2 mt-4 text-sm text-[var(--app-subtle)]">
+        <p className="fade-rise-delay-2 mt-4 text-sm text-(--app-subtle)">
           {t("auth.login.subtitle")}
         </p>
 
         <form className="mt-8 space-y-4" onSubmit={submit}>
           <label className="block">
-            <span className="mb-2 block text-sm font-medium text-[var(--app-ink)]">
+            <span className="mb-2 block text-sm font-medium text-(--app-ink)">
               {t("auth.login.fields.email")}
             </span>
             <input
               autoComplete="username"
-              className="w-full rounded-2xl border border-[var(--app-border)] bg-white px-4 py-3 text-base outline-none transition focus:border-[var(--app-accent)]"
+              className="w-full rounded-2xl border border-(--app-border) bg-white px-4 py-3 text-base outline-none transition focus:border-(--app-accent)"
               name="email"
               onChange={event =>
                 setFormState(previous => ({ ...previous, email: event.target.value }))}
@@ -96,12 +96,12 @@ export const LoginPage = () => {
           </label>
 
           <label className="block">
-            <span className="mb-2 block text-sm font-medium text-[var(--app-ink)]">
+            <span className="mb-2 block text-sm font-medium text-(--app-ink)">
               {t("auth.login.fields.password")}
             </span>
             <input
               autoComplete="current-password"
-              className="w-full rounded-2xl border border-[var(--app-border)] bg-white px-4 py-3 text-base outline-none transition focus:border-[var(--app-accent)]"
+              className="w-full rounded-2xl border border-(--app-border) bg-white px-4 py-3 text-base outline-none transition focus:border-(--app-accent)"
               name="password"
               onChange={event =>
                 setFormState(previous => ({ ...previous, password: event.target.value }))}
@@ -133,7 +133,7 @@ export const LoginPage = () => {
           </button>
         </form>
 
-        <p className="mt-6 text-sm text-[var(--app-subtle)]">
+        <p className="mt-6 text-sm text-(--app-subtle)">
           {t("auth.login.footer.firstTime")}
           {" "}
           <Link className={INLINE_ACTION_CLASS_NAME} to="/register">

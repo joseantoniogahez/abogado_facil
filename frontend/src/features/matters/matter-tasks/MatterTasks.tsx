@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { type FormEvent, useState } from "react";
+import { type SyntheticEvent, useState } from "react";
 
 import { t } from "@/shared/i18n/ui-text";
 import { ACCENT_ACTION_CLASS_NAME, SECONDARY_ACTION_CLASS_NAME } from "@/shared/ui/actionStyles";
@@ -34,7 +34,7 @@ export const MatterTasks = ({ matterId }: { matterId: number }) => {
       await refresh();
     },
   });
-  const submit = (event: FormEvent) => {
+  const submit = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (title.trim() && dueDate) create.mutate();
   };

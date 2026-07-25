@@ -42,28 +42,28 @@ export const DashboardPage = () => {
   ] as const;
   return (
     <main className="mx-auto max-w-6xl p-6 sm:p-10">
-      <p className="mono-label text-[var(--app-subtle)]">{t("dashboard.badge")}</p>
+      <p className="mono-label text-(--app-subtle)">{t("dashboard.badge")}</p>
       <h1 className="mt-3 text-4xl font-semibold">
         {t("dashboard.greeting", { displayName: user.display_name })}
       </h1>
-      <p className="mt-2 text-[var(--app-subtle)]">
+      <p className="mt-2 text-(--app-subtle)">
         {t("dashboard.firm", { firmName: summary.data.firm_name })}
       </p>
       <section aria-label={t("dashboard.summary")} className="mt-8 grid gap-4 sm:grid-cols-3">
         {metrics.map(([label, metric]) => (
           <article
-            className="rounded-2xl border border-[var(--app-border)] bg-[var(--app-surface)] p-5"
+            className="rounded-2xl border border-(--app-border) bg-(--app-surface) p-5"
             key={label}
           >
             <h2>{label}</h2>
             <p className="mt-2 text-3xl font-semibold">{metric.value}</p>
-            <p className="text-sm text-[var(--app-subtle)]">
+            <p className="text-sm text-(--app-subtle)">
               {metric.available ? t("dashboard.available") : t("dashboard.comingSoon")}
             </p>
           </article>
         ))}
       </section>
-      <section className="mt-8 rounded-2xl border border-[var(--app-border)] p-5">
+      <section className="mt-8 rounded-2xl border border-(--app-border) p-5">
         <h2 className="text-xl font-semibold">{t("dashboard.upcoming")}</h2>
         {summary.data.upcoming_tasks.length
           ? (
@@ -83,11 +83,11 @@ export const DashboardPage = () => {
                 ))}
               </ul>
             )
-          : <p className="mt-3 text-[var(--app-subtle)]">{t("dashboard.upcoming.empty")}</p>}
+          : <p className="mt-3 text-(--app-subtle)">{t("dashboard.upcoming.empty")}</p>}
       </section>
-      <section className="mt-8 rounded-2xl border border-[var(--app-border)] p-5">
+      <section className="mt-8 rounded-2xl border border-(--app-border) p-5">
         <h2 className="text-xl font-semibold">{t("dashboard.ai")}</h2>
-        <p className="mt-3 text-[var(--app-subtle)]">{t("dashboard.ai.notAvailable")}</p>
+        <p className="mt-3 text-(--app-subtle)">{t("dashboard.ai.notAvailable")}</p>
       </section>
       <section className="mt-8">
         <h2 className="text-xl font-semibold">{t("dashboard.actions")}</h2>

@@ -297,12 +297,12 @@ export const AdminPermissionsPage = () => {
                             <ul className="mt-4 space-y-3">
                               {selectedRole.permissions.map(permission => (
                                 <li
-                                  className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[var(--app-border)] px-3 py-3"
+                                  className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-(--app-border) px-3 py-3"
                                   key={permission.id}
                                 >
                                   <div className="text-sm">
                                     <p className="font-semibold">{permission.name}</p>
-                                    <p className="text-xs text-[var(--app-subtle)]">
+                                    <p className="text-xs text-(--app-subtle)">
                                       {permission.id}
                                       {` - ${t(UI.scope)}: ${permission.scope}`}
                                     </p>
