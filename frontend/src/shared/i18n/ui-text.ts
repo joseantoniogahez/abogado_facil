@@ -404,6 +404,7 @@ export const ES_MESSAGES = {
   "aiSettings.loading": "Cargando configuración...",
   "aiSettings.error.load": "No fue posible cargar la configuración de IA.",
   "aiSettings.error.generic": "No fue posible actualizar la configuración. Intenta nuevamente.",
+  "aiSettings.retry": "Reintentar",
   "aiSettings.success.save": "La clave quedó guardada de forma segura.",
   "aiSettings.success.delete": "La clave fue eliminada.",
   "aiSettings.configured": "Clave configurada",

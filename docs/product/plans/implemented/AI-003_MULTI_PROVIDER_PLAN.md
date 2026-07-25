@@ -38,12 +38,13 @@ y Mock, sin que las funciones de producto conozcan SDKs, formatos externos ni cr
 - [x] Las respuestas se normalizan a un contrato común.
 - [x] Las pruebas cubren payloads, errores HTTP, respuestas inválidas y Mock.
 - [x] Documentación de arquitectura e integración queda sincronizada.
+- [x] Gemini autentica mediante `x-goog-api-key` y la credencial nunca forma parte de la URL.
 
 ## Validation
 
-- [ ] `python -m pytest backend/tests`
-- [ ] `python -m pytest backend/tests --cov=app --cov-report=term-missing:skip-covered --cov-fail-under=100`
-- [ ] Pre-commit sobre archivos modificados.
+- [x] `python -m pytest backend/tests`
+- [x] `python -m pytest backend/tests --cov=app --cov-report=term-missing:skip-covered --cov-fail-under=100`
+- [x] Pre-commit sobre archivos modificados.
 
 ## Progress Log
 
@@ -53,10 +54,11 @@ y Mock, sin que las funciones de producto conozcan SDKs, formatos externos ni cr
 
 ## Validation Results
 
-| Date       | Command                                                                                                | Result | Notes                     |
-| ---------- | ------------------------------------------------------------------------------------------------------ | ------ | ------------------------- |
-| 2026-07-25 | `python -m pytest backend/tests --cov=app --cov-report=term-missing:skip-covered --cov-fail-under=100` | Passed | 423 tests, cobertura 100% |
-| 2026-07-25 | `pre-commit run --all-files`                                                                           | Passed | Todos los hooks pasan     |
+| Date       | Command                                                                                                | Result | Notes                       |
+| ---------- | ------------------------------------------------------------------------------------------------------ | ------ | --------------------------- |
+| 2026-07-25 | `python -m pytest backend/tests --cov=app --cov-report=term-missing:skip-covered --cov-fail-under=100` | Passed | 423 tests, cobertura 100%   |
+| 2026-07-25 | `pre-commit run --all-files`                                                                           | Passed | Todos los hooks pasan       |
+| 2026-07-25 | `python -m pytest backend/tests --cov=app --cov-report=term-missing:skip-covered --cov-fail-under=100` | Passed | 431 pruebas, cobertura 100% |
 
 ## Completion Summary
 
@@ -69,6 +71,8 @@ y Mock, sin que las funciones de producto conozcan SDKs, formatos externos ni cr
 
 ## Pause / Handoff Record
 
-- Current state: plan listo e implementación iniciada.
-- Pending work: puerto, adaptadores, pruebas y docs.
-- Next safe action: crear `app/integrations/ai_providers.py` y sus pruebas.
+- Current state: Gemini autentica por header y las URLs de proveedor no contienen credenciales.
+- Pending work: ninguno dentro de AI-003.
+- Blockers or approvals: ninguno.
+- Residual risk: no se ejecutaron llamadas reales a proveedores, fuera del alcance del adaptador.
+- Next safe action: conectar el puerto desde funciones IA futuras.

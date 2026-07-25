@@ -40,9 +40,17 @@ sin volver a mostrar secretos y sin asumir que una credencial configurada ya fue
 ## Validation
 
 - [x] `npm --prefix frontend run check`
-- [ ] `npm --prefix frontend run build` (compilación pasa; falla `perf:check` por presupuesto CSS global)
+- [x] `npm --prefix frontend run build`
 - [x] `npm --prefix frontend run openapi:check`
 - [x] Pre-commit sobre archivos modificados.
+
+## Remediación de revisión 2026-07-24
+
+- [x] El feedback de guardado y eliminación nunca muestra éxito y error obsoletos a la vez.
+- [x] El error de carga conserva diagnóstico correlacionado y no presenta un estado desconocido
+  como no configurado.
+- [x] El smoke E2E cubre acceso protegido, carga, guardado y eliminación en `/settings/ai`.
+- [x] La matriz de errores y la política de mutaciones documentan el consumidor BYOK.
 
 ## Progress Log
 
@@ -58,8 +66,10 @@ El 2026-07-24 se aprobó aumentar hasta 50% el presupuesto CSS para cerrar este 
 ## Completion Summary
 
 - Delivered: pantalla protegida de configuración BYOK para OpenAI y Gemini, guardado/eliminación,
-  estados accesibles, consumidores API tipados, navegación y documentación sincronizada.
-- Validation: `npm run check`, `npm run build`, `npm run openapi:check` y `pre-commit run --all-files` pasan.
+  estados accesibles, feedback sin mensajes obsoletos, diagnóstico correlacionado, consumidor API
+  tipado, navegación, smoke E2E y documentación sincronizada.
+- Validation: `npm run check` (254 pruebas), `npm run build`, `npm run test:e2e:ci` (14 pruebas) y
+  `pre-commit run --all-files` pasan.
 - Skipped validation: ninguna.
 - Human approvals: aumento de presupuesto CSS aprobado por el usuario; no se requirió aprobación jurídica para este slice.
 - Residual risk: no valida conexión con proveedores ni ejecuta llamadas reales; corresponde a AI-003.
@@ -77,18 +87,22 @@ El 2026-07-24 se aprobó aumentar hasta 50% el presupuesto CSS para cerrar este 
 | 2026-07-24 | `npm run check` | Blocked | Tests, lint, typecheck y OpenAPI pasan; `deps:audit` reporta 2 vulnerabilidades altas en React Router |
 | 2026-07-25 | `npm run check` | Passed | Tests con cobertura, OpenAPI y `deps:audit` pasan; vulnerabilidades altas/críticas: 0 |
 | 2026-07-25 | `pre-commit run --all-files` | Passed | Todos los hooks pasan |
+| 2026-07-25 | `npm run check && npm run build` | Passed | 254 pruebas; OpenAPI, dependencias y presupuestos verdes |
+| 2026-07-25 | `npm run test:e2e:ci` | Passed | 14 smoke tests, incluido `/settings/ai` |
 
 ## Pause / Handoff Record
 
 ## Final Handoff
 
-AI-002 quedó cerrado el 2026-07-25. El backlog está sincronizado en `Hecho`, el plan fue movido
-a `plans/implemented/`, y no quedan acciones funcionales pendientes en este ticket. El siguiente
-ticket recomendado es `AI-003`.
+AI-002 quedó cerrado nuevamente después de la remediación de revisión. El backlog está
+sincronizado en `Hecho`, no quedan validaciones ni aprobaciones pendientes y la auditoría de
+dependencias reporta cero vulnerabilidades altas o críticas.
 
-- Current state: pantalla funcional conectada a `/v1/ai/credentials` mediante TanStack Query; React Router actualizado a `7.18.1`.
-- Changed files and contracts: `frontend/src/features/ai-settings/`, rutas, navegación, catálogo i18n, route inventory y API consumer matrix.
-- Pending work: resolver o aprobar formalmente la excepción de las 2 vulnerabilidades altas reportadas por npm audit y correr pre-commit antes de marcar `Hecho`.
-- Blockers or approvals: `deps:audit` permanece bloqueado; `react-router-dom@7.18.1` es la versión publicada más reciente y el advisory todavía la reporta dentro del rango afectado.
-- Residual risks: todavía no existe prueba de conexión; el backend acepta únicamente las validaciones del slice AI-001.
-- Next safe action: obtener una versión corregida de React Router o una aprobación explícita de seguridad para documentar una excepción temporal.
+- Current state: pantalla funcional conectada a `/v1/ai/credentials`, con estados deterministas y
+  smoke E2E protegido.
+- Changed files and contracts: UI y pruebas de `ai-settings`, catálogo i18n, matriz de consumidores,
+  política de mutaciones, smoke E2E y READMEs.
+- Pending work: ninguno dentro de AI-002.
+- Blockers or approvals: ninguno.
+- Residual risks: la prueba de conexión real pertenece a funciones posteriores.
+- Next safe action: continuar con los siguientes tickets de producto IA.

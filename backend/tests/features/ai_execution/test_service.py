@@ -4,6 +4,7 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 
 from app.core.errors.services import InvalidInputError, NotFoundError
+from app.core.security.service.encryption import AesGcmSecretEncryption
 from app.features.ai_execution.service import AiProviderFactory
 
 
@@ -43,6 +44,24 @@ def test_build_rejects_empty_credential_without_provider_call() -> None:
     credentials.get_secret = AsyncMock(return_value="   ")
     constructor = Mock()
     factory = AiProviderFactory(credentials, {"openai": constructor})
+
+    with pytest.raises(InvalidInputError, match="invalid"):
+        run(factory.build(user_id=7, firm_id=3, provider="openai", model="gpt-test"))
+    constructor.assert_not_called()
+
+
+def test_build_rejects_tampered_aes_gcm_credential_without_provider_call() -> None:
+    encryption = AesGcmSecretEncryption(b"x" * 32)
+    ciphertext, nonce = encryption.encrypt("test-api-key")
+    tampered_prefix = "A" if ciphertext[0] != "A" else "B"
+    tampered_ciphertext = f"{tampered_prefix}{ciphertext[1:]}"
+
+    class TamperedCredentialReader:
+        async def get_secret(self, *, user_id: int, firm_id: int, provider: str) -> str:
+            return encryption.decrypt(tampered_ciphertext, nonce)
+
+    constructor = Mock()
+    factory = AiProviderFactory(TamperedCredentialReader(), {"openai": constructor})
 
     with pytest.raises(InvalidInputError, match="invalid"):
         run(factory.build(user_id=7, firm_id=3, provider="openai", model="gpt-test"))

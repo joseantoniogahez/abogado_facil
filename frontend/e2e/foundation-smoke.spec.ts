@@ -354,6 +354,78 @@ test.describe("frontend foundation smoke", () => {
     await expect(page.getByRole("heading", { name: t("auth.login.title") })).toBeVisible();
   });
 
+  test("manages BYOK credentials from the protected AI settings route", async ({ page }) => {
+    await page.addInitScript((storageKey) => {
+      window.sessionStorage.setItem(storageKey, "seed-token");
+    }, ACCESS_TOKEN_STORAGE_KEY);
+    let credentials = [{
+      provider: "openai",
+      configured: true,
+      created_at: "2026-07-24T10:00:00Z",
+      updated_at: "2026-07-24T10:00:00Z",
+    }];
+
+    await page.route("**/v1/**", async (route) => {
+      const request = route.request();
+      const method = request.method();
+      const pathname = new URL(request.url()).pathname;
+      if (method === "GET" && pathname === "/v1/users/me") {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(authenticatedUser()),
+        });
+        return;
+      }
+      if (pathname.startsWith("/v1/ai/credentials")) {
+        expect(request.headers().authorization).toBe("Bearer seed-token");
+      }
+      if (method === "GET" && pathname === "/v1/ai/credentials") {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({ items: credentials }),
+        });
+        return;
+      }
+      if (method === "PUT" && pathname === "/v1/ai/credentials/gemini") {
+        expect(request.postDataJSON()).toEqual({ api_key: "gemini-smoke-key" }); // pragma: allowlist secret
+        const geminiCredential = {
+          provider: "gemini",
+          configured: true,
+          created_at: "2026-07-24T10:05:00Z",
+          updated_at: "2026-07-24T10:05:00Z",
+        };
+        credentials = [...credentials, geminiCredential];
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(geminiCredential),
+        });
+        return;
+      }
+      if (method === "DELETE" && pathname === "/v1/ai/credentials/openai") {
+        credentials = credentials.filter(item => item.provider !== "openai");
+        await route.fulfill({ status: 204 });
+        return;
+      }
+      throw new Error(`Unhandled API request in AI settings smoke: ${method} ${pathname}`);
+    });
+
+    await page.goto("/settings/ai");
+
+    await expect(page.getByRole("heading", { name: t("aiSettings.title") })).toBeVisible();
+    await expect(page.getByText(t("aiSettings.configured"), { exact: true })).toHaveCount(1);
+    await page.locator("#gemini-key").fill("gemini-smoke-key");
+    await page.getByRole("button", { name: t("aiSettings.save") }).nth(1).click();
+    await expect(page.getByRole("status")).toHaveText(t("aiSettings.success.save"));
+    await expect(page.getByText(t("aiSettings.configured"), { exact: true })).toHaveCount(2);
+
+    await page.getByRole("button", { name: t("aiSettings.delete") }).first().click();
+    await expect(page.getByRole("status")).toHaveText(t("aiSettings.success.delete"));
+    await expect(page.getByText(t("aiSettings.notConfigured"), { exact: true })).toHaveCount(1);
+  });
+
   test("redirects authenticated legacy welcome route to dashboard", async ({ page }) => {
     await page.addInitScript((storageKey) => {
       window.sessionStorage.setItem(storageKey, "seed-token");

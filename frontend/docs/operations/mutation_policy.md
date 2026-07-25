@@ -11,6 +11,7 @@ This document defines deterministic mutation retry and invalidation behavior by 
 | Auth logout mutation       | No retry                                         | Clear `SESSION_QUERY_KEY` and invalidate session query |
 | Auth registration mutation | No retry                                         | Keep session unchanged; show explicit login transition |
 | Profile update mutation    | No retry                                         | Write returned profile through `SESSION_QUERY_KEY`     |
+| AI credential mutation     | No retry                                         | Invalidate `AI_CREDENTIALS_QUERY_KEY`                  |
 | Client/matter mutation     | Default mutation policy                          | Explicit domain list/detail and dashboard invalidation |
 | Matter note mutation       | Default mutation policy                          | Invalidate only the note list for its matter           |
 | Matter document mutation   | Default mutation policy                          | Invalidate only the document list for its matter       |
@@ -26,6 +27,7 @@ This document defines deterministic mutation retry and invalidation behavior by 
 - Login mutation consumer: `src/features/auth/LoginPage.tsx`
 - Registration mutation consumer: `src/features/auth/RegisterPage.tsx`
 - Profile mutation consumer: `src/features/profile/ProfilePage.tsx`
+- AI credential mutations: `src/features/ai-settings/AiSettingsPage.tsx`
 - Logout mutation consumer: `src/shared/routing/RootLayout.tsx`
 - Matter document mutations: `src/features/matters/matter-documents/api.ts`
 - Matter checklist mutations: `src/features/matters/matter-checklist/api.ts`
@@ -40,3 +42,5 @@ This document defines deterministic mutation retry and invalidation behavior by 
 - Registration never writes an access token or authenticated user into the session cache.
 - An unauthorized profile update clears the cached session; a successful update replaces the
   complete cached product account profile.
+- AI credential mutations do not retry automatically, clear stale action feedback before each
+  attempt, and refresh provider status after success.

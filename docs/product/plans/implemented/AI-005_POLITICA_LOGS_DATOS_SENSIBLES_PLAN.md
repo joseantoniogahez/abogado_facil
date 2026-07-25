@@ -25,6 +25,7 @@ los logs técnicos, manteniendo eventos operativos mínimos y correlacionables.
 - [x] Los errores de proveedor conservan un mensaje seguro sin cuerpos ni secretos.
 - [x] Las pruebas negativas cubren contenido de entrada, credenciales y errores.
 - [x] La política queda documentada y los gates backend pasan.
+- [x] Las credenciales de proveedor se transportan en headers y nunca en URLs observables.
 
 ## Validación
 
@@ -41,12 +42,11 @@ los logs técnicos, manteniendo eventos operativos mínimos y correlacionables.
 
 ## Validaciones ejecutadas
 
-- `\.venv\Scripts\python.exe -m pytest backend/tests` — 430 passed.
-- `\.venv\Scripts\python.exe -m pytest backend/tests --cov=app --cov-report=term-missing:skip-covered --cov-fail-under=100` — 430 passed, 100% coverage.
-- `pre-commit run --files ...` — no ejecutado correctamente: el almacén global de pre-commit es de solo lectura en el entorno (`OperationalError: attempt to write a readonly database`).
+- `\.venv\Scripts\python.exe -m pytest backend/tests --cov=app --cov-report=term-missing:skip-covered --cov-fail-under=100` — 431 passed, 100% coverage.
+- `pre-commit run --all-files` — todos los hooks pasaron.
 
 ## Revisión documental
 
-Revisados `AGENTS.md`, `docs/ai/backlog_tracking.md`, `backend/README.md` y el playbook backend.
-Se actualizó `backend/README.md`; no cambian API, auth, permisos, rutas, OpenAPI ni contratos de
-frontend.
+Revisados `AGENTS.md`, `docs/ai/backlog_tracking.md`, los READMEs, ambos playbooks, arquitectura,
+error mapping y contratos frontend. Se documentó el transporte de credenciales por headers; no
+cambian API, auth, permisos, rutas ni OpenAPI.

@@ -42,7 +42,9 @@ def test_openai_provider_builds_provider_payload_without_leaking_key() -> None:
 
 def test_gemini_provider_normalizes_response() -> None:
     async def transport(url, headers, body):
-        assert f":generateContent?key={PROVIDER_API_KEY}" in url
+        assert url.endswith(":generateContent")
+        assert PROVIDER_API_KEY not in url
+        assert headers["x-goog-api-key"] == PROVIDER_API_KEY
         return 200, {"candidates": [{"content": {"parts": [{"text": "gemini result"}]}}]}
 
     response = run(GeminiProvider(api_key=PROVIDER_API_KEY, model="gemini-test", transport=transport).generate(REQUEST))
@@ -89,6 +91,32 @@ def test_default_transport_parses_json_response(monkeypatch: pytest.MonkeyPatch)
 
     monkeypatch.setattr(ai_providers, "urlopen", lambda *args, **kwargs: Response())
     assert run(ai_providers._default_transport("https://provider.test", {}, b"{}")) == (200, {"ok": True})
+
+
+@pytest.mark.parametrize(
+    ("url", "error_message"),
+    [
+        ("http://provider.test", "must use HTTPS"),
+        ("file:///tmp/provider.json", "must use HTTPS"),
+        ("custom://provider.test", "must use HTTPS"),
+        ("https:///missing-host", "must use HTTPS"),
+        ("https://[", "is invalid"),
+    ],
+)
+def test_default_transport_rejects_invalid_urls(
+    url: str,
+    error_message: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def unexpected_request(*args, **kwargs):
+        pytest.fail("urlopen must not be called for a non-HTTPS provider URL")
+
+    monkeypatch.setattr(ai_providers, "urlopen", unexpected_request)
+
+    with pytest.raises(AiProviderError, match=error_message) as error:
+        run(ai_providers._default_transport(url, {}, b"{}"))
+
+    assert error.value.retryable is False
 
 
 def test_default_transport_maps_http_error(monkeypatch: pytest.MonkeyPatch) -> None:

@@ -13,6 +13,8 @@ This document defines the automated accessibility quality gate for foundation ro
 ## Automation Contract
 
 - Baseline test file: `src/app/accessibility.routes.test.tsx`.
+- AI settings success and correlated load-error states:
+  `src/features/ai-settings/AiSettingsPage.test.tsx`.
 - Shared AI notice test: `src/shared/ui/AiGeneratedContentNotice.test.tsx`.
 - Matter documents test: `src/features/matters/matter-documents/MatterDocuments.test.tsx`.
 - Engine: `axe-core` running inside the frontend Vitest workflow.

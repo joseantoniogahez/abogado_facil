@@ -6,6 +6,7 @@ from collections.abc import Awaitable, Callable, Mapping
 from dataclasses import dataclass
 from typing import Any, Protocol
 from urllib.error import HTTPError, URLError
+from urllib.parse import urlsplit
 from urllib.request import Request, urlopen
 
 
@@ -40,12 +41,22 @@ class AiProviderPort(Protocol):
 JsonTransport = Callable[[str, Mapping[str, str], bytes], Awaitable[tuple[int, Any]]]
 
 
+def _validate_provider_url(url: str) -> None:
+    try:
+        parsed_url = urlsplit(url)
+    except ValueError as exc:
+        raise AiProviderError("AI provider URL is invalid") from exc
+    if parsed_url.scheme != "https" or parsed_url.hostname is None:
+        raise AiProviderError("AI provider URL must use HTTPS")
+
+
 def _default_transport(url: str, headers: Mapping[str, str], body: bytes) -> Awaitable[tuple[int, Any]]:
     async def send() -> tuple[int, Any]:
         def request() -> tuple[int, Any]:
+            _validate_provider_url(url)
             try:
                 response_request = Request(url, data=body, headers=dict(headers), method="POST")
-                with urlopen(response_request, timeout=30) as response:  # noqa: S310 - URL is provider configuration.
+                with urlopen(response_request, timeout=30) as response:  # nosec B310 - HTTPS validated above.
                     return response.status, json.loads(response.read())
             except HTTPError as exc:
                 return exc.code, None
@@ -122,8 +133,8 @@ class GeminiProvider(_HttpAiProvider):
     async def generate(self, request: AiTextRequest) -> AiTextResponse:
         model = request.model or self._model
         payload = await self._post(
-            url=f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={self._api_key}",
-            headers={"Content-Type": "application/json"},
+            url=f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
+            headers={"Content-Type": "application/json", "x-goog-api-key": self._api_key},
             body={
                 "contents": [{"parts": [{"text": request.prompt}]}],
                 "generationConfig": {"maxOutputTokens": request.max_tokens},

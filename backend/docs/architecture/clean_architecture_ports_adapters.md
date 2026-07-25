@@ -37,6 +37,8 @@ Current top-level shape:
   contracts, and `OpenAIProvider`, `GeminiProvider`, and `MockProvider` adapters.
 - OpenAI and Gemini use an injected HTTP transport so tests never call external providers and future
   runtime wiring can own timeouts, retries, and observability.
+- Provider credentials are transported only in headers. Gemini uses `x-goog-api-key`; credentials
+  must never be placed in URLs that can be retained by access logs or intermediaries.
 - Provider errors are normalized to `AiProviderError`; API keys, response bodies, and provider error
   details are never included in the exception message.
 - This port does not decide whether a user has a valid BYOK credential or persist results; those

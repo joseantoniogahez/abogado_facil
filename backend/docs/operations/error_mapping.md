@@ -28,6 +28,7 @@ Notes:
 - Authorization decisions are logged as `event=api_authorization_decision` with `request_id`, `user_id`, `permission_id`, `required_scope`, `decision`, `method`, `path`, and `route`.
 - Future AI SSE provider failures use the transport-level `error` event with `code=provider_error`; provider exception details are not returned or logged.
 - BYOK credential validation failures use `400 invalid_input`; missing credentials use `404 not_found`.
+  Corrupt or tampered AES-GCM credentials are treated as invalid input before any provider is built.
 
 Example of normalized validation error:
 

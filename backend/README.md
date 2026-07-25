@@ -83,7 +83,8 @@ import `boto3` directly.
 AI observability is metadata-only: prompts, document text, credentials, tokens, authorization
 headers, and provider exception details must not be passed to technical logs. Use
 `app.core.common.observability.log_layer_event` for structured events; sensitive field names are
-redacted centrally and tests enforce the negative contract.
+redacted centrally and tests enforce the negative contract. Provider credentials belong in
+authorization headers, never in request URLs; the Gemini adapter uses `x-goog-api-key`.
 
 PDF uploads are parsed locally through `PdfTextExtractorPort`. When a text layer is available, its
 normalized content is stored with the document metadata for future AI workflows. Scanned PDFs are
@@ -226,3 +227,4 @@ vertical product slices in `app/features`:
 - `app/features/matter_documents`: matter document metadata and storage operations
 - `app/features/outbox`: outbox capability
 - `app/features/ai_credentials`: encrypted per-user BYOK credential management
+- `app/features/ai_execution`: scoped BYOK validation before provider construction

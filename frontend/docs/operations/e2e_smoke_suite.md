@@ -6,6 +6,7 @@ This document defines the deterministic end-to-end smoke baseline for the fronte
 
 - Critical registration, email login, profile, and logout journey.
 - Canonical dashboard navigation, legacy `/welcome` redirect, and protected route behavior.
+- Protected `/settings/ai` BYOK status, save, and delete journey with authenticated API requests.
 - Protected client list, creation, detail, editing, search, and dashboard counter/action journey.
 - Matter detail smoke covers embedded note CRUD and document upload, list, authenticated download,
   and confirmed deletion with strict API mocks.

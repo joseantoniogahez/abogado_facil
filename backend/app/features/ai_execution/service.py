@@ -3,6 +3,8 @@
 from collections.abc import Callable
 from typing import Protocol
 
+from cryptography.exceptions import InvalidTag
+
 from app.core.errors.services import InvalidInputError, NotFoundError
 from app.integrations.ai_providers import AiProviderPort, GeminiProvider, OpenAIProvider
 
@@ -29,7 +31,7 @@ class AiProviderFactory:
             api_key = await self.credentials.get_secret(user_id=user_id, firm_id=firm_id, provider=provider)
         except NotFoundError as exc:
             raise InvalidInputError(message="AI provider credential is not configured") from exc
-        except (TypeError, ValueError) as exc:
+        except (InvalidTag, TypeError, ValueError) as exc:
             raise InvalidInputError(message="AI provider credential is invalid") from exc
         if not api_key.strip():
             raise InvalidInputError(message="AI provider credential is invalid")
