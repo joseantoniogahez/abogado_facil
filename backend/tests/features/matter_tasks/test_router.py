@@ -41,6 +41,20 @@ def test_matter_task_crud_dashboard_and_firm_isolation(mock_client: TestClient) 
     assert updated.json()["completed"] is True
     assert mock_client.get("/v1/dashboard", headers=reader).json()["pending_tasks"]["value"] == 0
     assert mock_client.get(f"/v1/matters/{matter_id}/tasks", headers=admin).status_code == HTTPStatus.NOT_FOUND
+    assert (
+        mock_client.post(
+            f"/v1/matters/{matter_id}/tasks",
+            headers=admin,
+            json={"title": "Foreign write", "due_date": "2026-07-21"},
+        ).status_code
+        == HTTPStatus.NOT_FOUND
+    )
+    assert (
+        mock_client.patch(
+            f"/v1/matters/{matter_id}/tasks/{task_id}", headers=admin, json={"completed": False}
+        ).status_code
+        == HTTPStatus.NOT_FOUND
+    )
 
 
 def test_matter_tasks_validate_and_require_auth(mock_client: TestClient) -> None:

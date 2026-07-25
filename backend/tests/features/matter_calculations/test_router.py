@@ -45,6 +45,22 @@ def test_calculations_preview_save_list_and_isolate(mock_client):
         == saved.json()["id"]
     )
     assert mock_client.get(f"/v1/matters/{matter_id}/calculations", headers=admin).status_code == HTTPStatus.NOT_FOUND
+    assert (
+        mock_client.post(
+            f"/v1/matters/{matter_id}/calculations/preview",
+            headers=admin,
+            json={**base, "calculation_type": "debt_balance"},
+        ).status_code
+        == HTTPStatus.NOT_FOUND
+    )
+    assert (
+        mock_client.post(
+            f"/v1/matters/{matter_id}/calculations",
+            headers=admin,
+            json={**base, "calculation_type": "debt_balance"},
+        ).status_code
+        == HTTPStatus.NOT_FOUND
+    )
     assert mock_client.get(f"/v1/matters/{matter_id}/calculations").status_code == HTTPStatus.UNAUTHORIZED
 
 

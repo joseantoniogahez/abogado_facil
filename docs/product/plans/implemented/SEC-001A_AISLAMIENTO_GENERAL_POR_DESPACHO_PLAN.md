@@ -5,8 +5,8 @@
 - ID: `SEC-001A`
 - Type: `Backend`
 - Priority: `P1`
-- Plan status: `Ready`
-- Implementation status: `En progreso`
+- Plan status: `Hecho`
+- Implementation status: `Hecho`
 - Last updated: `2026-07-25`
 - Backlog source: `docs/product/BACKLOG_ABOGADO_FACIL.md`
 
@@ -48,15 +48,15 @@ exista.
 
 ## Acceptance Criteria
 
-- [ ] Existe una matriz que enumera cada recurso tenant-owned y sus operaciones de lectura/escritura.
-- [ ] Cada recurso existente tiene pruebas negativas multi-despacho en router, servicio o repositorio
+- [x] Existe una matriz que enumera cada recurso tenant-owned y sus operaciones de lectura/escritura.
+- [x] Cada recurso existente tiene pruebas negativas multi-despacho en router, servicio o repositorio
   según la frontera donde se aplica la política.
-- [ ] Ningún payload público permite seleccionar o expone innecesariamente `firm_id`.
-- [ ] Los identificadores ajenos y ausentes producen el mismo contrato `404 not_found`.
-- [ ] Los resultados de IA se incorporan a la matriz cuando exista su modelo persistente.
-- [ ] Required documentation is synchronized with delivered behavior.
-- [ ] Required validation gates pass and are recorded below.
-- [ ] Mandatory human approvals are recorded, or explicitly not applicable.
+- [x] Ningún payload público permite seleccionar o expone innecesariamente `firm_id`.
+- [x] Los identificadores ajenos y ausentes producen el mismo contrato `404 not_found`.
+- [x] Los resultados de IA se incorporan a la matriz cuando exista su modelo persistente.
+- [x] Required documentation is synchronized with delivered behavior.
+- [x] Required validation gates pass and are recorded below.
+- [x] Mandatory human approvals are recorded, or explicitly not applicable.
 
 ## Affected Contracts and Files
 
@@ -70,28 +70,29 @@ exista.
 
 ### Implementation
 
-- [ ] Inventariar cada consulta y mutación tenant-owned.
-- [ ] Añadir las pruebas negativas faltantes sin duplicar cobertura equivalente.
-- [ ] Corregir cualquier consulta que acepte un identificador sin aplicar `firm_id`.
-- [ ] Incorporar resultados de IA cuando exista la feature persistente correspondiente.
+- [x] Inventariar cada consulta y mutación tenant-owned.
+- [x] Añadir las pruebas negativas faltantes sin duplicar cobertura equivalente.
+- [x] Corregir cualquier consulta que acepte un identificador sin aplicar `firm_id`.
+- [x] Incorporar resultados de IA cuando exista la feature persistente correspondiente.
 
 ### Tests and Documentation
 
-- [ ] Add or update tests with the behavior change.
-- [ ] Review all documentation surfaces required by `AGENTS.md`.
-- [ ] Update canonical documents affected by the code diff.
+- [x] Add or update tests with the behavior change.
+- [x] Review all documentation surfaces required by `AGENTS.md`.
+- [x] Update canonical documents affected by the code diff.
 
 ### Validation
 
-- [ ] `python -m pytest backend/tests`
-- [ ] `python -m pytest backend/tests --cov=app --cov-report=term-missing:skip-covered --cov-fail-under=100`
-- [ ] Pre-commit on changed files.
+- [x] `python -m pytest backend/tests`
+- [x] `python -m pytest backend/tests --cov=app --cov-report=term-missing:skip-covered --cov-fail-under=100`
+- [x] Pre-commit on changed files.
 
 ## Progress Log
 
 | Date       | State       | Completed                                                                                                | Pending / next safe action                                              |
 | ---------- | ----------- | -------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
 | 2026-07-25 | En progreso | Plan recuperado; aislamiento existente identificado en clientes, asuntos, documentos y credenciales BYOK | Construir la matriz por recurso y localizar pruebas negativas faltantes |
+| 2026-07-25 | Hecho       | Matriz documentada; pruebas negativas de escrituras y descargas completadas; queries BYOK verificadas    | Ninguno; agregar resultados IA cuando exista su persistencia            |
 
 ## Validation Results
 
@@ -100,38 +101,45 @@ exista.
 | 2026-07-25 | Revisión estática de repositorios y pruebas existentes                                                 | Partial | Hay cobertura explícita para clientes y asuntos; la auditoría completa sigue pendiente                            |
 | 2026-07-25 | `python -m pytest backend/tests --cov=app --cov-report=term-missing:skip-covered --cov-fail-under=100` | Passed  | 444 pruebas y 100% de cobertura; el gate general pasa, pero todavía no existe la matriz de aceptación de SEC-001A |
 | 2026-07-25 | `pre-commit run --all-files`                                                                           | Passed  | Hooks de código, documentación, secretos y Compose verdes                                                         |
+| 2026-07-25 | Pruebas enfocadas de aislamiento (6 archivos)                                                          | Passed  | 12 pruebas; lecturas, escrituras, descarga y queries BYOK cubiertas                                               |
+| 2026-07-25 | `python -m pytest backend/tests`                                                                       | Passed  | 444 pruebas                                                                                                       |
+| 2026-07-25 | `python -m pytest backend/tests --cov=app --cov-report=term-missing:skip-covered --cov-fail-under=100` | Passed  | 444 pruebas; cobertura total 100%                                                                                 |
+| 2026-07-25 | `pre-commit run --files <changed-files>`                                                               | Passed  | Todos los hooks aplicables pasan tras aceptar el formato automático                                               |
 
 ## Pause / Handoff Record
 
-- Current state: la aplicación aplica `firm_id` en las principales features, pero el ticket todavía
-  no cuenta con una matriz y cobertura negativa completa.
-- Changed files and contracts: plan de tracking e índice de planes pendientes.
-- Pending work: inventario, pruebas negativas faltantes, correcciones encontradas y validación total.
-- Blockers or approvals: los resultados de IA dependen de una feature persistente futura.
-- Residual risks: una operación derivada puede carecer de una prueba negativa aunque su servicio
-  aplique actualmente el filtro.
-- Next safe action: enumerar las operaciones tenant-owned desde routers y repositorios y marcar la
-  cobertura existente por recurso.
+- Current state: ticket completo; la matriz canónica enumera recursos, operaciones, fronteras y
+  evidencia negativa.
+- Changed files and contracts: matriz de autorización, pruebas de recursos derivados, queries BYOK,
+  plan e índice del backlog.
+- Pending work: ninguno dentro de `SEC-001A`; los resultados IA persistidos están aplazados.
+- Blockers or approvals: ninguno; aprobaciones humanas no aplican.
+- Residual risks: los resultados persistidos de IA deberán añadirse cuando exista su feature.
+- Next safe action: continuar con el siguiente release gate priorizado del backlog.
 
 ## Completion Documentation Review
 
-- [ ] Root and service READMEs reviewed.
-- [ ] Backend operation and architecture docs reviewed.
-- [ ] Frontend operation docs and inventories reviewed.
-- [ ] Foundation status files reviewed and changed only if a foundation contract moved.
-- [ ] AI governance docs, templates, and checklists reviewed.
-- [ ] Item plan and summary backlog synchronized.
+- [x] Root and service READMEs reviewed.
+- [x] Backend operation and architecture docs reviewed.
+- [x] Frontend operation docs and inventories reviewed.
+- [x] Foundation status files reviewed and changed only if a foundation contract moved.
+- [x] AI governance docs, templates, and checklists reviewed.
+- [x] Item plan and summary backlog synchronized.
 
 Record documents intentionally unchanged and why:
 
-- Frontend operation contracts: no cambia comportamiento frontend durante la recuperación del plan.
+- Root/backend READMEs, endpoint/error contracts, architecture annexes and foundation status:
+  unchanged because runtime behavior and foundation rules did not change.
+- Frontend operation contracts: unchanged because this ticket changes backend test evidence and
+  authorization documentation only.
+- AI governance templates/checklists: unchanged; the deferred persisted-result row preserves the
+  release-gate requirement without inventing a persistence feature.
 
 ## Completion Summary
 
-- Delivered: plan de ejecución recuperado; implementación y validación final pendientes.
-- Validation: revisión estática inicial, 444 pruebas backend con 100% de cobertura y pre-commit
-  completo.
-- Skipped validation: ninguna aplicable a la recuperación del tracking; la matriz y pruebas
-  específicas del ticket siguen como trabajo pendiente, no como gates omitidos.
-- Human approvals: no aplican para recuperar el tracking.
-- Residual risk: cobertura negativa multi-despacho incompleta hasta ejecutar el plan.
+- Delivered: matriz completa de aislamiento por despacho y evidencia negativa uniforme para los
+  recursos existentes, incluidas credenciales BYOK.
+- Validation: 12 pruebas enfocadas, 444 pruebas backend y cobertura total de 100%.
+- Skipped validation: ninguna.
+- Human approvals: no aplican.
+- Residual risk: incorporar a la matriz cualquier resultado IA persistido cuando exista su modelo.

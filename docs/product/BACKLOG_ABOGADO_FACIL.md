@@ -117,22 +117,21 @@ esperada: pruebas de contrato, métricas, ADR, threat model, caso de fallo o dem
 
 ## Fase 2 - BYOK y Capa de IA
 
-| ID     | Tipo       | Prioridad | Estado       | Trabajo                                         | Entregable / Criterio                                                                         |
-| ------ | ---------- | --------- | ------------ | ----------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| AI-001 | Backend    | P0-IA     | Hecho        | Modelo y servicio para credenciales BYOK.       | API keys cifradas, no expuestas al frontend y eliminables por usuario.                        |
-| AI-002 | Full-stack | P1        | Hecho        | Pantalla de configuración IA.                   | Seleccionar proveedor, guardar key cifrada, eliminar key y ver estado sin exponer el secreto. |
-| AI-003 | Backend    | P1        | Hecho        | Abstracción multi-provider.                     | `OpenAIProvider`, `GeminiProvider` y `MockProvider` detrás de un puerto común.                |
-| AI-004 | Backend    | P0-IA     | Hecho        | Validación obligatoria de BYOK en funciones IA. | Sin credencial válida no se ejecutan llamadas reales.                                         |
-| AI-005 | Ops        | P0-IA     | Hecho        | Política de logs y datos sensibles de IA.       | Prompts/API keys no aparecen en logs técnicos sin protección.                                 |
-| AI-006 | Backend    | P1        | Identificado | Registro de uso/errores por función IA.         | Métricas iniciales por proveedor, función, error y tiempo de respuesta.                       |
-| AI-007 | Backend    | P0-IA     | Identificado | Validación de salidas estructuradas.            | JSON/schema validado antes de guardar, mostrar, copiar o exportar resultados IA.              |
-| AI-008 | Backend    | P0-IA     | Identificado | Minimización del contexto enviado a IA.         | Cada llamada envía únicamente el contexto autorizado y necesario para la función.             |
-
-| AI-009 | Backend | P0-IA | Identificado | Ciclo de vida de ejecuciones de IA. | `AIJob` con estados, intentos, versiones, resultado, error y correlación. |
-| AI-010 | Backend | P1 | Identificado | Resiliencia de proveedores. | Timeouts, reintentos recuperables, backoff, rate limits y prevención de duplicados. |
-| AI-011 | Backend | P1 | Identificado | Taxonomía normalizada de errores. | OpenAI, Gemini y mock mapean errores al contrato común y seguro para frontend. |
-| OBS-001 | Ops | P1 | Identificado | Observabilidad correlacionada. | `request_id` permite seguir API → `AIJob` → proveedor → resultado sin datos sensibles. |
-| TEST-AI-001 | Backend | P1 | Identificado | Pruebas de contrato y fallos multi-provider. | Contratos OpenAI/Gemini/mock y escenarios de timeout, rate limit, JSON inválido y reintentos. |
+| ID          | Tipo       | Prioridad | Estado       | Trabajo                                         | Entregable / Criterio                                                                         |
+| ----------- | ---------- | --------- | ------------ | ----------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| AI-001      | Backend    | P0-IA     | Hecho        | Modelo y servicio para credenciales BYOK.       | API keys cifradas, no expuestas al frontend y eliminables por usuario.                        |
+| AI-002      | Full-stack | P1        | Hecho        | Pantalla de configuración IA.                   | Seleccionar proveedor, guardar key cifrada, eliminar key y ver estado sin exponer el secreto. |
+| AI-003      | Backend    | P1        | Hecho        | Abstracción multi-provider.                     | `OpenAIProvider`, `GeminiProvider` y `MockProvider` detrás de un puerto común.                |
+| AI-004      | Backend    | P0-IA     | Hecho        | Validación obligatoria de BYOK en funciones IA. | Sin credencial válida no se ejecutan llamadas reales.                                         |
+| AI-005      | Ops        | P0-IA     | Hecho        | Política de logs y datos sensibles de IA.       | Prompts/API keys no aparecen en logs técnicos sin protección.                                 |
+| AI-006      | Backend    | P1        | Identificado | Registro de uso/errores por función IA.         | Métricas iniciales por proveedor, función, error y tiempo de respuesta.                       |
+| AI-007      | Backend    | P0-IA     | Identificado | Validación de salidas estructuradas.            | JSON/schema validado antes de guardar, mostrar, copiar o exportar resultados IA.              |
+| AI-008      | Backend    | P0-IA     | Identificado | Minimización del contexto enviado a IA.         | Cada llamada envía únicamente el contexto autorizado y necesario para la función.             |
+| AI-009      | Backend    | P0-IA     | Identificado | Ciclo de vida de ejecuciones de IA.             | `AIJob` con estados, intentos, versiones, resultado, error y correlación.                     |
+| AI-010      | Backend    | P1        | Identificado | Resiliencia de proveedores.                     | Timeouts, reintentos recuperables, backoff, rate limits y prevención de duplicados.           |
+| AI-011      | Backend    | P1        | Identificado | Taxonomía normalizada de errores.               | OpenAI, Gemini y mock mapean errores al contrato común y seguro para frontend.                |
+| OBS-001     | Ops        | P1        | Identificado | Observabilidad correlacionada.                  | `request_id` permite seguir API → `AIJob` → proveedor → resultado sin datos sensibles.        |
+| TEST-AI-001 | Backend    | P1        | Identificado | Pruebas de contrato y fallos multi-provider.    | Contratos OpenAI/Gemini/mock y escenarios de timeout, rate limit, JSON inválido y reintentos. |
 
 ## Fase 3 - IA Inicial Controlada
 
@@ -169,7 +168,7 @@ esperada: pruebas de contrato, métricas, ADR, threat model, caso de fallo o dem
 
 | ID       | Tipo    | Prioridad | Estado       | Trabajo                                                           | Entregable / Criterio                                                                                      |
 | -------- | ------- | --------- | ------------ | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| SEC-001A | Backend | P1        | En progreso  | Aislamiento general por despacho.                                 | Matriz de pruebas confirma aislamiento de clientes, asuntos, documentos y resultados por `firm_id`.        |
+| SEC-001A | Backend | P1        | Hecho        | Aislamiento general por despacho.                                 | Matriz de pruebas confirma aislamiento de clientes, asuntos, documentos y resultados por `firm_id`.        |
 | SEC-001B | Backend | P0-IA     | Identificado | Aislamiento del contexto enviado a IA.                            | El contexto de cada llamada se construye solo desde recursos autorizados del despacho actual.              |
 | SEC-001C | Backend | P0-IA     | Identificado | Pruebas negativas multiusuario.                                   | Accesos cruzados a clientes, asuntos, documentos y resultados devuelven rechazo o `404` opaco.             |
 | SEC-002  | Legal   | P0-IA     | Identificado | Aviso de privacidad, términos y aprobación jurídica para IA BYOK. | Explica el envío al proveedor, solicita consentimiento y registra revisión jurídica antes del lanzamiento. |

@@ -34,6 +34,20 @@ def test_checklist_crud_templates_and_firm_isolation(mock_client: TestClient) ->
     assert custom.json()["label"] == "Fotografías"
     assert custom.json()["is_custom"] is True
     assert mock_client.get(f"/v1/matters/{matter_id}/checklist", headers=admin).status_code == HTTPStatus.NOT_FOUND
+    assert (
+        mock_client.post(
+            f"/v1/matters/{matter_id}/checklist", headers=admin, json={"label": "Foreign write"}
+        ).status_code
+        == HTTPStatus.NOT_FOUND
+    )
+    assert (
+        mock_client.patch(
+            f"/v1/matters/{matter_id}/checklist/{item_id}",
+            headers=admin,
+            json={"status": "not_applicable"},
+        ).status_code
+        == HTTPStatus.NOT_FOUND
+    )
 
 
 def test_checklist_validates_and_requires_auth(mock_client: TestClient) -> None:

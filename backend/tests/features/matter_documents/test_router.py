@@ -44,6 +44,19 @@ def test_document_upload_list_download_delete_and_isolation(mock_client: TestCli
     assert downloaded.headers["content-disposition"].startswith("attachment;")
     assert mock_client.get(f"/v1/matters/{matter_id}/documents", headers=admin).status_code == HTTPStatus.NOT_FOUND
     assert (
+        mock_client.get(f"/v1/matters/{matter_id}/documents/{document_id}/download", headers=admin).status_code
+        == HTTPStatus.NOT_FOUND
+    )
+    assert (
+        mock_client.post(
+            f"/v1/matters/{matter_id}/documents",
+            headers=admin,
+            data={"document_type": "record"},
+            files={"file": ("foreign.txt", b"foreign", "text/plain")},
+        ).status_code
+        == HTTPStatus.NOT_FOUND
+    )
+    assert (
         mock_client.delete(f"/v1/matters/{matter_id}/documents/{document_id}", headers=admin).status_code
         == HTTPStatus.NOT_FOUND
     )

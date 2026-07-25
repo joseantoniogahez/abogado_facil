@@ -40,6 +40,22 @@ def test_matter_payments_summary_updates_records_and_isolates_firms(mock_client:
     assert recorded.json()["balance"] == "7499.50"
     assert recorded.json()["payments"][0]["note"] == "Transferencia"
     assert mock_client.get(f"/v1/matters/{matter_id}/payments", headers=admin).status_code == HTTPStatus.NOT_FOUND
+    assert (
+        mock_client.put(
+            f"/v1/matters/{matter_id}/payments",
+            headers=admin,
+            json={"agreed_fee": "1.00", "notes": None},
+        ).status_code
+        == HTTPStatus.NOT_FOUND
+    )
+    assert (
+        mock_client.post(
+            f"/v1/matters/{matter_id}/payments",
+            headers=admin,
+            json={"amount": "1.00", "payment_type": "partial", "paid_on": "2026-07-16"},
+        ).status_code
+        == HTTPStatus.NOT_FOUND
+    )
 
 
 def test_matter_payments_validate_and_require_auth(mock_client: TestClient) -> None:

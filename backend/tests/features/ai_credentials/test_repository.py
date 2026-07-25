@@ -24,6 +24,10 @@ def test_repository_reads_and_scopes_credentials() -> None:
         assert await repository.get_for_user(user_id=1, firm_id=2, provider="openai") is item
         assert await repository.list_for_user(user_id=1, firm_id=2) == [item]
         assert session.execute.await_count == 2
+        for call in session.execute.await_args_list:
+            query = str(call.args[0])
+            assert "ai_credentials.user_id" in query
+            assert "ai_credentials.firm_id" in query
 
     asyncio.run(run())
 
