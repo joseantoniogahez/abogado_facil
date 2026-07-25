@@ -1,6 +1,7 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
-import { createMemoryRouter, RouterProvider } from "react-router-dom";
+import { createMemoryRouter } from "react-router";
+import { RouterProvider } from "react-router/dom";
 
 import { createQueryClient } from "@/app/query-client";
 import { type AuthenticatedUser, SESSION_QUERY_KEY } from "@/shared/auth/session";

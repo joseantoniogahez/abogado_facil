@@ -3,7 +3,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import type { RouteObject } from "react-router-dom";
+import type { RouteObject } from "react-router";
 
 import { appRoutes } from "@/app/routes";
 import { FRONTEND_DIR } from "@/contracts/docs";
@@ -19,6 +19,7 @@ const ROUTE_OWNER_BY_COMPONENT: Record<string, string> = {
   AdminPermissionsPage: "features/admin-permissions/AdminPermissionsPage",
   AdminRolesPage: "features/admin-roles/AdminRolesPage",
   AdminUsersPage: "features/admin-users/AdminUsersPage",
+  AiSettingsPage: "features/ai-settings/AiSettingsPage",
   DashboardPage: "features/dashboard/DashboardPage",
   ClientsPage: "features/clients/ClientsPage",
   NewClientPage: "features/clients/NewClientPage",

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { type FormEvent, useState } from "react";
-import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router";
 
 import { defaultQueryPolicy } from "@/app/query-policy";
 import { expectNumberField, expectRecord, expectStringField } from "@/shared/api/contracts";

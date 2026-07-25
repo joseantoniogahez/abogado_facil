@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router";
 
 import { appendRequestIdDiagnostic, getApiErrorRequestId } from "@/shared/api/errors";
 import { useSession } from "@/shared/auth/session";

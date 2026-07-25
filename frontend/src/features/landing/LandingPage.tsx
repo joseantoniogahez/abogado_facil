@@ -1,4 +1,4 @@
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate } from "react-router";
 
 import { useSession } from "@/shared/auth/session";
 import { t, type UiTextKey } from "@/shared/i18n/ui-text";

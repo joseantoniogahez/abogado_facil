@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router";
 
 import { useSession } from "@/shared/auth/session";
 import { userHasPermission } from "@/shared/iam/api";

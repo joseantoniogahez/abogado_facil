@@ -25,7 +25,9 @@ Status date: `2026-07-17`
   - E2E smoke baseline for auth/routing/error journeys.
 
 The JavaScript budget is `836000` raw bytes and `247000` gzip bytes after the owner-approved
-CORE-010 capacity increase; enforcement and route-level/dependency review remain mandatory.
+CORE-010 capacity increase. The CSS budget is `32100` raw bytes and `9000` gzip bytes after the
+owner-approved AI-002 capacity increase; enforcement and route-level/dependency review remain
+mandatory.
 
 ## Active Guardrails
 

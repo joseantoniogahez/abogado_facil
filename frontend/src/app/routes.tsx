@@ -1,11 +1,12 @@
 import { lazy, Suspense } from "react";
-import type { RouteObject } from "react-router-dom";
-import { Navigate } from "react-router-dom";
+import type { RouteObject } from "react-router";
+import { Navigate } from "react-router";
 
 import { AdminAssignmentsPage } from "@/features/admin-assignments/AdminAssignmentsPage";
 import { AdminPermissionsPage } from "@/features/admin-permissions/AdminPermissionsPage";
 import { AdminRolesPage } from "@/features/admin-roles/AdminRolesPage";
 import { AdminUsersPage } from "@/features/admin-users/AdminUsersPage";
+import { AiSettingsPage } from "@/features/ai-settings/AiSettingsPage";
 import { AuditLogPage } from "@/features/audit-log/AuditLogPage";
 import { LoginPage } from "@/features/auth/LoginPage";
 import { RegisterPage } from "@/features/auth/RegisterPage";
@@ -82,6 +83,10 @@ export const appRoutes: RouteObject[] = [
           {
             path: "profile",
             element: <ProfilePage />,
+          },
+          {
+            path: "settings/ai",
+            element: <AiSettingsPage />,
           },
           { path: "clients", element: <ClientsPage /> },
           { path: "clients/new", element: <NewClientPage /> },

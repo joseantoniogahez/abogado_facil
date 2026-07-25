@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { startTransition, useEffect, useMemo, useState } from "react";
-import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { startTransition, useMemo, useState } from "react";
+import { Link, Outlet, useLocation, useNavigate } from "react-router";
 
 import { authLogoutMutationPolicy } from "@/app/mutation-policy";
 import { logout, SESSION_QUERY_KEY, useSession } from "@/shared/auth/session";
@@ -30,8 +30,8 @@ interface AdminMenuItem {
 }
 
 interface PrimaryMenuItem {
-  key: "routing.nav.clients" | "routing.nav.matters" | "routing.nav.home" | "routing.nav.profile";
-  to: "/clients" | "/matters" | "/dashboard" | "/profile";
+  key: "routing.nav.clients" | "routing.nav.matters" | "routing.nav.home" | "routing.nav.profile" | "routing.nav.aiSettings";
+  to: "/clients" | "/matters" | "/dashboard" | "/profile" | "/settings/ai";
 }
 
 const PRIMARY_MENU_ITEMS: readonly PrimaryMenuItem[] = [
@@ -42,6 +42,10 @@ const PRIMARY_MENU_ITEMS: readonly PrimaryMenuItem[] = [
   {
     key: "routing.nav.profile",
     to: "/profile",
+  },
+  {
+    key: "routing.nav.aiSettings",
+    to: "/settings/ai",
   },
   {
     key: "routing.nav.clients",
@@ -82,8 +86,13 @@ const ADMIN_MENU_ITEMS: readonly AdminMenuItem[] = [
 ];
 
 export const RootLayout = () => {
-  const { data: user } = useSession();
   const location = useLocation();
+
+  return <RootLayoutContent key={location.pathname} />;
+};
+
+const RootLayoutContent = () => {
+  const { data: user } = useSession();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -96,10 +105,6 @@ export const RootLayout = () => {
       startTransition(() => void navigate("/login", { replace: true }));
     },
   });
-
-  useEffect(() => {
-    setIsMenuOpen(false);
-  }, [location.pathname]);
 
   const visibleAdminItems = useMemo(() => {
     if (!user) {

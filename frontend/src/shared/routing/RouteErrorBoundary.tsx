@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { isRouteErrorResponse, useRouteError } from "react-router-dom";
+import { isRouteErrorResponse, useRouteError } from "react-router";
 
 import { appendRequestIdDiagnostic, getApiErrorRequestId } from "@/shared/api/errors";
 import { t } from "@/shared/i18n/ui-text";
