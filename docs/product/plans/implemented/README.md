@@ -28,3 +28,4 @@ derivarse de esa carpeta, no de estos planes técnicos.
 | Tabs de detalle de asuntos | [`UX-002`](UX-002_TABS_DETALLE_ASUNTOS_PLAN.md)               |
 | OpenAPI en producción      | [`OPS-005`](OPS-005_OPENAPI_PRODUCCION_PLAN.md)               |
 | CORS endurecido            | [`OPS-006`](OPS-006_CORS_ENDURECIDO_PLAN.md)                  |
+| Validación BYOK para IA    | [`AI-004`](AI-004_VALIDACION_BYOK_PLAN.md)                    |

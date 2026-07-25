@@ -122,7 +122,7 @@ esperada: pruebas de contrato, métricas, ADR, threat model, caso de fallo o dem
 | AI-001 | Backend    | P0-IA     | Hecho        | Modelo y servicio para credenciales BYOK.       | API keys cifradas, no expuestas al frontend y eliminables por usuario.            |
 | AI-002 | Full-stack | P1        | Hecho        | Pantalla de configuración IA.                   | Seleccionar proveedor, guardar key, probar conexión, eliminar key y ver estado.   |
 | AI-003 | Backend    | P1        | Hecho        | Abstracción multi-provider.                     | `OpenAIProvider`, `GeminiProvider` y `MockProvider` detrás de un puerto común.    |
-| AI-004 | Backend    | P0-IA     | Identificado | Validación obligatoria de BYOK en funciones IA. | Sin credencial válida no se ejecutan llamadas reales.                             |
+| AI-004 | Backend    | P0-IA     | Hecho        | Validación obligatoria de BYOK en funciones IA. | Sin credencial válida no se ejecutan llamadas reales.                             |
 | AI-005 | Ops        | P0-IA     | Identificado | Política de logs y datos sensibles de IA.       | Prompts/API keys no aparecen en logs técnicos sin protección.                     |
 | AI-006 | Backend    | P1        | Identificado | Registro de uso/errores por función IA.         | Métricas iniciales por proveedor, función, error y tiempo de respuesta.           |
 | AI-007 | Backend    | P0-IA     | Identificado | Validación de salidas estructuradas.            | JSON/schema validado antes de guardar, mostrar, copiar o exportar resultados IA.  |
