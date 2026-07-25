@@ -80,6 +80,11 @@ Features consume `FileStoragePort`; provider code is isolated in `app/integratio
 use a test-only `FakeFileStorage` or a mocked SDK client without Docker or network access. No feature should
 import `boto3` directly.
 
+AI observability is metadata-only: prompts, document text, credentials, tokens, authorization
+headers, and provider exception details must not be passed to technical logs. Use
+`app.core.common.observability.log_layer_event` for structured events; sensitive field names are
+redacted centrally and tests enforce the negative contract.
+
 PDF uploads are parsed locally through `PdfTextExtractorPort`. When a text layer is available, its
 normalized content is stored with the document metadata for future AI workflows. Scanned PDFs are
 kept with an `empty` extraction state and are not sent through OCR; parser failures are non-fatal and
