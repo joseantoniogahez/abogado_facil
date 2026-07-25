@@ -28,3 +28,21 @@ def test_ai_credential_settings_require_production_environment_key(monkeypatch) 
     monkeypatch.delenv("AI_CREDENTIAL_ENCRYPTION_KEY", raising=False)
     with pytest.raises(ValidationError):
         AiCredentialSettings(APP_ENV="prod")
+
+
+def test_ai_credential_settings_reject_local_default_in_production(monkeypatch) -> None:
+    monkeypatch.setenv(
+        "AI_CREDENTIAL_ENCRYPTION_KEY",
+        AiCredentialSettings._LOCAL_ENCRYPTION_KEY,
+    )
+    with pytest.raises(ValidationError, match="local default"):
+        AiCredentialSettings(APP_ENV="prod")
+
+
+def test_ai_credential_settings_accept_unique_production_key(monkeypatch) -> None:
+    key = base64.urlsafe_b64encode(b"p" * 32).decode()
+    monkeypatch.setenv("AI_CREDENTIAL_ENCRYPTION_KEY", key)
+
+    settings = AiCredentialSettings(APP_ENV="prod")
+
+    assert settings.AI_CREDENTIAL_ENCRYPTION_KEY.get_secret_value() == key

@@ -149,4 +149,24 @@ describe("documentation contracts", () => {
 
     expect(indexMarkdown).toContain("foundation_status.md");
   });
+
+  it("keeps frontend README tool versions aligned with package metadata", () => {
+    const packageJson = JSON.parse(
+      readMarkdown(path.join(FRONTEND_DIR, "package.json")),
+    ) as {
+      dependencies: Record<string, string>;
+      engines: Record<string, string>;
+      packageManager: string;
+    };
+    const readme = readMarkdown(path.join(FRONTEND_DIR, "README.md"));
+    const composeTest = readMarkdown(path.join(REPO_DIR, "compose.test.yaml"));
+    const routerMajor = packageJson.dependencies["react-router"].match(/\d+/)?.[0];
+    const nodeVersion = packageJson.engines.node.replace(/^>=/, "");
+    const npmVersion = packageJson.packageManager.replace(/^npm@/, "");
+
+    expect(readme).toContain(`React Router ${routerMajor}`);
+    expect(readme).toContain(`Node.js \`${packageJson.engines.node}\``);
+    expect(composeTest).toContain(`node:${nodeVersion}-alpine`);
+    expect(composeTest).toContain(`npm@${npmVersion}`);
+  });
 });

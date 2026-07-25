@@ -41,8 +41,9 @@ Current top-level shape:
   must never be placed in URLs that can be retained by access logs or intermediaries.
 - Provider errors are normalized to `AiProviderError`; API keys, response bodies, and provider error
   details are never included in the exception message.
-- This port does not decide whether a user has a valid BYOK credential or persist results; those
-  policies belong to `AI-004` and future feature services.
+- This port does not decide whether a user has a valid BYOK credential or persist results.
+  `app/features/ai_execution/service.py` owns the implemented BYOK validation and provider
+  construction policy; future AI use-case services will own result persistence.
 
 ## Ownership
 
@@ -67,11 +68,25 @@ Current top-level shape:
 
 Current features:
 
+- `ai_credentials`
+- `ai_execution`
 - `audit_log`
-- `health`
 - `auth`
-- `rbac`
+- `clients`
+- `dashboard`
+- `health`
+- `matter_calculations`
+- `matter_checklists`
+- `matter_documents`
+- `matter_notes`
+- `matter_payments`
+- `matter_tasks`
+- `matters`
 - `outbox`
+- `rbac`
+
+`outbox` and `ai_execution` are service capabilities without public routers. The remaining routed
+features are registered through `app/core/setup/routers.py`.
 
 ## Dependency direction
 

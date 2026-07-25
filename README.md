@@ -12,6 +12,7 @@ SaaS web para abogados independientes y despachos pequeños con expedientes, tar
 - `README.md` (this file): repository architecture and multi-service run flow.
 - `backend/README.md`: backend-only setup, API behavior, migrations, and backend tests.
 - `frontend/README.md`: frontend-only setup, scripts, tests, and API client configuration.
+- `docs/product/README.md`: current product capabilities, backlog, and implementation-plan indexes.
 - `AGENTS.md`: AI assistant operating guide for this starter kit.
 - `docs/ai/start_new_project.md`: new-project bootstrap workflow for turning this starter kit into
   a named application.
@@ -22,6 +23,7 @@ SaaS web para abogados independientes y despachos pequeños con expedientes, tar
 - `backend/docs/`: backend documentation (API endpoints, auth, RBAC, DI, OpenAPI pattern)
 - `frontend/`: React SPA and frontend tests
 - `frontend/docs/`: frontend documentation (routing, API sync, runtime config, quality gates)
+- `docs/product/`: current functional capabilities, backlog, and pending/implemented plans
 - `docs/ai/`: repository-level AI request templates and new-project bootstrap instructions
 - `scripts/`: repository-level developer and AI workflow helpers
 - `.github/workflows/ci.yaml`: CI validation for repository hooks, backend, and frontend
@@ -37,7 +39,7 @@ SaaS web para abogados independientes y despachos pequeños con expedientes, tar
 - Docker Desktop (or Docker Engine + Compose plugin)
 - Optional for local non-Docker workflows:
   - Python 3.14
-  - Node.js >=22.0.0 (Node.js 22 is used by Docker/CI)
+  - Node.js >=22.23.1 (Node.js 22.23.1 is used by Docker/CI)
   - npm >=12.0.1
 
 ## Environment Setup
@@ -134,10 +136,14 @@ From repository root:
 docker compose -f compose.yaml -f compose.prod.yaml up --build -d
 ```
 
-Production JWT note:
+Production secrets and credentials:
 
 - `compose.prod.yaml` sets `APP_ENV=prod`.
 - Define `JWT_SECRET_KEY`, `JWT_ALGORITHM`, `JWT_ACCESS_TOKEN_EXPIRE_MINUTES`, `JWT_ISSUER`, and `JWT_AUDIENCE` in `.env` before starting.
+- Define `AI_CREDENTIAL_ENCRYPTION_KEY` as URL-safe base64 for exactly 32 random bytes. Generate a
+  production value with
+  `python -c "import base64, secrets; print(base64.urlsafe_b64encode(secrets.token_bytes(32)).decode())"`.
+  Production startup rejects the local default from `.env_examples`.
 - Define `S3_ENDPOINT_URL`, `S3_REGION`, `S3_BUCKET`, `S3_ACCESS_KEY`, and `S3_SECRET_KEY`; production
   has no object-storage credential defaults and does not publish MinIO ports.
 
@@ -169,7 +175,7 @@ The repository uses a root virtual environment for shared tooling and hooks.
 Local `pre-commit` hooks depend on more than the root Python environment:
 
 - Python 3.14 for Python-based hooks
-- Node.js >=22.0.0 (Node.js 22 in Docker/CI) and npm 12.0.1+ for frontend ESLint and typecheck hooks
+- Node.js >=22.23.1 (Node.js 22.23.1 in Docker/CI) and npm 12.0.1+ for frontend ESLint and typecheck hooks
 - Docker Desktop (or Docker Engine + Compose plugin) for `hadolint` and `docker compose config` hooks
 - A local `.env` copied from `.env_examples`, because compose validation hooks resolve environment variables from it
 

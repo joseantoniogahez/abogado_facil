@@ -7,7 +7,7 @@ This document replaces backlog-style historical tracking for frontend foundation
 
 ## Current Foundation Snapshot
 
-Status date: `2026-07-17`
+Status date: `2026-07-25`
 
 - Foundation maturity: `ready for feature delivery`.
 - Architecture baseline enforced:
@@ -35,6 +35,8 @@ mandatory.
 - Canonical runtime contracts: `docs/operations/*.md`.
 - Request workflows for AI execution: `docs/templates/*.md`.
 - Documentation contracts: `src/contracts/docs.contract.test.ts`.
+- Performance documentation thresholds are contract-checked against
+  `performance/bundle_budget.json`.
 
 ## Required Validation Gates
 

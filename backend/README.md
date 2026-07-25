@@ -67,6 +67,13 @@ JWT defaults for `local/test`:
 - `JWT_ISSUER=abogado-facil`
 - `JWT_AUDIENCE=abogado-facil-api`
 
+BYOK credential encryption:
+
+- `AI_CREDENTIAL_ENCRYPTION_KEY` must be URL-safe base64 that decodes to exactly 32 bytes.
+- Direct local execution uses a development-only default when the variable is unset.
+- Production requires an explicit unique value and rejects the local default. Generate one with
+  `python -c "import base64, secrets; print(base64.urlsafe_b64encode(secrets.token_bytes(32)).decode())"`.
+
 Required object storage configuration:
 
 - Define `S3_ENDPOINT_URL`, `S3_REGION`, `S3_BUCKET`, `S3_ACCESS_KEY`, and `S3_SECRET_KEY` in every environment.
@@ -191,6 +198,7 @@ Before production startup (`APP_ENV=prod`), set strong values for:
 - `JWT_ACCESS_TOKEN_EXPIRE_MINUTES`
 - `JWT_ISSUER`
 - `JWT_AUDIENCE`
+- `AI_CREDENTIAL_ENCRYPTION_KEY`
 - `S3_ENDPOINT_URL`, `S3_REGION`, `S3_BUCKET`, `S3_ACCESS_KEY`, and `S3_SECRET_KEY`
 
 Run production stack from repo root:

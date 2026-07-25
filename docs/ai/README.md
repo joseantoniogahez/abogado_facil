@@ -5,6 +5,10 @@ This folder contains repository-level AI workflow assets that apply across backe
 Use `AGENTS.md` as the root operating guide. Use these templates when a request needs a structured
 scope before implementation.
 
+Current product behavior and planning state live under `../product/`; use
+`../product/capabilities/` for delivered functional truth and
+`../product/BACKLOG_ABOGADO_FACIL.md` for concise status.
+
 ## New Project Startup
 
 - `start_new_project.md`: practical workflow for turning this starter kit into a named application.

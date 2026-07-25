@@ -34,4 +34,14 @@ describe("performance budget contracts", () => {
     expect(markdown).toContain("npm --prefix frontend run build");
     expect(markdown).toContain("npm --prefix frontend run perf:check");
   });
+
+  it("keeps documented thresholds aligned with the enforced policy", () => {
+    const policy = JSON.parse(fs.readFileSync(POLICY_PATH, "utf8")) as Record<string, number>;
+    const markdown = fs.readFileSync(DOC_PATH, "utf8");
+
+    for (const [key, value] of Object.entries(policy)) {
+      expect(markdown).toContain(`| \`${key}\``);
+      expect(markdown).toMatch(new RegExp(`\\| \`${key}\`\\s+\\| \`${value}\`\\s+\\|`));
+    }
+  });
 });

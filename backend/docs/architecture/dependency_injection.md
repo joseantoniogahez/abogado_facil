@@ -8,21 +8,21 @@ Keep wiring in one place and keep feature modules focused on behavior.
 
 Dependency providers live in `app/core/setup/dependencies.py`.
 
-Main providers:
+Main provider groups:
 
-- `get_db_session`
-- `get_unit_of_work`
-- `get_auth_repository`
-- `get_audit_log_repository`
-- `get_rbac_repository`
-- `get_outbox_repository`
-- `get_auth_service`
-- `get_audit_log_service`
-- `get_rbac_service`
-- `get_outbox_service`
-- `get_password_service`
-- `get_token_service`
-- `get_file_storage`
+- Request and transaction state: `get_db_session`, `get_unit_of_work`, and
+  `get_request_permission_scope_cache`.
+- Feature repositories: auth, audit log, RBAC, outbox, clients, matters, notes, checklists, tasks,
+  payments, calculations, documents, and AI credentials.
+- Feature services: auth, audit log, RBAC, outbox, dashboard, clients, matters, notes, checklists,
+  tasks, payments, calculations, documents, and AI credentials.
+- Security and settings: `get_auth_settings`, `get_ai_credential_settings`,
+  `get_secret_encryption`, `get_password_service`, and `get_token_service`.
+- Integration adapters and settings: `get_file_storage`, `get_pdf_text_extractor`,
+  `get_object_storage_settings`, and `get_matter_document_settings`.
+
+The executable provider catalog is `app/core/setup/dependencies.py`; add new request-scoped wiring
+there and update this grouping when a new provider category is introduced.
 
 Feature-local auth dependencies live in:
 

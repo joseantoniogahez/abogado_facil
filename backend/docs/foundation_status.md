@@ -7,7 +7,7 @@ This document replaces backlog-style historical tracking for backend foundation 
 
 ## Current Foundation Snapshot
 
-Status date: `2026-07-17`
+Status date: `2026-07-25`
 
 - Foundation maturity: `ready for feature delivery`.
 - Architecture baseline enforced:
@@ -20,6 +20,8 @@ Status date: `2026-07-17`
   - Normalized error payload and HTTP mapping.
   - UnitOfWork transaction boundary enforcement.
   - Dependency-injection and OpenAPI documentation patterns.
+  - Documentation contracts for backend paths/router inventory, product-plan indexes, active item
+    plans, and production BYOK encryption-key wiring.
 
 ## Active Guardrails
 

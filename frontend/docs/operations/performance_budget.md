@@ -21,6 +21,17 @@ The gate evaluates production artifacts in `dist/assets`:
 - `npm --prefix frontend run build` must fail when any budget threshold is exceeded.
 - Build command runs `npm run perf:check` after Vite production build.
 
+## Current Enforced Thresholds
+
+These values must match `performance/bundle_budget.json` exactly:
+
+| Policy key                 | Bytes    |
+| -------------------------- | -------- |
+| `max_total_js_bytes`       | `836000` |
+| `max_total_js_gzip_bytes`  | `247000` |
+| `max_total_css_bytes`      | `32100`  |
+| `max_total_css_gzip_bytes` | `9000`   |
+
 ## Threshold Rationale
 
 - The prior PROD-003 `max_total_js_bytes` was `395000` bytes. PROD-003 added the authenticated dashboard, API parser,
@@ -62,6 +73,9 @@ The gate evaluates production artifacts in `dist/assets`:
 - On 2026-07-18 the owner explicitly approved increasing the raw CSS limit from `21200` to `21400`
   bytes for UX-002. The measured build is `21333` raw CSS bytes, retaining `67` bytes of headroom;
   the CSS gzip limit remains `6000`.
+- On 2026-07-24 the owner approved up to a 50% CSS capacity increase to close AI-002. The enforced
+  CSS limits moved from `21400` to `32100` raw bytes and from `6000` to `9000` gzip bytes. The
+  approval does not waive accessibility review, shared-style reuse, or the build gate.
 
 ## Commands
 

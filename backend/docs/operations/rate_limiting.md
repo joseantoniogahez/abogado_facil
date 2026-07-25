@@ -9,8 +9,11 @@ ordinary authenticated reads.
 - `POST /v1/users/register`: 5 requests per client IP per 60 seconds.
 - `POST /v1/matters/{matter_id}/documents`: 30 requests per client IP per 60 seconds.
 - Limits and the window are configurable with `RATE_LIMIT_*` settings.
-- Local and test environments default to disabled; enabling them locally uses an application-local
-  memory counter.
+- Direct backend execution without `RATE_LIMIT_*` variables defaults to disabled and uses an
+  application-local memory counter when enabled.
+- The repository Compose profile and `.env_examples` enable rate limiting with shared Redis by
+  default, including local Docker development. Backend unit tests keep it disabled unless a test
+  opts in explicitly.
 - Production requires `RATE_LIMIT_STORAGE=redis` when rate limiting is enabled. Redis uses an atomic
   increment/expiry script, so counters are shared across workers.
 

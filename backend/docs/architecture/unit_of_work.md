@@ -17,7 +17,17 @@ With UoW, a use case either:
 - Port contract: `app/core/db/ports.py` (`UnitOfWorkPort`)
 - DI provider: `app/core/setup/dependencies.py` (`get_unit_of_work`)
 - Service usage:
+  - `app/features/ai_credentials/service.py`
   - `app/features/auth/service.py`
+  - `app/features/auth/profile_updates.py`
+  - `app/features/clients/service.py`
+  - `app/features/matters/service.py`
+  - `app/features/matter_calculations/service.py`
+  - `app/features/matter_checklists/service.py`
+  - `app/features/matter_documents/service.py`
+  - `app/features/matter_notes/service.py`
+  - `app/features/matter_payments/service.py`
+  - `app/features/matter_tasks/service.py`
   - `app/features/rbac/service.py`
   - `app/features/outbox/service.py`
 
@@ -59,6 +69,8 @@ Examples in current code:
 
 - `AuthService.register`
 - `AuthProfileUpdates.persist_user_changes` (called by `AuthService.update_current_user`)
+- `AiCredentialsService` save/delete operations
+- Client, matter, note, checklist, task, payment, calculation, and document write operations
 - `RBACService` write methods (create/update/delete/assignment operations)
 - `OutboxService.enqueue` and `OutboxService.mark_published`
 

@@ -201,9 +201,10 @@ class MatterDocumentSettings(BaseSettings):
 
 class AiCredentialSettings(BaseSettings):
     _PRODUCTION_ENV_VALUES: ClassVar[set[str]] = {"prod", "production", "staging"}
+    _LOCAL_ENCRYPTION_KEY: ClassVar[str] = "MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDE="
 
     APP_ENV: str = "local"
-    AI_CREDENTIAL_ENCRYPTION_KEY: SecretStr = SecretStr("MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDE=")
+    AI_CREDENTIAL_ENCRYPTION_KEY: SecretStr = SecretStr(_LOCAL_ENCRYPTION_KEY)
 
     @field_validator("APP_ENV")
     @classmethod
@@ -214,12 +215,15 @@ class AiCredentialSettings(BaseSettings):
     def validate_encryption_key(self) -> AiCredentialSettings:
         import base64
 
+        encoded_key = self.AI_CREDENTIAL_ENCRYPTION_KEY.get_secret_value()
         try:
-            key = base64.urlsafe_b64decode(self.AI_CREDENTIAL_ENCRYPTION_KEY.get_secret_value())
+            key = base64.urlsafe_b64decode(encoded_key)
         except Exception as exc:
             raise ValueError("AI_CREDENTIAL_ENCRYPTION_KEY must be urlsafe base64.") from exc
         if len(key) != 32:
             raise ValueError("AI_CREDENTIAL_ENCRYPTION_KEY must decode to 32 bytes.")
         if self.APP_ENV in self._PRODUCTION_ENV_VALUES and not os.getenv("AI_CREDENTIAL_ENCRYPTION_KEY", "").strip():
             raise ValueError("AI_CREDENTIAL_ENCRYPTION_KEY is required in production.")
+        if self.APP_ENV in self._PRODUCTION_ENV_VALUES and encoded_key == self._LOCAL_ENCRYPTION_KEY:
+            raise ValueError("AI_CREDENTIAL_ENCRYPTION_KEY must not use the local default in production.")
         return self

@@ -93,6 +93,7 @@ services:
       JWT_ISSUER: "${JWT_ISSUER:-abogado-facil}"
       JWT_AUDIENCE: "${JWT_AUDIENCE:-abogado-facil-api}"
       JWT_SECRET_KEY: "${JWT_SECRET_KEY:-local-dev-jwt-secret-change-me-now}"
+      AI_CREDENTIAL_ENCRYPTION_KEY: "${AI_CREDENTIAL_ENCRYPTION_KEY:-MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDE=}" # pragma: allowlist secret
       LOG_LEVEL: "${LOG_LEVEL:-INFO}"
       RATE_LIMIT_ENABLED: "${RATE_LIMIT_ENABLED:-true}"
       RATE_LIMIT_STORAGE: "${RATE_LIMIT_STORAGE:-redis}"

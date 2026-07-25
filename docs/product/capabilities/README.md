@@ -17,6 +17,7 @@ Los detalles técnicos, decisiones de implementación y evidencias de validació
 - [`clients.md`](clients.md): clientes y aislamiento por despacho.
 - [`matters.md`](matters.md): asuntos y todas las capacidades integradas en su detalle.
 - [`documents-and-storage.md`](documents-and-storage.md): documentos, almacenamiento y extracción de texto.
+- [`ai-configuration.md`](ai-configuration.md): configuración segura de credenciales BYOK.
 - [`legal-and-ux.md`](legal-and-ux.md): avisos legales, accesibilidad y jerarquía de acciones.
 
 ## Convenciones
