@@ -43,30 +43,30 @@ flowchart LR
 | PostgreSQL to worker          | mutable product/document data     | reload by job `firm_id` and `user_id`; explicit allowlist                                                           |
 | Application to Redis          | producer-controlled job command   | catalogued handler, JSON serializer, opaque execution ID only                                                       |
 | Stored credential to provider | encrypted secret at rest          | production key wiring, scoped lookup, decrypt only in memory                                                        |
-| Document/context to model     | legal and user-authored text      | size/field minimization now; `SEC-004` before real document workflows                                               |
+| Document/context to model     | legal and user-authored text      | minimization, escaped untrusted-data envelope, separate system instruction, no tools                                |
 | Provider to application       | arbitrary text and malformed JSON | closed error taxonomy and sealed schema validation result                                                           |
 | Runtime to logs/metrics       | correlation and failure metadata  | allowlisted fields and content-free context/output representations; no prompts, documents, responses or credentials |
 
 ## Threats and Controls
 
-| Threat                          | Current control                                                                               | Residual risk / next gate                                                                                         |
-| ------------------------------- | --------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Cross-firm or cross-user access | every `AIJob` read and mutation requires both IDs; context must be loaded with the same scope | negative multi-user tests remain mandatory per feature                                                            |
-| Credential disclosure           | AES-GCM at rest, keys omitted from API and logs, provider headers only                        | operational key rotation and incident procedures remain deployment responsibilities                               |
-| Sensitive data in Redis         | JSON payload contains only `execution_id`; deterministic catalogued jobs                      | real handlers must preserve this boundary                                                                         |
-| Context over-collection         | sealed builder requires authorized and necessary fields and bounded payloads                  | product allowlists must be reviewed per function                                                                  |
-| Forged validation marker        | `MinimizedAIContext` and `ValidatedAIOutput` reject direct construction                       | Python process memory is trusted application code; unsafe reflection is outside the boundary                      |
-| Mutating a validated result     | callers receive a defensive copy and persistence receives a fresh copy                        | schemas still need `extra="forbid"` and function-specific constraints                                             |
-| Provider error/content leakage  | normalized errors, redacted logs and content-free metrics                                     | provider SDK/transport changes require contract tests                                                             |
-| Prompt injection in documents   | context is minimized and delimited                                                            | unresolved: `SEC-004` must separate trusted instructions from untrusted document data and prohibit tool execution |
-| Autonomous legal action         | no Phase 2 handler or public AI workflow performs actions                                     | `LEGAL-002A` is required before user-facing results                                                               |
+| Threat                          | Current control                                                                                | Residual risk / next gate                                                                    |
+| ------------------------------- | ---------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Cross-firm or cross-user access | every `AIJob` read and mutation requires both IDs; context must be loaded with the same scope  | negative multi-user tests remain mandatory per feature                                       |
+| Credential disclosure           | AES-GCM at rest, keys omitted from API and logs, provider headers only                         | operational key rotation and incident procedures remain deployment responsibilities          |
+| Sensitive data in Redis         | JSON payload contains only `execution_id`; deterministic catalogued jobs                       | real handlers must preserve this boundary                                                    |
+| Context over-collection         | sealed builder requires authorized and necessary fields and bounded payloads                   | product allowlists must be reviewed per function                                             |
+| Forged validation marker        | `MinimizedAIContext` and `ValidatedAIOutput` reject direct construction                        | Python process memory is trusted application code; unsafe reflection is outside the boundary |
+| Mutating a validated result     | callers receive a defensive copy and persistence receives a fresh copy                         | schemas still need `extra="forbid"` and function-specific constraints                        |
+| Provider error/content leakage  | normalized errors, redacted logs and content-free metrics                                      | provider SDK/transport changes require contract tests                                        |
+| Prompt injection in documents   | trusted instruction and escaped untrusted data use separate provider channels; tools are empty | model output remains probabilistic and must pass schema validation plus `LEGAL-002A` review  |
+| Autonomous legal action         | no Phase 2 handler or public AI workflow performs actions                                      | `LEGAL-002A` is required before user-facing results                                          |
 
 ## Release Gates
 
 Phase 2 supplies internal infrastructure, not a production legal AI workflow. Before enabling the
-first document-backed function:
+first document-backed function, the `SEC-004` infrastructure control described above is mandatory
+and the remaining gates are:
 
-1. complete `SEC-004`;
 1. apply `LEGAL-002A`;
 1. define a closed schema and reviewed context allowlist for that function;
 1. register and test a real RQ handler that reconstructs scope from PostgreSQL;
@@ -77,6 +77,7 @@ Canonical detailed contracts are:
 - `../operations/ai_job_lifecycle.md`
 - `../operations/rq_ai_queue.md`
 - `../operations/ai_context_minimization.md`
+- `../operations/document_prompt_injection.md`
 - `../operations/structured_ai_outputs.md`
 - `../operations/ai_provider_errors.md`
 - `../operations/streaming_observability.md`

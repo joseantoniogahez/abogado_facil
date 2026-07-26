@@ -1,4 +1,5 @@
 import asyncio
+import json
 import logging
 from io import BytesIO
 from unittest.mock import MagicMock
@@ -98,7 +99,7 @@ def test_provider_logs_correlated_lifecycle_without_request_or_response_content(
     assert "ai_provider_succeeded" in log_text
     assert REQUEST.request_id in log_text
     assert REQUEST.execution_id in log_text
-    assert REQUEST.context.render() not in log_text
+    assert REQUEST.context.render_untrusted_data() not in log_text
     assert response.text not in log_text
 
 
@@ -112,8 +113,16 @@ def test_openai_provider_builds_provider_payload_without_leaking_key() -> None:
     response = run(OpenAIProvider(api_key=PROVIDER_API_KEY, model="fallback", transport=transport).generate(REQUEST))
     assert response.text == "result"
     assert calls[0][0].endswith("/chat/completions")
-    assert b"Summarize this" in calls[0][2]
-    assert b"Private matter" in calls[0][2]
+    payload = json.loads(calls[0][2])
+    assert payload["messages"][0]["role"] == "system"
+    assert "Summarize this" in payload["messages"][0]["content"]
+    assert "Private matter" not in payload["messages"][0]["content"]
+    assert payload["messages"][1] == {
+        "role": "user",
+        "content": REQUEST.context.render_untrusted_data(),
+    }
+    assert "tools" not in payload
+    assert payload["tool_choice"] == "none"
     assert calls[0][1]["Authorization"] == f"Bearer {PROVIDER_API_KEY}"
 
 
@@ -122,6 +131,17 @@ def test_gemini_provider_normalizes_response() -> None:
         assert url.endswith(":generateContent")
         assert PROVIDER_API_KEY not in url
         assert headers["x-goog-api-key"] == PROVIDER_API_KEY
+        payload = json.loads(body)
+        system_text = payload["systemInstruction"]["parts"][0]["text"]
+        assert "Summarize this" in system_text
+        assert "Private matter" not in system_text
+        assert payload["contents"] == [
+            {
+                "role": "user",
+                "parts": [{"text": REQUEST.context.render_untrusted_data()}],
+            }
+        ]
+        assert "tools" not in payload
         return 200, {"candidates": [{"content": {"parts": [{"text": "gemini result"}]}}]}
 
     response = run(GeminiProvider(api_key=PROVIDER_API_KEY, model="gemini-test", transport=transport).generate(REQUEST))

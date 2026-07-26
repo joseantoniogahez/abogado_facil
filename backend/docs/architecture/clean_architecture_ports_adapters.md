@@ -52,7 +52,9 @@ Current top-level shape:
   `AIJobsService` rejects arbitrary dictionaries and version mismatches before persistence.
 - `app/integrations/ai_context.py` builds a bounded `MinimizedAIContext` from the exact intersection
   of authorized and necessary fields. The context is factory-sealed, and provider requests reject
-  arbitrary prompt strings or directly constructed context markers.
+  arbitrary prompt strings or directly constructed context markers. Provider adapters keep its
+  trusted instruction in the system channel, escape and wrap document values as untrusted user
+  data, and expose no tool capability.
 - `app/core/common/ai_metrics.py` owns the process-local, provider-neutral metrics registry.
   `_ObservedAiProvider` records one content-free observation for every completed provider call.
 

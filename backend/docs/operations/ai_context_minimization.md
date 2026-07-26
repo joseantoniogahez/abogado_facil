@@ -18,9 +18,12 @@ La capa de producto que conoce al usuario, despacho y funcion declara:
 - `instruction`: instruccion estable de la funcion, sin secretos.
 
 El constructor rechaza campos necesarios no autorizados o ausentes. Los campos disponibles pero no
-necesarios no se copian ni se renderizan. La salida ordena los nombres de forma determinista y los
-delimita dentro de `<authorized_context>`; esta delimitacion no sustituye el hardening contra prompt
-injection de `SEC-004`.
+necesarios no se copian ni se renderizan. La salida ordena los nombres de forma determinista, escapa
+sus valores y los delimita dentro de `<untrusted_document_data>`.
+
+La instruccion confiable nunca forma parte de ese render. Los adaptadores la envian por el canal de
+sistema y envian el sobre documental por el canal de usuario, conforme al gate obligatorio de
+`document_prompt_injection.md` implementado por `SEC-004`.
 
 ## Limites
 
@@ -28,7 +31,7 @@ injection de `SEC-004`.
 - nombres `snake_case` de hasta 50 caracteres;
 - instruccion de hasta 4,000 caracteres;
 - cada valor de hasta 20,000 caracteres;
-- payload renderizado total de hasta 60,000 caracteres;
+- instruccion mas payload renderizado total de hasta 60,000 caracteres;
 - no se aceptan instrucciones, campos o valores vacios.
 
 Los casos de uso futuros pueden imponer limites mas estrictos, pero no ampliar estos topes sin

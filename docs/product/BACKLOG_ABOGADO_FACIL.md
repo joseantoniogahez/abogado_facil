@@ -186,9 +186,9 @@ esperada: pruebas de contrato, métricas, ADR, threat model, caso de fallo o dem
 
 ### Gate adicional de seguridad de IA
 
-| ID      | Tipo    | Prioridad | Estado       | Trabajo                                        | Entregable / Criterio                                                                                               |
-| ------- | ------- | --------- | ------------ | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| SEC-004 | Backend | P0-IA     | Identificado | Protección contra prompt injection documental. | Documentos son datos no confiables, delimitados y sin capacidad de modificar instrucciones o ejecutar herramientas. |
+| ID      | Tipo    | Prioridad | Estado | Trabajo                                        | Entregable / Criterio                                                                                               |
+| ------- | ------- | --------- | ------ | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| SEC-004 | Backend | P0-IA     | Hecho  | Protección contra prompt injection documental. | Documentos son datos no confiables, delimitados y sin capacidad de modificar instrucciones o ejecutar herramientas. |
 
 ## Evidencia pública de portafolio
 
@@ -222,6 +222,6 @@ esperada: pruebas de contrato, métricas, ADR, threat model, caso de fallo o dem
 La Fase 2 está completa tras revisar y sellar los gates internos de outputs y contexto. La secuencia
 priorizada continúa con:
 
-1. Seguridad adicional y revisión humana: `SEC-004` y `LEGAL-002A`.
+1. Revisión humana: `LEGAL-002A`.
 1. Hero flow: `UX-AI-001`, `AI-101`, `AI-104`, `AI-105` y `PROD-AI-001`.
 1. Medición posterior: `OBS-002`, `PROD-AI-002` y `PROD-AI-003`.

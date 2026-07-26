@@ -101,7 +101,7 @@ def test_providers_share_success_contract(provider_name: str, factory: ProviderF
     log_text = " ".join(str(call) for call in logger.log.call_args_list)
     assert REQUEST.request_id in log_text
     assert REQUEST.execution_id in log_text
-    assert REQUEST.context.render() not in log_text
+    assert REQUEST.context.render_untrusted_data() not in log_text
     assert response.text not in log_text
     assert API_KEY not in log_text
 
@@ -138,7 +138,7 @@ def test_providers_share_safe_failure_and_retry_contract(
     assert expected_code.value in log_text
     assert REQUEST.request_id in log_text
     assert REQUEST.execution_id in log_text
-    assert REQUEST.context.render() not in log_text
+    assert REQUEST.context.render_untrusted_data() not in log_text
     assert EXTERNAL_DETAIL not in log_text
     assert API_KEY not in log_text
 

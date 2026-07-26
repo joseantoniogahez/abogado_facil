@@ -16,7 +16,7 @@ from urllib.request import Request, urlopen
 from app.core.common.ai_metrics import AI_METRICS, AIMetricsRegistry
 from app.core.common.observability import AiCorrelationContext, log_ai_event
 from app.core.errors.services import InvalidInputError
-from app.integrations.ai_context import MinimizedAIContext
+from app.integrations.ai_context import UNTRUSTED_DATA_POLICY, MinimizedAIContext
 
 
 class AiProviderErrorCode(StrEnum):
@@ -303,8 +303,18 @@ class OpenAIProvider(_HttpAiProvider):
                 headers={"Authorization": f"Bearer {self._api_key}", "Content-Type": "application/json"},
                 body={
                     "model": model,
-                    "messages": [{"role": "user", "content": request.context.render()}],
+                    "messages": [
+                        {
+                            "role": "system",
+                            "content": f"{UNTRUSTED_DATA_POLICY}\n\n{request.context.instruction}",
+                        },
+                        {
+                            "role": "user",
+                            "content": request.context.render_untrusted_data(),
+                        },
+                    ],
                     "max_tokens": request.max_tokens,
+                    "tool_choice": "none",
                 },
             )
             return _require_text(payload, "choices.0.message.content") if isinstance(payload, Mapping) else ""
@@ -323,7 +333,19 @@ class GeminiProvider(_HttpAiProvider):
                 url=f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
                 headers={"Content-Type": "application/json", "x-goog-api-key": self._api_key},
                 body={
-                    "contents": [{"parts": [{"text": request.context.render()}]}],
+                    "systemInstruction": {
+                        "parts": [
+                            {
+                                "text": f"{UNTRUSTED_DATA_POLICY}\n\n{request.context.instruction}",
+                            }
+                        ]
+                    },
+                    "contents": [
+                        {
+                            "role": "user",
+                            "parts": [{"text": request.context.render_untrusted_data()}],
+                        }
+                    ],
                     "generationConfig": {"maxOutputTokens": request.max_tokens},
                 },
             )

@@ -48,3 +48,4 @@ derivarse de esa carpeta, no de estos planes técnicos.
 | Rate limiting               | [`OPS-008`](OPS-008_RATE_LIMITING_PLAN.md)                                |
 | Streaming y observabilidad  | [`OPS-009`](OPS-009_STREAMING_OBSERVABILIDAD_IA_PLAN.md)                  |
 | Aislamiento por despacho    | [`SEC-001A`](SEC-001A_AISLAMIENTO_GENERAL_POR_DESPACHO_PLAN.md)           |
+| Prompt injection documental | [`SEC-004`](SEC-004_PROTECCION_PROMPT_INJECTION_DOCUMENTAL_PLAN.md)       |

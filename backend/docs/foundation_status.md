@@ -34,6 +34,8 @@ Status date: `2026-07-25`
     before an AI result can complete an `AIJob`.
   - Mandatory factory-sealed, allowlisted and bounded context gate before any OpenAI, Gemini, or
     Mock call.
+  - Mandatory prompt-injection gate separating trusted system instructions from escaped,
+    delimited document data while all provider tool capabilities remain disabled.
   - Content-free AI call metrics by provider, stable function, outcome, normalized error, and
     latency through a process-local exportable snapshot.
 

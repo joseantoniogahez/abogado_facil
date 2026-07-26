@@ -302,6 +302,24 @@ def test_ai_context_contract_documents_minimization_gate() -> None:
     assert "`MinimizedAIContext`" in lifecycle
 
 
+def test_document_prompt_injection_contract_separates_authority_and_tools() -> None:
+    contract = _read_markdown(DOCS_DIR / "operations" / "document_prompt_injection.md")
+    threat_model = _read_markdown(BACKEND_ARCHITECTURE_DIR / "ai_data_flow_threat_model.md")
+
+    for token in (
+        "`MinimizedAIContext`",
+        "`build_minimized_ai_context`",
+        "`UNTRUSTED_DATA_POLICY`",
+        "`MinimizedAIContext.render_untrusted_data()`",
+        "campo `tools`",
+        '`tool_choice="none"`',
+        "`LEGAL-002A`",
+    ):
+        assert token in contract
+    assert "separate provider channels" in threat_model
+    assert "tools are empty" in threat_model
+
+
 def test_ai_threat_model_documents_trust_boundaries_and_release_gates() -> None:
     contract = _read_markdown(BACKEND_ARCHITECTURE_DIR / "ai_data_flow_threat_model.md")
 
