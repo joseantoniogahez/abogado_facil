@@ -38,6 +38,8 @@ documental y mensajes de excepción quedan fuera del log.
 `succeeded` y `cancelled` son terminales. Cada inicio incrementa `attempt_count`. Las transiciones
 bloquean la fila dentro de Unit of Work y rechazan estados incompatibles. Un job exitoso exige
 resultado y no permite error; un job fallido exige `error_code` y no permite resultado.
+Además, `AIJobsService.succeed` sólo acepta `ValidatedAIOutput` producido por
+`validate_ai_output`, y su `schema_version` debe coincidir con la registrada en el job.
 
 ## Límites de responsabilidad
 
@@ -47,3 +49,5 @@ resultado y no permite error; un job fallido exige `error_code` y no permite res
 - `OBS-001` conecta la correlación persistente con RQ y los adaptadores; cada worker futuro debe
   recuperar el par desde este registro antes de llamar al proveedor.
 - Los endpoints de producto decidirán qué resultados estructurados están autorizados y validados.
+- `AI-007` exige en `structured_ai_outputs.md` validación y versión coincidente antes de persistir,
+  mostrar, copiar o exportar un resultado.

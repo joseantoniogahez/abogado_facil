@@ -31,6 +31,7 @@ derivarse de esa carpeta, no de estos planes técnicos.
 | Proveedores de IA          | [`AI-003`](AI-003_MULTI_PROVIDER_PLAN.md)                                 |
 | Validación BYOK para IA    | [`AI-004`](AI-004_VALIDACION_BYOK_PLAN.md)                                |
 | Logs y datos sensibles IA  | [`AI-005`](AI-005_POLITICA_LOGS_DATOS_SENSIBLES_PLAN.md)                  |
+| Salidas estructuradas IA   | [`AI-007`](AI-007_VALIDACION_SALIDAS_ESTRUCTURADAS_PLAN.md)               |
 | Ciclo de vida de IA        | [`AI-009`](AI-009_CICLO_VIDA_EJECUCIONES_IA_PLAN.md)                      |
 | Resiliencia RQ/Redis       | [`AI-010`](AI-010_RESILIENCIA_RQ_REDIS_PLAN.md)                           |
 | Taxonomía de errores IA    | [`AI-011`](AI-011_TAXONOMIA_ERRORES_IA_PLAN.md)                           |

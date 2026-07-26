@@ -125,7 +125,7 @@ esperada: pruebas de contrato, métricas, ADR, threat model, caso de fallo o dem
 | AI-004      | Backend    | P0-IA     | Hecho        | Validación obligatoria de BYOK en funciones IA. | Sin credencial válida no se ejecutan llamadas reales.                                         |
 | AI-005      | Ops        | P0-IA     | Hecho        | Política de logs y datos sensibles de IA.       | Prompts/API keys no aparecen en logs técnicos sin protección.                                 |
 | AI-006      | Backend    | P1        | Identificado | Registro de uso/errores por función IA.         | Métricas iniciales por proveedor, función, error y tiempo de respuesta.                       |
-| AI-007      | Backend    | P0-IA     | Identificado | Validación de salidas estructuradas.            | JSON/schema validado antes de guardar, mostrar, copiar o exportar resultados IA.              |
+| AI-007      | Backend    | P0-IA     | Hecho        | Validación de salidas estructuradas.            | JSON/schema validado antes de guardar, mostrar, copiar o exportar resultados IA.              |
 | AI-008      | Backend    | P0-IA     | Identificado | Minimización del contexto enviado a IA.         | Cada llamada envía únicamente el contexto autorizado y necesario para la función.             |
 | AI-009      | Backend    | P0-IA     | Hecho        | Ciclo de vida de ejecuciones de IA.             | `AIJob` con estados, intentos, versiones, resultado, error y correlación.                     |
 | AI-010      | Backend    | P1        | Hecho        | Resiliencia de proveedores.                     | Timeouts, reintentos recuperables, backoff, rate limits y prevención de duplicados.           |

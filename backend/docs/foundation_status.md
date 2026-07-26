@@ -30,6 +30,7 @@ Status date: `2026-07-25`
     provider adapters, and streaming.
   - Cross-provider contract matrix for OpenAI, Gemini, and Mock covering success, timeout, rate
     limiting, invalid responses, safe failures, and the retry handoff to RQ.
+  - Mandatory schema and version validation gate before an AI result can complete an `AIJob`.
 
 ## Active Guardrails
 

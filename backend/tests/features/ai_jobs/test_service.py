@@ -12,6 +12,7 @@ from app.core.config.settings import AIQueueSettings
 from app.core.errors.services import ConflictError, InvalidInputError, NotFoundError
 from app.features.ai_jobs.schemas import AIJobRecord, AIJobStatus, CreateAIJobCommand
 from app.features.ai_jobs.service import AIJobsService
+from app.integrations.ai_outputs import ValidatedAIOutput
 from app.integrations.ai_providers import (
     AiProviderError,
     AiProviderErrorCode,
@@ -122,7 +123,10 @@ def test_successful_lifecycle_tracks_correlation_versions_and_attempt() -> None:
             execution_id=queued.execution_id,
             user_id=7,
             firm_id=3,
-            result={"questions": ["safe structured output"]},
+            result=ValidatedAIOutput(
+                data={"questions": ["safe structured output"]},
+                schema_version="schema-v1",
+            ),
         )
         assert succeeded.status == AIJobStatus.SUCCEEDED
         assert succeeded.result == {"questions": ["safe structured output"]}
@@ -185,13 +189,37 @@ def test_missing_scoped_job_and_invalid_transitions_are_rejected() -> None:
             await service.start(execution_id=queued.execution_id, user_id=8, firm_id=3)
         with pytest.raises(InvalidInputError):
             await service.fail(execution_id=queued.execution_id, user_id=7, firm_id=3, error_code="unsafe message")
+        with pytest.raises(InvalidInputError, match="schema validated"):
+            await service.succeed(
+                execution_id=queued.execution_id,
+                user_id=7,
+                firm_id=3,
+                result={"ok": True},  # type: ignore[arg-type]
+            )
         with pytest.raises(ConflictError):
-            await service.succeed(execution_id=queued.execution_id, user_id=7, firm_id=3, result={"ok": True})
+            await service.succeed(
+                execution_id=queued.execution_id,
+                user_id=7,
+                firm_id=3,
+                result=ValidatedAIOutput(data={"ok": True}, schema_version="schema-v1"),
+            )
 
         await service.start(execution_id=queued.execution_id, user_id=7, firm_id=3)
         with pytest.raises(ConflictError):
             await service.start(execution_id=queued.execution_id, user_id=7, firm_id=3)
-        await service.succeed(execution_id=queued.execution_id, user_id=7, firm_id=3, result={"ok": True})
+        with pytest.raises(InvalidInputError, match="schema version"):
+            await service.succeed(
+                execution_id=queued.execution_id,
+                user_id=7,
+                firm_id=3,
+                result=ValidatedAIOutput(data={"ok": True}, schema_version="schema-v2"),
+            )
+        await service.succeed(
+            execution_id=queued.execution_id,
+            user_id=7,
+            firm_id=3,
+            result=ValidatedAIOutput(data={"ok": True}, schema_version="schema-v1"),
+        )
         with pytest.raises(ConflictError):
             await service.cancel(execution_id=queued.execution_id, user_id=7, firm_id=3)
 

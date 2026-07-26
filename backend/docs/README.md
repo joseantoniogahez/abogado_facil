@@ -22,6 +22,7 @@ This folder is the canonical backend documentation set. It is organized for thre
 - `operations/ai_job_lifecycle.md`: persistent AI execution states, isolation, correlation, and safe result/error storage.
 - `operations/rq_ai_queue.md`: RQ/Redis transport, JSON payload boundary, retry, timeout, TTL, and deduplication policy.
 - `operations/ai_provider_errors.md`: provider-neutral failure codes, safe public messages, and retry policy.
+- `operations/structured_ai_outputs.md`: schema validation and version gate before AI results can be persisted or consumed.
 
 ## Architecture Annexes
 

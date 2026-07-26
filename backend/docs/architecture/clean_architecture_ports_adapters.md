@@ -47,6 +47,9 @@ Current top-level shape:
   `app/features/ai_execution/service.py` owns the implemented BYOK validation and provider
   construction policy. `app/features/ai_jobs` owns the persistent, tenant-scoped execution
   lifecycle; future AI use-case services will validate and supply structured results.
+- `app/integrations/ai_outputs.py` converts untrusted provider text into `ValidatedAIOutput` using
+  an explicit Pydantic schema and version. `AIJobsService` rejects arbitrary dictionaries and
+  version mismatches before persistence.
 
 ## Background job port and RQ adapter
 

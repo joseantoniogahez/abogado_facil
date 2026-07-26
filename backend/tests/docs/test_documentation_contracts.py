@@ -264,3 +264,19 @@ def test_ai_observability_contract_documents_every_correlated_layer() -> None:
     assert "execution_id" in observability_contract
     assert "Redis recibe únicamente" in queue_contract
     assert "`execution_id` opaco como único argumento" in queue_contract
+
+
+def test_structured_ai_output_contract_documents_validation_gate() -> None:
+    contract = _read_markdown(DOCS_DIR / "operations" / "structured_ai_outputs.md")
+    lifecycle = _read_markdown(DOCS_DIR / "operations" / "ai_job_lifecycle.md")
+
+    for token in (
+        "`validate_ai_output`",
+        "`ValidatedAIOutput`",
+        "`schema_version`",
+        "`provider_invalid_response`",
+        '`extra="forbid"`',
+    ):
+        assert token in contract
+    assert "`AIJobsService.succeed`" in contract
+    assert "`ValidatedAIOutput`" in lifecycle

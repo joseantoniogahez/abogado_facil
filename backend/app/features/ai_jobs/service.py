@@ -7,6 +7,7 @@ from app.core.common.observability import AiCorrelationContext, log_ai_event
 from app.core.db.ports import UnitOfWorkPort
 from app.core.errors.services import ConflictError, InvalidInputError, NotFoundError
 from app.features.ai_jobs.schemas import AIJobRecord, AIJobStatus, CreateAIJobCommand
+from app.integrations.ai_outputs import ValidatedAIOutput
 
 
 class AIJobsRepositoryPort(Protocol):
@@ -86,14 +87,25 @@ class AIJobsService:
             self._log_lifecycle(updated, event="ai_job_started")
             return updated
 
-    async def succeed(self, *, execution_id: str, user_id: int, firm_id: int, result: dict[str, Any]) -> AIJobRecord:
+    async def succeed(
+        self,
+        *,
+        execution_id: str,
+        user_id: int,
+        firm_id: int,
+        result: ValidatedAIOutput,
+    ) -> AIJobRecord:
+        if not isinstance(result, ValidatedAIOutput):
+            raise InvalidInputError(message="AI job result must be schema validated")
         async with self.unit_of_work:
             job = await self._get_for_update(execution_id=execution_id, user_id=user_id, firm_id=firm_id)
             self._require_running(job)
+            if result.schema_version != job.schema_version:
+                raise InvalidInputError(message="AI output schema version does not match the job")
             updated = await self._update(
                 job,
                 status=AIJobStatus.SUCCEEDED,
-                result=result,
+                result=result.data,
                 completed_at=datetime.now(UTC),
             )
             self._log_lifecycle(updated, event="ai_job_succeeded")
