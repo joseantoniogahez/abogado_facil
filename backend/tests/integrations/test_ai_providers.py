@@ -5,6 +5,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
+from app.core.common.ai_metrics import AIMetricsRegistry
 from app.core.errors.services import InvalidInputError
 from app.integrations import ai_providers
 from app.integrations.ai_context import build_minimized_ai_context
@@ -24,6 +25,7 @@ REQUEST = AiTextRequest(
         authorized_fields={"matter_summary"},
         necessary_fields={"matter_summary"},
     ),
+    function="matter_summary",
     model="test-model",
     request_id="request-1",
     execution_id="a" * 32,
@@ -41,10 +43,45 @@ def test_mock_provider_returns_normalized_response() -> None:
     assert response.text == "safe mock"
 
 
+def test_provider_records_success_and_normalized_failure_metrics() -> None:
+    metrics = AIMetricsRegistry()
+    run(MockProvider(response="safe mock", metrics=metrics).generate(REQUEST))
+    with pytest.raises(AiProviderError):
+        run(
+            MockProvider(
+                failure_code=AiProviderErrorCode.TIMEOUT,
+                metrics=metrics,
+            ).generate(REQUEST)
+        )
+
+    failure, success = metrics.snapshot()
+    assert failure.key.provider == "mock"
+    assert failure.key.function == REQUEST.function
+    assert failure.key.outcome == "failure"
+    assert failure.key.error_code == "provider_timeout"
+    assert success.key.outcome == "success"
+    assert success.key.error_code is None
+    assert failure.call_count == success.call_count == 1
+    assert failure.total_duration_ms >= 0
+    assert success.total_duration_ms >= 0
+
+
 def test_provider_request_rejects_arbitrary_context() -> None:
     with pytest.raises(InvalidInputError, match="must be minimized"):
         AiTextRequest(
             context="private prompt",  # type: ignore[arg-type]
+            function="matter_summary",
+            model="test-model",
+            request_id="request-1",
+            execution_id="a" * 32,
+        )
+
+
+def test_provider_request_rejects_unsafe_metric_function() -> None:
+    with pytest.raises(InvalidInputError, match="safe metric label"):
+        AiTextRequest(
+            context=REQUEST.context,
+            function="Private matter text",
             model="test-model",
             request_id="request-1",
             execution_id="a" * 32,

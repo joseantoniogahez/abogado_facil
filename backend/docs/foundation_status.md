@@ -32,6 +32,8 @@ Status date: `2026-07-25`
     limiting, invalid responses, safe failures, and the retry handoff to RQ.
   - Mandatory schema and version validation gate before an AI result can complete an `AIJob`.
   - Mandatory allowlisted and bounded context gate before any OpenAI, Gemini, or Mock call.
+  - Content-free AI call metrics by provider, stable function, outcome, normalized error, and
+    latency through a process-local exportable snapshot.
 
 ## Active Guardrails
 

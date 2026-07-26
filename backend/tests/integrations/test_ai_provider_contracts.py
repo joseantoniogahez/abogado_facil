@@ -28,6 +28,7 @@ REQUEST = AiTextRequest(
         authorized_fields={"legal_context"},
         necessary_fields={"legal_context"},
     ),
+    function="legal_analysis",
     model="contract-model",
     request_id="request-contract",
     execution_id="c" * 32,

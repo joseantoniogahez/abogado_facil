@@ -117,21 +117,21 @@ esperada: pruebas de contrato, métricas, ADR, threat model, caso de fallo o dem
 
 ## Fase 2 - BYOK y Capa de IA
 
-| ID          | Tipo       | Prioridad | Estado       | Trabajo                                         | Entregable / Criterio                                                                         |
-| ----------- | ---------- | --------- | ------------ | ----------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| AI-001      | Backend    | P0-IA     | Hecho        | Modelo y servicio para credenciales BYOK.       | API keys cifradas, no expuestas al frontend y eliminables por usuario.                        |
-| AI-002      | Full-stack | P1        | Hecho        | Pantalla de configuración IA.                   | Seleccionar proveedor, guardar key cifrada, eliminar key y ver estado sin exponer el secreto. |
-| AI-003      | Backend    | P1        | Hecho        | Abstracción multi-provider.                     | `OpenAIProvider`, `GeminiProvider` y `MockProvider` detrás de un puerto común.                |
-| AI-004      | Backend    | P0-IA     | Hecho        | Validación obligatoria de BYOK en funciones IA. | Sin credencial válida no se ejecutan llamadas reales.                                         |
-| AI-005      | Ops        | P0-IA     | Hecho        | Política de logs y datos sensibles de IA.       | Prompts/API keys no aparecen en logs técnicos sin protección.                                 |
-| AI-006      | Backend    | P1        | Identificado | Registro de uso/errores por función IA.         | Métricas iniciales por proveedor, función, error y tiempo de respuesta.                       |
-| AI-007      | Backend    | P0-IA     | Hecho        | Validación de salidas estructuradas.            | JSON/schema validado antes de guardar, mostrar, copiar o exportar resultados IA.              |
-| AI-008      | Backend    | P0-IA     | Hecho        | Minimización del contexto enviado a IA.         | Cada llamada envía únicamente el contexto autorizado y necesario para la función.             |
-| AI-009      | Backend    | P0-IA     | Hecho        | Ciclo de vida de ejecuciones de IA.             | `AIJob` con estados, intentos, versiones, resultado, error y correlación.                     |
-| AI-010      | Backend    | P1        | Hecho        | Resiliencia de proveedores.                     | Timeouts, reintentos recuperables, backoff, rate limits y prevención de duplicados.           |
-| AI-011      | Backend    | P1        | Hecho        | Taxonomía normalizada de errores.               | OpenAI, Gemini y mock mapean errores al contrato común y seguro para frontend.                |
-| OBS-001     | Ops        | P1        | Hecho        | Observabilidad correlacionada.                  | `request_id` permite seguir API → `AIJob` → proveedor → resultado sin datos sensibles.        |
-| TEST-AI-001 | Backend    | P1        | Hecho        | Pruebas de contrato y fallos multi-provider.    | Contratos OpenAI/Gemini/mock y escenarios de timeout, rate limit, JSON inválido y reintentos. |
+| ID          | Tipo       | Prioridad | Estado | Trabajo                                         | Entregable / Criterio                                                                         |
+| ----------- | ---------- | --------- | ------ | ----------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| AI-001      | Backend    | P0-IA     | Hecho  | Modelo y servicio para credenciales BYOK.       | API keys cifradas, no expuestas al frontend y eliminables por usuario.                        |
+| AI-002      | Full-stack | P1        | Hecho  | Pantalla de configuración IA.                   | Seleccionar proveedor, guardar key cifrada, eliminar key y ver estado sin exponer el secreto. |
+| AI-003      | Backend    | P1        | Hecho  | Abstracción multi-provider.                     | `OpenAIProvider`, `GeminiProvider` y `MockProvider` detrás de un puerto común.                |
+| AI-004      | Backend    | P0-IA     | Hecho  | Validación obligatoria de BYOK en funciones IA. | Sin credencial válida no se ejecutan llamadas reales.                                         |
+| AI-005      | Ops        | P0-IA     | Hecho  | Política de logs y datos sensibles de IA.       | Prompts/API keys no aparecen en logs técnicos sin protección.                                 |
+| AI-006      | Backend    | P1        | Hecho  | Registro de uso/errores por función IA.         | Métricas iniciales por proveedor, función, error y tiempo de respuesta.                       |
+| AI-007      | Backend    | P0-IA     | Hecho  | Validación de salidas estructuradas.            | JSON/schema validado antes de guardar, mostrar, copiar o exportar resultados IA.              |
+| AI-008      | Backend    | P0-IA     | Hecho  | Minimización del contexto enviado a IA.         | Cada llamada envía únicamente el contexto autorizado y necesario para la función.             |
+| AI-009      | Backend    | P0-IA     | Hecho  | Ciclo de vida de ejecuciones de IA.             | `AIJob` con estados, intentos, versiones, resultado, error y correlación.                     |
+| AI-010      | Backend    | P1        | Hecho  | Resiliencia de proveedores.                     | Timeouts, reintentos recuperables, backoff, rate limits y prevención de duplicados.           |
+| AI-011      | Backend    | P1        | Hecho  | Taxonomía normalizada de errores.               | OpenAI, Gemini y mock mapean errores al contrato común y seguro para frontend.                |
+| OBS-001     | Ops        | P1        | Hecho  | Observabilidad correlacionada.                  | `request_id` permite seguir API → `AIJob` → proveedor → resultado sin datos sensibles.        |
+| TEST-AI-001 | Backend    | P1        | Hecho  | Pruebas de contrato y fallos multi-provider.    | Contratos OpenAI/Gemini/mock y escenarios de timeout, rate limit, JSON inválido y reintentos. |
 
 ## Fase 3 - IA Inicial Controlada
 
@@ -219,17 +219,8 @@ esperada: pruebas de contrato, métricas, ADR, threat model, caso de fallo o dem
 
 ## Siguiente Trabajo del Backlog
 
-La secuencia de portafolio prioriza primero la plataforma confiable y después el hero flow:
+La Fase 2 está completa. La secuencia priorizada continúa con:
 
-1. Plataforma: `AI-009`, `AI-010`, `AI-011`, `OBS-001` y `TEST-AI-001`.
-1. Seguridad adicional: `SEC-004` y `LEGAL-002A`.
+1. Seguridad adicional y revisión humana: `SEC-004` y `LEGAL-002A`.
 1. Hero flow: `UX-AI-001`, `AI-101`, `AI-104`, `AI-105` y `PROD-AI-001`.
-1. Medición: `AI-006`, `OBS-002`, `PROD-AI-002` y `PROD-AI-003`.
-
-El siguiente trabajo priorizado es continuar con la Fase 2:
-
-1. Cerrar los release gates de IA y la configuración segura de BYOK (`AI-001`, `AI-004`, `AI-005`, `AI-007`, `AI-008`, `SEC-001A`, `SEC-001B`, `SEC-001C`, `SEC-002`).
-
-1. Implementar la pantalla de configuración y la abstracción multi-provider (`AI-002`, `AI-003`).
-
-1. Mantener pendientes las políticas operativas y de privacidad de IA (`AI-005`, `AI-006`, `SEC-002`).
+1. Medición posterior: `OBS-002`, `PROD-AI-002` y `PROD-AI-003`.

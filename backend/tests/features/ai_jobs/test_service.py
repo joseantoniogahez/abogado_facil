@@ -118,6 +118,7 @@ def test_successful_lifecycle_tracks_correlation_versions_and_attempt() -> None:
                     authorized_fields={"matter_text"},
                     necessary_fields={"matter_text"},
                 ),
+                function=queued.feature,
                 model=queued.model,
                 request_id=queued.request_id,
                 execution_id=queued.execution_id,

@@ -52,6 +52,8 @@ Current top-level shape:
   version mismatches before persistence.
 - `app/integrations/ai_context.py` builds a bounded `MinimizedAIContext` from the exact intersection
   of authorized and necessary fields. Provider requests reject arbitrary prompt strings.
+- `app/core/common/ai_metrics.py` owns the process-local, provider-neutral metrics registry.
+  `_ObservedAiProvider` records one content-free observation for every completed provider call.
 
 ## Background job port and RQ adapter
 

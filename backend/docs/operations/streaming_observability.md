@@ -59,6 +59,9 @@ not invent a request ID or read one from Redis.
 Provider failures become the stable `error` event and `provider_error` code. The original exception
 is intentionally not sent to the client.
 
+Aggregate series are defined in `ai_metrics.md`. They use only provider, stable function, outcome,
+normalized error code, and latency; correlation identifiers and content are excluded.
+
 ## Verification
 
 `backend/tests/test_streaming.py` covers lifecycle correlation, heartbeat delivery, safe provider

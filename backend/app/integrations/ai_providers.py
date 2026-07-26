@@ -3,6 +3,7 @@
 import asyncio
 import json
 import logging
+import re
 from collections.abc import Awaitable, Callable, Mapping
 from dataclasses import dataclass
 from enum import StrEnum
@@ -12,6 +13,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit
 from urllib.request import Request, urlopen
 
+from app.core.common.ai_metrics import AI_METRICS, AIMetricsRegistry
 from app.core.common.observability import AiCorrelationContext, log_ai_event
 from app.core.errors.services import InvalidInputError
 from app.integrations.ai_context import MinimizedAIContext
@@ -70,6 +72,7 @@ class AiProviderError(Exception):
 @dataclass(frozen=True)
 class AiTextRequest:
     context: MinimizedAIContext
+    function: str
     model: str
     request_id: str
     execution_id: str
@@ -78,6 +81,8 @@ class AiTextRequest:
     def __post_init__(self) -> None:
         if not isinstance(self.context, MinimizedAIContext):
             raise InvalidInputError("AI provider context must be minimized")
+        if re.fullmatch(r"[a-z][a-z0-9_.-]{0,63}", self.function) is None:
+            raise InvalidInputError("AI function is not a safe metric label")
 
 
 @dataclass(frozen=True)
@@ -152,8 +157,14 @@ def _require_text(payload: Any, path: str) -> str:
 class _ObservedAiProvider:
     provider: str
 
-    def __init__(self, *, logger: logging.Logger | None = None):
+    def __init__(
+        self,
+        *,
+        logger: logging.Logger | None = None,
+        metrics: AIMetricsRegistry | None = None,
+    ):
         self._logger = logger or logging.getLogger("app.ai_provider")
+        self._metrics = metrics or AI_METRICS
 
     async def _observe(
         self,
@@ -178,6 +189,14 @@ class _ObservedAiProvider:
         try:
             text = await operation()
         except AiProviderError as exc:
+            duration_ms = round((perf_counter() - started_at) * 1000, 2)
+            self._metrics.record(
+                provider=self.provider,
+                function=request.function,
+                outcome="failure",
+                error_code=exc.error_code,
+                duration_ms=duration_ms,
+            )
             log_ai_event(
                 self._logger,
                 layer="ai_provider",
@@ -187,11 +206,19 @@ class _ObservedAiProvider:
                 model=model,
                 error_code=exc.error_code,
                 retryable=exc.retryable,
-                duration_ms=round((perf_counter() - started_at) * 1000, 2),
+                duration_ms=duration_ms,
                 level=logging.WARNING,
             )
             raise
         except Exception as exc:
+            duration_ms = round((perf_counter() - started_at) * 1000, 2)
+            self._metrics.record(
+                provider=self.provider,
+                function=request.function,
+                outcome="failure",
+                error_code="internal_error",
+                duration_ms=duration_ms,
+            )
             log_ai_event(
                 self._logger,
                 layer="ai_provider",
@@ -200,10 +227,17 @@ class _ObservedAiProvider:
                 provider=self.provider,
                 model=model,
                 error_type=type(exc).__name__,
-                duration_ms=round((perf_counter() - started_at) * 1000, 2),
+                duration_ms=duration_ms,
                 level=logging.ERROR,
             )
             raise
+        duration_ms = round((perf_counter() - started_at) * 1000, 2)
+        self._metrics.record(
+            provider=self.provider,
+            function=request.function,
+            outcome="success",
+            duration_ms=duration_ms,
+        )
         log_ai_event(
             self._logger,
             layer="ai_provider",
@@ -211,7 +245,7 @@ class _ObservedAiProvider:
             correlation=correlation,
             provider=self.provider,
             model=model,
-            duration_ms=round((perf_counter() - started_at) * 1000, 2),
+            duration_ms=duration_ms,
         )
         return AiTextResponse(provider=self.provider, model=model, text=text)
 
@@ -226,8 +260,9 @@ class _HttpAiProvider(_ObservedAiProvider):
         model: str,
         transport: JsonTransport | None = None,
         logger: logging.Logger | None = None,
+        metrics: AIMetricsRegistry | None = None,
     ):
-        super().__init__(logger=logger)
+        super().__init__(logger=logger, metrics=metrics)
         if not api_key.strip():
             raise ValueError("api_key cannot be empty")
         self._api_key = api_key
@@ -307,8 +342,9 @@ class MockProvider(_ObservedAiProvider):
         model: str = "mock-model",
         failure_code: AiProviderErrorCode | None = None,
         logger: logging.Logger | None = None,
+        metrics: AIMetricsRegistry | None = None,
     ):
-        super().__init__(logger=logger)
+        super().__init__(logger=logger, metrics=metrics)
         self._response = response
         self._model = model
         self._failure_code = failure_code

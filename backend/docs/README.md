@@ -24,6 +24,7 @@ This folder is the canonical backend documentation set. It is organized for thre
 - `operations/ai_provider_errors.md`: provider-neutral failure codes, safe public messages, and retry policy.
 - `operations/structured_ai_outputs.md`: schema validation and version gate before AI results can be persisted or consumed.
 - `operations/ai_context_minimization.md`: allowlisted, bounded context gate before any AI provider call.
+- `operations/ai_metrics.md`: bounded provider/function call, error, and latency aggregates.
 
 ## Architecture Annexes
 

@@ -297,3 +297,21 @@ def test_ai_context_contract_documents_minimization_gate() -> None:
     ):
         assert token in contract
     assert "`MinimizedAIContext`" in lifecycle
+
+
+def test_ai_metrics_contract_documents_safe_aggregates() -> None:
+    contract = _read_markdown(DOCS_DIR / "operations" / "ai_metrics.md")
+    observability = _read_markdown(DOCS_DIR / "operations" / "streaming_observability.md")
+
+    for token in (
+        "`AIMetricsRegistry`",
+        "`AiTextRequest`",
+        "`call_count`",
+        "`total_duration_ms`",
+        "`max_duration_ms`",
+        "`average_duration_ms`",
+        "`internal_error`",
+        "`OBS-002`",
+    ):
+        assert token in contract
+    assert "`ai_metrics.md`" in observability
