@@ -43,7 +43,8 @@ Current top-level shape:
   details are never included in the exception message.
 - This port does not decide whether a user has a valid BYOK credential or persist results.
   `app/features/ai_execution/service.py` owns the implemented BYOK validation and provider
-  construction policy; future AI use-case services will own result persistence.
+  construction policy. `app/features/ai_jobs` owns the persistent, tenant-scoped execution
+  lifecycle; future AI use-case services will validate and supply structured results.
 
 ## Ownership
 
@@ -70,6 +71,7 @@ Current features:
 
 - `ai_credentials`
 - `ai_execution`
+- `ai_jobs`
 - `audit_log`
 - `auth`
 - `clients`
@@ -85,8 +87,8 @@ Current features:
 - `outbox`
 - `rbac`
 
-`outbox` and `ai_execution` are service capabilities without public routers. The remaining routed
-features are registered through `app/core/setup/routers.py`.
+`outbox`, `ai_execution`, and `ai_jobs` are service capabilities without public routers. The
+remaining routed features are registered through `app/core/setup/routers.py`.
 
 ## Dependency direction
 

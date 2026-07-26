@@ -11,6 +11,8 @@ from app.core.security.service import Argon2PasswordService, JwtTokenService, Pa
 from app.core.security.service.encryption import AesGcmSecretEncryption, SecretEncryptionPort
 from app.features.ai_credentials.repository import AiCredentialsRepository
 from app.features.ai_credentials.service import AiCredentialsService
+from app.features.ai_jobs.repository import AIJobsRepository
+from app.features.ai_jobs.service import AIJobsService
 from app.features.audit_log.repository import AuditLogRepository
 from app.features.audit_log.service import AuditLogService, AuditLogServicePort
 from app.features.auth.repository import AuthRepository
@@ -261,6 +263,20 @@ async def get_ai_credentials_service(
 
 
 AiCredentialsServiceDependency = Annotated[AiCredentialsService, Depends(get_ai_credentials_service)]
+
+
+async def get_ai_jobs_repository(session: DbSessionDependency) -> AIJobsRepository:
+    return AIJobsRepository(session=session)
+
+
+async def get_ai_jobs_service(
+    repository: Annotated[AIJobsRepository, Depends(get_ai_jobs_repository)],
+    unit_of_work: UnitOfWorkDependency,
+) -> AIJobsService:
+    return AIJobsService(repository=repository, unit_of_work=unit_of_work)
+
+
+AiJobsServiceDependency = Annotated[AIJobsService, Depends(get_ai_jobs_service)]
 
 
 async def get_rbac_service(

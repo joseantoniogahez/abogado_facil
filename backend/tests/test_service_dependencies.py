@@ -10,6 +10,8 @@ from app.core.setup import dependencies
 from app.core.setup.dependencies import (
     get_ai_credentials_repository,
     get_ai_credentials_service,
+    get_ai_jobs_repository,
+    get_ai_jobs_service,
     get_audit_log_repository,
     get_audit_log_service,
     get_file_storage,
@@ -20,6 +22,8 @@ from app.core.setup.dependencies import (
 )
 from app.features.ai_credentials.repository import AiCredentialsRepository
 from app.features.ai_credentials.service import AiCredentialsService
+from app.features.ai_jobs.repository import AIJobsRepository
+from app.features.ai_jobs.service import AIJobsService
 from app.features.audit_log.repository import AuditLogRepository
 from app.features.audit_log.service import AuditLogService
 from app.features.outbox.repository import OutboxRepository
@@ -140,3 +144,16 @@ def test_get_ai_credential_settings_returns_settings() -> None:
 
     settings = asyncio.run(get_ai_credential_settings())
     assert isinstance(settings, AiCredentialSettings)
+
+
+def test_ai_job_dependencies_build_expected_components() -> None:
+    session = MagicMock()
+    repository = asyncio.run(get_ai_jobs_repository(session))
+    assert isinstance(repository, AIJobsRepository)
+    assert repository.session is session
+
+    unit_of_work = MagicMock()
+    service = asyncio.run(get_ai_jobs_service(repository, unit_of_work))
+    assert isinstance(service, AIJobsService)
+    assert service.repository is repository
+    assert service.unit_of_work is unit_of_work

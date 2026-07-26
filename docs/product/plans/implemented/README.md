@@ -31,6 +31,7 @@ derivarse de esa carpeta, no de estos planes técnicos.
 | Proveedores de IA          | [`AI-003`](AI-003_MULTI_PROVIDER_PLAN.md)                                 |
 | Validación BYOK para IA    | [`AI-004`](AI-004_VALIDACION_BYOK_PLAN.md)                                |
 | Logs y datos sensibles IA  | [`AI-005`](AI-005_POLITICA_LOGS_DATOS_SENSIBLES_PLAN.md)                  |
+| Ciclo de vida de IA        | [`AI-009`](AI-009_CICLO_VIDA_EJECUCIONES_IA_PLAN.md)                      |
 | Auditoría backend inicial  | [`AUDIT-001`](AUDIT-001_AUDITORIA_BACKEND_FASTAPI_INICIAL_PLAN.md)        |
 | Auditoría backend final    | [`AUDIT-002`](AUDIT-002_AUDITORIA_BACKEND_FASTAPI_POST_HARDENING_PLAN.md) |
 | OpenAPI en producción      | [`OPS-005`](OPS-005_OPENAPI_PRODUCCION_PLAN.md)                           |

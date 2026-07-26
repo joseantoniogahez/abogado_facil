@@ -127,7 +127,7 @@ esperada: pruebas de contrato, métricas, ADR, threat model, caso de fallo o dem
 | AI-006      | Backend    | P1        | Identificado | Registro de uso/errores por función IA.         | Métricas iniciales por proveedor, función, error y tiempo de respuesta.                       |
 | AI-007      | Backend    | P0-IA     | Identificado | Validación de salidas estructuradas.            | JSON/schema validado antes de guardar, mostrar, copiar o exportar resultados IA.              |
 | AI-008      | Backend    | P0-IA     | Identificado | Minimización del contexto enviado a IA.         | Cada llamada envía únicamente el contexto autorizado y necesario para la función.             |
-| AI-009      | Backend    | P0-IA     | Identificado | Ciclo de vida de ejecuciones de IA.             | `AIJob` con estados, intentos, versiones, resultado, error y correlación.                     |
+| AI-009      | Backend    | P0-IA     | Hecho        | Ciclo de vida de ejecuciones de IA.             | `AIJob` con estados, intentos, versiones, resultado, error y correlación.                     |
 | AI-010      | Backend    | P1        | Identificado | Resiliencia de proveedores.                     | Timeouts, reintentos recuperables, backoff, rate limits y prevención de duplicados.           |
 | AI-011      | Backend    | P1        | Identificado | Taxonomía normalizada de errores.               | OpenAI, Gemini y mock mapean errores al contrato común y seguro para frontend.                |
 | OBS-001     | Ops        | P1        | Identificado | Observabilidad correlacionada.                  | `request_id` permite seguir API → `AIJob` → proveedor → resultado sin datos sensibles.        |

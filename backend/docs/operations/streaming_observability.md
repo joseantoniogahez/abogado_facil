@@ -31,6 +31,10 @@ The caller provides the HTTP `request_id`; the wrapper creates or accepts an opa
 count, and exception type. Prompts, provider responses, document text, credentials, and provider
 exception messages must not be logged.
 
+`app.features.ai_jobs` persists the same `request_id` and `execution_id` pair for execution
+lifecycles. A future SSE endpoint must pass the job's existing `execution_id` to
+`stream_ai_events`; it must not create a second identifier for the same provider call.
+
 Provider failures become the stable `error` event and `provider_error` code. The original exception
 is intentionally not sent to the client.
 

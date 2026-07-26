@@ -175,7 +175,7 @@ def test_in_progress_backlog_items_have_pending_plans() -> None:
 def test_backend_architecture_feature_inventory_matches_feature_packages() -> None:
     architecture_doc = _read_markdown(BACKEND_ARCHITECTURE_DIR / "clean_architecture_ports_adapters.md")
     inventory = architecture_doc.split("Current features:", maxsplit=1)[1].split(
-        "`outbox` and `ai_execution`", maxsplit=1
+        "`outbox`, `ai_execution`, and `ai_jobs`", maxsplit=1
     )[0]
     documented_features = {match.group(1) for match in re.finditer(r"^- `([a-z][a-z0-9_]*)`$", inventory, re.MULTILINE)}
     actual_features = {

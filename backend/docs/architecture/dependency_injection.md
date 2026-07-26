@@ -13,9 +13,9 @@ Main provider groups:
 - Request and transaction state: `get_db_session`, `get_unit_of_work`, and
   `get_request_permission_scope_cache`.
 - Feature repositories: auth, audit log, RBAC, outbox, clients, matters, notes, checklists, tasks,
-  payments, calculations, documents, and AI credentials.
+  payments, calculations, documents, AI credentials, and AI jobs.
 - Feature services: auth, audit log, RBAC, outbox, dashboard, clients, matters, notes, checklists,
-  tasks, payments, calculations, documents, and AI credentials.
+  tasks, payments, calculations, documents, AI credentials, and AI jobs.
 - Security and settings: `get_auth_settings`, `get_ai_credential_settings`,
   `get_secret_encryption`, `get_password_service`, and `get_token_service`.
 - Integration adapters and settings: `get_file_storage`, `get_pdf_text_extractor`,

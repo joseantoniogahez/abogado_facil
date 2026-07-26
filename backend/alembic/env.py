@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import create_async_engine
 
 from app.core.db.database import Base, get_database_url
 from app.features.ai_credentials.models import AiCredential
+from app.features.ai_jobs.models import AIJob
 from app.features.audit_log.models import AuditLogEntry
 from app.features.auth.models import User
 from app.features.clients.models import Client
@@ -29,6 +30,7 @@ if config.config_file_name is not None:
 _MODEL_REGISTRY = (
     User,
     AiCredential,
+    AIJob,
     Role,
     Permission,
     UserRole,

@@ -18,6 +18,7 @@ With UoW, a use case either:
 - DI provider: `app/core/setup/dependencies.py` (`get_unit_of_work`)
 - Service usage:
   - `app/features/ai_credentials/service.py`
+  - `app/features/ai_jobs/service.py`
   - `app/features/auth/service.py`
   - `app/features/auth/profile_updates.py`
   - `app/features/clients/service.py`
@@ -73,6 +74,11 @@ Examples in current code:
 - Client, matter, note, checklist, task, payment, calculation, and document write operations
 - `RBACService` write methods (create/update/delete/assignment operations)
 - `OutboxService.enqueue` and `OutboxService.mark_published`
+- `AIJobsService` creation and every lifecycle transition
+
+AI job transitions read the scoped row with `FOR UPDATE` inside the same UoW before validating and
+writing the next state. This serializes competing workers and prevents contradictory terminal
+updates.
 
 ## Rollback policy
 

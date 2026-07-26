@@ -19,6 +19,7 @@ This folder is the canonical backend documentation set. It is organized for thre
 - `operations/error_mapping.md`: normalized error payload and domain-to-HTTP status mapping.
 - `operations/rate_limiting.md`: sensitive-surface quotas, storage policy, and `429` contract.
 - `operations/streaming_observability.md`: SSE lifecycle, cancellation, correlation, and redaction contract for future AI responses.
+- `operations/ai_job_lifecycle.md`: persistent AI execution states, isolation, correlation, and safe result/error storage.
 
 ## Architecture Annexes
 
