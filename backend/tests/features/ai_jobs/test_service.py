@@ -6,6 +6,7 @@ from typing import Any
 from unittest.mock import MagicMock
 
 import pytest
+from pydantic import BaseModel, ConfigDict
 
 from app.core.common.integration import EnqueueJobCommand
 from app.core.config.settings import AIQueueSettings
@@ -13,7 +14,7 @@ from app.core.errors.services import ConflictError, InvalidInputError, NotFoundE
 from app.features.ai_jobs.schemas import AIJobRecord, AIJobStatus, CreateAIJobCommand
 from app.features.ai_jobs.service import AIJobsService
 from app.integrations.ai_context import build_minimized_ai_context
-from app.integrations.ai_outputs import ValidatedAIOutput
+from app.integrations.ai_outputs import ValidatedAIOutput, validate_ai_output
 from app.integrations.ai_providers import (
     AiProviderError,
     AiProviderErrorCode,
@@ -33,6 +34,34 @@ class Uow:
 
     async def __aexit__(self, *_args):
         return False
+
+
+class QuestionsJobOutput(BaseModel):
+    questions: list[str]
+
+    model_config = ConfigDict(extra="forbid")
+
+
+class OkJobOutput(BaseModel):
+    ok: bool
+
+    model_config = ConfigDict(extra="forbid")
+
+
+def validated_questions(*, schema_version: str = "schema-v1") -> ValidatedAIOutput:
+    return validate_ai_output(
+        '{"questions":["safe structured output"]}',
+        schema=QuestionsJobOutput,
+        schema_version=schema_version,
+    )
+
+
+def validated_ok(*, schema_version: str = "schema-v1") -> ValidatedAIOutput:
+    return validate_ai_output(
+        '{"ok":true}',
+        schema=OkJobOutput,
+        schema_version=schema_version,
+    )
 
 
 class Repository:
@@ -130,10 +159,7 @@ def test_successful_lifecycle_tracks_correlation_versions_and_attempt() -> None:
             execution_id=queued.execution_id,
             user_id=7,
             firm_id=3,
-            result=ValidatedAIOutput(
-                data={"questions": ["safe structured output"]},
-                schema_version="schema-v1",
-            ),
+            result=validated_questions(),
         )
         assert succeeded.status == AIJobStatus.SUCCEEDED
         assert succeeded.result == {"questions": ["safe structured output"]}
@@ -208,7 +234,7 @@ def test_missing_scoped_job_and_invalid_transitions_are_rejected() -> None:
                 execution_id=queued.execution_id,
                 user_id=7,
                 firm_id=3,
-                result=ValidatedAIOutput(data={"ok": True}, schema_version="schema-v1"),
+                result=validated_ok(),
             )
 
         await service.start(execution_id=queued.execution_id, user_id=7, firm_id=3)
@@ -219,13 +245,13 @@ def test_missing_scoped_job_and_invalid_transitions_are_rejected() -> None:
                 execution_id=queued.execution_id,
                 user_id=7,
                 firm_id=3,
-                result=ValidatedAIOutput(data={"ok": True}, schema_version="schema-v2"),
+                result=validated_ok(schema_version="schema-v2"),
             )
         await service.succeed(
             execution_id=queued.execution_id,
             user_id=7,
             firm_id=3,
-            result=ValidatedAIOutput(data={"ok": True}, schema_version="schema-v1"),
+            result=validated_ok(),
         )
         with pytest.raises(ConflictError):
             await service.cancel(execution_id=queued.execution_id, user_id=7, firm_id=3)

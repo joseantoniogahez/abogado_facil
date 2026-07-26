@@ -1,5 +1,3 @@
-from copy import deepcopy
-
 import pytest
 from pydantic import BaseModel, ConfigDict, RootModel
 
@@ -25,15 +23,27 @@ def test_valid_output_is_normalized_versioned_and_copied() -> None:
         schema_version="questions-v1",
     )
 
-    assert output == ValidatedAIOutput(
-        data={"questions": ["First"], "confidence": 1.0},
-        schema_version="questions-v1",
-    )
-    source = {"questions": ["Safe"], "confidence": 0.5}
-    copied = ValidatedAIOutput(data=source, schema_version="questions-v1")
-    source["questions"].append("Mutated")
-    assert copied.data == {"questions": ["Safe"], "confidence": 0.5}
-    assert deepcopy(copied.data) == copied.data
+    assert output.data == {"questions": ["First"], "confidence": 1.0}
+    returned_data = output.data
+    returned_data["questions"].append("Mutated")
+    returned_data["unvalidated"] = object()
+    assert output.data == {"questions": ["First"], "confidence": 1.0}
+    assert "First" not in repr(output)
+
+
+def test_validated_output_cannot_be_constructed_directly() -> None:
+    with pytest.raises(TypeError, match="factory_token"):
+        ValidatedAIOutput(  # type: ignore[call-arg]
+            data={"questions": ["Bypass"], "confidence": 0.5},
+            schema_version="questions-v1",
+        )
+
+    with pytest.raises(TypeError, match="validate_ai_output"):
+        ValidatedAIOutput(
+            data={"questions": ["Bypass"], "confidence": 0.5},
+            schema_version="questions-v1",
+            _factory_token=object(),
+        )
 
 
 @pytest.mark.parametrize(
@@ -68,4 +78,8 @@ def test_root_list_is_rejected_even_when_its_schema_accepts_it() -> None:
 @pytest.mark.parametrize("schema_version", ("", " ", "v" * 51))
 def test_validated_output_rejects_invalid_schema_version(schema_version: str) -> None:
     with pytest.raises(ValueError, match="schema_version"):
-        ValidatedAIOutput(data={}, schema_version=schema_version)
+        validate_ai_output(
+            '{"questions":[],"confidence":1}',
+            schema=QuestionsOutput,
+            schema_version=schema_version,
+        )

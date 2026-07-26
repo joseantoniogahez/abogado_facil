@@ -29,6 +29,8 @@ This folder is the canonical backend documentation set. It is organized for thre
 ## Architecture Annexes
 
 - `architecture/clean_architecture_ports_adapters.md`: feature ownership and dependency direction.
+- `architecture/ai_data_flow_threat_model.md`: AI data flow, trust boundaries, controls, residual
+  risks, and release gates.
 - `architecture/dependency_injection.md`: dependency providers and request-scoped wiring rules.
 - `architecture/unit_of_work.md`: transaction boundary behavior and rollback/commit policy.
 - `architecture/openapi_documentation.md`: OpenAPI metadata split and naming conventions.

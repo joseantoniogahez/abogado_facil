@@ -279,6 +279,8 @@ def test_structured_ai_output_contract_documents_validation_gate() -> None:
     ):
         assert token in contract
     assert "`AIJobsService.succeed`" in contract
+    assert "sellado" in contract
+    assert "copia defensiva" in contract
     assert "`ValidatedAIOutput`" in lifecycle
 
 
@@ -296,7 +298,25 @@ def test_ai_context_contract_documents_minimization_gate() -> None:
         "`SEC-004`",
     ):
         assert token in contract
+    assert "sellado" in contract
     assert "`MinimizedAIContext`" in lifecycle
+
+
+def test_ai_threat_model_documents_trust_boundaries_and_release_gates() -> None:
+    contract = _read_markdown(BACKEND_ARCHITECTURE_DIR / "ai_data_flow_threat_model.md")
+
+    for token in (
+        "`firm_id`",
+        "`user_id`",
+        "`execution_id`",
+        "`MinimizedAIContext`",
+        "`ValidatedAIOutput`",
+        "`SEC-004`",
+        "`LEGAL-002A`",
+        "Prompt injection",
+        "RQ/Redis",
+    ):
+        assert token in contract
 
 
 def test_ai_metrics_contract_documents_safe_aggregates() -> None:

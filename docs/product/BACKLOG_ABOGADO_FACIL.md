@@ -195,7 +195,7 @@ esperada: pruebas de contrato, métricas, ADR, threat model, caso de fallo o dem
 | ID          | Tipo | Prioridad | Estado       | Trabajo                              | Entregable / Criterio                                                                 |
 | ----------- | ---- | --------- | ------------ | ------------------------------------ | ------------------------------------------------------------------------------------- |
 | DOCS-AI-001 | Docs | P1        | Identificado | Arquitectura de integración IA.      | Diagrama de puertos, adaptadores, jobs, resultados y límites de confianza.            |
-| DOCS-AI-002 | Docs | P1        | Identificado | Flujo de datos y threat model.       | Contexto, aislamiento, prompt injection, credenciales y datos sensibles documentados. |
+| DOCS-AI-002 | Docs | P1        | Hecho        | Flujo de datos y threat model.       | Contexto, aislamiento, prompt injection, credenciales y datos sensibles documentados. |
 | DOCS-AI-003 | Docs | P1        | Identificado | ADR de BYOK y multi-provider.        | Decisiones, alternativas y trade-offs registrados.                                    |
 | DOCS-AI-004 | Docs | P1        | Identificado | Catálogo de errores y reintentos.    | Taxonomía, política de retry y ejemplos de fallos reproducibles.                      |
 | DOCS-AI-005 | Docs | P1        | Identificado | Evaluación de prompts y schemas.     | Casos de evaluación, resultados y cambios documentados.                               |
@@ -219,7 +219,8 @@ esperada: pruebas de contrato, métricas, ADR, threat model, caso de fallo o dem
 
 ## Siguiente Trabajo del Backlog
 
-La Fase 2 está completa. La secuencia priorizada continúa con:
+La Fase 2 está completa tras revisar y sellar los gates internos de outputs y contexto. La secuencia
+priorizada continúa con:
 
 1. Seguridad adicional y revisión humana: `SEC-004` y `LEGAL-002A`.
 1. Hero flow: `UX-AI-001`, `AI-101`, `AI-104`, `AI-105` y `PROD-AI-001`.

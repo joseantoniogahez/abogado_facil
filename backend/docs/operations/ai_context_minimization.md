@@ -6,6 +6,10 @@ Toda llamada a OpenAI, Gemini o Mock debe construir primero un `MinimizedAIConte
 `build_minimized_ai_context`. `AiTextRequest` rechaza texto libre y cualquier valor que no cumpla
 ese contrato.
 
+`MinimizedAIContext` está sellado: su construcción directa falla y sólo el builder compartido posee
+la capacidad interna para crearlo después de validar allowlists y límites. Su representación
+técnica no incluye instrucción ni campos, evitando filtraciones por logging accidental del objeto.
+
 La capa de producto que conoce al usuario, despacho y funcion declara:
 
 - `authorized_fields`: campos que el principal puede usar en esa ejecucion;

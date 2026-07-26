@@ -7,7 +7,7 @@
 - Priority: `P0-IA`
 - Plan status: `Complete`
 - Implementation status: `Hecho`
-- Last updated: `2026-07-25`
+- Last updated: `2026-07-26`
 - Backlog source: `docs/product/BACKLOG_ABOGADO_FACIL.md`
 
 ## Objective
@@ -132,3 +132,16 @@ Record documents intentionally unchanged and why:
 - Human approvals: not applicable.
 - Residual risk: correct product allowlists remain the responsibility of future AI use cases;
   prompt-injection hardening remains in `SEC-004`.
+
+## Reopened Gate Review - 2026-07-26
+
+- Direct `MinimizedAIContext` construction now fails without the module-private factory capability.
+- Invalid factory capabilities are rejected explicitly.
+- Provider requests continue accepting only the sealed nominal context.
+- Technical representations omit instructions and fields to prevent accidental logging disclosure.
+- Focused validation: 86 passed; affected modules at 100% coverage.
+- Full validation: 547 passed; total backend coverage 100%.
+- Documentation contracts: 37 passed after formatting.
+- Pre-commit: all hooks passed on the second run after `mdformat` normalized Markdown.
+- Residual risk: `SEC-004` remains a release gate for document-backed product functions, not an
+  incomplete Phase 2 context-minimization contract.

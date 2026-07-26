@@ -14,9 +14,15 @@ copiar, exportar o usar un resultado, cada función IA debe:
 el schema, y normaliza el resultado a valores JSON-safe. Los schemas de producto deben usar
 `extra="forbid"` cuando no acepten propiedades adicionales.
 
+`ValidatedAIOutput` está sellado: su construcción directa falla y sólo `validate_ai_output` posee
+la capacidad interna para crearlo. Su propiedad `data` devuelve una copia defensiva; modificar esa
+copia no altera el resultado que ya pasó el schema. Su representación técnica tampoco incluye los
+datos validados.
+
 ## Gate de persistencia
 
-`AIJobsService.succeed` rechaza diccionarios y otros valores sin la marca `ValidatedAIOutput`.
+`AIJobsService.succeed` rechaza diccionarios y otros valores sin la marca sellada
+`ValidatedAIOutput`.
 También exige que `ValidatedAIOutput.schema_version` coincida exactamente con
 `AIJob.schema_version`. Sólo entonces entrega los datos normalizados al repositorio.
 

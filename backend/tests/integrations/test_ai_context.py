@@ -3,6 +3,7 @@ import pytest
 from app.core.errors.services import InvalidInputError
 from app.integrations.ai_context import (
     MAX_AI_CONTEXT_FIELD_CHARS,
+    MinimizedAIContext,
     build_minimized_ai_context,
 )
 
@@ -23,6 +24,7 @@ def test_context_contains_only_authorized_necessary_fields() -> None:
     assert "Authorized facts" in rendered
     assert "private_notes" not in rendered
     assert "must never be sent" not in rendered
+    assert "Authorized facts" not in repr(context)
 
 
 @pytest.mark.parametrize(
@@ -83,4 +85,19 @@ def test_context_rejects_invalid_instruction_and_duplicate_or_excess_fields() ->
             source_context=large_fields,
             authorized_fields=set(large_fields),
             necessary_fields=set(large_fields),
+        )
+
+
+def test_context_cannot_be_constructed_directly() -> None:
+    with pytest.raises(TypeError, match="factory_token"):
+        MinimizedAIContext(  # type: ignore[call-arg]
+            instruction="Bypass",
+            fields=(("document", "x" * 100_000),),
+        )
+
+    with pytest.raises(TypeError, match="build_minimized_ai_context"):
+        MinimizedAIContext(
+            instruction="Bypass",
+            fields=(("document", "x" * 100_000),),
+            _factory_token=object(),
         )

@@ -7,7 +7,7 @@
 - Priority: P0-IA
 - Plan status: Complete
 - Implementation status: Hecho
-- Last updated: 2026-07-25
+- Last updated: 2026-07-26
 - Backlog source: `docs/product/BACKLOG_ABOGADO_FACIL.md`
 
 ## Objective
@@ -141,3 +141,16 @@ Record documents intentionally unchanged and why:
 
 Do not set the item to `Hecho` while any required criterion, validation, documentation update, or
 approval remains incomplete.
+
+## Reopened Gate Review - 2026-07-26
+
+- Direct `ValidatedAIOutput` construction now fails without the module-private factory capability.
+- Invalid factory capabilities are rejected explicitly.
+- `data` returns a deep defensive copy, so callers cannot mutate validated state.
+- Technical representations omit validated data to prevent accidental logging disclosure.
+- AI job tests create every successful result through `validate_ai_output` and a real closed schema.
+- Focused validation: 86 passed; affected modules at 100% coverage.
+- Full validation: 547 passed; total backend coverage 100%.
+- Documentation contracts: 37 passed after formatting.
+- Pre-commit: all hooks passed on the second run after `mdformat` normalized Markdown.
+- Residual risk: function-specific schemas still require review; no gate bypass remains open.

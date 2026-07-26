@@ -48,10 +48,11 @@ Current top-level shape:
   construction policy. `app/features/ai_jobs` owns the persistent, tenant-scoped execution
   lifecycle; future AI use-case services will validate and supply structured results.
 - `app/integrations/ai_outputs.py` converts untrusted provider text into `ValidatedAIOutput` using
-  an explicit Pydantic schema and version. `AIJobsService` rejects arbitrary dictionaries and
-  version mismatches before persistence.
+  an explicit Pydantic schema and version. The factory-sealed result returns defensive data copies;
+  `AIJobsService` rejects arbitrary dictionaries and version mismatches before persistence.
 - `app/integrations/ai_context.py` builds a bounded `MinimizedAIContext` from the exact intersection
-  of authorized and necessary fields. Provider requests reject arbitrary prompt strings.
+  of authorized and necessary fields. The context is factory-sealed, and provider requests reject
+  arbitrary prompt strings or directly constructed context markers.
 - `app/core/common/ai_metrics.py` owns the process-local, provider-neutral metrics registry.
   `_ObservedAiProvider` records one content-free observation for every completed provider call.
 

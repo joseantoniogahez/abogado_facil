@@ -11,14 +11,27 @@ MAX_AI_CONTEXT_FIELD_CHARS = 20_000
 MAX_AI_CONTEXT_CHARS = 60_000
 MAX_AI_CONTEXT_FIELDS = 20
 _FIELD_NAME_PATTERN = re.compile(r"^[a-z][a-z0-9_]{0,49}$")
+_CONTEXT_FACTORY_TOKEN = object()
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, init=False, repr=False)
 class MinimizedAIContext:
-    """Trusted instruction plus the exact authorized fields selected for a call."""
+    """Factory-sealed instruction and exact authorized fields selected for a call."""
 
     instruction: str
     fields: tuple[tuple[str, str], ...]
+
+    def __init__(
+        self,
+        *,
+        instruction: str,
+        fields: tuple[tuple[str, str], ...],
+        _factory_token: object,
+    ) -> None:
+        if _factory_token is not _CONTEXT_FACTORY_TOKEN:
+            raise TypeError("MinimizedAIContext must be built with build_minimized_ai_context")
+        object.__setattr__(self, "instruction", instruction)
+        object.__setattr__(self, "fields", fields)
 
     def render(self) -> str:
         parts = [self.instruction, "", "<authorized_context>"]
@@ -82,7 +95,11 @@ def build_minimized_ai_context(
         )
         for name in sorted(necessary)
     )
-    context = MinimizedAIContext(instruction=clean_instruction, fields=selected)
+    context = MinimizedAIContext(
+        instruction=clean_instruction,
+        fields=selected,
+        _factory_token=_CONTEXT_FACTORY_TOKEN,
+    )
     if len(context.render()) > MAX_AI_CONTEXT_CHARS:
         raise InvalidInputError("AI context exceeds the allowed size")
     return context
