@@ -59,6 +59,8 @@ def test_scheduler_enqueues_only_execution_id_with_resilience_policy() -> None:
     assert call["result_ttl"] == 0
     assert call["failure_ttl"] == 600
     assert isinstance(call["retry"], Retry)
+    assert call["retry"].max == 3
+    assert call["retry"].intervals == [10, 30, 60]
     assert "prompt" not in str(call).lower()
     assert "api_key" not in str(call).lower()
     log_text = str(logger.log.call_args)

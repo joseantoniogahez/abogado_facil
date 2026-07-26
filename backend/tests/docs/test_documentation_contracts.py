@@ -232,6 +232,7 @@ def test_rq_worker_uses_json_and_only_validated_queue_configuration() -> None:
 
 def test_ai_provider_error_catalog_matches_runtime_codes() -> None:
     error_contract = _read_markdown(DOCS_DIR / "operations" / "ai_provider_errors.md")
+    queue_contract = _read_markdown(DOCS_DIR / "operations" / "rq_ai_queue.md")
 
     for code in AiProviderErrorCode:
         assert f"`{code.value}`" in error_contract
@@ -239,6 +240,9 @@ def test_ai_provider_error_catalog_matches_runtime_codes() -> None:
     assert "API key" in error_contract
     assert "cuerpo de respuesta" in error_contract
     assert "`to_public_failure()`" in error_contract
+    assert "`retryable=True`" in error_contract
+    assert "`retryable=False`" in error_contract
+    assert "sólo relanza" in queue_contract
 
 
 def test_ai_observability_contract_documents_every_correlated_layer() -> None:

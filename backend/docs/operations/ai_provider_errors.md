@@ -43,6 +43,16 @@ El mapeo usa estado y clase de fallo, nunca el cuerpo controlado por el proveedo
 detalles sensibles o no confiables crucen el adaptador. Un worker puede usar `retryable` para decidir
 si RQ debe reintentar y debe persistir exclusivamente `error_code` al agotar los intentos.
 
+La suite contractual multi-provider exige la misma decisión en OpenAI, Gemini y Mock:
+
+- timeout y rate limit producen `retryable=True`;
+- JSON o estructura de respuesta inválida produce `retryable=False`;
+- el contrato público y los logs omiten clave, prompt, payload y detalle externo.
+
+Esta clasificación no encola por sí sola. El handler captura cada `AiProviderError`, persiste como
+fallo definitivo los casos no recuperables y sólo relanza los recuperables para activar el retry de
+RQ.
+
 ## Mock y pruebas
 
 `MockProvider(failure_code=...)` falla de forma determinista con cualquier miembro del catálogo. Esto

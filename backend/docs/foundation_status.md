@@ -28,6 +28,8 @@ Status date: `2026-07-25`
     decisions shared by OpenAI, Gemini, and Mock adapters.
   - Validated AI correlation context and redaction-safe lifecycle events spanning `AIJob`, RQ,
     provider adapters, and streaming.
+  - Cross-provider contract matrix for OpenAI, Gemini, and Mock covering success, timeout, rate
+    limiting, invalid responses, safe failures, and the retry handoff to RQ.
 
 ## Active Guardrails
 

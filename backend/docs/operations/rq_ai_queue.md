@@ -39,6 +39,12 @@ PostgreSQL; la correlación nunca amplía el payload Redis.
   distribuida por proveedor requiere handlers reales y se cerrará antes de habilitar una función IA
   pública; RQ 2.10 publicado no expone aún la API `RateLimit` descrita por documentación futura.
 
+RQ aplica su retry cuando el handler termina con excepción. Por ello, un handler de IA debe capturar
+`AiProviderError`: persiste y termina normalmente cuando `retryable=False`, y sólo relanza cuando
+`retryable=True`. La suite contractual verifica que timeout y rate limit llegan a RQ, mientras una
+respuesta inválida se registra como fallo definitivo. Los intervalos configurados se prueban como
+parte del contrato del scheduler.
+
 ## Registro de handlers
 
 `RQJobScheduler` recibe un mapa explícito `job_name -> dotted function path`. Un nombre no
