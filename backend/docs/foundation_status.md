@@ -22,6 +22,8 @@ Status date: `2026-07-25`
   - Dependency-injection and OpenAPI documentation patterns.
   - Documentation contracts for backend paths/router inventory, product-plan indexes, active item
     plans, and production BYOK encryption-key wiring.
+  - RQ/Redis background-job transport with JSON-only payloads, deterministic deduplication,
+    configurable retry/backoff, and PostgreSQL-owned AI lifecycle.
 
 ## Active Guardrails
 

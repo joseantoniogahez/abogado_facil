@@ -93,6 +93,12 @@ headers, and provider exception details must not be passed to technical logs. Us
 redacted centrally and tests enforce the negative contract. Provider credentials belong in
 authorization headers, never in request URLs; the Gemini adapter uses `x-goog-api-key`.
 
+AI background work uses RQ 2.10 over the shared Redis service. The producer uses JSON serialization
+and enqueues only the opaque `execution_id`; prompts, credentials, context, results, and provider
+errors remain outside Redis. `AI_QUEUE_JOB_TIMEOUT_SECONDS`, `AI_QUEUE_MAX_RETRIES`,
+`AI_QUEUE_RETRY_BACKOFF_SECONDS`, queue/result/failure TTLs, and `AI_QUEUE_NAME` control the worker.
+Compose starts one worker with scheduler support by default so delayed retry intervals work.
+
 PDF uploads are parsed locally through `PdfTextExtractorPort`. When a text layer is available, its
 normalized content is stored with the document metadata for future AI workflows. Scanned PDFs are
 kept with an `empty` extraction state and are not sent through OCR; parser failures are non-fatal and

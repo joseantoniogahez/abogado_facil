@@ -20,6 +20,7 @@ This folder is the canonical backend documentation set. It is organized for thre
 - `operations/rate_limiting.md`: sensitive-surface quotas, storage policy, and `429` contract.
 - `operations/streaming_observability.md`: SSE lifecycle, cancellation, correlation, and redaction contract for future AI responses.
 - `operations/ai_job_lifecycle.md`: persistent AI execution states, isolation, correlation, and safe result/error storage.
+- `operations/rq_ai_queue.md`: RQ/Redis transport, JSON payload boundary, retry, timeout, TTL, and deduplication policy.
 
 ## Architecture Annexes
 

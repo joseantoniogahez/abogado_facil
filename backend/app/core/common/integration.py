@@ -11,7 +11,7 @@ class PublishMessageCommand(ApplicationSchema):
 
 class EnqueueJobCommand(ApplicationSchema):
     job_name: str
-    payload: dict[str, Any]
+    execution_id: str
 
 
 class SearchDocumentUpsertCommand(ApplicationSchema):

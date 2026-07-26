@@ -5,6 +5,7 @@ SaaS web para abogados independientes y despachos pequeños con expedientes, tar
 - Backend: FastAPI + SQLAlchemy (async) + Alembic
 - Frontend: Vite + React 19 + TypeScript
 - Database: PostgreSQL 18.2 (`postgres:18.2`)
+- Background jobs: RQ 2.10 + Redis
 - Orchestration: Docker Compose
 
 ## README Map
@@ -95,6 +96,8 @@ Endpoints:
 Notes:
 
 - Backend runs Alembic migrations during startup (`backend/prestart.sh`).
+- `ai-worker` runs one RQ worker with scheduler support, JSON serialization, bounded retries, and
+  Redis payloads limited to opaque execution IDs.
 - `compose.override.yaml` is loaded automatically for local runs and enables backend hot reload via bind mount.
 - Frontend API target is controlled by `VITE_API_ORIGIN` and `VITE_API_BASE_PATH`.
 - Vite env vars are baked into build output; rebuild frontend image after changing them.

@@ -32,6 +32,10 @@ services:
         "/app/app",
       ]
 
+  ai-worker:
+    volumes:
+      - ./backend/app:/app/app
+
   frontend:
     container_name: "${UI_HOST}"
     hostname: "${UI_HOST}"

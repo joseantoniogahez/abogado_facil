@@ -227,3 +227,47 @@ class AiCredentialSettings(BaseSettings):
         if self.APP_ENV in self._PRODUCTION_ENV_VALUES and encoded_key == self._LOCAL_ENCRYPTION_KEY:
             raise ValueError("AI_CREDENTIAL_ENCRYPTION_KEY must not use the local default in production.")
         return self
+
+
+class AIQueueSettings(BaseSettings):
+    REDIS_URL: str = "redis://localhost:6379/0"
+    AI_QUEUE_NAME: str = "ai"
+    AI_QUEUE_JOB_TIMEOUT_SECONDS: int = Field(120, gt=0)
+    AI_QUEUE_MAX_RETRIES: int = Field(3, ge=0, le=10)
+    AI_QUEUE_RETRY_BACKOFF_SECONDS: str = "10,30,60"
+    AI_QUEUE_RESULT_TTL_SECONDS: int = Field(0, ge=0)
+    AI_QUEUE_FAILURE_TTL_SECONDS: int = Field(86400, gt=0)
+    AI_QUEUE_TTL_SECONDS: int = Field(300, gt=0)
+
+    @field_validator("REDIS_URL")
+    @classmethod
+    def validate_queue_redis_url(cls, value: str) -> str:
+        normalized = value.strip()
+        if not normalized.startswith(("redis://", "rediss://")):
+            raise ValueError("REDIS_URL must use redis:// or rediss://.")
+        return normalized
+
+    @field_validator("AI_QUEUE_NAME")
+    @classmethod
+    def validate_queue_name(cls, value: str) -> str:
+        normalized = value.strip()
+        if not normalized or not normalized.replace("-", "").replace("_", "").isalnum():
+            raise ValueError("AI_QUEUE_NAME must contain only letters, numbers, dashes, or underscores.")
+        return normalized
+
+    @property
+    def retry_backoff_seconds(self) -> list[int]:
+        try:
+            intervals = [int(value.strip()) for value in self.AI_QUEUE_RETRY_BACKOFF_SECONDS.split(",")]
+        except ValueError as exc:
+            raise ValueError("AI_QUEUE_RETRY_BACKOFF_SECONDS must be comma-separated integers.") from exc
+        if any(interval <= 0 for interval in intervals):
+            raise ValueError("AI_QUEUE_RETRY_BACKOFF_SECONDS values must be positive.")
+        if self.AI_QUEUE_MAX_RETRIES and len(intervals) < self.AI_QUEUE_MAX_RETRIES:
+            raise ValueError("AI_QUEUE_RETRY_BACKOFF_SECONDS must cover every configured retry.")
+        return intervals[: self.AI_QUEUE_MAX_RETRIES]
+
+    @model_validator(mode="after")
+    def validate_retry_policy(self) -> AIQueueSettings:
+        _ = self.retry_backoff_seconds
+        return self

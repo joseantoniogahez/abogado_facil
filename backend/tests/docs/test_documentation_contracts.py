@@ -213,3 +213,17 @@ def test_rate_limiting_docs_distinguish_direct_and_compose_defaults() -> None:
     assert "Compose profile" in markdown
     assert 'RATE_LIMIT_ENABLED: "${RATE_LIMIT_ENABLED:-true}"' in compose
     assert 'RATE_LIMIT_STORAGE: "${RATE_LIMIT_STORAGE:-redis}"' in compose
+
+
+def test_rq_worker_uses_json_and_only_validated_queue_configuration() -> None:
+    compose = (REPO_DIR / "compose.yaml").read_text(encoding="utf-8")
+    requirements = (BACKEND_DIR / "requirements.txt").read_text(encoding="utf-8")
+    queue_contract = _read_markdown(DOCS_DIR / "operations" / "rq_ai_queue.md")
+
+    assert "rq==2.10.0" in requirements
+    assert '"app.rq_config"' in compose
+    assert '"--serializer"' in compose
+    assert '"json"' in compose
+    assert "--disable-job-desc-logging" in compose
+    assert "Redis recibe únicamente" in queue_contract
+    assert "AI_QUEUE_RESULT_TTL_SECONDS=0" in queue_contract

@@ -46,6 +46,16 @@ Current top-level shape:
   construction policy. `app/features/ai_jobs` owns the persistent, tenant-scoped execution
   lifecycle; future AI use-case services will validate and supply structured results.
 
+## Background job port and RQ adapter
+
+- `app/integrations/jobs.py` owns the provider-neutral `JobSchedulerPort`.
+- `app/integrations/rq_jobs.py` implements RQ/Redis dispatch with JSON serialization.
+- The adapter accepts only catalogued job names and opaque `execution_id` values.
+- Deterministic IDs plus RQ uniqueness prevent duplicate enqueues; timeout, TTL and retry/backoff
+  policy come from validated settings.
+- RQ never owns legal context or AI results. Workers reconstruct authorized context from
+  PostgreSQL, and `AIJob` remains the lifecycle source of truth.
+
 ## Ownership
 
 `app/core` owns cross-feature concerns only:

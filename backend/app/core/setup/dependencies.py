@@ -3,7 +3,13 @@ from typing import Annotated, cast
 from fastapi import Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.config.settings import AiCredentialSettings, AuthSettings, MatterDocumentSettings, ObjectStorageSettings
+from app.core.config.settings import (
+    AiCredentialSettings,
+    AIQueueSettings,
+    AuthSettings,
+    MatterDocumentSettings,
+    ObjectStorageSettings,
+)
 from app.core.db.database import get_async_session_factory
 from app.core.db.ports import UnitOfWorkPort
 from app.core.db.uow import UnitOfWork
@@ -40,6 +46,7 @@ from app.features.rbac.repository import RBACRepository
 from app.features.rbac.service import RBACService, RBACServicePort
 from app.integrations.files import FileStoragePort
 from app.integrations.pdf_text import PdfTextExtractorPort, PyPdfTextExtractor
+from app.integrations.rq_jobs import RQJobScheduler
 from app.integrations.s3 import S3FileStorage
 
 PermissionScopeCache = dict[tuple[int, str], str | None]
@@ -277,6 +284,16 @@ async def get_ai_jobs_service(
 
 
 AiJobsServiceDependency = Annotated[AIJobsService, Depends(get_ai_jobs_service)]
+
+
+async def get_ai_queue_settings() -> AIQueueSettings:
+    return AIQueueSettings()
+
+
+async def get_job_scheduler(
+    settings: Annotated[AIQueueSettings, Depends(get_ai_queue_settings)],
+) -> RQJobScheduler:
+    return RQJobScheduler(settings=settings, handlers={})
 
 
 async def get_rbac_service(

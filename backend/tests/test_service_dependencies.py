@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from starlette.requests import Request
 
-from app.core.config.settings import AiCredentialSettings
+from app.core.config.settings import AiCredentialSettings, AIQueueSettings
 from app.core.security.service.encryption import AesGcmSecretEncryption
 from app.core.setup import dependencies
 from app.core.setup.dependencies import (
@@ -12,9 +12,11 @@ from app.core.setup.dependencies import (
     get_ai_credentials_service,
     get_ai_jobs_repository,
     get_ai_jobs_service,
+    get_ai_queue_settings,
     get_audit_log_repository,
     get_audit_log_service,
     get_file_storage,
+    get_job_scheduler,
     get_outbox_repository,
     get_outbox_service,
     get_request_permission_scope_cache,
@@ -28,6 +30,7 @@ from app.features.audit_log.repository import AuditLogRepository
 from app.features.audit_log.service import AuditLogService
 from app.features.outbox.repository import OutboxRepository
 from app.features.outbox.service import OutboxService
+from app.integrations.rq_jobs import RQJobScheduler
 from utils.testing_support.file_storage import FakeFileStorage
 
 
@@ -157,3 +160,11 @@ def test_ai_job_dependencies_build_expected_components() -> None:
     assert isinstance(service, AIJobsService)
     assert service.repository is repository
     assert service.unit_of_work is unit_of_work
+
+
+def test_ai_queue_dependencies_build_expected_components() -> None:
+    settings = asyncio.run(get_ai_queue_settings())
+    assert isinstance(settings, AIQueueSettings)
+    scheduler = asyncio.run(get_job_scheduler(settings))
+    assert isinstance(scheduler, RQJobScheduler)
+    assert scheduler.handlers == {}
