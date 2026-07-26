@@ -1,6 +1,7 @@
 """Provider-neutral contracts and safe adapters for text-generation providers."""
 
 import asyncio
+import http.client
 import json
 import logging
 import re
@@ -9,9 +10,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 from time import perf_counter
 from typing import Any, Protocol
-from urllib.error import HTTPError, URLError
-from urllib.parse import urlsplit
-from urllib.request import Request, urlopen
+from urllib.parse import SplitResult, urlsplit
 
 from app.core.common.ai_metrics import AI_METRICS, AIMetricsRegistry
 from app.core.common.observability import AiCorrelationContext, log_ai_event
@@ -101,36 +100,48 @@ class AiProviderPort(Protocol):
 JsonTransport = Callable[[str, Mapping[str, str], bytes], Awaitable[tuple[int, Any]]]
 
 
-def _validate_provider_url(url: str) -> None:
+def _validate_provider_url(url: str) -> tuple[SplitResult, str]:
     try:
         parsed_url = urlsplit(url)
+        _ = parsed_url.port
     except ValueError as exc:
         raise AiProviderError(AiProviderErrorCode.CONFIGURATION_ERROR) from exc
-    if parsed_url.scheme != "https" or parsed_url.hostname is None:
+    hostname = parsed_url.hostname
+    if (
+        parsed_url.scheme != "https"
+        or hostname is None
+        or parsed_url.username is not None
+        or parsed_url.password is not None
+        or parsed_url.fragment
+    ):
         raise AiProviderError(AiProviderErrorCode.CONFIGURATION_ERROR)
+    return parsed_url, hostname
 
 
 def _default_transport(url: str, headers: Mapping[str, str], body: bytes) -> Awaitable[tuple[int, Any]]:
     async def send() -> tuple[int, Any]:
         def request() -> tuple[int, Any]:
-            _validate_provider_url(url)
+            parsed_url, hostname = _validate_provider_url(url)
+            request_target = parsed_url.path or "/"
+            if parsed_url.query:
+                request_target = f"{request_target}?{parsed_url.query}"
+            connection: http.client.HTTPSConnection | None = None
             try:
-                response_request = Request(url, data=body, headers=dict(headers), method="POST")
-                with urlopen(response_request, timeout=30) as response:  # nosec B310 - HTTPS validated above.
-                    return response.status, json.loads(response.read())
-            except HTTPError as exc:
-                return exc.code, None
+                connection = http.client.HTTPSConnection(hostname, parsed_url.port, timeout=30)
+                connection.request("POST", request_target, body=body, headers=dict(headers))
+                response = connection.getresponse()
+                if response.status < 200 or response.status >= 300:
+                    return response.status, None
+                return response.status, json.loads(response.read())
             except TimeoutError as exc:
                 raise AiProviderError(AiProviderErrorCode.TIMEOUT) from exc
-            except URLError as exc:
-                code = (
-                    AiProviderErrorCode.TIMEOUT
-                    if isinstance(exc.reason, TimeoutError)
-                    else AiProviderErrorCode.UNAVAILABLE
-                )
-                raise AiProviderError(code) from exc
             except ValueError as exc:
                 raise AiProviderError(AiProviderErrorCode.INVALID_RESPONSE) from exc
+            except (http.client.HTTPException, OSError) as exc:
+                raise AiProviderError(AiProviderErrorCode.UNAVAILABLE) from exc
+            finally:
+                if connection is not None:
+                    connection.close()
 
         return await asyncio.to_thread(request)
 

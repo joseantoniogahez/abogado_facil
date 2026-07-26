@@ -1,7 +1,7 @@
 import asyncio
 from datetime import UTC, datetime
 from types import SimpleNamespace
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
 
 from app.features.ai_jobs.models import AIJob
 from app.features.ai_jobs.repository import AIJobsRepository
@@ -46,26 +46,28 @@ def test_create_get_and_update_are_scoped() -> None:
         persisted = job()
         session = session_with(persisted)
         repository = AIJobsRepository(session)
-        repository._to_record = MagicMock(side_effect=lambda value: value)
-
-        created = await repository.create(execution_id=persisted.execution_id)
-        found = await repository.get_scoped(execution_id=persisted.execution_id, user_id=7, firm_id=3)
-        locked = await repository.get_scoped(execution_id=persisted.execution_id, user_id=7, firm_id=3, for_update=True)
-        updated = await repository.update_scoped(
-            execution_id=persisted.execution_id,
-            user_id=7,
-            firm_id=3,
-            status="running",
-            attempt_count=1,
-            result=None,
-            error_code=None,
-            started_at=datetime.now(UTC),
-            completed_at=None,
-        )
+        with patch.object(AIJobsRepository, "_to_record", side_effect=lambda value: value):
+            created = await repository.create(execution_id=persisted.execution_id)
+            found = await repository.get_scoped(execution_id=persisted.execution_id, user_id=7, firm_id=3)
+            locked = await repository.get_scoped(
+                execution_id=persisted.execution_id, user_id=7, firm_id=3, for_update=True
+            )
+            updated = await repository.update_scoped(
+                execution_id=persisted.execution_id,
+                user_id=7,
+                firm_id=3,
+                status="running",
+                attempt_count=1,
+                result=None,
+                error_code=None,
+                started_at=datetime.now(UTC),
+                completed_at=None,
+            )
 
         assert created is not None
         assert found is persisted
         assert locked is persisted
+        assert updated is not None
         assert updated.status == "running"
         for call in session.execute.await_args_list:
             query = str(call.args[0])

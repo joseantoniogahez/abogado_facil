@@ -2,7 +2,7 @@ import asyncio
 import logging
 from datetime import UTC, datetime
 from types import SimpleNamespace
-from typing import Any
+from typing import Any, cast
 from unittest.mock import MagicMock
 
 import pytest
@@ -34,6 +34,12 @@ class Uow:
 
     async def __aexit__(self, *_args):
         return False
+
+    async def commit(self) -> None:
+        pass
+
+    async def rollback(self) -> None:
+        pass
 
 
 class QuestionsJobOutput(BaseModel):
@@ -67,6 +73,7 @@ def validated_ok(*, schema_version: str = "schema-v1") -> ValidatedAIOutput:
 class Repository:
     def __init__(self) -> None:
         self.jobs: dict[str, AIJobRecord] = {}
+        self.return_missing_update = False
 
     async def create(self, **values: Any) -> AIJobRecord:
         now = datetime.now(UTC)
@@ -83,6 +90,8 @@ class Repository:
         return job
 
     async def update_scoped(self, *, execution_id: str, user_id: int, firm_id: int, **values: Any):
+        if self.return_missing_update:
+            return None
         job = await self.get_scoped(execution_id=execution_id, user_id=user_id, firm_id=firm_id)
         if job is None:
             return None
@@ -227,7 +236,7 @@ def test_missing_scoped_job_and_invalid_transitions_are_rejected() -> None:
                 execution_id=queued.execution_id,
                 user_id=7,
                 firm_id=3,
-                result={"ok": True},  # type: ignore[arg-type]
+                result=cast(Any, {"ok": True}),
             )
         with pytest.raises(ConflictError):
             await service.succeed(
@@ -256,15 +265,9 @@ def test_missing_scoped_job_and_invalid_transitions_are_rejected() -> None:
         with pytest.raises(ConflictError):
             await service.cancel(execution_id=queued.execution_id, user_id=7, firm_id=3)
 
-        original_update = repository.update_scoped
-
-        async def missing_update(**_values):
-            return None
-
-        repository.update_scoped = missing_update
+        repository.return_missing_update = True
         running = repository.jobs[queued.execution_id].model_copy(update={"status": AIJobStatus.RUNNING})
         with pytest.raises(NotFoundError):
             await service._update(running, status=AIJobStatus.CANCELLED)
-        repository.update_scoped = original_update
 
     asyncio.run(run())

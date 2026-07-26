@@ -2,7 +2,7 @@
 
 import asyncio
 import logging
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from typing import Any
 from unittest.mock import MagicMock
 
@@ -41,7 +41,7 @@ def run(coroutine):
 
 
 def _openai_factory(scenario: str, logger: MagicMock) -> OpenAIProvider:
-    async def transport(url: str, headers: dict[str, str], body: bytes) -> tuple[int, Any]:
+    async def transport(url: str, headers: Mapping[str, str], body: bytes) -> tuple[int, Any]:
         outcomes = {
             "success": (200, {"choices": [{"message": {"content": "normalized result"}}]}),
             "timeout": (504, {"error": EXTERNAL_DETAIL}),
@@ -54,7 +54,7 @@ def _openai_factory(scenario: str, logger: MagicMock) -> OpenAIProvider:
 
 
 def _gemini_factory(scenario: str, logger: MagicMock) -> GeminiProvider:
-    async def transport(url: str, headers: dict[str, str], body: bytes) -> tuple[int, Any]:
+    async def transport(url: str, headers: Mapping[str, str], body: bytes) -> tuple[int, Any]:
         outcomes = {
             "success": (
                 200,

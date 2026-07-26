@@ -1,3 +1,5 @@
+from typing import Any
+
 import pytest
 from pydantic import ValidationError
 
@@ -25,6 +27,6 @@ def test_ai_queue_settings_parse_retry_backoff() -> None:
         ),
     ),
 )
-def test_ai_queue_settings_reject_invalid_values(values: dict[str, object], message: str) -> None:
+def test_ai_queue_settings_reject_invalid_values(values: dict[str, Any], message: str) -> None:
     with pytest.raises(ValidationError, match=message):
         AIQueueSettings(**values)

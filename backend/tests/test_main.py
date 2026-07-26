@@ -2,7 +2,7 @@ import asyncio
 import logging
 from collections.abc import Iterable
 from types import SimpleNamespace
-from typing import Any
+from typing import Any, cast
 from unittest.mock import AsyncMock, MagicMock, call, patch
 
 import pytest
@@ -10,6 +10,7 @@ from fastapi import APIRouter, FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.routing import APIRoute
 from pydantic import ValidationError
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.testclient import TestClient
 
@@ -544,7 +545,7 @@ def test_get_unit_of_work_returns_repository_unit_of_work() -> None:
 
     async def run_test() -> None:
         with patch("app.core.setup.dependencies.UnitOfWork", return_value=expected_uow) as unit_of_work:
-            result = await get_unit_of_work(session)  # type: ignore[arg-type]
+            result = await get_unit_of_work(cast(AsyncSession, session))
 
         assert result is expected_uow
         unit_of_work.assert_called_once_with(session=session)

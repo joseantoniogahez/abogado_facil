@@ -1,3 +1,5 @@
+from typing import Any, cast
+
 import pytest
 from pydantic import BaseModel, ConfigDict, RootModel
 
@@ -33,7 +35,7 @@ def test_valid_output_is_normalized_versioned_and_copied() -> None:
 
 def test_validated_output_cannot_be_constructed_directly() -> None:
     with pytest.raises(TypeError, match="factory_token"):
-        ValidatedAIOutput(  # type: ignore[call-arg]
+        cast(Any, ValidatedAIOutput)(
             data={"questions": ["Bypass"], "confidence": 0.5},
             schema_version="questions-v1",
         )

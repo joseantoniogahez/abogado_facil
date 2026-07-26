@@ -1,3 +1,4 @@
+from typing import Any, cast
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -52,7 +53,7 @@ def _get_validation_error() -> ValidationError:
         required: int
 
     with pytest.raises(ValidationError) as exc_info:
-        RequiredFieldModel()  # type: ignore[call-arg]
+        cast(Any, RequiredFieldModel)()
     return exc_info.value
 
 
@@ -118,7 +119,7 @@ def test_build_database_url_raises_on_unsupported_connection_type() -> None:
     manager = DatabaseManager(settings_loader=lambda: settings)
 
     with pytest.raises(DatabaseConfigError) as exc_info:
-        manager.build_database_url("unsupported")  # type: ignore[arg-type]
+        manager.build_database_url(cast(DatabaseConnectionType, "unsupported"))
 
     assert "Unsupported DB connection type: unsupported" in str(exc_info.value)
 

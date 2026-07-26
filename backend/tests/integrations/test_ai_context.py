@@ -1,3 +1,5 @@
+from typing import Any, cast
+
 import pytest
 
 from app.core.errors.services import InvalidInputError
@@ -62,8 +64,8 @@ def test_adversarial_document_content_cannot_break_untrusted_envelope() -> None:
         {"source_context": {"matter_summary": "x" * (MAX_AI_CONTEXT_FIELD_CHARS + 1)}},
     ],
 )
-def test_context_rejects_unauthorized_missing_invalid_or_oversized_data(changes) -> None:
-    values = {
+def test_context_rejects_unauthorized_missing_invalid_or_oversized_data(changes: dict[str, object]) -> None:
+    values: dict[str, Any] = {
         "instruction": "Summarize",
         "source_context": {"matter_summary": "Authorized facts"},
         "authorized_fields": {"matter_summary"},
@@ -113,7 +115,7 @@ def test_context_rejects_invalid_instruction_and_duplicate_or_excess_fields() ->
 
 def test_context_cannot_be_constructed_directly() -> None:
     with pytest.raises(TypeError, match="factory_token"):
-        MinimizedAIContext(  # type: ignore[call-arg]
+        cast(Any, MinimizedAIContext)(
             instruction="Bypass",
             fields=(("document", "x" * 100_000),),
         )

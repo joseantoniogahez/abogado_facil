@@ -7,7 +7,7 @@ from botocore.exceptions import ClientError, EndpointConnectionError
 
 from app.core.common.integration import StoreFileCommand
 from app.core.config.settings import ObjectStorageSettings
-from app.integrations.files import FileNotFoundInStorageError, FileStorageError
+from app.integrations.files import FileNotFoundInStorageError, FileStorageError, FileStoragePort
 from app.integrations.s3 import S3FileStorage
 from utils.testing_support.file_storage import FakeFileStorage
 
@@ -16,8 +16,13 @@ def _command(body: bytes = b"legal-document") -> StoreFileCommand:
     return StoreFileCommand(bucket="documents", path="matters/1/file.pdf", content_type="application/pdf", body=body)
 
 
-async def _collect(storage: object, *, bucket: str = "documents", path: str = "matters/1/file.pdf") -> bytes:
-    chunks = [chunk async for chunk in storage.stream(bucket=bucket, path=path)]  # type: ignore[attr-defined]
+async def _collect(
+    storage: FileStoragePort,
+    *,
+    bucket: str = "documents",
+    path: str = "matters/1/file.pdf",
+) -> bytes:
+    chunks = [chunk async for chunk in storage.stream(bucket=bucket, path=path)]
     return b"".join(chunks)
 
 

@@ -88,15 +88,21 @@ def test_spooling_validates_supported_file_content_and_limits() -> None:
             (_upload("binary.txt", b"\xff"), "UTF-8"),
         ):
             with pytest.raises(InvalidInputError, match=message):
-                await service._spool(upload)
+                async with service._spool(upload):
+                    pass
 
         docx_service, _, _, _ = _service(max_size=1000)
         with pytest.raises(InvalidInputError, match="does not match DOCX"):
-            await docx_service._spool(_upload("incomplete.docx", _docx(complete=False)))
-        body, size, filename, media_type = await docx_service._spool(_upload("valid.docx", _docx()))
-        assert size > 0 and filename == "valid.docx"
-        assert media_type.endswith("wordprocessingml.document")
-        body.close()
+            async with docx_service._spool(_upload("incomplete.docx", _docx(complete=False))):
+                pass
+        async with docx_service._spool(_upload("valid.docx", _docx())) as (
+            _body,
+            size,
+            filename,
+            media_type,
+        ):
+            assert size > 0 and filename == "valid.docx"
+            assert media_type.endswith("wordprocessingml.document")
         assert service._filename(None) == "document"
         assert service._filename("... ") == "document"
 

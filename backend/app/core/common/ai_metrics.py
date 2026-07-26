@@ -52,8 +52,8 @@ class AIMetricsRegistry:
         duration_ms: float,
         error_code: str | None = None,
     ) -> None:
-        for label, value in (("provider", provider), ("function", function)):
-            if _METRIC_LABEL_PATTERN.fullmatch(value) is None:
+        for label, label_value in (("provider", provider), ("function", function)):
+            if _METRIC_LABEL_PATTERN.fullmatch(label_value) is None:
                 raise ValueError(f"{label} is not a safe metric label")
         if outcome not in _OUTCOMES:
             raise ValueError("outcome is not supported")

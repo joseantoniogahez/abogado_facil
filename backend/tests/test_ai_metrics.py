@@ -1,4 +1,5 @@
 import math
+from typing import Any
 
 import pytest
 
@@ -50,8 +51,8 @@ def test_ai_metrics_aggregate_count_and_latency_by_safe_labels() -> None:
         {"duration_ms": math.inf},
     ],
 )
-def test_ai_metrics_reject_unsafe_or_inconsistent_observations(changes) -> None:
-    values = {
+def test_ai_metrics_reject_unsafe_or_inconsistent_observations(changes: dict[str, object]) -> None:
+    values: dict[str, Any] = {
         "provider": "openai",
         "function": "matter_summary",
         "outcome": "success",

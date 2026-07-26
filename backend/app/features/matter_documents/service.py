@@ -3,7 +3,8 @@ import re
 import tempfile
 import uuid
 import zipfile
-from collections.abc import AsyncIterator
+from collections.abc import AsyncGenerator, AsyncIterator
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import BinaryIO, Protocol, cast
 
@@ -90,20 +91,18 @@ class MatterDocumentsService:
         name = re.sub(r"[^\w.() -]", "_", name, flags=re.UNICODE).strip(" .")
         return (name or "document")[:255]
 
-    async def _spool(self, file: UploadFile) -> tuple[BinaryIO, int, str, str]:
+    @asynccontextmanager
+    async def _spool(self, file: UploadFile) -> AsyncGenerator[tuple[BinaryIO, int, str, str]]:
         filename = self._filename(file.filename)
         suffix = Path(filename).suffix.lower()
         media_type = _MEDIA_TYPES.get(suffix)
         if media_type is None:
             raise InvalidInputError("Only PDF, DOCX and TXT files are supported")
-        spool = cast(
-            BinaryIO,
-            tempfile.SpooledTemporaryFile(  # noqa: SIM115 - caller owns the returned stream
-                max_size=min(self.settings.MATTER_DOCUMENT_MAX_SIZE_BYTES, 1024 * 1024)
-            ),
-        )
-        size = 0
-        try:
+        with tempfile.SpooledTemporaryFile(
+            max_size=min(self.settings.MATTER_DOCUMENT_MAX_SIZE_BYTES, 1024 * 1024)
+        ) as temporary_file:
+            spool = cast(BinaryIO, temporary_file)
+            size = 0
             while chunk := await file.read(_CHUNK_SIZE):
                 size += len(chunk)
                 if size > self.settings.MATTER_DOCUMENT_MAX_SIZE_BYTES:
@@ -114,10 +113,7 @@ class MatterDocumentsService:
             spool.seek(0)
             self._validate_content(spool, suffix)
             spool.seek(0)
-            return spool, size, filename, media_type
-        except Exception:
-            spool.close()
-            raise
+            yield spool, size, filename, media_type
 
     @staticmethod
     def _validate_content(body: BinaryIO, suffix: str) -> None:
@@ -142,49 +138,47 @@ class MatterDocumentsService:
     async def upload(
         self, *, firm_id: int, matter_id: int, document_type: DocumentType, file: UploadFile
     ) -> MatterDocument:
-        body, size, filename, media_type = await self._spool(file)
-        text_extraction_status, extracted_text = self._extract_text(body, media_type)
-        document_id = str(uuid.uuid4())
-        storage_key = f"firms/{firm_id}/matters/{matter_id}/{document_id}"
-        stored = False
-        try:
-            async with self.unit_of_work:
-                await self._require_matter(firm_id=firm_id, matter_id=matter_id)
-                await self.repository.lock_quota(firm_id=firm_id, matter_id=matter_id)
-                if (
-                    await self.repository.count_for_matter(matter_id=matter_id, firm_id=firm_id)
-                    >= self.settings.MATTER_DOCUMENT_MAX_PER_MATTER
-                ):
-                    raise ConflictError("Matter document limit reached")
-                await self.storage.store(
-                    StoreFileCommand(
-                        bucket=self.bucket,
-                        path=storage_key,
-                        content_type=media_type,
-                        body=body,
+        async with self._spool(file) as (body, size, filename, media_type):
+            text_extraction_status, extracted_text = self._extract_text(body, media_type)
+            document_id = str(uuid.uuid4())
+            storage_key = f"firms/{firm_id}/matters/{matter_id}/{document_id}"
+            stored = False
+            try:
+                async with self.unit_of_work:
+                    await self._require_matter(firm_id=firm_id, matter_id=matter_id)
+                    await self.repository.lock_quota(firm_id=firm_id, matter_id=matter_id)
+                    if (
+                        await self.repository.count_for_matter(matter_id=matter_id, firm_id=firm_id)
+                        >= self.settings.MATTER_DOCUMENT_MAX_PER_MATTER
+                    ):
+                        raise ConflictError("Matter document limit reached")
+                    await self.storage.store(
+                        StoreFileCommand(
+                            bucket=self.bucket,
+                            path=storage_key,
+                            content_type=media_type,
+                            body=body,
+                        )
                     )
-                )
-                stored = True
-                return await self.repository.create(
-                    id=document_id,
-                    firm_id=firm_id,
-                    matter_id=matter_id,
-                    original_filename=filename,
-                    document_type=document_type.value,
-                    media_type=media_type,
-                    size_bytes=size,
-                    storage_key=storage_key,
-                    text_extraction_status=text_extraction_status,
-                    extracted_text=extracted_text,
-                )
-        except Exception as exc:
-            if stored:
-                await self.storage.delete(bucket=self.bucket, path=storage_key)
-            if isinstance(exc, FileStorageError):
-                raise InternalError("Document storage operation failed") from exc
-            raise
-        finally:
-            body.close()
+                    stored = True
+                    return await self.repository.create(
+                        id=document_id,
+                        firm_id=firm_id,
+                        matter_id=matter_id,
+                        original_filename=filename,
+                        document_type=document_type.value,
+                        media_type=media_type,
+                        size_bytes=size,
+                        storage_key=storage_key,
+                        text_extraction_status=text_extraction_status,
+                        extracted_text=extracted_text,
+                    )
+            except Exception as exc:
+                if stored:
+                    await self.storage.delete(bucket=self.bucket, path=storage_key)
+                if isinstance(exc, FileStorageError):
+                    raise InternalError("Document storage operation failed") from exc
+                raise
 
     async def list(self, *, firm_id: int, matter_id: int) -> tuple[list[MatterDocument], int]:
         await self._require_matter(firm_id=firm_id, matter_id=matter_id)

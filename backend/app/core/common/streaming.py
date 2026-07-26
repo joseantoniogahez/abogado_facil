@@ -192,7 +192,7 @@ async def stream_ai_events(
                 await next_chunk
         if hasattr(iterator, "aclose"):
             with suppress(Exception):
-                await iterator.aclose()  # type: ignore[attr-defined]
+                await iterator.aclose()
 
     _log_stream_event(
         stream_logger,

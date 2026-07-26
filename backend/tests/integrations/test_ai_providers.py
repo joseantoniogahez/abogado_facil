@@ -1,7 +1,7 @@
 import asyncio
 import json
 import logging
-from io import BytesIO
+from typing import cast
 from unittest.mock import MagicMock
 
 import pytest
@@ -9,7 +9,7 @@ import pytest
 from app.core.common.ai_metrics import AIMetricsRegistry
 from app.core.errors.services import InvalidInputError
 from app.integrations import ai_providers
-from app.integrations.ai_context import build_minimized_ai_context
+from app.integrations.ai_context import MinimizedAIContext, build_minimized_ai_context
 from app.integrations.ai_providers import (
     AiProviderError,
     AiProviderErrorCode,
@@ -70,7 +70,7 @@ def test_provider_records_success_and_normalized_failure_metrics() -> None:
 def test_provider_request_rejects_arbitrary_context() -> None:
     with pytest.raises(InvalidInputError, match="must be minimized"):
         AiTextRequest(
-            context="private prompt",  # type: ignore[arg-type]
+            context=cast(MinimizedAIContext, "private prompt"),
             function="matter_summary",
             model="test-model",
             request_id="request-1",
@@ -179,6 +179,14 @@ def test_default_transport_parses_json_response(monkeypatch: pytest.MonkeyPatch)
     class Response:
         status = 200
 
+        @staticmethod
+        def read():
+            return b'{"ok": true}'
+
+    class Connection:
+        def __init__(self, *args, **kwargs):
+            pass
+
         def __enter__(self):
             return self
 
@@ -186,10 +194,18 @@ def test_default_transport_parses_json_response(monkeypatch: pytest.MonkeyPatch)
             return None
 
         @staticmethod
-        def read():
-            return b'{"ok": true}'
+        def request(*args, **kwargs):
+            return None
 
-    monkeypatch.setattr(ai_providers, "urlopen", lambda *args, **kwargs: Response())
+        @staticmethod
+        def getresponse():
+            return Response()
+
+        @staticmethod
+        def close():
+            return None
+
+    monkeypatch.setattr(ai_providers.http.client, "HTTPSConnection", Connection)
     assert run(ai_providers._default_transport("https://provider.test", {}, b"{}")) == (200, {"ok": True})
 
 
@@ -207,10 +223,10 @@ def test_default_transport_rejects_invalid_urls(
     url: str,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    def unexpected_request(*args, **kwargs):
-        pytest.fail("urlopen must not be called for a non-HTTPS provider URL")
+    def unexpected_connection(*args, **kwargs):
+        pytest.fail("HTTPSConnection must not be created for an invalid provider URL")
 
-    monkeypatch.setattr(ai_providers, "urlopen", unexpected_request)
+    monkeypatch.setattr(ai_providers.http.client, "HTTPSConnection", unexpected_connection)
 
     with pytest.raises(AiProviderError, match="configuración") as error:
         run(ai_providers._default_transport(url, {}, b"{}"))
@@ -220,25 +236,29 @@ def test_default_transport_rejects_invalid_urls(
 
 
 def test_default_transport_maps_http_error(monkeypatch: pytest.MonkeyPatch) -> None:
-    from urllib.error import HTTPError
-
-    def raise_http_error(*args, **kwargs):
-        raise HTTPError("https://provider.test", 429, "rate limited", {}, BytesIO())
-
-    monkeypatch.setattr(ai_providers, "urlopen", raise_http_error)
+    connection = MagicMock()
+    connection.__enter__.return_value = connection
+    connection.getresponse.return_value.status = 429
+    monkeypatch.setattr(ai_providers.http.client, "HTTPSConnection", lambda *args, **kwargs: connection)
     assert run(ai_providers._default_transport("https://provider.test", {}, b"{}")) == (429, None)
 
 
 def test_default_transport_maps_network_and_json_errors(monkeypatch: pytest.MonkeyPatch) -> None:
-    from urllib.error import URLError
-
-    monkeypatch.setattr(ai_providers, "urlopen", lambda *args, **kwargs: (_ for _ in ()).throw(URLError("offline")))
+    monkeypatch.setattr(
+        ai_providers.http.client,
+        "HTTPSConnection",
+        lambda *args, **kwargs: (_ for _ in ()).throw(OSError("offline")),
+    )
     with pytest.raises(AiProviderError) as error:
         run(ai_providers._default_transport("https://provider.test", {}, b"{}"))
     assert error.value.code is AiProviderErrorCode.UNAVAILABLE
     assert error.value.retryable is True
 
-    monkeypatch.setattr(ai_providers, "urlopen", lambda *args, **kwargs: (_ for _ in ()).throw(ValueError("bad json")))
+    connection = MagicMock()
+    connection.__enter__.return_value = connection
+    connection.getresponse.return_value.status = 200
+    connection.getresponse.return_value.read.side_effect = ValueError("bad json")
+    monkeypatch.setattr(ai_providers.http.client, "HTTPSConnection", lambda *args, **kwargs: connection)
     with pytest.raises(AiProviderError) as error:
         run(ai_providers._default_transport("https://provider.test", {}, b"{}"))
     assert error.value.code is AiProviderErrorCode.INVALID_RESPONSE
@@ -247,8 +267,8 @@ def test_default_transport_maps_network_and_json_errors(monkeypatch: pytest.Monk
 
 def test_default_transport_maps_timeout(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
-        ai_providers,
-        "urlopen",
+        ai_providers.http.client,
+        "HTTPSConnection",
         lambda *args, **kwargs: (_ for _ in ()).throw(TimeoutError("external timeout detail")),
     )
 

@@ -182,5 +182,6 @@ repos:
           - pypdf==6.14.2
           - pytest==9.1.1
           - redis==7.1.0
+          - rq==2.10.0
           - sqlalchemy[mypy]==2.0.51
           - uvicorn==0.51.0
