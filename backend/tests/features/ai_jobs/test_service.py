@@ -7,6 +7,7 @@ import pytest
 from app.core.errors.services import ConflictError, InvalidInputError, NotFoundError
 from app.features.ai_jobs.schemas import AIJobRecord, AIJobStatus, CreateAIJobCommand
 from app.features.ai_jobs.service import AIJobsService
+from app.integrations.ai_providers import AiProviderError, AiProviderErrorCode
 
 
 class Uow:
@@ -98,11 +99,12 @@ def test_failure_can_be_started_as_new_attempt_and_cancelled() -> None:
         service = AIJobsService(repository, Uow())
         queued = await service.create(user_id=7, firm_id=3, command=command())
         await service.start(execution_id=queued.execution_id, user_id=7, firm_id=3)
+        provider_error = AiProviderError(AiProviderErrorCode.TIMEOUT)
         failed = await service.fail(
             execution_id=queued.execution_id,
             user_id=7,
             firm_id=3,
-            error_code="provider_timeout",
+            error_code=provider_error.error_code,
         )
         assert failed.status == AIJobStatus.FAILED
         assert failed.error_code == "provider_timeout"

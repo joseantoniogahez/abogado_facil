@@ -27,6 +27,9 @@ Notes:
 - API request completion logs include a consistent structured shape with `request_id`, `method`, `path`, `status_code`, and `duration_ms`.
 - Authorization decisions are logged as `event=api_authorization_decision` with `request_id`, `user_id`, `permission_id`, `required_scope`, `decision`, `method`, `path`, and `route`.
 - Future AI SSE provider failures use the transport-level `error` event with `code=provider_error`; provider exception details are not returned or logged.
+- Provider adapters classify failures with the closed catalog in `ai_provider_errors.md`. Future
+  product endpoints may expose only its stable code, constant public message, and retry decision;
+  provider-controlled details remain outside the HTTP contract.
 - BYOK credential validation failures use `400 invalid_input`; missing credentials use `404 not_found`.
   Corrupt or tampered AES-GCM credentials are treated as invalid input before any provider is built.
 

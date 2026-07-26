@@ -6,6 +6,7 @@ import pytest
 from app.integrations import ai_providers
 from app.integrations.ai_providers import (
     AiProviderError,
+    AiProviderErrorCode,
     AiTextRequest,
     GeminiProvider,
     MockProvider,
@@ -56,8 +57,9 @@ def test_provider_failures_are_safe_and_retryable() -> None:
     async def transport(url, headers, body):
         return 503, {"error": "contains provider details"}
 
-    with pytest.raises(AiProviderError, match="AI provider request failed") as error:
+    with pytest.raises(AiProviderError, match="no está disponible") as error:
         run(OpenAIProvider(api_key=PROVIDER_API_KEY, model="test", transport=transport).generate(REQUEST))
+    assert error.value.code is AiProviderErrorCode.UNAVAILABLE
     assert error.value.retryable is True
     assert PROVIDER_API_KEY not in str(error.value)
 
@@ -66,8 +68,10 @@ def test_invalid_provider_response_is_rejected() -> None:
     async def transport(url, headers, body):
         return 200, {"choices": []}
 
-    with pytest.raises(AiProviderError, match="invalid response"):
+    with pytest.raises(AiProviderError, match="respuesta inválida") as error:
         run(OpenAIProvider(api_key=PROVIDER_API_KEY, model="test", transport=transport).generate(REQUEST))
+    assert error.value.error_code == "provider_invalid_response"
+    assert error.value.retryable is False
 
 
 def test_empty_provider_key_is_rejected() -> None:
@@ -94,18 +98,17 @@ def test_default_transport_parses_json_response(monkeypatch: pytest.MonkeyPatch)
 
 
 @pytest.mark.parametrize(
-    ("url", "error_message"),
+    "url",
     [
-        ("http://provider.test", "must use HTTPS"),
-        ("file:///tmp/provider.json", "must use HTTPS"),
-        ("custom://provider.test", "must use HTTPS"),
-        ("https:///missing-host", "must use HTTPS"),
-        ("https://[", "is invalid"),
+        "http://provider.test",
+        "file:///tmp/provider.json",
+        "custom://provider.test",
+        "https:///missing-host",
+        "https://[",
     ],
 )
 def test_default_transport_rejects_invalid_urls(
     url: str,
-    error_message: str,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     def unexpected_request(*args, **kwargs):
@@ -113,9 +116,10 @@ def test_default_transport_rejects_invalid_urls(
 
     monkeypatch.setattr(ai_providers, "urlopen", unexpected_request)
 
-    with pytest.raises(AiProviderError, match=error_message) as error:
+    with pytest.raises(AiProviderError, match="configuración") as error:
         run(ai_providers._default_transport(url, {}, b"{}"))
 
+    assert error.value.code is AiProviderErrorCode.CONFIGURATION_ERROR
     assert error.value.retryable is False
 
 
@@ -135,40 +139,99 @@ def test_default_transport_maps_network_and_json_errors(monkeypatch: pytest.Monk
     monkeypatch.setattr(ai_providers, "urlopen", lambda *args, **kwargs: (_ for _ in ()).throw(URLError("offline")))
     with pytest.raises(AiProviderError) as error:
         run(ai_providers._default_transport("https://provider.test", {}, b"{}"))
+    assert error.value.code is AiProviderErrorCode.UNAVAILABLE
     assert error.value.retryable is True
 
     monkeypatch.setattr(ai_providers, "urlopen", lambda *args, **kwargs: (_ for _ in ()).throw(ValueError("bad json")))
-    with pytest.raises(AiProviderError):
+    with pytest.raises(AiProviderError) as error:
+        run(ai_providers._default_transport("https://provider.test", {}, b"{}"))
+    assert error.value.code is AiProviderErrorCode.INVALID_RESPONSE
+    assert error.value.retryable is False
+
+
+def test_default_transport_maps_timeout(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        ai_providers,
+        "urlopen",
+        lambda *args, **kwargs: (_ for _ in ()).throw(TimeoutError("external timeout detail")),
+    )
+
+    with pytest.raises(AiProviderError) as error:
         run(ai_providers._default_transport("https://provider.test", {}, b"{}"))
 
+    assert error.value.code is AiProviderErrorCode.TIMEOUT
+    assert "external timeout detail" not in str(error.value)
 
-def test_provider_maps_non_retryable_status_and_transport_errors() -> None:
-    async def bad_status(url, headers, body):
-        return 400, None
 
-    with pytest.raises(AiProviderError) as status_error:
-        run(OpenAIProvider(api_key=PROVIDER_API_KEY, model="test", transport=bad_status).generate(REQUEST))
-    assert status_error.value.retryable is False
+@pytest.mark.parametrize("provider_class", [OpenAIProvider, GeminiProvider])
+@pytest.mark.parametrize(
+    ("status", "expected_code", "retryable"),
+    [
+        (400, AiProviderErrorCode.REQUEST_REJECTED, False),
+        (401, AiProviderErrorCode.AUTHENTICATION_FAILED, False),
+        (403, AiProviderErrorCode.AUTHENTICATION_FAILED, False),
+        (408, AiProviderErrorCode.TIMEOUT, True),
+        (429, AiProviderErrorCode.RATE_LIMITED, True),
+        (500, AiProviderErrorCode.UNAVAILABLE, True),
+        (503, AiProviderErrorCode.UNAVAILABLE, True),
+        (504, AiProviderErrorCode.TIMEOUT, True),
+    ],
+)
+def test_http_providers_share_error_taxonomy(provider_class, status, expected_code, retryable) -> None:
+    async def transport(url, headers, body):
+        return status, {"error": f"external detail {PROVIDER_API_KEY}"}
 
+    with pytest.raises(AiProviderError) as error:
+        run(provider_class(api_key=PROVIDER_API_KEY, model="test", transport=transport).generate(REQUEST))
+
+    assert error.value.code is expected_code
+    assert error.value.error_code == expected_code.value
+    assert error.value.retryable is retryable
+    assert PROVIDER_API_KEY not in str(error.value)
+    assert "external detail" not in str(error.value)
+
+
+def test_provider_maps_transport_errors() -> None:
     async def unexpected_error(url, headers, body):
         raise RuntimeError("provider internals")
 
     with pytest.raises(AiProviderError) as transport_error:
         run(OpenAIProvider(api_key=PROVIDER_API_KEY, model="test", transport=unexpected_error).generate(REQUEST))
+    assert transport_error.value.code is AiProviderErrorCode.UNAVAILABLE
     assert transport_error.value.retryable is True
+
+    async def timeout(url, headers, body):
+        raise TimeoutError("provider timeout detail")
+
+    with pytest.raises(AiProviderError) as timeout_error:
+        run(GeminiProvider(api_key=PROVIDER_API_KEY, model="test", transport=timeout).generate(REQUEST))
+    assert timeout_error.value.code is AiProviderErrorCode.TIMEOUT
 
 
 def test_provider_rethrows_safe_provider_error() -> None:
     async def provider_error(url, headers, body):
-        raise AiProviderError(retryable=False)
+        raise AiProviderError(AiProviderErrorCode.REQUEST_REJECTED)
 
     with pytest.raises(AiProviderError) as error:
         run(OpenAIProvider(api_key=PROVIDER_API_KEY, model="test", transport=provider_error).generate(REQUEST))
+    assert error.value.code is AiProviderErrorCode.REQUEST_REJECTED
     assert error.value.retryable is False
 
 
 def test_response_text_parser_rejects_wrong_shape_and_blank_text() -> None:
-    with pytest.raises(AiProviderError, match="invalid response"):
+    with pytest.raises(AiProviderError, match="respuesta inválida"):
         ai_providers._require_text("not-an-object", "value")
-    with pytest.raises(AiProviderError, match="invalid response"):
+    with pytest.raises(AiProviderError, match="respuesta inválida"):
         ai_providers._require_text({"value": "  "}, "value")
+
+
+@pytest.mark.parametrize("code", list(AiProviderErrorCode))
+def test_mock_provider_uses_same_public_failure_contract(code: AiProviderErrorCode) -> None:
+    with pytest.raises(AiProviderError) as error:
+        run(MockProvider(failure_code=code).generate(REQUEST))
+
+    failure = error.value.to_public_failure()
+    assert failure.code == code.value
+    assert failure.message == str(error.value)
+    assert failure.retryable is error.value.retryable
+    assert PROVIDER_API_KEY not in repr(failure)

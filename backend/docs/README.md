@@ -21,6 +21,7 @@ This folder is the canonical backend documentation set. It is organized for thre
 - `operations/streaming_observability.md`: SSE lifecycle, cancellation, correlation, and redaction contract for future AI responses.
 - `operations/ai_job_lifecycle.md`: persistent AI execution states, isolation, correlation, and safe result/error storage.
 - `operations/rq_ai_queue.md`: RQ/Redis transport, JSON payload boundary, retry, timeout, TTL, and deduplication policy.
+- `operations/ai_provider_errors.md`: provider-neutral failure codes, safe public messages, and retry policy.
 
 ## Architecture Annexes
 

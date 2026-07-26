@@ -39,8 +39,10 @@ Current top-level shape:
   runtime wiring can own timeouts, retries, and observability.
 - Provider credentials are transported only in headers. Gemini uses `x-goog-api-key`; credentials
   must never be placed in URLs that can be retained by access logs or intermediaries.
-- Provider errors are normalized to `AiProviderError`; API keys, response bodies, and provider error
-  details are never included in the exception message.
+- Provider errors are normalized to `AiProviderError` with a closed provider-neutral code, public
+  message, and explicit retry decision. API keys, URLs, response bodies, and provider error details
+  are never included in the exception or its public contract. The canonical catalog and HTTP
+  translation live in `docs/operations/ai_provider_errors.md`.
 - This port does not decide whether a user has a valid BYOK credential or persist results.
   `app/features/ai_execution/service.py` owns the implemented BYOK validation and provider
   construction policy. `app/features/ai_jobs` owns the persistent, tenant-scoped execution

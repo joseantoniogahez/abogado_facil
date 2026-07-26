@@ -24,6 +24,8 @@ Status date: `2026-07-25`
     plans, and production BYOK encryption-key wiring.
   - RQ/Redis background-job transport with JSON-only payloads, deterministic deduplication,
     configurable retry/backoff, and PostgreSQL-owned AI lifecycle.
+  - Closed provider-neutral AI failure taxonomy with safe public messages and explicit retry
+    decisions shared by OpenAI, Gemini, and Mock adapters.
 
 ## Active Guardrails
 

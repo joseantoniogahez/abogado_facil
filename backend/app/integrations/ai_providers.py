@@ -4,18 +4,61 @@ import asyncio
 import json
 from collections.abc import Awaitable, Callable, Mapping
 from dataclasses import dataclass
+from enum import StrEnum
 from typing import Any, Protocol
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit
 from urllib.request import Request, urlopen
 
 
-class AiProviderError(Exception):
-    """Safe provider failure that never carries credentials or response bodies."""
+class AiProviderErrorCode(StrEnum):
+    """Provider-neutral codes safe to persist and expose to API consumers."""
 
-    def __init__(self, message: str = "AI provider request failed", *, retryable: bool = False):
+    AUTHENTICATION_FAILED = "provider_authentication_failed"
+    RATE_LIMITED = "provider_rate_limited"
+    TIMEOUT = "provider_timeout"
+    UNAVAILABLE = "provider_unavailable"
+    REQUEST_REJECTED = "provider_request_rejected"
+    INVALID_RESPONSE = "provider_invalid_response"
+    CONFIGURATION_ERROR = "provider_configuration_error"
+
+
+@dataclass(frozen=True)
+class AiProviderFailure:
+    """Public failure contract without provider-controlled values."""
+
+    code: str
+    message: str
+    retryable: bool
+
+
+_ERROR_POLICY: dict[AiProviderErrorCode, tuple[str, bool]] = {
+    AiProviderErrorCode.AUTHENTICATION_FAILED: ("Revisa la credencial y el acceso del proveedor de IA.", False),
+    AiProviderErrorCode.RATE_LIMITED: ("El proveedor de IA alcanzó temporalmente su límite.", True),
+    AiProviderErrorCode.TIMEOUT: ("El proveedor de IA tardó demasiado en responder.", True),
+    AiProviderErrorCode.UNAVAILABLE: ("El proveedor de IA no está disponible temporalmente.", True),
+    AiProviderErrorCode.REQUEST_REJECTED: ("El proveedor de IA rechazó la solicitud.", False),
+    AiProviderErrorCode.INVALID_RESPONSE: ("El proveedor de IA devolvió una respuesta inválida.", False),
+    AiProviderErrorCode.CONFIGURATION_ERROR: ("La configuración del proveedor de IA no es válida.", False),
+}
+
+
+class AiProviderError(Exception):
+    """Safe, classified provider failure without external response details."""
+
+    def __init__(self, code: AiProviderErrorCode):
+        message, retryable = _ERROR_POLICY[code]
         super().__init__(message)
+        self.code = code
         self.retryable = retryable
+
+    @property
+    def error_code(self) -> str:
+        """Return the stable value accepted by ``AIJob.error_code``."""
+        return self.code.value
+
+    def to_public_failure(self) -> AiProviderFailure:
+        return AiProviderFailure(code=self.error_code, message=str(self), retryable=self.retryable)
 
 
 @dataclass(frozen=True)
@@ -45,9 +88,9 @@ def _validate_provider_url(url: str) -> None:
     try:
         parsed_url = urlsplit(url)
     except ValueError as exc:
-        raise AiProviderError("AI provider URL is invalid") from exc
+        raise AiProviderError(AiProviderErrorCode.CONFIGURATION_ERROR) from exc
     if parsed_url.scheme != "https" or parsed_url.hostname is None:
-        raise AiProviderError("AI provider URL must use HTTPS")
+        raise AiProviderError(AiProviderErrorCode.CONFIGURATION_ERROR)
 
 
 def _default_transport(url: str, headers: Mapping[str, str], body: bytes) -> Awaitable[tuple[int, Any]]:
@@ -60,8 +103,17 @@ def _default_transport(url: str, headers: Mapping[str, str], body: bytes) -> Awa
                     return response.status, json.loads(response.read())
             except HTTPError as exc:
                 return exc.code, None
-            except (URLError, TimeoutError, ValueError) as exc:
-                raise AiProviderError(retryable=True) from exc
+            except TimeoutError as exc:
+                raise AiProviderError(AiProviderErrorCode.TIMEOUT) from exc
+            except URLError as exc:
+                code = (
+                    AiProviderErrorCode.TIMEOUT
+                    if isinstance(exc.reason, TimeoutError)
+                    else AiProviderErrorCode.UNAVAILABLE
+                )
+                raise AiProviderError(code) from exc
+            except ValueError as exc:
+                raise AiProviderError(AiProviderErrorCode.INVALID_RESPONSE) from exc
 
         return await asyncio.to_thread(request)
 
@@ -75,13 +127,13 @@ def _require_text(payload: Any, path: str) -> str:
             try:
                 value = value[int(key)]
             except IndexError as exc:
-                raise AiProviderError("AI provider returned an invalid response") from exc
+                raise AiProviderError(AiProviderErrorCode.INVALID_RESPONSE) from exc
         elif isinstance(value, Mapping):
             value = value.get(key)
         else:
-            raise AiProviderError("AI provider returned an invalid response")
+            raise AiProviderError(AiProviderErrorCode.INVALID_RESPONSE)
     if not isinstance(value, str) or not value.strip():
-        raise AiProviderError("AI provider returned an invalid response")
+        raise AiProviderError(AiProviderErrorCode.INVALID_RESPONSE)
     return value.strip()
 
 
@@ -100,12 +152,20 @@ class _HttpAiProvider:
             status, payload = await self._transport(url, headers, json.dumps(body).encode("utf-8"))
         except AiProviderError:
             raise
+        except TimeoutError as exc:
+            raise AiProviderError(AiProviderErrorCode.TIMEOUT) from exc
         except Exception as exc:
-            raise AiProviderError(retryable=True) from exc
-        if status == 429 or status >= 500:
-            raise AiProviderError(retryable=True)
+            raise AiProviderError(AiProviderErrorCode.UNAVAILABLE) from exc
+        if status in {401, 403}:
+            raise AiProviderError(AiProviderErrorCode.AUTHENTICATION_FAILED)
+        if status == 429:
+            raise AiProviderError(AiProviderErrorCode.RATE_LIMITED)
+        if status in {408, 504}:
+            raise AiProviderError(AiProviderErrorCode.TIMEOUT)
+        if status >= 500 or status < 100:
+            raise AiProviderError(AiProviderErrorCode.UNAVAILABLE)
         if status < 200 or status >= 300:
-            raise AiProviderError()
+            raise AiProviderError(AiProviderErrorCode.REQUEST_REJECTED)
         return payload
 
 
@@ -147,9 +207,18 @@ class GeminiProvider(_HttpAiProvider):
 class MockProvider:
     provider = "mock"
 
-    def __init__(self, *, response: str = "Mock AI response", model: str = "mock-model"):
+    def __init__(
+        self,
+        *,
+        response: str = "Mock AI response",
+        model: str = "mock-model",
+        failure_code: AiProviderErrorCode | None = None,
+    ):
         self._response = response
         self._model = model
+        self._failure_code = failure_code
 
     async def generate(self, request: AiTextRequest) -> AiTextResponse:
+        if self._failure_code is not None:
+            raise AiProviderError(self._failure_code)
         return AiTextResponse(provider=self.provider, model=request.model or self._model, text=self._response)

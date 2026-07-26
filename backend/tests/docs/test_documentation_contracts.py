@@ -2,6 +2,7 @@ import re
 from pathlib import Path
 
 from app.core.setup.routers import ROUTER_MODULES
+from app.integrations.ai_providers import AiProviderErrorCode
 from utils.testing_support.docs import (
     BACKEND_DIR,
     BACKEND_PLAYBOOK_PATH,
@@ -227,3 +228,14 @@ def test_rq_worker_uses_json_and_only_validated_queue_configuration() -> None:
     assert "--disable-job-desc-logging" in compose
     assert "Redis recibe únicamente" in queue_contract
     assert "AI_QUEUE_RESULT_TTL_SECONDS=0" in queue_contract
+
+
+def test_ai_provider_error_catalog_matches_runtime_codes() -> None:
+    error_contract = _read_markdown(DOCS_DIR / "operations" / "ai_provider_errors.md")
+
+    for code in AiProviderErrorCode:
+        assert f"`{code.value}`" in error_contract
+
+    assert "API key" in error_contract
+    assert "cuerpo de respuesta" in error_contract
+    assert "`to_public_failure()`" in error_contract

@@ -37,7 +37,8 @@ resultado y no permite error; un job fallido exige `error_code` y no permite res
 
 ## Límites de responsabilidad
 
-- `AI-010` añadirá política de retry, backoff y prevención de duplicados.
-- `AI-011` definirá la taxonomía completa que alimentará `error_code`.
+- `AI-010` define en `rq_ai_queue.md` la política de retry, backoff y prevención de duplicados.
+- `AI-011` define en `ai_provider_errors.md` la taxonomía cerrada que alimenta `error_code`; un
+  worker persiste el código normalizado y nunca el mensaje o cuerpo externo.
 - `OBS-001` conectará la correlación persistente con el recorrido completo hacia proveedor.
 - Los endpoints de producto decidirán qué resultados estructurados están autorizados y validados.
