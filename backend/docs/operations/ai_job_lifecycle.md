@@ -51,3 +51,5 @@ Además, `AIJobsService.succeed` sólo acepta `ValidatedAIOutput` producido por
 - Los endpoints de producto decidirán qué resultados estructurados están autorizados y validados.
 - `AI-007` exige en `structured_ai_outputs.md` validación y versión coincidente antes de persistir,
   mostrar, copiar o exportar un resultado.
+- `AI-008` exige en `ai_context_minimization.md` que el worker reconstruya datos aislados y que
+  `AiTextRequest` reciba solo campos autorizados y necesarios mediante `MinimizedAIContext`.

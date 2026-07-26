@@ -8,6 +8,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
+from app.integrations.ai_context import build_minimized_ai_context
 from app.integrations.ai_providers import (
     AiProviderError,
     AiProviderErrorCode,
@@ -21,7 +22,12 @@ from app.integrations.ai_providers import (
 API_KEY = "contract-provider-secret"  # pragma: allowlist secret
 EXTERNAL_DETAIL = "private provider payload"
 REQUEST = AiTextRequest(
-    prompt="private legal prompt",
+    context=build_minimized_ai_context(
+        instruction="Analyze the authorized legal context",
+        source_context={"legal_context": "private legal prompt"},
+        authorized_fields={"legal_context"},
+        necessary_fields={"legal_context"},
+    ),
     model="contract-model",
     request_id="request-contract",
     execution_id="c" * 32,
@@ -94,7 +100,7 @@ def test_providers_share_success_contract(provider_name: str, factory: ProviderF
     log_text = " ".join(str(call) for call in logger.log.call_args_list)
     assert REQUEST.request_id in log_text
     assert REQUEST.execution_id in log_text
-    assert REQUEST.prompt not in log_text
+    assert REQUEST.context.render() not in log_text
     assert response.text not in log_text
     assert API_KEY not in log_text
 
@@ -131,7 +137,7 @@ def test_providers_share_safe_failure_and_retry_contract(
     assert expected_code.value in log_text
     assert REQUEST.request_id in log_text
     assert REQUEST.execution_id in log_text
-    assert REQUEST.prompt not in log_text
+    assert REQUEST.context.render() not in log_text
     assert EXTERNAL_DETAIL not in log_text
     assert API_KEY not in log_text
 

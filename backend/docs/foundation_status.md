@@ -31,6 +31,7 @@ Status date: `2026-07-25`
   - Cross-provider contract matrix for OpenAI, Gemini, and Mock covering success, timeout, rate
     limiting, invalid responses, safe failures, and the retry handoff to RQ.
   - Mandatory schema and version validation gate before an AI result can complete an `AIJob`.
+  - Mandatory allowlisted and bounded context gate before any OpenAI, Gemini, or Mock call.
 
 ## Active Guardrails
 

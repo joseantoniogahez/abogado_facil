@@ -280,3 +280,20 @@ def test_structured_ai_output_contract_documents_validation_gate() -> None:
         assert token in contract
     assert "`AIJobsService.succeed`" in contract
     assert "`ValidatedAIOutput`" in lifecycle
+
+
+def test_ai_context_contract_documents_minimization_gate() -> None:
+    contract = _read_markdown(DOCS_DIR / "operations" / "ai_context_minimization.md")
+    lifecycle = _read_markdown(DOCS_DIR / "operations" / "ai_job_lifecycle.md")
+
+    for token in (
+        "`MinimizedAIContext`",
+        "`build_minimized_ai_context`",
+        "`authorized_fields`",
+        "`necessary_fields`",
+        "`source_context`",
+        "`AiTextRequest`",
+        "`SEC-004`",
+    ):
+        assert token in contract
+    assert "`MinimizedAIContext`" in lifecycle

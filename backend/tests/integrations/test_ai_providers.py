@@ -5,7 +5,9 @@ from unittest.mock import MagicMock
 
 import pytest
 
+from app.core.errors.services import InvalidInputError
 from app.integrations import ai_providers
+from app.integrations.ai_context import build_minimized_ai_context
 from app.integrations.ai_providers import (
     AiProviderError,
     AiProviderErrorCode,
@@ -16,7 +18,12 @@ from app.integrations.ai_providers import (
 )
 
 REQUEST = AiTextRequest(
-    prompt="Summarize this",
+    context=build_minimized_ai_context(
+        instruction="Summarize this",
+        source_context={"matter_summary": "Private matter"},
+        authorized_fields={"matter_summary"},
+        necessary_fields={"matter_summary"},
+    ),
     model="test-model",
     request_id="request-1",
     execution_id="a" * 32,
@@ -34,6 +41,16 @@ def test_mock_provider_returns_normalized_response() -> None:
     assert response.text == "safe mock"
 
 
+def test_provider_request_rejects_arbitrary_context() -> None:
+    with pytest.raises(InvalidInputError, match="must be minimized"):
+        AiTextRequest(
+            context="private prompt",  # type: ignore[arg-type]
+            model="test-model",
+            request_id="request-1",
+            execution_id="a" * 32,
+        )
+
+
 def test_provider_logs_correlated_lifecycle_without_request_or_response_content() -> None:
     logger = MagicMock(spec=logging.Logger)
     response = run(MockProvider(response="private response", logger=logger).generate(REQUEST))
@@ -44,7 +61,7 @@ def test_provider_logs_correlated_lifecycle_without_request_or_response_content(
     assert "ai_provider_succeeded" in log_text
     assert REQUEST.request_id in log_text
     assert REQUEST.execution_id in log_text
-    assert REQUEST.prompt not in log_text
+    assert REQUEST.context.render() not in log_text
     assert response.text not in log_text
 
 
@@ -59,6 +76,7 @@ def test_openai_provider_builds_provider_payload_without_leaking_key() -> None:
     assert response.text == "result"
     assert calls[0][0].endswith("/chat/completions")
     assert b"Summarize this" in calls[0][2]
+    assert b"Private matter" in calls[0][2]
     assert calls[0][1]["Authorization"] == f"Bearer {PROVIDER_API_KEY}"
 
 

@@ -13,6 +13,8 @@ from urllib.parse import urlsplit
 from urllib.request import Request, urlopen
 
 from app.core.common.observability import AiCorrelationContext, log_ai_event
+from app.core.errors.services import InvalidInputError
+from app.integrations.ai_context import MinimizedAIContext
 
 
 class AiProviderErrorCode(StrEnum):
@@ -67,11 +69,15 @@ class AiProviderError(Exception):
 
 @dataclass(frozen=True)
 class AiTextRequest:
-    prompt: str
+    context: MinimizedAIContext
     model: str
     request_id: str
     execution_id: str
     max_tokens: int = 512
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.context, MinimizedAIContext):
+            raise InvalidInputError("AI provider context must be minimized")
 
 
 @dataclass(frozen=True)
@@ -262,7 +268,7 @@ class OpenAIProvider(_HttpAiProvider):
                 headers={"Authorization": f"Bearer {self._api_key}", "Content-Type": "application/json"},
                 body={
                     "model": model,
-                    "messages": [{"role": "user", "content": request.prompt}],
+                    "messages": [{"role": "user", "content": request.context.render()}],
                     "max_tokens": request.max_tokens,
                 },
             )
@@ -282,7 +288,7 @@ class GeminiProvider(_HttpAiProvider):
                 url=f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
                 headers={"Content-Type": "application/json", "x-goog-api-key": self._api_key},
                 body={
-                    "contents": [{"parts": [{"text": request.prompt}]}],
+                    "contents": [{"parts": [{"text": request.context.render()}]}],
                     "generationConfig": {"maxOutputTokens": request.max_tokens},
                 },
             )

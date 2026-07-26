@@ -12,6 +12,7 @@ from app.core.config.settings import AIQueueSettings
 from app.core.errors.services import ConflictError, InvalidInputError, NotFoundError
 from app.features.ai_jobs.schemas import AIJobRecord, AIJobStatus, CreateAIJobCommand
 from app.features.ai_jobs.service import AIJobsService
+from app.integrations.ai_context import build_minimized_ai_context
 from app.integrations.ai_outputs import ValidatedAIOutput
 from app.integrations.ai_providers import (
     AiProviderError,
@@ -111,7 +112,12 @@ def test_successful_lifecycle_tracks_correlation_versions_and_attempt() -> None:
 
         provider_response = await MockProvider(response="provider output", logger=logger).generate(
             AiTextRequest(
-                prompt="private prompt",
+                context=build_minimized_ai_context(
+                    instruction="Analyze",
+                    source_context={"matter_text": "private prompt"},
+                    authorized_fields={"matter_text"},
+                    necessary_fields={"matter_text"},
+                ),
                 model=queued.model,
                 request_id=queued.request_id,
                 execution_id=queued.execution_id,

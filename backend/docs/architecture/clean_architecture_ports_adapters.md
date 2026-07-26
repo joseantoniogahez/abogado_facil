@@ -50,6 +50,8 @@ Current top-level shape:
 - `app/integrations/ai_outputs.py` converts untrusted provider text into `ValidatedAIOutput` using
   an explicit Pydantic schema and version. `AIJobsService` rejects arbitrary dictionaries and
   version mismatches before persistence.
+- `app/integrations/ai_context.py` builds a bounded `MinimizedAIContext` from the exact intersection
+  of authorized and necessary fields. Provider requests reject arbitrary prompt strings.
 
 ## Background job port and RQ adapter
 
