@@ -21,6 +21,9 @@ Notes:
 - `meta` is optional and only appears when extra context is available.
 - `request_id` is always included in normalized error payloads.
 - The same value is also returned in the `X-Request-ID` response header.
+- Safe incoming `X-Request-ID` values are preserved. Empty, longer than 100 characters, or values
+  outside letters, digits, `.`, `_`, `:`, and `-` are replaced with an opaque generated ID to
+  prevent log injection.
 - `401` responses include `WWW-Authenticate: Bearer`.
 - Rate-limited responses use `429 rate_limited`, include `Retry-After`, and expose only numeric quota headers.
 - FastAPI request validation errors are converted to `400 invalid_input`.

@@ -12,7 +12,8 @@ no sustituye el lifecycle persistente.
 
 ## Frontera de datos
 
-Redis recibe únicamente:
+El comando interno del productor incluye `request_id` y `execution_id` para registrar el evento de
+enqueue, pero Redis recibe únicamente:
 
 - el nombre de un handler registrado en el catálogo interno;
 - el `execution_id` opaco como único argumento;
@@ -21,6 +22,10 @@ Redis recibe únicamente:
 No se permiten prompts, credenciales, contexto legal, texto documental, resultados ni mensajes de
 error de proveedor. Se usa JSON porque el serializer pickle predeterminado de RQ no es apropiado
 para esta frontera.
+
+Los eventos `ai_job_enqueued`, `ai_job_duplicate` y `ai_job_enqueue_failed` incluyen ambos IDs en el
+log del productor. El worker recibe sólo `execution_id` y recupera `request_id` desde `AIJob` en
+PostgreSQL; la correlación nunca amplía el payload Redis.
 
 ## Resiliencia
 

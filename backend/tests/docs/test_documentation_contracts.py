@@ -239,3 +239,24 @@ def test_ai_provider_error_catalog_matches_runtime_codes() -> None:
     assert "API key" in error_contract
     assert "cuerpo de respuesta" in error_contract
     assert "`to_public_failure()`" in error_contract
+
+
+def test_ai_observability_contract_documents_every_correlated_layer() -> None:
+    observability_contract = _read_markdown(DOCS_DIR / "operations" / "streaming_observability.md")
+    queue_contract = _read_markdown(DOCS_DIR / "operations" / "rq_ai_queue.md")
+
+    for layer in ("`ai_job`", "`ai_queue`", "`ai_provider`", "`ai_stream`"):
+        assert layer in observability_contract
+    for event in (
+        "ai_job_created",
+        "ai_job_enqueued",
+        "ai_provider_started",
+        "ai_provider_succeeded",
+        "ai_stream_started",
+    ):
+        assert f"`{event}`" in observability_contract
+
+    assert "request_id" in observability_contract
+    assert "execution_id" in observability_contract
+    assert "Redis recibe únicamente" in queue_contract
+    assert "`execution_id` opaco como único argumento" in queue_contract

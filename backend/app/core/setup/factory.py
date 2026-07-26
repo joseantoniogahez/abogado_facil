@@ -3,12 +3,12 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from time import perf_counter
 from typing import Any
-from uuid import uuid4
 
 from fastapi import FastAPI, Request, Response
 from fastapi.openapi.utils import get_openapi
 from pydantic import ValidationError
 
+from app.core.common.observability import normalize_request_id
 from app.core.common.openapi import normalize_generated_openapi_schema
 from app.core.config.settings import ApiSettings, AuthSettings, ObjectStorageSettings
 from app.core.errors.setup.handlers import REQUEST_ID_HEADER, configure_exception_handlers
@@ -83,7 +83,7 @@ def configure_request_context_middleware(app: FastAPI) -> None:
 
     @app.middleware("http")
     async def request_context_middleware(request: Request, call_next) -> Response:
-        request_id = request.headers.get(REQUEST_ID_HEADER, "").strip() or uuid4().hex
+        request_id = normalize_request_id(request.headers.get(REQUEST_ID_HEADER))
         request.state.request_id = request_id
 
         started_at = perf_counter()

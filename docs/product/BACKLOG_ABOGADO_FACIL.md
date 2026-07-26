@@ -130,7 +130,7 @@ esperada: pruebas de contrato, métricas, ADR, threat model, caso de fallo o dem
 | AI-009      | Backend    | P0-IA     | Hecho        | Ciclo de vida de ejecuciones de IA.             | `AIJob` con estados, intentos, versiones, resultado, error y correlación.                     |
 | AI-010      | Backend    | P1        | Hecho        | Resiliencia de proveedores.                     | Timeouts, reintentos recuperables, backoff, rate limits y prevención de duplicados.           |
 | AI-011      | Backend    | P1        | Hecho        | Taxonomía normalizada de errores.               | OpenAI, Gemini y mock mapean errores al contrato común y seguro para frontend.                |
-| OBS-001     | Ops        | P1        | Identificado | Observabilidad correlacionada.                  | `request_id` permite seguir API → `AIJob` → proveedor → resultado sin datos sensibles.        |
+| OBS-001     | Ops        | P1        | Hecho        | Observabilidad correlacionada.                  | `request_id` permite seguir API → `AIJob` → proveedor → resultado sin datos sensibles.        |
 | TEST-AI-001 | Backend    | P1        | Identificado | Pruebas de contrato y fallos multi-provider.    | Contratos OpenAI/Gemini/mock y escenarios de timeout, rate limit, JSON inválido y reintentos. |
 
 ## Fase 3 - IA Inicial Controlada

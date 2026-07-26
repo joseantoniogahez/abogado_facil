@@ -34,6 +34,7 @@ derivarse de esa carpeta, no de estos planes técnicos.
 | Ciclo de vida de IA        | [`AI-009`](AI-009_CICLO_VIDA_EJECUCIONES_IA_PLAN.md)                      |
 | Resiliencia RQ/Redis       | [`AI-010`](AI-010_RESILIENCIA_RQ_REDIS_PLAN.md)                           |
 | Taxonomía de errores IA    | [`AI-011`](AI-011_TAXONOMIA_ERRORES_IA_PLAN.md)                           |
+| Observabilidad de IA       | [`OBS-001`](OBS-001_OBSERVABILIDAD_CORRELACIONADA_IA_PLAN.md)             |
 | Auditoría backend inicial  | [`AUDIT-001`](AUDIT-001_AUDITORIA_BACKEND_FASTAPI_INICIAL_PLAN.md)        |
 | Auditoría backend final    | [`AUDIT-002`](AUDIT-002_AUDITORIA_BACKEND_FASTAPI_POST_HARDENING_PLAN.md) |
 | OpenAPI en producción      | [`OPS-005`](OPS-005_OPENAPI_PRODUCCION_PLAN.md)                           |

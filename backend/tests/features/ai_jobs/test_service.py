@@ -1,13 +1,24 @@
 import asyncio
+import logging
 from datetime import UTC, datetime
+from types import SimpleNamespace
 from typing import Any
+from unittest.mock import MagicMock
 
 import pytest
 
+from app.core.common.integration import EnqueueJobCommand
+from app.core.config.settings import AIQueueSettings
 from app.core.errors.services import ConflictError, InvalidInputError, NotFoundError
 from app.features.ai_jobs.schemas import AIJobRecord, AIJobStatus, CreateAIJobCommand
 from app.features.ai_jobs.service import AIJobsService
-from app.integrations.ai_providers import AiProviderError, AiProviderErrorCode
+from app.integrations.ai_providers import (
+    AiProviderError,
+    AiProviderErrorCode,
+    AiTextRequest,
+    MockProvider,
+)
+from app.integrations.rq_jobs import RQJobScheduler
 
 
 class Uow:
@@ -64,7 +75,8 @@ def test_successful_lifecycle_tracks_correlation_versions_and_attempt() -> None:
     async def run() -> None:
         repository = Repository()
         uow = Uow()
-        service = AIJobsService(repository, uow)
+        logger = MagicMock(spec=logging.Logger)
+        service = AIJobsService(repository, uow, logger=logger)
 
         queued = await service.create(user_id=7, firm_id=3, command=command(), execution_id="a" * 32)
         assert queued.status == AIJobStatus.QUEUED
@@ -73,10 +85,38 @@ def test_successful_lifecycle_tracks_correlation_versions_and_attempt() -> None:
         assert queued.schema_version == "schema-v1"
         assert await service.get(execution_id=queued.execution_id, user_id=7, firm_id=3) == queued
 
+        class Queue:
+            @staticmethod
+            def enqueue_call(**values: Any) -> SimpleNamespace:
+                return SimpleNamespace(id=values["job_id"])
+
+        scheduler = RQJobScheduler(
+            settings=AIQueueSettings(),
+            handlers={"ai.execute": "app.features.example.worker"},
+            queue=Queue(),
+            logger=logger,
+        )
+        await scheduler.enqueue(
+            EnqueueJobCommand(
+                job_name="ai.execute",
+                request_id=queued.request_id,
+                execution_id=queued.execution_id,
+            )
+        )
         running = await service.start(execution_id=queued.execution_id, user_id=7, firm_id=3)
         assert running.status == AIJobStatus.RUNNING
         assert running.attempt_count == 1
         assert running.started_at is not None
+
+        provider_response = await MockProvider(response="provider output", logger=logger).generate(
+            AiTextRequest(
+                prompt="private prompt",
+                model=queued.model,
+                request_id=queued.request_id,
+                execution_id=queued.execution_id,
+            )
+        )
+        assert provider_response.text == "provider output"
 
         succeeded = await service.succeed(
             execution_id=queued.execution_id,
@@ -89,6 +129,18 @@ def test_successful_lifecycle_tracks_correlation_versions_and_attempt() -> None:
         assert succeeded.error_code is None
         assert succeeded.completed_at is not None
         assert uow.entries == 3
+        log_text = " ".join(str(call) for call in logger.log.call_args_list)
+        assert "ai_job_created" in log_text
+        assert "ai_job_started" in log_text
+        assert "ai_job_succeeded" in log_text
+        assert "ai_job_enqueued" in log_text
+        assert "ai_provider_started" in log_text
+        assert "ai_provider_succeeded" in log_text
+        assert queued.request_id in log_text
+        assert queued.execution_id in log_text
+        assert "private prompt" not in log_text
+        assert "provider output" not in log_text
+        assert "safe structured output" not in log_text
 
     asyncio.run(run())
 

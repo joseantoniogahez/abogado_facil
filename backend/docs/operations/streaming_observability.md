@@ -35,6 +35,27 @@ exception messages must not be logged.
 lifecycles. A future SSE endpoint must pass the job's existing `execution_id` to
 `stream_ai_events`; it must not create a second identifier for the same provider call.
 
+`AiCorrelationContext` is the shared log contract. Both identifiers are bounded to 100 characters
+and accept only letters, digits, `.`, `_`, `:`, and `-`. The HTTP middleware preserves a valid
+incoming `X-Request-ID`; an empty or unsafe value is replaced with a server-generated 32-character
+hex ID before it reaches state, persistence, responses, or logs.
+
+## Correlated execution events
+
+All events below include `request_id` and `execution_id` through `log_ai_event`:
+
+| Layer         | Stable events                                                                               | Additional safe fields                               |
+| ------------- | ------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| `ai_job`      | `ai_job_created`, `ai_job_started`, `ai_job_succeeded`, `ai_job_failed`, `ai_job_cancelled` | `status`, `attempt_count`, optional `error_code`     |
+| `ai_queue`    | `ai_job_enqueued`, `ai_job_duplicate`, `ai_job_enqueue_failed`                              | allowlisted `job_name`, optional `error_type`        |
+| `ai_provider` | `ai_provider_started`, `ai_provider_succeeded`, `ai_provider_failed`                        | provider, model, duration, normalized error metadata |
+| `ai_stream`   | `ai_stream_started`, `ai_stream_completed`, `ai_stream_failed`, `ai_stream_cancelled`       | duration, chunks, optional `error_type`              |
+
+Future workers receive only `execution_id` from RQ. Before provider work they must load the
+tenant-scoped `AIJob`, call `AIJobsService.start`, and construct provider requests with the
+persisted `request_id` and `execution_id`. They complete through `succeed` or `fail`; workers must
+not invent a request ID or read one from Redis.
+
 Provider failures become the stable `error` event and `provider_error` code. The original exception
 is intentionally not sent to the client.
 

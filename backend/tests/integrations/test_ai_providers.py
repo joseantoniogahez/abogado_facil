@@ -1,5 +1,7 @@
 import asyncio
+import logging
 from io import BytesIO
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -13,7 +15,12 @@ from app.integrations.ai_providers import (
     OpenAIProvider,
 )
 
-REQUEST = AiTextRequest(prompt="Summarize this", model="test-model")
+REQUEST = AiTextRequest(
+    prompt="Summarize this",
+    model="test-model",
+    request_id="request-1",
+    execution_id="a" * 32,
+)
 PROVIDER_API_KEY = "provider-secret"  # pragma: allowlist secret
 
 
@@ -25,6 +32,20 @@ def test_mock_provider_returns_normalized_response() -> None:
     response = run(MockProvider(response="safe mock").generate(REQUEST))
     assert response.provider == "mock"
     assert response.text == "safe mock"
+
+
+def test_provider_logs_correlated_lifecycle_without_request_or_response_content() -> None:
+    logger = MagicMock(spec=logging.Logger)
+    response = run(MockProvider(response="private response", logger=logger).generate(REQUEST))
+
+    assert response.text == "private response"
+    log_text = " ".join(str(call) for call in logger.log.call_args_list)
+    assert "ai_provider_started" in log_text
+    assert "ai_provider_succeeded" in log_text
+    assert REQUEST.request_id in log_text
+    assert REQUEST.execution_id in log_text
+    assert REQUEST.prompt not in log_text
+    assert response.text not in log_text
 
 
 def test_openai_provider_builds_provider_payload_without_leaking_key() -> None:
@@ -218,6 +239,21 @@ def test_provider_rethrows_safe_provider_error() -> None:
     assert error.value.retryable is False
 
 
+def test_provider_observer_logs_unexpected_error_type_without_message() -> None:
+    logger = MagicMock(spec=logging.Logger)
+    provider = MockProvider(logger=logger)
+
+    async def unexpected() -> str:
+        raise RuntimeError("private unexpected detail")
+
+    with pytest.raises(RuntimeError, match="private unexpected detail"):
+        run(provider._observe(REQUEST, model=REQUEST.model, operation=unexpected))
+
+    log_text = " ".join(str(call) for call in logger.log.call_args_list)
+    assert "RuntimeError" in log_text
+    assert "private unexpected detail" not in log_text
+
+
 def test_response_text_parser_rejects_wrong_shape_and_blank_text() -> None:
     with pytest.raises(AiProviderError, match="respuesta inválida"):
         ai_providers._require_text("not-an-object", "value")
@@ -227,11 +263,15 @@ def test_response_text_parser_rejects_wrong_shape_and_blank_text() -> None:
 
 @pytest.mark.parametrize("code", list(AiProviderErrorCode))
 def test_mock_provider_uses_same_public_failure_contract(code: AiProviderErrorCode) -> None:
+    logger = MagicMock(spec=logging.Logger)
     with pytest.raises(AiProviderError) as error:
-        run(MockProvider(failure_code=code).generate(REQUEST))
+        run(MockProvider(failure_code=code, logger=logger).generate(REQUEST))
 
     failure = error.value.to_public_failure()
     assert failure.code == code.value
     assert failure.message == str(error.value)
     assert failure.retryable is error.value.retryable
     assert PROVIDER_API_KEY not in repr(failure)
+    log_text = " ".join(str(call) for call in logger.log.call_args_list)
+    assert code.value in log_text
+    assert failure.message not in log_text

@@ -1,6 +1,7 @@
 """RQ adapter for safe, idempotent background AI job dispatch."""
 
 import asyncio
+import logging
 from collections.abc import Mapping
 from typing import Any, Protocol
 
@@ -10,6 +11,7 @@ from rq.exceptions import DuplicateJobError
 from rq.serializers import JSONSerializer
 
 from app.core.common.integration import EnqueueJobCommand
+from app.core.common.observability import AiCorrelationContext, log_ai_event
 from app.core.config.settings import AIQueueSettings
 from app.integrations.jobs import JobSchedulerError, UnsupportedJobError
 
@@ -29,9 +31,11 @@ class RQJobScheduler:
         settings: AIQueueSettings,
         handlers: Mapping[str, str],
         queue: QueuePort | None = None,
+        logger: logging.Logger | None = None,
     ):
         self.settings = settings
         self.handlers = dict(handlers)
+        self.logger = logger or logging.getLogger("app.ai_queue")
         self.queue = queue or Queue(
             name=settings.AI_QUEUE_NAME,
             connection=Redis.from_url(settings.REDIS_URL),
@@ -40,10 +44,17 @@ class RQJobScheduler:
         )
 
     async def enqueue(self, job: EnqueueJobCommand) -> str:
+        try:
+            correlation = AiCorrelationContext(
+                request_id=job.request_id.strip(),
+                execution_id=job.execution_id.strip(),
+            )
+        except ValueError as exc:
+            raise JobSchedulerError("Invalid AI correlation identifier") from exc
         handler = self.handlers.get(job.job_name)
         if handler is None:
             raise UnsupportedJobError("Unsupported background job")
-        execution_id = job.execution_id.strip()
+        execution_id = correlation.execution_id
         if len(execution_id) != 32 or any(character not in "0123456789abcdef" for character in execution_id):
             raise JobSchedulerError("Invalid AI execution identifier")
 
@@ -69,7 +80,30 @@ class RQJobScheduler:
                 description=f"{job.job_name}:{execution_id}",
             )
         except DuplicateJobError:
+            log_ai_event(
+                self.logger,
+                layer="ai_queue",
+                event="ai_job_duplicate",
+                correlation=correlation,
+                job_name=job.job_name,
+            )
             return rq_job_id
         except Exception as exc:
+            log_ai_event(
+                self.logger,
+                layer="ai_queue",
+                event="ai_job_enqueue_failed",
+                correlation=correlation,
+                job_name=job.job_name,
+                error_type=type(exc).__name__,
+                level=logging.ERROR,
+            )
             raise JobSchedulerError("Background job dispatch failed") from exc
+        log_ai_event(
+            self.logger,
+            layer="ai_queue",
+            event="ai_job_enqueued",
+            correlation=correlation,
+            job_name=job.job_name,
+        )
         return queued.id

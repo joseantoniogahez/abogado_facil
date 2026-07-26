@@ -57,6 +57,9 @@ Current top-level shape:
   policy come from validated settings.
 - RQ never owns legal context or AI results. Workers reconstruct authorized context from
   PostgreSQL, and `AIJob` remains the lifecycle source of truth.
+- `AiCorrelationContext` and `log_ai_event` keep the same validated `request_id`/`execution_id`
+  across lifecycle, queue, provider, and streaming logs. Provider adapters log duration and
+  normalized codes, never request/response content or external exception messages.
 
 ## Ownership
 

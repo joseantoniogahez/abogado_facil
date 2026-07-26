@@ -20,6 +20,10 @@ No se almacenan prompts, credenciales, texto de documentos, respuestas sin valid
 error del proveedor. Las consultas sin coincidencia exacta de despacho y usuario se comportan como
 recurso inexistente.
 
+Cada creación y transición emite un evento `ai_job_*` con `request_id`, `execution_id`, estado e
+intento. Los eventos de fallo añaden sólo el `error_code` normalizado. Resultado, prompt, texto
+documental y mensajes de excepción quedan fuera del log.
+
 ## Estados y transiciones
 
 | Estado origen | Transición permitida  | Estado destino |
@@ -40,5 +44,6 @@ resultado y no permite error; un job fallido exige `error_code` y no permite res
 - `AI-010` define en `rq_ai_queue.md` la política de retry, backoff y prevención de duplicados.
 - `AI-011` define en `ai_provider_errors.md` la taxonomía cerrada que alimenta `error_code`; un
   worker persiste el código normalizado y nunca el mensaje o cuerpo externo.
-- `OBS-001` conectará la correlación persistente con el recorrido completo hacia proveedor.
+- `OBS-001` conecta la correlación persistente con RQ y los adaptadores; cada worker futuro debe
+  recuperar el par desde este registro antes de llamar al proveedor.
 - Los endpoints de producto decidirán qué resultados estructurados están autorizados y validados.

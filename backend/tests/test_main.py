@@ -247,6 +247,23 @@ def test_request_context_middleware_reuses_incoming_request_id_for_errors() -> N
     assert log_call.args[5] == 404
 
 
+def test_request_context_middleware_replaces_unsafe_incoming_request_id() -> None:
+    test_app = FastAPI()
+    configure_request_context_middleware(test_app)
+
+    @test_app.get("/ping")
+    async def ping() -> dict[str, str]:
+        return {"status": "ok"}
+
+    unsafe_request_id = "request 1 forged=true"
+    with TestClient(test_app) as client:
+        response = client.get("/ping", headers={REQUEST_ID_HEADER: unsafe_request_id})
+
+    request_id = response.headers[REQUEST_ID_HEADER]
+    assert request_id != unsafe_request_id
+    assert len(request_id) == 32
+
+
 def test_request_context_middleware_logs_server_errors_and_explicit_500_at_error_level() -> None:
     logger = MagicMock()
     with patch("app.core.setup.factory.logging.getLogger", return_value=logger):

@@ -1,7 +1,9 @@
+import logging
 from datetime import UTC, datetime
 from typing import Any, Protocol
 from uuid import uuid4
 
+from app.core.common.observability import AiCorrelationContext, log_ai_event
 from app.core.db.ports import UnitOfWorkPort
 from app.core.errors.services import ConflictError, InvalidInputError, NotFoundError
 from app.features.ai_jobs.schemas import AIJobRecord, AIJobStatus, CreateAIJobCommand
@@ -30,9 +32,15 @@ class AIJobsRepositoryPort(Protocol):
 
 
 class AIJobsService:
-    def __init__(self, repository: AIJobsRepositoryPort, unit_of_work: UnitOfWorkPort):
+    def __init__(
+        self,
+        repository: AIJobsRepositoryPort,
+        unit_of_work: UnitOfWorkPort,
+        logger: logging.Logger | None = None,
+    ):
         self.repository = repository
         self.unit_of_work = unit_of_work
+        self.logger = logger or logging.getLogger("app.ai_jobs")
 
     async def create(
         self,
@@ -43,7 +51,7 @@ class AIJobsService:
         execution_id: str | None = None,
     ) -> AIJobRecord:
         async with self.unit_of_work:
-            return await self.repository.create(
+            job = await self.repository.create(
                 execution_id=execution_id or uuid4().hex,
                 user_id=user_id,
                 firm_id=firm_id,
@@ -55,6 +63,8 @@ class AIJobsService:
                 completed_at=None,
                 **command.model_dump(),
             )
+            self._log_lifecycle(job, event="ai_job_created")
+            return job
 
     async def get(self, *, execution_id: str, user_id: int, firm_id: int) -> AIJobRecord:
         job = await self.repository.get_scoped(execution_id=execution_id, user_id=user_id, firm_id=firm_id)
@@ -67,23 +77,27 @@ class AIJobsService:
             job = await self._get_for_update(execution_id=execution_id, user_id=user_id, firm_id=firm_id)
             if job.status not in {AIJobStatus.QUEUED, AIJobStatus.FAILED}:
                 raise ConflictError(message="AI job cannot be started from its current status")
-            return await self._update(
+            updated = await self._update(
                 job,
                 status=AIJobStatus.RUNNING,
                 attempt_count=job.attempt_count + 1,
                 started_at=datetime.now(UTC),
             )
+            self._log_lifecycle(updated, event="ai_job_started")
+            return updated
 
     async def succeed(self, *, execution_id: str, user_id: int, firm_id: int, result: dict[str, Any]) -> AIJobRecord:
         async with self.unit_of_work:
             job = await self._get_for_update(execution_id=execution_id, user_id=user_id, firm_id=firm_id)
             self._require_running(job)
-            return await self._update(
+            updated = await self._update(
                 job,
                 status=AIJobStatus.SUCCEEDED,
                 result=result,
                 completed_at=datetime.now(UTC),
             )
+            self._log_lifecycle(updated, event="ai_job_succeeded")
+            return updated
 
     async def fail(self, *, execution_id: str, user_id: int, firm_id: int, error_code: str) -> AIJobRecord:
         if not error_code or len(error_code) > 100 or not error_code.replace("_", "").isalnum():
@@ -91,19 +105,41 @@ class AIJobsService:
         async with self.unit_of_work:
             job = await self._get_for_update(execution_id=execution_id, user_id=user_id, firm_id=firm_id)
             self._require_running(job)
-            return await self._update(
+            updated = await self._update(
                 job,
                 status=AIJobStatus.FAILED,
                 error_code=error_code,
                 completed_at=datetime.now(UTC),
             )
+            self._log_lifecycle(updated, event="ai_job_failed")
+            return updated
 
     async def cancel(self, *, execution_id: str, user_id: int, firm_id: int) -> AIJobRecord:
         async with self.unit_of_work:
             job = await self._get_for_update(execution_id=execution_id, user_id=user_id, firm_id=firm_id)
             if job.status not in {AIJobStatus.QUEUED, AIJobStatus.RUNNING}:
                 raise ConflictError(message="AI job cannot be cancelled from its current status")
-            return await self._update(job, status=AIJobStatus.CANCELLED, completed_at=datetime.now(UTC))
+            updated = await self._update(job, status=AIJobStatus.CANCELLED, completed_at=datetime.now(UTC))
+            self._log_lifecycle(updated, event="ai_job_cancelled")
+            return updated
+
+    def _log_lifecycle(self, job: AIJobRecord, *, event: str) -> None:
+        fields: dict[str, Any] = {
+            "status": job.status.value if isinstance(job.status, AIJobStatus) else job.status,
+            "attempt_count": job.attempt_count,
+        }
+        if job.error_code is not None:
+            fields["error_code"] = job.error_code
+        log_ai_event(
+            self.logger,
+            layer="ai_job",
+            event=event,
+            correlation=AiCorrelationContext(
+                request_id=job.request_id,
+                execution_id=job.execution_id,
+            ),
+            **fields,
+        )
 
     @staticmethod
     def _require_running(job: AIJobRecord) -> None:

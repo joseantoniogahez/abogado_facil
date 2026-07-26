@@ -26,6 +26,8 @@ Status date: `2026-07-25`
     configurable retry/backoff, and PostgreSQL-owned AI lifecycle.
   - Closed provider-neutral AI failure taxonomy with safe public messages and explicit retry
     decisions shared by OpenAI, Gemini, and Mock adapters.
+  - Validated AI correlation context and redaction-safe lifecycle events spanning `AIJob`, RQ,
+    provider adapters, and streaming.
 
 ## Active Guardrails
 

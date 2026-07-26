@@ -11,6 +11,7 @@ class PublishMessageCommand(ApplicationSchema):
 
 class EnqueueJobCommand(ApplicationSchema):
     job_name: str
+    request_id: str
     execution_id: str
 
 

@@ -2,13 +2,17 @@
 
 import asyncio
 import json
+import logging
 from collections.abc import Awaitable, Callable, Mapping
 from dataclasses import dataclass
 from enum import StrEnum
+from time import perf_counter
 from typing import Any, Protocol
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit
 from urllib.request import Request, urlopen
+
+from app.core.common.observability import AiCorrelationContext, log_ai_event
 
 
 class AiProviderErrorCode(StrEnum):
@@ -65,6 +69,8 @@ class AiProviderError(Exception):
 class AiTextRequest:
     prompt: str
     model: str
+    request_id: str
+    execution_id: str
     max_tokens: int = 512
 
 
@@ -137,10 +143,85 @@ def _require_text(payload: Any, path: str) -> str:
     return value.strip()
 
 
-class _HttpAiProvider:
+class _ObservedAiProvider:
     provider: str
 
-    def __init__(self, *, api_key: str, model: str, transport: JsonTransport | None = None):
+    def __init__(self, *, logger: logging.Logger | None = None):
+        self._logger = logger or logging.getLogger("app.ai_provider")
+
+    async def _observe(
+        self,
+        request: AiTextRequest,
+        *,
+        model: str,
+        operation: Callable[[], Awaitable[str]],
+    ) -> AiTextResponse:
+        correlation = AiCorrelationContext(
+            request_id=request.request_id,
+            execution_id=request.execution_id,
+        )
+        started_at = perf_counter()
+        log_ai_event(
+            self._logger,
+            layer="ai_provider",
+            event="ai_provider_started",
+            correlation=correlation,
+            provider=self.provider,
+            model=model,
+        )
+        try:
+            text = await operation()
+        except AiProviderError as exc:
+            log_ai_event(
+                self._logger,
+                layer="ai_provider",
+                event="ai_provider_failed",
+                correlation=correlation,
+                provider=self.provider,
+                model=model,
+                error_code=exc.error_code,
+                retryable=exc.retryable,
+                duration_ms=round((perf_counter() - started_at) * 1000, 2),
+                level=logging.WARNING,
+            )
+            raise
+        except Exception as exc:
+            log_ai_event(
+                self._logger,
+                layer="ai_provider",
+                event="ai_provider_failed",
+                correlation=correlation,
+                provider=self.provider,
+                model=model,
+                error_type=type(exc).__name__,
+                duration_ms=round((perf_counter() - started_at) * 1000, 2),
+                level=logging.ERROR,
+            )
+            raise
+        log_ai_event(
+            self._logger,
+            layer="ai_provider",
+            event="ai_provider_succeeded",
+            correlation=correlation,
+            provider=self.provider,
+            model=model,
+            duration_ms=round((perf_counter() - started_at) * 1000, 2),
+        )
+        return AiTextResponse(provider=self.provider, model=model, text=text)
+
+
+class _HttpAiProvider(_ObservedAiProvider):
+    provider: str
+
+    def __init__(
+        self,
+        *,
+        api_key: str,
+        model: str,
+        transport: JsonTransport | None = None,
+        logger: logging.Logger | None = None,
+    ):
+        super().__init__(logger=logger)
         if not api_key.strip():
             raise ValueError("api_key cannot be empty")
         self._api_key = api_key
@@ -174,17 +255,20 @@ class OpenAIProvider(_HttpAiProvider):
 
     async def generate(self, request: AiTextRequest) -> AiTextResponse:
         model = request.model or self._model
-        payload = await self._post(
-            url="https://api.openai.com/v1/chat/completions",
-            headers={"Authorization": f"Bearer {self._api_key}", "Content-Type": "application/json"},
-            body={
-                "model": model,
-                "messages": [{"role": "user", "content": request.prompt}],
-                "max_tokens": request.max_tokens,
-            },
-        )
-        text = _require_text(payload, "choices.0.message.content") if isinstance(payload, Mapping) else ""
-        return AiTextResponse(provider=self.provider, model=model, text=text)
+
+        async def execute() -> str:
+            payload = await self._post(
+                url="https://api.openai.com/v1/chat/completions",
+                headers={"Authorization": f"Bearer {self._api_key}", "Content-Type": "application/json"},
+                body={
+                    "model": model,
+                    "messages": [{"role": "user", "content": request.prompt}],
+                    "max_tokens": request.max_tokens,
+                },
+            )
+            return _require_text(payload, "choices.0.message.content") if isinstance(payload, Mapping) else ""
+
+        return await self._observe(request, model=model, operation=execute)
 
 
 class GeminiProvider(_HttpAiProvider):
@@ -192,19 +276,22 @@ class GeminiProvider(_HttpAiProvider):
 
     async def generate(self, request: AiTextRequest) -> AiTextResponse:
         model = request.model or self._model
-        payload = await self._post(
-            url=f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
-            headers={"Content-Type": "application/json", "x-goog-api-key": self._api_key},
-            body={
-                "contents": [{"parts": [{"text": request.prompt}]}],
-                "generationConfig": {"maxOutputTokens": request.max_tokens},
-            },
-        )
-        text = _require_text(payload, "candidates.0.content.parts.0.text") if isinstance(payload, Mapping) else ""
-        return AiTextResponse(provider=self.provider, model=model, text=text)
+
+        async def execute() -> str:
+            payload = await self._post(
+                url=f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
+                headers={"Content-Type": "application/json", "x-goog-api-key": self._api_key},
+                body={
+                    "contents": [{"parts": [{"text": request.prompt}]}],
+                    "generationConfig": {"maxOutputTokens": request.max_tokens},
+                },
+            )
+            return _require_text(payload, "candidates.0.content.parts.0.text") if isinstance(payload, Mapping) else ""
+
+        return await self._observe(request, model=model, operation=execute)
 
 
-class MockProvider:
+class MockProvider(_ObservedAiProvider):
     provider = "mock"
 
     def __init__(
@@ -213,12 +300,19 @@ class MockProvider:
         response: str = "Mock AI response",
         model: str = "mock-model",
         failure_code: AiProviderErrorCode | None = None,
+        logger: logging.Logger | None = None,
     ):
+        super().__init__(logger=logger)
         self._response = response
         self._model = model
         self._failure_code = failure_code
 
     async def generate(self, request: AiTextRequest) -> AiTextResponse:
-        if self._failure_code is not None:
-            raise AiProviderError(self._failure_code)
-        return AiTextResponse(provider=self.provider, model=request.model or self._model, text=self._response)
+        model = request.model or self._model
+
+        async def execute() -> str:
+            if self._failure_code is not None:
+                raise AiProviderError(self._failure_code)
+            return self._response
+
+        return await self._observe(request, model=model, operation=execute)
