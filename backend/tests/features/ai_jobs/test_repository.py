@@ -3,6 +3,8 @@ from datetime import UTC, datetime
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock, patch
 
+from sqlalchemy.dialects import postgresql
+
 from app.features.ai_jobs.models import AIJob
 from app.features.ai_jobs.repository import AIJobsRepository
 
@@ -106,3 +108,12 @@ def test_model_is_converted_to_immutable_record() -> None:
     record = AIJobsRepository._to_record(AIJob(**vars(persisted)))
     assert record.execution_id == persisted.execution_id
     assert record.status.value == "queued"
+
+
+def test_result_none_is_persisted_as_sql_null() -> None:
+    result_type = AIJob.__table__.c.result.type
+    bind_processor = result_type.bind_processor(postgresql.dialect())
+
+    assert result_type.none_as_null is True
+    assert bind_processor is not None
+    assert bind_processor(None) is None

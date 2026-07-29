@@ -226,6 +226,8 @@ def test_rq_worker_uses_json_and_only_validated_queue_configuration() -> None:
     assert '"--serializer"' in compose
     assert '"json"' in compose
     assert "--disable-job-desc-logging" in compose
+    assert "entrypoint: []" in compose
+    assert "sólo FastAPI aplica migraciones" in queue_contract
     assert "Redis recibe únicamente" in queue_contract
     assert "AI_QUEUE_RESULT_TTL_SECONDS=0" in queue_contract
 

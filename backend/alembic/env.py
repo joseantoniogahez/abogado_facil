@@ -6,6 +6,7 @@ from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import create_async_engine
 
 from app.core.db.database import Base, get_database_url
+from app.features.ai_assistance.models import AIAssistanceResult
 from app.features.ai_credentials.models import AiCredential
 from app.features.ai_jobs.models import AIJob
 from app.features.audit_log.models import AuditLogEntry
@@ -30,6 +31,7 @@ if config.config_file_name is not None:
 _MODEL_REGISTRY = (
     User,
     AiCredential,
+    AIAssistanceResult,
     AIJob,
     Role,
     Permission,

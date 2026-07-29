@@ -20,6 +20,12 @@ class DomainErrorType(StrEnum):
     CONFLICT = "conflict"
     INTERNAL_ERROR = "internal_error"
     RATE_LIMITED = "rate_limited"
+    PROVIDER_AUTHENTICATION_FAILED = "provider_authentication_failed"
+    PROVIDER_TIMEOUT = "provider_timeout"
+    PROVIDER_UNAVAILABLE = "provider_unavailable"
+    PROVIDER_REQUEST_REJECTED = "provider_request_rejected"
+    PROVIDER_INVALID_RESPONSE = "provider_invalid_response"
+    PROVIDER_CONFIGURATION_ERROR = "provider_configuration_error"
 
 
 class DomainError(AppError):

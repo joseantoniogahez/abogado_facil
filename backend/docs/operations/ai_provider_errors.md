@@ -53,6 +53,22 @@ Esta clasificación no encola por sí sola. El handler captura cada `AiProviderE
 fallo definitivo los casos no recuperables y sólo relanza los recuperables para activar el retry de
 RQ.
 
+El endpoint síncrono `POST /v1/matters/{matter_id}/ai/results` traduce
+`provider_rate_limited` a la respuesta normalizada `429 rate_limited`, con el mensaje público
+constante y `Retry-After: 60`. El código persistido en `AIJob.error_code` permanece como
+`provider_rate_limited`. Los detalles y encabezados controlados por el proveedor no cruzan el
+adaptador.
+
+El mismo endpoint traduce todos los demás fallos del catálogo sin dejarlos escapar como excepciones
+no controladas: credencial y solicitud rechazada usan `400`; respuesta inválida usa `502`;
+indisponibilidad usa `503`; timeout usa `504`; y configuración interna usa `500`. La respuesta
+conserva el código estable `provider_*` y el mensaje público constante.
+
+Las funciones de asistencia que requieren resultados estructurados envían a Gemini el esquema JSON
+esperado mediante `responseMimeType=application/json` y `responseJsonSchema`. El adaptador concatena
+las partes textuales, ignora metadatos de pensamiento y el servicio vuelve a validar localmente el
+JSON contra el esquema de la función antes de persistirlo.
+
 ## Mock y pruebas
 
 `MockProvider(failure_code=...)` falla de forma determinista con cualquier miembro del catálogo. Esto

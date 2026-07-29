@@ -17,6 +17,7 @@ ROUTER_MODULES: tuple[str, ...] = (
     "app.features.matter_calculations.router",
     "app.features.matter_documents.router",
     "app.features.ai_credentials.router",
+    "app.features.ai_assistance.router",
 )
 ROUTER_ATTRIBUTE: str = "router"
 

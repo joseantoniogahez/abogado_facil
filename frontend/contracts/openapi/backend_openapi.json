@@ -1,6 +1,284 @@
 {
   "components": {
     "schemas": {
+      "AIAssistanceResultListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AIAssistanceResultResponse"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "AIAssistanceResultListResponse",
+        "type": "object"
+      },
+      "AIAssistanceResultResponse": {
+        "properties": {
+          "converted_actions": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Converted Actions",
+            "type": "array"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "execution_id": {
+            "title": "Execution Id",
+            "type": "string"
+          },
+          "feature": {
+            "enum": [
+              "intake_analysis",
+              "client_questions",
+              "client_message"
+            ],
+            "title": "Feature",
+            "type": "string"
+          },
+          "generated_content": {
+            "additionalProperties": true,
+            "title": "Generated Content",
+            "type": "object"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "is_stale": {
+            "title": "Is Stale",
+            "type": "boolean"
+          },
+          "matter_id": {
+            "title": "Matter Id",
+            "type": "integer"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "problem_report": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Problem Report"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "review_status": {
+            "enum": [
+              "pending",
+              "accepted",
+              "partially_accepted",
+              "rejected"
+            ],
+            "title": "Review Status",
+            "type": "string"
+          },
+          "reviewed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed At"
+          },
+          "reviewed_content": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed Content"
+          },
+          "source_snapshot": {
+            "additionalProperties": true,
+            "title": "Source Snapshot",
+            "type": "object"
+          },
+          "source_version": {
+            "title": "Source Version",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "matter_id",
+          "execution_id",
+          "feature",
+          "provider",
+          "model",
+          "source_version",
+          "source_snapshot",
+          "generated_content",
+          "reviewed_content",
+          "review_status",
+          "problem_report",
+          "converted_actions",
+          "is_stale",
+          "reviewed_at",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "AIAssistanceResultResponse",
+        "type": "object"
+      },
+      "AIContextPreviewRequest": {
+        "properties": {
+          "feature": {
+            "enum": [
+              "intake_analysis",
+              "client_questions",
+              "client_message"
+            ],
+            "title": "Feature",
+            "type": "string"
+          },
+          "include_matter_description": {
+            "default": true,
+            "title": "Include Matter Description",
+            "type": "boolean"
+          },
+          "model": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Model",
+            "type": "string"
+          },
+          "narrative": {
+            "maxLength": 20000,
+            "minLength": 20,
+            "title": "Narrative",
+            "type": "string"
+          },
+          "provider": {
+            "enum": [
+              "openai",
+              "gemini"
+            ],
+            "title": "Provider",
+            "type": "string"
+          },
+          "regenerates_result_id": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Regenerates Result Id"
+          }
+        },
+        "required": [
+          "feature",
+          "narrative",
+          "provider",
+          "model"
+        ],
+        "title": "AIContextPreviewRequest",
+        "type": "object"
+      },
+      "AIContextPreviewResponse": {
+        "properties": {
+          "character_count": {
+            "title": "Character Count",
+            "type": "integer"
+          },
+          "confirmation_token": {
+            "title": "Confirmation Token",
+            "type": "string"
+          },
+          "cost_notice": {
+            "title": "Cost Notice",
+            "type": "string"
+          },
+          "estimated_max_output_tokens": {
+            "title": "Estimated Max Output Tokens",
+            "type": "integer"
+          },
+          "excluded_sources": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Excluded Sources",
+            "type": "array"
+          },
+          "feature": {
+            "enum": [
+              "intake_analysis",
+              "client_questions",
+              "client_message"
+            ],
+            "title": "Feature",
+            "type": "string"
+          },
+          "included_sources": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Included Sources",
+            "type": "array"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          }
+        },
+        "required": [
+          "feature",
+          "provider",
+          "model",
+          "included_sources",
+          "excluded_sources",
+          "character_count",
+          "estimated_max_output_tokens",
+          "cost_notice",
+          "confirmation_token"
+        ],
+        "title": "AIContextPreviewResponse",
+        "type": "object"
+      },
       "AccessTokenResponse": {
         "properties": {
           "access_token": {
@@ -639,6 +917,46 @@
         "title": "ClientResponse",
         "type": "object"
       },
+      "ConvertAIAssistanceRequest": {
+        "properties": {
+          "action_type": {
+            "enum": [
+              "note",
+              "task",
+              "question",
+              "checklist",
+              "missing_document",
+              "message"
+            ],
+            "title": "Action Type",
+            "type": "string"
+          },
+          "content": {
+            "maxLength": 20000,
+            "minLength": 1,
+            "title": "Content",
+            "type": "string"
+          },
+          "due_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due Date"
+          }
+        },
+        "required": [
+          "action_type",
+          "content"
+        ],
+        "title": "ConvertAIAssistanceRequest",
+        "type": "object"
+      },
       "CreateAdminUserRequest": {
         "properties": {
           "email": {
@@ -1076,6 +1394,72 @@
         ],
         "title": "DocumentType",
         "type": "string"
+      },
+      "ExecuteAIAssistanceRequest": {
+        "properties": {
+          "confirmation_token": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Confirmation Token",
+            "type": "string"
+          },
+          "feature": {
+            "enum": [
+              "intake_analysis",
+              "client_questions",
+              "client_message"
+            ],
+            "title": "Feature",
+            "type": "string"
+          },
+          "include_matter_description": {
+            "default": true,
+            "title": "Include Matter Description",
+            "type": "boolean"
+          },
+          "model": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Model",
+            "type": "string"
+          },
+          "narrative": {
+            "maxLength": 20000,
+            "minLength": 20,
+            "title": "Narrative",
+            "type": "string"
+          },
+          "provider": {
+            "enum": [
+              "openai",
+              "gemini"
+            ],
+            "title": "Provider",
+            "type": "string"
+          },
+          "regenerates_result_id": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Regenerates Result Id"
+          }
+        },
+        "required": [
+          "feature",
+          "narrative",
+          "provider",
+          "model",
+          "confirmation_token"
+        ],
+        "title": "ExecuteAIAssistanceRequest",
+        "type": "object"
       },
       "MatterBillingResponse": {
         "properties": {
@@ -1794,6 +2178,49 @@
           "password"
         ],
         "title": "RegisterUserRequest",
+        "type": "object"
+      },
+      "ReviewAIAssistanceRequest": {
+        "properties": {
+          "content": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Content"
+          },
+          "problem_report": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Problem Report"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "accepted",
+              "partially_accepted",
+              "rejected"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "ReviewAIAssistanceRequest",
         "type": "object"
       },
       "SaveAiCredentialRequest": {
@@ -3996,6 +4423,274 @@
         "summary": "Update matter",
         "tags": [
           "matters"
+        ]
+      }
+    },
+    "/v1/matters/{matter_id}/ai/preview": {
+      "post": {
+        "description": "Returns the reviewed context metadata and a signed confirmation token bound to the exact inputs.",
+        "operationId": "preview_context_v1_matters__matter_id__ai_preview_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "matter_id",
+            "required": true,
+            "schema": {
+              "title": "Matter Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AIContextPreviewRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AIContextPreviewResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Preview minimized AI context",
+        "tags": [
+          "ai-assistance"
+        ]
+      }
+    },
+    "/v1/matters/{matter_id}/ai/results": {
+      "get": {
+        "operationId": "list_results_v1_matters__matter_id__ai_results_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "matter_id",
+            "required": true,
+            "schema": {
+              "title": "Matter Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AIAssistanceResultListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "List matter AI results",
+        "tags": [
+          "ai-assistance"
+        ]
+      },
+      "post": {
+        "operationId": "execute_assistance_v1_matters__matter_id__ai_results_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "matter_id",
+            "required": true,
+            "schema": {
+              "title": "Matter Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExecuteAIAssistanceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AIAssistanceResultResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "description": "The configured provider rejected the request or its credential is invalid."
+          },
+          "409": {
+            "description": "The signed context preview no longer matches the execution inputs."
+          },
+          "429": {
+            "description": "The configured AI provider temporarily reached its request quota.",
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds clients should wait before retrying.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "The configured AI provider returned an invalid response."
+          },
+          "503": {
+            "description": "The configured AI provider is temporarily unavailable."
+          },
+          "504": {
+            "description": "The configured AI provider timed out."
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Run a controlled matter AI function",
+        "tags": [
+          "ai-assistance"
+        ]
+      }
+    },
+    "/v1/matters/{matter_id}/ai/results/{result_id}": {
+      "patch": {
+        "operationId": "review_result_v1_matters__matter_id__ai_results__result_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "matter_id",
+            "required": true,
+            "schema": {
+              "title": "Matter Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "result_id",
+            "required": true,
+            "schema": {
+              "title": "Result Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReviewAIAssistanceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AIAssistanceResultResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Persist human review of an AI result",
+        "tags": [
+          "ai-assistance"
+        ]
+      }
+    },
+    "/v1/matters/{matter_id}/ai/results/{result_id}/actions": {
+      "post": {
+        "operationId": "convert_result_v1_matters__matter_id__ai_results__result_id__actions_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "matter_id",
+            "required": true,
+            "schema": {
+              "title": "Matter Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "result_id",
+            "required": true,
+            "schema": {
+              "title": "Result Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConvertAIAssistanceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AIAssistanceResultResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Convert an accepted AI result into an explicit action",
+        "tags": [
+          "ai-assistance"
         ]
       }
     },

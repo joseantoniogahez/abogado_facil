@@ -76,6 +76,7 @@ class AiTextRequest:
     request_id: str
     execution_id: str
     max_tokens: int = 512
+    response_json_schema: Mapping[str, Any] | None = None
 
     def __post_init__(self) -> None:
         if not isinstance(self.context, MinimizedAIContext):
@@ -163,6 +164,32 @@ def _require_text(payload: Any, path: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise AiProviderError(AiProviderErrorCode.INVALID_RESPONSE)
     return value.strip()
+
+
+def _require_gemini_text(payload: Any) -> str:
+    """Return all textual response parts, ignoring Gemini thought metadata."""
+    if not isinstance(payload, Mapping):
+        raise AiProviderError(AiProviderErrorCode.INVALID_RESPONSE)
+    candidates = payload.get("candidates")
+    if not isinstance(candidates, list) or not candidates:
+        raise AiProviderError(AiProviderErrorCode.INVALID_RESPONSE)
+    candidate = candidates[0]
+    if not isinstance(candidate, Mapping):
+        raise AiProviderError(AiProviderErrorCode.INVALID_RESPONSE)
+    content = candidate.get("content")
+    if not isinstance(content, Mapping):
+        raise AiProviderError(AiProviderErrorCode.INVALID_RESPONSE)
+    parts = content.get("parts")
+    if not isinstance(parts, list):
+        raise AiProviderError(AiProviderErrorCode.INVALID_RESPONSE)
+    text_parts = [
+        text.strip()
+        for part in parts
+        if isinstance(part, Mapping) and isinstance((text := part.get("text")), str) and text.strip()
+    ]
+    if not text_parts:
+        raise AiProviderError(AiProviderErrorCode.INVALID_RESPONSE)
+    return "".join(text_parts)
 
 
 class _ObservedAiProvider:
@@ -340,6 +367,14 @@ class GeminiProvider(_HttpAiProvider):
         model = request.model or self._model
 
         async def execute() -> str:
+            generation_config: dict[str, Any] = {"maxOutputTokens": request.max_tokens}
+            if request.response_json_schema is not None:
+                generation_config.update(
+                    {
+                        "responseMimeType": "application/json",
+                        "responseJsonSchema": dict(request.response_json_schema),
+                    }
+                )
             payload = await self._post(
                 url=f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
                 headers={"Content-Type": "application/json", "x-goog-api-key": self._api_key},
@@ -357,10 +392,10 @@ class GeminiProvider(_HttpAiProvider):
                             "parts": [{"text": request.context.render_untrusted_data()}],
                         }
                     ],
-                    "generationConfig": {"maxOutputTokens": request.max_tokens},
+                    "generationConfig": generation_config,
                 },
             )
-            return _require_text(payload, "candidates.0.content.parts.0.text") if isinstance(payload, Mapping) else ""
+            return _require_gemini_text(payload)
 
         return await self._observe(request, model=model, operation=execute)
 

@@ -22,6 +22,7 @@ import {
   updateMatter,
 } from "./api";
 import type { MatterInput, MatterRecord, MatterStatus } from "./contracts";
+import { MatterAiAssistance } from "./matter-ai/MatterAiAssistance";
 import { MatterCalculations } from "./matter-calculations/MatterCalculations";
 import { MatterChecklist } from "./matter-checklist/MatterChecklist";
 import { MatterDocuments } from "./matter-documents/MatterDocuments";
@@ -394,7 +395,7 @@ export const MatterDetailTabs = ({ matterId }: { matterId: number }) => {
             )
           : null}
         {activeTab === "summary"
-          ? <p className="mt-6 text-slate-600">{t("matters.tabs.summary")}</p>
+          ? <MatterAiAssistance matterId={matterId} />
           : null}
       </div>
     </>

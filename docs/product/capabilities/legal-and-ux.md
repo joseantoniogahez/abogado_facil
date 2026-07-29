@@ -19,4 +19,4 @@
 
 - [LEGAL-001](../plans/implemented/LEGAL-001_AVISOS_LEGALES_PLAN.md)
 - [UX-001](../plans/implemented/UX-001_JERARQUIA_VISUAL_ACCIONES_PLAN.md)
-- [LEGAL-002 pendiente](../plans/pending/LEGAL-002_VALIDACION_AVISOS_IA_PLAN.md)
+- [LEGAL-002B implementado](../plans/implemented/LEGAL-002B_VALIDACION_AVISOS_IA_PLAN.md)

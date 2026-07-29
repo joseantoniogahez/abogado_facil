@@ -4,21 +4,22 @@ This document defines deterministic mutation retry and invalidation behavior by 
 
 ## Policy Matrix
 
-| Domain                     | Retry Policy                                     | Invalidation Strategy                                  |
-| -------------------------- | ------------------------------------------------ | ------------------------------------------------------ |
-| Default mutation           | Retry only transient/network errors, max 1 retry | Caller-defined                                         |
-| Auth login mutation        | No retry                                         | Set `SESSION_QUERY_KEY` and invalidate session query   |
-| Auth logout mutation       | No retry                                         | Clear `SESSION_QUERY_KEY` and invalidate session query |
-| Auth registration mutation | No retry                                         | Keep session unchanged; show explicit login transition |
-| Profile update mutation    | No retry                                         | Write returned profile through `SESSION_QUERY_KEY`     |
-| AI credential mutation     | No retry                                         | Invalidate `AI_CREDENTIALS_QUERY_KEY`                  |
-| Client/matter mutation     | Default mutation policy                          | Explicit domain list/detail and dashboard invalidation |
-| Matter note mutation       | Default mutation policy                          | Invalidate only the note list for its matter           |
-| Matter document mutation   | Default mutation policy                          | Invalidate only the document list for its matter       |
-| Matter checklist mutation  | Default mutation policy                          | Invalidate only the checklist for its matter           |
-| Matter task mutation       | Default mutation policy                          | Invalidate its matter task list and dashboard summary  |
-| Matter payment mutation    | Default mutation policy                          | Invalidate the payment summary for its matter          |
-| Matter calculation save    | Default mutation policy                          | Invalidate saved calculations for its matter           |
+| Domain                     | Retry Policy                                     | Invalidation Strategy                                                                                                                                               |
+| -------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Default mutation           | Retry only transient/network errors, max 1 retry | Caller-defined                                                                                                                                                      |
+| Auth login mutation        | No retry                                         | Set `SESSION_QUERY_KEY` and invalidate session query                                                                                                                |
+| Auth logout mutation       | No retry                                         | Clear `SESSION_QUERY_KEY` and invalidate session query                                                                                                              |
+| Auth registration mutation | No retry                                         | Keep session unchanged; show explicit login transition                                                                                                              |
+| Profile update mutation    | No retry                                         | Write returned profile through `SESSION_QUERY_KEY`                                                                                                                  |
+| AI credential mutation     | No retry                                         | Invalidate `AI_CREDENTIALS_QUERY_KEY`                                                                                                                               |
+| Client/matter mutation     | Default mutation policy                          | Explicit domain list/detail and dashboard invalidation                                                                                                              |
+| Matter note mutation       | Default mutation policy                          | Invalidate only the note list for its matter                                                                                                                        |
+| Matter document mutation   | Default mutation policy                          | Invalidate only the document list for its matter                                                                                                                    |
+| Matter checklist mutation  | Default mutation policy                          | Invalidate only the checklist for its matter                                                                                                                        |
+| Matter task mutation       | Default mutation policy                          | Invalidate its matter task list and dashboard summary                                                                                                               |
+| Matter payment mutation    | Default mutation policy                          | Invalidate the payment summary for its matter                                                                                                                       |
+| Matter calculation save    | Default mutation policy                          | Invalidate saved calculations for its matter                                                                                                                        |
+| Matter AI assistance       | Default mutation policy                          | Preview input changes clear its signed confirmation; execution/review invalidate AI results; conversion also invalidates the created note, task or checklist domain |
 
 ## Implementation References
 

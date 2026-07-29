@@ -95,7 +95,8 @@ Endpoints:
 
 Notes:
 
-- Backend runs Alembic migrations during startup (`backend/prestart.sh`).
+- Backend runs Alembic migrations during startup (`backend/prestart.sh`); `ai-worker` clears that
+  image entrypoint and waits for the backend healthcheck, so it never applies migrations.
 - `ai-worker` runs one RQ worker with scheduler support, JSON serialization, bounded retries, and
   Redis payloads limited to opaque execution IDs.
 - `compose.override.yaml` is loaded automatically for local runs and enables backend hot reload via bind mount.

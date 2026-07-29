@@ -123,10 +123,11 @@ services:
       args:
         PYTHON_VERSION: "${PYTHON_VERSION:-3.14}"
     depends_on:
-      database:
+      backend:
         condition: service_healthy
       redis:
         condition: service_healthy
+    entrypoint: []
     environment:
       APP_ENV: "${APP_ENV:-local}"
       AI_CREDENTIAL_ENCRYPTION_KEY: "${AI_CREDENTIAL_ENCRYPTION_KEY:-MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDE=}" # pragma: allowlist secret

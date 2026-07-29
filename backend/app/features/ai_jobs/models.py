@@ -38,7 +38,11 @@ class AIJob(BaseModel):
     schema_version: Mapped[str] = mapped_column(String(50), nullable=False)
     status: Mapped[str] = mapped_column(String(20), nullable=False, default="queued")
     attempt_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
-    result: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True, default=None)
+    result: Mapped[dict[str, Any] | None] = mapped_column(
+        JSON(none_as_null=True),
+        nullable=True,
+        default=None,
+    )
     error_code: Mapped[str | None] = mapped_column(String(100), nullable=True, default=None)
     started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True, default=None)
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True, default=None)

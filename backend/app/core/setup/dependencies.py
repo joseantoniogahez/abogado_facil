@@ -15,8 +15,11 @@ from app.core.db.ports import UnitOfWorkPort
 from app.core.db.uow import UnitOfWork
 from app.core.security.service import Argon2PasswordService, JwtTokenService, PasswordServicePort, TokenServicePort
 from app.core.security.service.encryption import AesGcmSecretEncryption, SecretEncryptionPort
+from app.features.ai_assistance.repository import AIAssistanceRepository
+from app.features.ai_assistance.service import AIAssistanceService
 from app.features.ai_credentials.repository import AiCredentialsRepository
 from app.features.ai_credentials.service import AiCredentialsService
+from app.features.ai_execution.service import AiProviderFactory
 from app.features.ai_jobs.repository import AIJobsRepository
 from app.features.ai_jobs.service import AIJobsService
 from app.features.audit_log.repository import AuditLogRepository
@@ -284,6 +287,43 @@ async def get_ai_jobs_service(
 
 
 AiJobsServiceDependency = Annotated[AIJobsService, Depends(get_ai_jobs_service)]
+
+
+async def get_ai_assistance_repository(session: DbSessionDependency) -> AIAssistanceRepository:
+    return AIAssistanceRepository(session=session)
+
+
+async def get_ai_provider_factory(
+    credentials: AiCredentialsServiceDependency,
+) -> AiProviderFactory:
+    return AiProviderFactory(credentials=credentials)
+
+
+async def get_ai_assistance_service(
+    repository: Annotated[AIAssistanceRepository, Depends(get_ai_assistance_repository)],
+    matters_repository: MattersRepositoryDependency,
+    provider_factory: Annotated[AiProviderFactory, Depends(get_ai_provider_factory)],
+    jobs_service: AiJobsServiceDependency,
+    unit_of_work: UnitOfWorkDependency,
+    auth_settings: AuthSettingsDependency,
+    notes_repository: MatterNotesRepositoryDependency,
+    tasks_repository: MatterTasksRepositoryDependency,
+    checklists_repository: MatterChecklistsRepositoryDependency,
+) -> AIAssistanceService:
+    return AIAssistanceService(
+        repository=repository,
+        matters_repository=matters_repository,
+        provider_factory=provider_factory,
+        jobs_service=jobs_service,
+        unit_of_work=unit_of_work,
+        preview_signing_key=auth_settings.JWT_SECRET_KEY,
+        notes_repository=notes_repository,
+        tasks_repository=tasks_repository,
+        checklists_repository=checklists_repository,
+    )
+
+
+AIAssistanceServiceDependency = Annotated[AIAssistanceService, Depends(get_ai_assistance_service)]
 
 
 async def get_ai_queue_settings() -> AIQueueSettings:

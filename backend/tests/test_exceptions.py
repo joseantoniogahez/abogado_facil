@@ -137,6 +137,32 @@ def test_request_validation_exception_handler_returns_invalid_input() -> None:
     assert response.headers[REQUEST_ID_HEADER] == "req-123"
 
 
+@pytest.mark.parametrize(
+    ("error_type", "status_code"),
+    [
+        (DomainErrorType.PROVIDER_AUTHENTICATION_FAILED, status.HTTP_400_BAD_REQUEST),
+        (DomainErrorType.PROVIDER_TIMEOUT, status.HTTP_504_GATEWAY_TIMEOUT),
+        (DomainErrorType.PROVIDER_UNAVAILABLE, status.HTTP_503_SERVICE_UNAVAILABLE),
+        (DomainErrorType.PROVIDER_REQUEST_REJECTED, status.HTTP_400_BAD_REQUEST),
+        (DomainErrorType.PROVIDER_INVALID_RESPONSE, status.HTTP_502_BAD_GATEWAY),
+        (DomainErrorType.PROVIDER_CONFIGURATION_ERROR, status.HTTP_500_INTERNAL_SERVER_ERROR),
+    ],
+)
+def test_domain_error_handler_maps_provider_failures(
+    error_type: DomainErrorType,
+    status_code: int,
+) -> None:
+    response = asyncio.run(domain_error_handler(_request("req-123"), DomainError(error_type, "Safe message")))
+
+    assert response.status_code == status_code
+    assert _payload(response) == {
+        "detail": "Safe message",
+        "status": status_code,
+        "code": error_type.value,
+        "request_id": "req-123",
+    }
+
+
 def test_http_exception_handler_with_string_detail() -> None:
     exc = StarletteHTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Denied", headers={"X-Rule": "rbac"})
 

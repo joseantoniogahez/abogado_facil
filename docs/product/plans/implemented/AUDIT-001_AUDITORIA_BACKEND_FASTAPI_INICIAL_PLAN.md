@@ -7,7 +7,7 @@
 - Priority: `P1`
 - Plan status: `Complete`
 - Implementation status: `Hecho`
-- Last updated: `2026-07-19`
+- Last updated: `2026-07-29`
 - Backlog source: `docs/product/BACKLOG_ABOGADO_FACIL.md`
 
 ## Objective
@@ -72,7 +72,7 @@ contratos operativos y los riesgos de producción.
 ### Validation
 
 - [x] `.venv\\Scripts\\python.exe -m pytest backend/tests` — 378 passed.
-- [ ] `pre-commit` sobre documentos modificados — intentado con `PRE_COMMIT_HOME` local, pero no pudo descargar hooks por falta de red; queda pendiente.
+- [x] `pre-commit` sobre documentos modificados — el gate completo pasó el 2026-07-29.
 
 ## Progress Log
 
@@ -85,7 +85,8 @@ contratos operativos y los riesgos de producción.
 Informe: `docs/product/AUDIT-001_BACKEND_FASTAPI_INICIAL.md`.
 
 `.venv\\Scripts\\python.exe -m pytest backend/tests`: 378 passed; 1 warning no funcional de pytest cache.
-Coverage 100%: no ejecutado. Pre-commit: intento fallido al descargar hooks desde GitHub por falta de red; queda como gate pendiente de los tickets de implementación.
+Coverage 100% no formaba parte del alcance de esta auditoría sin cambios runtime. El intento original
+de pre-commit falló por falta de red; el gate completo pasó posteriormente el 2026-07-29.
 
 ## Pause / Handoff Record
 
@@ -103,5 +104,6 @@ Coverage 100%: no ejecutado. Pre-commit: intento fallido al descargar hooks desd
 ## Completion Summary
 
 - Delivered: informe inicial con cinco hallazgos y destinos `OPS-005`–`OPS-009`.
-- Validation: 378 pruebas backend pasadas; coverage gate y pre-commit pendientes.
+- Validation: 378 pruebas backend pasadas en el cierre original; pre-commit completo aprobado el
+  2026-07-29.
 - Residual risk: hardening de producción aún no implementado.

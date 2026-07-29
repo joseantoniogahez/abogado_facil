@@ -58,15 +58,26 @@ value is the account email; the product has no separate username identity.
 
 ## Domain Error Code Mapping
 
-| Domain Error Code | HTTP Status                 |
-| ----------------- | --------------------------- |
-| `invalid_input`   | `400 Bad Request`           |
-| `unauthorized`    | `401 Unauthorized`          |
-| `forbidden`       | `403 Forbidden`             |
-| `not_found`       | `404 Not Found`             |
-| `conflict`        | `409 Conflict`              |
-| `internal_error`  | `500 Internal Server Error` |
-| `rate_limited`    | `429 Too Many Requests`     |
+| Domain Error Code                | HTTP Status                 |
+| -------------------------------- | --------------------------- |
+| `invalid_input`                  | `400 Bad Request`           |
+| `unauthorized`                   | `401 Unauthorized`          |
+| `forbidden`                      | `403 Forbidden`             |
+| `not_found`                      | `404 Not Found`             |
+| `conflict`                       | `409 Conflict`              |
+| `internal_error`                 | `500 Internal Server Error` |
+| `rate_limited`                   | `429 Too Many Requests`     |
+| `provider_authentication_failed` | `400 Bad Request`           |
+| `provider_timeout`               | `504 Gateway Timeout`       |
+| `provider_unavailable`           | `503 Service Unavailable`   |
+| `provider_request_rejected`      | `400 Bad Request`           |
+| `provider_invalid_response`      | `502 Bad Gateway`           |
+| `provider_configuration_error`   | `500 Internal Server Error` |
+
+The synchronous AI-assistance endpoint maps every normalized provider failure to this safe public
+contract. Provider messages and response bodies are never exposed. A provider credential failure
+uses `400` because it concerns the caller's configured BYOK credential rather than authentication
+with this API.
 
 Matter document uploads use `400 invalid_input` for unsupported, empty, oversized, or content-mismatched
 files; `409 conflict` when the per-matter quota is reached; opaque `404 not_found` for missing or foreign

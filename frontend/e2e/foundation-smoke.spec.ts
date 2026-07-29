@@ -58,6 +58,7 @@ test.describe("frontend foundation smoke", () => {
     };
     let notes: Record<string, unknown>[] = [];
     let documents: Record<string, unknown>[] = [];
+    let aiResults: Record<string, unknown>[] = [];
     await page.route("**/v1/**", async (route) => {
       const request = route.request();
       const method = request.method();
@@ -116,6 +117,90 @@ test.describe("frontend foundation smoke", () => {
           contentType: "application/json",
           body: JSON.stringify({ items: [], total: 0 }),
         });
+        return;
+      }
+      if (method === "GET" && pathname === "/v1/matters/3/ai/results") {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({ items: aiResults, total: aiResults.length }),
+        });
+        return;
+      }
+      if (method === "POST" && pathname === "/v1/matters/3/ai/preview") {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            feature: "intake_analysis",
+            provider: "openai",
+            model: "gpt-4.1-mini",
+            included_sources: ["relato proporcionado"],
+            excluded_sources: ["notas", "documentos", "pagos", "tareas", "descripción del asunto"],
+            character_count: 44,
+            estimated_max_output_tokens: 1200,
+            cost_notice: "Costo BYOK",
+            confirmation_token: "a".repeat(64),
+          }),
+        });
+        return;
+      }
+      if (method === "POST" && pathname === "/v1/matters/3/ai/results") {
+        const payload = request.postDataJSON() as Record<string, unknown>;
+        expect(payload.confirmation_token).toBe("a".repeat(64));
+        aiResults = [{
+          id: 17,
+          matter_id: 3,
+          execution_id: "execution-smoke",
+          feature: "intake_analysis",
+          provider: "openai",
+          model: "gpt-4.1-mini",
+          source_version: "source-smoke",
+          source_snapshot: {
+            fields: ["narrative"],
+            prompt_version: "phase3-v1",
+            matter_updated_at: matter.updated_at,
+          },
+          generated_content: {
+            summary: "Resumen generado",
+            relevant_facts: ["Hecho confirmado"],
+            critical_data: [],
+            missing_documents: [],
+            next_steps: [],
+          },
+          reviewed_content: null,
+          review_status: "pending",
+          problem_report: null,
+          converted_actions: [],
+          is_stale: false,
+          reviewed_at: null,
+          created_at: matter.created_at,
+          updated_at: matter.updated_at,
+        }];
+        await route.fulfill({ status: 201, contentType: "application/json", body: JSON.stringify(aiResults[0]) });
+        return;
+      }
+      if (method === "PATCH" && pathname === "/v1/matters/3/ai/results/17") {
+        const payload = request.postDataJSON() as Record<string, unknown>;
+        aiResults = [{ ...aiResults[0], ...payload, review_status: payload.status }];
+        await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(aiResults[0]) });
+        return;
+      }
+      if (method === "POST" && pathname === "/v1/matters/3/ai/results/17/actions") {
+        const payload = request.postDataJSON() as Record<string, unknown>;
+        notes = [{
+          id: 18,
+          matter_id: 3,
+          content: payload.content,
+          is_relevant: false,
+          created_at: matter.created_at,
+          updated_at: matter.updated_at,
+        }];
+        aiResults = [{
+          ...aiResults[0],
+          converted_actions: [{ ...payload, entity_id: 18, entity_type: "note" }],
+        }];
+        await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(aiResults[0]) });
         return;
       }
       if (method === "GET" && pathname === "/v1/matters/3/notes") {
@@ -237,6 +322,18 @@ test.describe("frontend foundation smoke", () => {
     page.once("dialog", dialog => void dialog.accept());
     await page.getByRole("button", { name: t("matterDocuments.delete") }).click();
     await expect(page.getByText(t("matterDocuments.empty"))).toBeVisible();
+    await page.getByRole("tab", { name: t("matters.tabs.summary") }).click();
+    await page.getByLabel(t("ai.narrative")).fill("Relato autorizado suficientemente largo para analizar.");
+    await page.getByRole("button", { name: t("ai.preview") }).click();
+    await expect(page.getByText("Costo BYOK")).toBeVisible();
+    await page.getByRole("button", { name: t("ai.execute") }).click();
+    await expect(page.getByLabel(t("ai.review.content"))).toHaveValue("Resumen generado");
+    await page.getByRole("button", { name: t("ai.review.accept") }).click();
+    await expect(page.getByText(t("ai.review.status.accepted"))).toBeVisible();
+    await page.getByRole("button", { name: t("ai.review.copy") }).click();
+    await page.getByRole("button", { name: t("ai.actions.convert") }).click();
+    await page.getByRole("tab", { name: t("matters.tabs.documentsNotes") }).click();
+    await expect(page.getByText("Resumen generado")).toBeVisible();
   });
 
   test("navigates to register and completes the registration flow", async ({ page }) => {

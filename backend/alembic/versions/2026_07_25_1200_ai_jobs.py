@@ -30,7 +30,7 @@ def upgrade() -> None:
         sa.Column("schema_version", sa.String(length=50), nullable=False),
         sa.Column("status", sa.String(length=20), nullable=False),
         sa.Column("attempt_count", sa.Integer(), nullable=False),
-        sa.Column("result", sa.JSON(), nullable=True),
+        sa.Column("result", sa.JSON(none_as_null=True), nullable=True),
         sa.Column("error_code", sa.String(length=100), nullable=True),
         sa.Column("started_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("completed_at", sa.DateTime(timezone=True), nullable=True),

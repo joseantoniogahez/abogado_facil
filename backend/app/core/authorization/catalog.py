@@ -70,6 +70,9 @@ READ_ACCESS_POLICY_CATALOG: tuple[ReadAccessPolicyDefinition, ...] = (
         method="GET", path="/v1/matters/{matter_id}/documents", access_level=ReadAccessLevel.AUTHENTICATED
     ),
     ReadAccessPolicyDefinition(
+        method="GET", path="/v1/matters/{matter_id}/ai/results", access_level=ReadAccessLevel.AUTHENTICATED
+    ),
+    ReadAccessPolicyDefinition(
         method="GET",
         path="/v1/matters/{matter_id}/documents/{document_id}/download",
         access_level=ReadAccessLevel.AUTHENTICATED,

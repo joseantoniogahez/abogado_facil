@@ -4,14 +4,17 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from starlette.requests import Request
 
-from app.core.config.settings import AiCredentialSettings, AIQueueSettings
+from app.core.config.settings import AiCredentialSettings, AIQueueSettings, AuthSettings
 from app.core.security.service.encryption import AesGcmSecretEncryption
 from app.core.setup import dependencies
 from app.core.setup.dependencies import (
+    get_ai_assistance_repository,
+    get_ai_assistance_service,
     get_ai_credentials_repository,
     get_ai_credentials_service,
     get_ai_jobs_repository,
     get_ai_jobs_service,
+    get_ai_provider_factory,
     get_ai_queue_settings,
     get_audit_log_repository,
     get_audit_log_service,
@@ -22,8 +25,11 @@ from app.core.setup.dependencies import (
     get_request_permission_scope_cache,
     get_secret_encryption,
 )
+from app.features.ai_assistance.repository import AIAssistanceRepository
+from app.features.ai_assistance.service import AIAssistanceService
 from app.features.ai_credentials.repository import AiCredentialsRepository
 from app.features.ai_credentials.service import AiCredentialsService
+from app.features.ai_execution.service import AiProviderFactory
 from app.features.ai_jobs.repository import AIJobsRepository
 from app.features.ai_jobs.service import AIJobsService
 from app.features.audit_log.repository import AuditLogRepository
@@ -160,6 +166,37 @@ def test_ai_job_dependencies_build_expected_components() -> None:
     assert isinstance(service, AIJobsService)
     assert service.repository is repository
     assert service.unit_of_work is unit_of_work
+
+
+def test_ai_assistance_dependencies_build_expected_components() -> None:
+    session = MagicMock()
+    repository = asyncio.run(get_ai_assistance_repository(session))
+    assert isinstance(repository, AIAssistanceRepository)
+    credentials = MagicMock()
+    factory = asyncio.run(get_ai_provider_factory(credentials))
+    assert isinstance(factory, AiProviderFactory)
+    matters = MagicMock()
+    jobs = MagicMock()
+    unit_of_work = MagicMock()
+    notes = MagicMock()
+    tasks = MagicMock()
+    checklists = MagicMock()
+    service = asyncio.run(
+        get_ai_assistance_service(
+            repository,
+            matters,
+            factory,
+            jobs,
+            unit_of_work,
+            AuthSettings(),
+            notes,
+            tasks,
+            checklists,
+        )
+    )
+    assert isinstance(service, AIAssistanceService)
+    assert service.repository is repository
+    assert service.notes_repository is notes
 
 
 def test_ai_queue_dependencies_build_expected_components() -> None:

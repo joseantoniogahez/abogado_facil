@@ -7,6 +7,10 @@ consume la cola configurada en `AI_QUEUE_NAME`. Ambos usan RQ 2.10, el mismo Red
 `rq.serializers.JSONSerializer`. El worker se ejecuta con scheduler porque los retries diferidos lo
 requieren.
 
+La imagen compartida define `/app/prestart.sh` como entrypoint para ejecutar Alembic antes de
+FastAPI. Compose elimina explícitamente ese entrypoint en `ai-worker` y espera a que `backend` esté
+saludable, de modo que sólo FastAPI aplica migraciones antes de que el worker empiece a consumir.
+
 PostgreSQL y `AIJob` siguen siendo la fuente de verdad. El estado de RQ es transporte operativo y
 no sustituye el lifecycle persistente.
 

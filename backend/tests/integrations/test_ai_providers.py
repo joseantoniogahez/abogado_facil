@@ -149,6 +149,43 @@ def test_gemini_provider_normalizes_response() -> None:
     assert response.text == "gemini result"
 
 
+def test_gemini_provider_requests_structured_json_and_joins_text_parts() -> None:
+    request = AiTextRequest(
+        context=REQUEST.context,
+        function=REQUEST.function,
+        model=REQUEST.model,
+        request_id=REQUEST.request_id,
+        execution_id=REQUEST.execution_id,
+        response_json_schema={
+            "type": "object",
+            "properties": {"summary": {"type": "string"}},
+            "required": ["summary"],
+        },
+    )
+
+    async def transport(url, headers, body):
+        generation_config = json.loads(body)["generationConfig"]
+        assert generation_config["responseMimeType"] == "application/json"
+        assert generation_config["responseJsonSchema"] == request.response_json_schema
+        return 200, {
+            "candidates": [
+                {
+                    "content": {
+                        "parts": [
+                            {"thought": True},
+                            {"text": '{"summary":'},
+                            {"text": '"resultado"}'},
+                        ]
+                    }
+                }
+            ]
+        }
+
+    response = run(GeminiProvider(api_key=PROVIDER_API_KEY, model="fallback", transport=transport).generate(request))
+
+    assert response.text == '{"summary":"resultado"}'
+
+
 def test_provider_failures_are_safe_and_retryable() -> None:
     async def transport(url, headers, body):
         return 503, {"error": "contains provider details"}
@@ -206,7 +243,10 @@ def test_default_transport_parses_json_response(monkeypatch: pytest.MonkeyPatch)
             return None
 
     monkeypatch.setattr(ai_providers.http.client, "HTTPSConnection", Connection)
-    assert run(ai_providers._default_transport("https://provider.test", {}, b"{}")) == (200, {"ok": True})
+    assert run(ai_providers._default_transport("https://provider.test/generate?model=test", {}, b"{}")) == (
+        200,
+        {"ok": True},
+    )
 
 
 @pytest.mark.parametrize(
@@ -354,6 +394,22 @@ def test_response_text_parser_rejects_wrong_shape_and_blank_text() -> None:
         ai_providers._require_text("not-an-object", "value")
     with pytest.raises(AiProviderError, match="respuesta inválida"):
         ai_providers._require_text({"value": "  "}, "value")
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        "not-an-object",
+        {"candidates": []},
+        {"candidates": ["not-an-object"]},
+        {"candidates": [{}]},
+        {"candidates": [{"content": {}}]},
+        {"candidates": [{"content": {"parts": [{"thought": True}, {"text": "  "}]}}]},
+    ],
+)
+def test_gemini_response_text_parser_rejects_invalid_shapes(payload) -> None:
+    with pytest.raises(AiProviderError):
+        ai_providers._require_gemini_text(payload)
 
 
 @pytest.mark.parametrize("code", list(AiProviderErrorCode))

@@ -135,18 +135,17 @@ esperada: pruebas de contrato, métricas, ADR, threat model, caso de fallo o dem
 
 ## Fase 3 - IA Inicial Controlada
 
-| ID         | Tipo       | Prioridad | Estado       | Trabajo                                  | Entregable / Criterio                                                        |
-| ---------- | ---------- | --------- | ------------ | ---------------------------------------- | ---------------------------------------------------------------------------- |
-| AI-101     | Full-stack | P1        | Identificado | Analizador de relato inicial.            | Entrada libre, salida JSON validada y guardable en asunto.                   |
-| AI-102     | Full-stack | P1        | Identificado | Generador de preguntas para cliente.     | Lista editable/copiable de preguntas, datos críticos y documentos faltantes. |
-| AI-103     | Full-stack | P1        | Identificado | Generador de mensajes para cliente.      | Mensajes para WhatsApp/email copiables y editables antes de enviar.          |
-| LEGAL-002A | Frontend   | P0-IA     | Listo        | Patrón obligatorio de revisión humana.   | Aviso, etiqueta, edición y aceptación explícita sin envío automático.        |
-| LEGAL-002B | Frontend   | P1        | Identificado | Auditoría de consistencia del patrón IA. | Varias funciones reales cumplen `LEGAL-002A` y sus pruebas consumidoras.     |
-
-| UX-AI-001 | Full-stack | P1 | Identificado | Vista previa del contexto. | Usuario revisa, incluye o excluye fuentes, proveedor y posible costo antes de ejecutar. |
-| AI-104 | Full-stack | P1 | Identificado | Revisión y aceptación de resultados. | Editar, aceptar parcial o totalmente, rechazar, regenerar y reportar problemas. |
-| AI-105 | Full-stack | P1 | Identificado | Convertir resultados en acciones. | Salida se convierte en nota, tarea, pregunta, checklist, documento faltante o mensaje. |
-| AI-106 | Full-stack | P1 | Identificado | Procedencia y estado de actualización. | Fuentes/versiones y aviso cuando un resultado guardado queda desactualizado. |
+| ID         | Tipo       | Prioridad | Estado | Trabajo                                  | Entregable / Criterio                                                                                            |
+| ---------- | ---------- | --------- | ------ | ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| AI-101     | Full-stack | P1        | Hecho  | Analizador de relato inicial.            | Primera función real: aplica `UX-AI-001` y `LEGAL-002A`, valida la salida y la entrega a revisión.               |
+| AI-102     | Full-stack | P1        | Hecho  | Generador de preguntas para cliente.     | Lista editable/copiable de preguntas, datos críticos y documentos faltantes.                                     |
+| AI-103     | Full-stack | P1        | Hecho  | Generador de mensajes para cliente.      | Mensajes para WhatsApp/email copiables y editables antes de enviar.                                              |
+| LEGAL-002A | Frontend   | P0-IA     | Hecho  | Contrato reusable de revisión humana.    | Componente, estados y pruebas de contrato listos para integrarse en `AI-101`, sin crear una pantalla ficticia.   |
+| LEGAL-002B | Frontend   | P1        | Hecho  | Auditoría de consistencia del patrón IA. | Al menos dos funciones reales cumplen `LEGAL-002A` y sus pruebas consumidoras.                                   |
+| UX-AI-001  | Full-stack | P1        | Hecho  | Vista previa del contexto.               | Antes de `AI-101`, el usuario revisa fuentes incluidas, proveedor y posible costo antes de ejecutar.             |
+| AI-104     | Full-stack | P1        | Hecho  | Persistencia de revisión y aceptación.   | Después de `AI-101`, persiste edición, aceptación parcial o total, rechazo, regeneración y reporte de problemas. |
+| AI-105     | Full-stack | P1        | Hecho  | Convertir resultados en acciones.        | Salida se convierte en nota, tarea, pregunta, checklist, documento faltante o mensaje.                           |
+| AI-106     | Full-stack | P1        | Hecho  | Procedencia y estado de actualización.   | Fuentes/versiones y aviso cuando un resultado guardado queda desactualizado.                                     |
 
 ## Fase 4 - Expediente Asistido
 
@@ -166,23 +165,22 @@ esperada: pruebas de contrato, métricas, ADR, threat model, caso de fallo o dem
 
 ## Seguridad, Privacidad y Operación
 
-| ID       | Tipo    | Prioridad | Estado       | Trabajo                                                           | Entregable / Criterio                                                                                      |
-| -------- | ------- | --------- | ------------ | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| SEC-001A | Backend | P1        | Hecho        | Aislamiento general por despacho.                                 | Matriz de pruebas confirma aislamiento de clientes, asuntos, documentos y resultados por `firm_id`.        |
-| SEC-001B | Backend | P0-IA     | Identificado | Aislamiento del contexto enviado a IA.                            | El contexto de cada llamada se construye solo desde recursos autorizados del despacho actual.              |
-| SEC-001C | Backend | P0-IA     | Identificado | Pruebas negativas multiusuario.                                   | Accesos cruzados a clientes, asuntos, documentos y resultados devuelven rechazo o `404` opaco.             |
-| SEC-002  | Legal   | P0-IA     | Identificado | Aviso de privacidad, términos y aprobación jurídica para IA BYOK. | Explica el envío al proveedor, solicita consentimiento y registra revisión jurídica antes del lanzamiento. |
-| SEC-003  | Backend | P1        | Identificado | Eliminación de datos del usuario.                                 | Usuario puede eliminar documentos/asuntos según política definida.                                         |
-| OPS-001  | Ops     | P1        | Identificado | Límites configurables de archivos y análisis.                     | Tamaño, número de documentos y entrada IA controlados por config.                                          |
-| OPS-002  | Ops     | P1        | Identificado | Backups básicos de PostgreSQL.                                    | Procedimiento documentado antes de despliegue productivo.                                                  |
-| OPS-003  | Docs    | P1        | Identificado | Mantener matrices de operaciones actualizadas.                    | Docs backend/frontend reflejan rutas, permisos, runtime, errores y e2e.                                    |
-| OPS-004  | Ops     | P1        | Hecho        | Base S3-compatible con MinIO.                                     | Compose levanta bucket privado persistente y backend dispone de un puerto probado.                         |
-
-| PROD-AI-001 | Full-stack | P1 | Identificado | Hero flow de incorporación de cliente. | Relato inicial convertido en expediente accionable con revisión y guardado. |
-| OBS-002 | Ops | P1 | Identificado | Métricas operativas de IA. | Dashboard reproducible con éxito, errores, latencia, tokens, costo, reintentos y jobs atascados. |
-| PROD-AI-002 | Full-stack | P1 | Identificado | Retroalimentación de utilidad. | Usuario clasifica utilidad, corrección, invención o información faltante. |
-| PROD-AI-003 | Full-stack | P1 | Identificado | Métricas de producto de IA. | Medición de valor, aceptación, edición, conversión, regeneración y abandono. |
-| UX-AI-002 | Frontend | P1 | Identificado | Onboarding BYOK guiado. | Guía por proveedor, validación accionable y modo demostrativo explícito con mock. |
+| ID          | Tipo       | Prioridad | Estado       | Trabajo                                                           | Entregable / Criterio                                                                                      |
+| ----------- | ---------- | --------- | ------------ | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| SEC-001A    | Backend    | P1        | Hecho        | Aislamiento general por despacho.                                 | Matriz de pruebas confirma aislamiento de clientes, asuntos, documentos y resultados por `firm_id`.        |
+| SEC-001B    | Backend    | P0-IA     | Hecho        | Aislamiento del contexto enviado a IA.                            | El contexto de cada llamada se construye solo desde recursos autorizados del despacho actual.              |
+| SEC-001C    | Backend    | P0-IA     | Identificado | Pruebas negativas multiusuario.                                   | Accesos cruzados a clientes, asuntos, documentos y resultados devuelven rechazo o `404` opaco.             |
+| SEC-002     | Legal      | P0-IA     | Identificado | Aviso de privacidad, términos y aprobación jurídica para IA BYOK. | Explica el envío al proveedor, solicita consentimiento y registra revisión jurídica antes del lanzamiento. |
+| SEC-003     | Backend    | P1        | Identificado | Eliminación de datos del usuario.                                 | Usuario puede eliminar documentos/asuntos según política definida.                                         |
+| OPS-001     | Ops        | P1        | Identificado | Límites configurables de archivos y análisis.                     | Tamaño, número de documentos y entrada IA controlados por config.                                          |
+| OPS-002     | Ops        | P1        | Identificado | Backups básicos de PostgreSQL.                                    | Procedimiento documentado antes de despliegue productivo.                                                  |
+| OPS-003     | Docs       | P1        | Identificado | Mantener matrices de operaciones actualizadas.                    | Docs backend/frontend reflejan rutas, permisos, runtime, errores y e2e.                                    |
+| OPS-004     | Ops        | P1        | Hecho        | Base S3-compatible con MinIO.                                     | Compose levanta bucket privado persistente y backend dispone de un puerto probado.                         |
+| PROD-AI-001 | Full-stack | P1        | Identificado | Hero flow de incorporación de cliente.                            | Relato inicial convertido en expediente accionable con revisión y guardado.                                |
+| OBS-002     | Ops        | P1        | Identificado | Métricas operativas de IA.                                        | Dashboard reproducible con éxito, errores, latencia, tokens, costo, reintentos y jobs atascados.           |
+| PROD-AI-002 | Full-stack | P1        | Identificado | Retroalimentación de utilidad.                                    | Usuario clasifica utilidad, corrección, invención o información faltante.                                  |
+| PROD-AI-003 | Full-stack | P1        | Identificado | Métricas de producto de IA.                                       | Medición de valor, aceptación, edición, conversión, regeneración y abandono.                               |
+| UX-AI-002   | Frontend   | P1        | Identificado | Onboarding BYOK guiado.                                           | Guía por proveedor, validación accionable y modo demostrativo explícito con mock.                          |
 
 ### Gate adicional de seguridad de IA
 
@@ -220,8 +218,14 @@ esperada: pruebas de contrato, métricas, ADR, threat model, caso de fallo o dem
 ## Siguiente Trabajo del Backlog
 
 La Fase 2 está completa tras revisar y sellar los gates internos de outputs y contexto. La secuencia
-priorizada continúa con:
+priorizada evita pantallas ficticias y separa el contrato reusable de su integración:
 
-1. Revisión humana: `LEGAL-002A`.
-1. Hero flow: `UX-AI-001`, `AI-101`, `AI-104`, `AI-105` y `PROD-AI-001`.
-1. Medición posterior: `OBS-002`, `PROD-AI-002` y `PROD-AI-003`.
+1. `LEGAL-002A`: construir y probar el patrón compartido de revisión humana; todavía no se publica
+   como flujo independiente.
+1. `UX-AI-001`: implementar la vista previa del contexto que precede a la primera ejecución real.
+1. `AI-101`: implementar el analizador de relato inicial e integrar `LEGAL-002A` en su resultado.
+1. `AI-104`: persistir la edición, aceptación, rechazo, regeneración y reporte del resultado.
+1. `AI-105` y `PROD-AI-001`: convertir el resultado revisado en acciones y cerrar el hero flow.
+1. `AI-102` o `AI-103`: integrar el mismo patrón en una segunda función real.
+1. `LEGAL-002B`: auditar consistencia cuando existan al menos dos consumidores reales.
+1. `OBS-002`, `PROD-AI-002` y `PROD-AI-003`: medir operación y valor después del flujo funcional.

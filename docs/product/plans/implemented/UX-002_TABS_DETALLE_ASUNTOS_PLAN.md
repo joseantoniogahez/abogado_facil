@@ -45,16 +45,16 @@ más información.
 
 ## Acceptance Criteria
 
-- [ ] El detalle ya no muestra todos los módulos uno debajo de otro por defecto.
-- [ ] El resumen inicial muestra la información operativa principal y las acciones de asunto.
-- [ ] Seguimiento contiene tareas y checklist.
-- [ ] Finanzas contiene pagos y cálculos.
-- [ ] Documentos y notas contiene ambos módulos.
-- [ ] La tab activa se conserva al recargar mediante la URL y se valida un valor inválido con un fallback seguro.
-- [ ] La navegación es usable con teclado y funciona en viewport móvil.
-- [ ] Required documentation is synchronized with delivered behavior.
-- [ ] Required validation gates pass and are recorded below.
-- [ ] Mandatory human approvals are recorded, or explicitly not applicable.
+- [x] El detalle ya no muestra todos los módulos uno debajo de otro por defecto.
+- [x] El resumen inicial muestra la información operativa principal y las acciones de asunto.
+- [x] Seguimiento contiene tareas y checklist.
+- [x] Finanzas contiene pagos y cálculos.
+- [x] Documentos y notas contiene ambos módulos.
+- [x] La tab activa se conserva al recargar mediante la URL y se valida un valor inválido con un fallback seguro.
+- [x] La navegación es usable con teclado y funciona en viewport móvil.
+- [x] Required documentation is synchronized with delivered behavior.
+- [x] Required validation gates pass and are recorded below.
+- [x] Mandatory human approvals are recorded, or explicitly not applicable.
 
 ## Affected Contracts and Files
 

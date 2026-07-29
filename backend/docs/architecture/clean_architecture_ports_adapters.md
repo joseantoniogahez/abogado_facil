@@ -94,6 +94,7 @@ Current top-level shape:
 
 Current features:
 
+- `ai_assistance`
 - `ai_credentials`
 - `ai_execution`
 - `ai_jobs`
