@@ -45,10 +45,19 @@ class ClientMessage(BaseModel):
     message: str = Field(min_length=1, max_length=8000)
 
 
+class MatterSummary(BaseModel):
+    summary: str = Field(min_length=1, max_length=5000)
+    matter_status: str = Field(min_length=1, max_length=1000)
+    key_facts: list[str] = Field(default_factory=list, max_length=30)
+    pending_items: list[str] = Field(default_factory=list, max_length=30)
+    next_steps: list[str] = Field(default_factory=list, max_length=30)
+
+
 FEATURE_SCHEMAS: dict[str, type[BaseModel]] = {
     "intake_analysis": IntakeAnalysis,
     "client_questions": ClientQuestions,
     "client_message": ClientMessage,
+    "matter_summary": MatterSummary,
 }
 FEATURE_INSTRUCTIONS = {
     "intake_analysis": (
@@ -63,6 +72,11 @@ FEATURE_INSTRUCTIONS = {
     "client_message": (
         "Redacta un mensaje profesional y prudente para solicitar información al cliente. "
         "Devuelve JSON con channel (whatsapp o email), subject y message. No prometas resultados."
+    ),
+    "matter_summary": (
+        "Resume el expediente con lenguaje neutral y verificable para consulta interna. Devuelve "
+        "JSON con summary, matter_status, key_facts, pending_items y next_steps. Distingue hechos "
+        "aportados de pendientes, no inventes información y no des asesoría definitiva."
     ),
 }
 

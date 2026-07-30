@@ -73,6 +73,7 @@ describe("MatterAiAssistance", () => {
 
     renderFeature();
     await screen.findByText(t("ai.results.empty"));
+    expect(screen.getByRole("option", { name: t("ai.feature.matter_summary") })).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText(t("ai.feature.label")), { target: { value: "client_questions" } });
     fireEvent.change(screen.getByLabelText(t("ai.provider")), { target: { value: "gemini" } });
     expect(screen.getByLabelText(t("ai.model"))).toHaveValue("gemini-3.5-flash-lite");

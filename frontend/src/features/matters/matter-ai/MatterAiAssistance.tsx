@@ -59,6 +59,15 @@ const resultText = (result: AiResult) => {
       listText(content.missing_documents),
     ].filter(Boolean).join("\n\n");
   }
+  if (result.feature === "matter_summary") {
+    return [
+      typeof content.summary === "string" ? content.summary : "",
+      typeof content.matter_status === "string" ? content.matter_status : "",
+      listText(content.key_facts),
+      listText(content.pending_items),
+      listText(content.next_steps),
+    ].filter(Boolean).join("\n\n");
+  }
   return [
     typeof content.summary === "string" ? content.summary : "",
     listText(content.relevant_facts),
@@ -95,6 +104,8 @@ const SupportingDetails = ({ result }: { result: AiResult }) => {
     [t("ai.review.missingDocuments"), content.missing_documents],
     [t("ai.review.relevantFacts"), content.relevant_facts],
     [t("ai.review.nextSteps"), content.next_steps],
+    [t("ai.review.keyFacts"), content.key_facts],
+    [t("ai.review.pendingItems"), content.pending_items],
   ] as const;
   const visible = details
     .map(([label, value]) => [label, Array.isArray(value) ? value.filter(item => typeof item === "string") : []] as const)
@@ -313,7 +324,7 @@ export const MatterAiAssistance = ({ matterId }: { matterId: number }) => {
           onChange={event => selectFeature(event.target.value as AiFeature)}
           value={input.feature}
         >
-          {(["intake_analysis", "client_questions", "client_message"] as const).map(feature => (
+          {(["intake_analysis", "client_questions", "client_message", "matter_summary"] as const).map(feature => (
             <option key={feature} value={feature}>{t(`ai.feature.${feature}`)}</option>
           ))}
         </select>

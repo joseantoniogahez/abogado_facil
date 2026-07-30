@@ -183,6 +183,16 @@ async def test_regeneration_rejects_a_different_feature() -> None:
         ("intake_analysis", {"summary": "S", "relevant_facts": ["F"]}),
         ("client_questions", {"questions": ["¿Qué ocurrió?"]}),
         ("client_message", {"channel": "whatsapp", "subject": None, "message": "Mensaje"}),
+        (
+            "matter_summary",
+            {
+                "summary": "Resumen ejecutivo",
+                "matter_status": "En integración",
+                "key_facts": ["Contrato firmado"],
+                "pending_items": ["Recibir anexos"],
+                "next_steps": ["Revisar anexos"],
+            },
+        ),
     ],
 )
 @run_async
@@ -257,9 +267,10 @@ async def test_regeneration_is_scoped_and_records_provenance() -> None:
 
 @run_async
 async def test_list_review_and_convert_enforce_scope_and_acceptance() -> None:
-    subject, repository, *_ = service()
+    subject, repository, _, factory, _ = service()
     results, total = await subject.list(matter_id=3, firm_id=2)
     assert len(results) == total == 1
+    factory.build.assert_not_awaited()
     reviewed = await subject.review(
         result_id=9,
         matter_id=3,

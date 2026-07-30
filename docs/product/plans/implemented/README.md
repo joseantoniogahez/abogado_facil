@@ -60,3 +60,4 @@ derivarse de esa carpeta, no de estos planes técnicos.
 | Preview de contexto IA      | [`UX-AI-001`](UX-AI-001_PREVIEW_CONTEXTO_PLAN.md)                         |
 | Aislamiento de contexto IA  | [`SEC-001B`](SEC-001B_AISLAMIENTO_CONTEXTO_IA_PLAN.md)                    |
 | Fase 3 IA controlada        | [`PHASE-3`](PHASE-3_IA_INICIAL_CONTROLADA_PLAN.md)                        |
+| Resumen IA del expediente   | [`AI-201`](AI-201_RESUMEN_EXPEDIENTE_PLAN.md)                             |

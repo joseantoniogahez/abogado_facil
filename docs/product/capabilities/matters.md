@@ -3,14 +3,25 @@
 ## Capacidades disponibles
 
 - Crear, listar, buscar y editar asuntos asociados a un cliente.
+
 - Seleccionar el tipo de asunto desde un catálogo cerrado que incluye `Otro`.
+
 - Gestionar notas: crear, editar, eliminar y marcar como relevantes.
+
 - Gestionar checklists con estados completo, pendiente y no aplica, además de elementos personalizados.
+
 - Gestionar tareas con fecha límite y estado completado.
+
 - Configurar honorarios, registrar anticipos y pagos parciales, y consultar saldo.
+
 - Ejecutar calculadoras determinísticas de adeudos, rentas vencidas e interés simple.
+
 - Guardar y listar resultados de cálculo como instantáneas inmutables.
+
 - Consultar el detalle del asunto organizado en tabs de resumen, seguimiento, finanzas y documentos y notas.
+
+- Generar un resumen estructurado del expediente con IA BYOK, revisarlo y reutilizar el resultado
+  guardado sin recomputarlo al consultar el asunto.
 
 ## Reglas funcionales
 
@@ -31,3 +42,4 @@
 - [CORE-009](../plans/implemented/CORE-009_CALCULADORAS_BASICAS_PLAN.md)
 - [CORE-011](../plans/implemented/CORE-011_CATALOGO_TIPOS_ASUNTO_PLAN.md)
 - [UX-002](../plans/implemented/UX-002_TABS_DETALLE_ASUNTOS_PLAN.md)
+- [AI-201](../plans/implemented/AI-201_RESUMEN_EXPEDIENTE_PLAN.md)

@@ -1,6 +1,6 @@
 import { expectNumberField, expectRecord, expectStringField } from "@/shared/api/contracts";
 
-export type AiFeature = "intake_analysis" | "client_questions" | "client_message";
+export type AiFeature = "intake_analysis" | "client_questions" | "client_message" | "matter_summary";
 
 export interface AiContextPreview {
   feature: AiFeature;
