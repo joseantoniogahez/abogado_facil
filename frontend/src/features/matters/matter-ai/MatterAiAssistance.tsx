@@ -47,8 +47,54 @@ type AiActionType = (typeof AI_ACTION_TYPES)[number];
 const listText = (value: unknown) =>
   Array.isArray(value) ? value.filter(item => typeof item === "string").join("\n") : "";
 
+interface TimelineEvent {
+  date: string | null;
+  description: string;
+  source: string | null;
+}
+
+const timelineEvents = (value: unknown): TimelineEvent[] =>
+  Array.isArray(value)
+    ? value.flatMap((item) => {
+        if (!item || typeof item !== "object") return [];
+        const event = item as Record<string, unknown>;
+        if (typeof event.description !== "string") return [];
+        return [{
+          date: typeof event.date === "string" ? event.date : null,
+          description: event.description,
+          source: typeof event.source === "string" ? event.source : null,
+        }];
+      })
+    : [];
+
+const timelineText = (value: unknown) =>
+  timelineEvents(value)
+    .map(event => [event.date ?? "", event.description, event.source ?? ""].join("\t"))
+    .join("\n");
+
+const parseTimelineText = (value: string): TimelineEvent[] =>
+  value.split("\n").flatMap((line) => {
+    const [date, description, ...sourceParts] = line.split("\t");
+    if (!description?.trim()) return [];
+    const source = sourceParts.join("\t").trim();
+    return [{
+      date: date?.trim() ? date.trim() : null,
+      description: description.trim(),
+      source: source ? source : null,
+    }];
+  });
+
 const resultText = (result: AiResult) => {
   const content = result.reviewed_content ?? result.generated_content;
+  if (result.feature === "matter_timeline") {
+    return timelineEvents(content.events)
+      .map(event =>
+        [event.date ?? t("ai.timeline.unknownDate"), event.description, event.source]
+          .filter(Boolean)
+          .join(" — "),
+      )
+      .join("\n");
+  }
   if (result.feature === "client_message") {
     return [content.subject, content.message].filter(value => typeof value === "string" && value.trim()).join("\n\n");
   }
@@ -82,6 +128,7 @@ const editableText = (result: AiResult) => {
   if (result.feature === "client_message")
     return typeof content.message === "string" ? content.message : "";
   if (result.feature === "client_questions") return listText(content.questions);
+  if (result.feature === "matter_timeline") return timelineText(content.events);
   return typeof content.summary === "string" ? content.summary : "";
 };
 
@@ -94,7 +141,33 @@ const reviewedContent = (result: AiResult, edited: string) => {
       questions: edited.split("\n").map(value => value.trim()).filter(Boolean),
     };
   }
+  if (result.feature === "matter_timeline") return { ...content, events: parseTimelineText(edited) };
   return { ...content, summary: edited };
+};
+
+const TimelineDetails = ({ result }: { result: AiResult }) => {
+  if (result.feature !== "matter_timeline") return null;
+  const content = result.reviewed_content ?? result.generated_content;
+  return (
+    <ol className="grid gap-3">
+      {timelineEvents(content.events).map((event, index) => (
+        <li className="rounded-xl bg-(--app-surface-muted) p-3" key={`${event.date}-${event.description}-${index}`}>
+          <p className="font-medium">{event.date ?? t("ai.timeline.unknownDate")}</p>
+          <p>{event.description}</p>
+          {event.source
+            ? (
+                <p className="text-sm text-(--app-subtle)">
+                  {t("ai.timeline.source")}
+                  :
+                  {" "}
+                  {event.source}
+                </p>
+              )
+            : null}
+        </li>
+      ))}
+    </ol>
+  );
 };
 
 const SupportingDetails = ({ result }: { result: AiResult }) => {
@@ -212,6 +285,7 @@ const ResultCard = ({
         value={initial}
       />
       <SupportingDetails result={result} />
+      <TimelineDetails result={result} />
       <button
         className={`${SECONDARY_ACTION_CLASS_NAME} w-fit`}
         onClick={() => onRegenerate(result)}
@@ -324,7 +398,13 @@ export const MatterAiAssistance = ({ matterId }: { matterId: number }) => {
           onChange={event => selectFeature(event.target.value as AiFeature)}
           value={input.feature}
         >
-          {(["intake_analysis", "client_questions", "client_message", "matter_summary"] as const).map(feature => (
+          {([
+            "intake_analysis",
+            "client_questions",
+            "client_message",
+            "matter_summary",
+            "matter_timeline",
+          ] as const).map(feature => (
             <option key={feature} value={feature}>{t(`ai.feature.${feature}`)}</option>
           ))}
         </select>

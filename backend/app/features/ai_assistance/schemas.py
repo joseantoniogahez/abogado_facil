@@ -5,7 +5,13 @@ from pydantic import ConfigDict, Field, field_validator, model_validator
 
 from app.core.common.schema import ApiSchema
 
-AiFeature = Literal["intake_analysis", "client_questions", "client_message", "matter_summary"]
+AiFeature = Literal[
+    "intake_analysis",
+    "client_questions",
+    "client_message",
+    "matter_summary",
+    "matter_timeline",
+]
 ReviewStatus = Literal["pending", "accepted", "partially_accepted", "rejected"]
 ActionType = Literal["note", "task", "question", "checklist", "missing_document", "message"]
 

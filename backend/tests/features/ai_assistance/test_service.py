@@ -193,6 +193,15 @@ async def test_regeneration_rejects_a_different_feature() -> None:
                 "next_steps": ["Revisar anexos"],
             },
         ),
+        (
+            "matter_timeline",
+            {
+                "events": [
+                    {"date": None, "description": "Consulta inicial", "source": "Relato"},
+                    {"date": "2026-01-10", "description": "Firma", "source": "Contrato"},
+                ]
+            },
+        ),
     ],
 )
 @run_async
@@ -213,6 +222,8 @@ async def test_execute_validates_each_feature_and_persists_result(feature: str, 
     assert set(context_fields) == {"narrative", "matter_description"}
     assert "notas" not in context_fields
     assert "documentos" not in context_fields
+    if feature == "matter_timeline":
+        assert result.generated_content["events"][0]["date"] == "2026-01-10"
 
 
 @run_async
@@ -347,6 +358,39 @@ async def test_list_review_and_convert_enforce_scope_and_acceptance() -> None:
         payload=ConvertAIAssistanceRequest(action_type="checklist", content="Obtener identificación"),
     )
     assert converted_checklist.converted_actions[0]["entity_id"] == 43
+
+
+@run_async
+async def test_review_timeline_validates_dates_and_keeps_json_safe_order() -> None:
+    timeline_item = item()
+    timeline_item.feature = "matter_timeline"
+    subject, repository, *_ = service(found_result=timeline_item)
+    reviewed = await subject.review(
+        result_id=9,
+        matter_id=3,
+        firm_id=2,
+        payload=ReviewAIAssistanceRequest(
+            status="accepted",
+            content={
+                "events": [
+                    {"date": None, "description": "Sin fecha", "source": None},
+                    {"date": "2026-02-01", "description": "Audiencia", "source": "Acuerdo"},
+                ]
+            },
+        ),
+    )
+    assert reviewed.reviewed_content["events"][0]["date"] == "2026-02-01"
+    repository.update_result.assert_awaited_once()
+    with pytest.raises(InvalidInputError):
+        await subject.review(
+            result_id=9,
+            matter_id=3,
+            firm_id=2,
+            payload=ReviewAIAssistanceRequest(
+                status="accepted",
+                content={"events": [{"date": "2026-99-99", "description": "Fecha imposible", "source": None}]},
+            ),
+        )
 
 
 def test_request_contracts_reject_unconfirmed_or_inconsistent_review() -> None:

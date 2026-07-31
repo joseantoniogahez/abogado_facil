@@ -6,6 +6,8 @@ import { t } from "@/shared/i18n/ui-text";
 
 import { MatterAiAssistance } from "./MatterAiAssistance";
 
+const clipboardWriteText = vi.fn();
+
 const result = (status = "pending") => ({
   id: 7,
   matter_id: 3,
@@ -44,7 +46,8 @@ const renderFeature = () => {
 describe("MatterAiAssistance", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
-    Object.assign(navigator, { clipboard: { writeText: vi.fn().mockResolvedValue(undefined) } });
+    clipboardWriteText.mockReset().mockResolvedValue(undefined);
+    Object.assign(navigator, { clipboard: { writeText: clipboardWriteText } });
   });
 
   it("previews context, executes a function and persists human review", async () => {
@@ -74,6 +77,7 @@ describe("MatterAiAssistance", () => {
     renderFeature();
     await screen.findByText(t("ai.results.empty"));
     expect(screen.getByRole("option", { name: t("ai.feature.matter_summary") })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: t("ai.feature.matter_timeline") })).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText(t("ai.feature.label")), { target: { value: "client_questions" } });
     fireEvent.change(screen.getByLabelText(t("ai.provider")), { target: { value: "gemini" } });
     expect(screen.getByLabelText(t("ai.model"))).toHaveValue("gemini-3.5-flash-lite");
@@ -114,6 +118,36 @@ describe("MatterAiAssistance", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: t("ai.preview") }));
     await screen.findByRole("alert");
+  });
+
+  it("renders dated and undated timeline events with their available source", async () => {
+    const timelineContent = {
+      events: [
+        null,
+        { date: 42, description: 9, source: false },
+        { date: "2026-01-10", description: "Firma del contrato", source: "Contrato" },
+        { date: null, description: "Consulta inicial", source: null },
+      ],
+    };
+    const timeline = {
+      ...result("accepted"),
+      feature: "matter_timeline",
+      generated_content: timelineContent,
+      reviewed_content: timelineContent,
+    };
+    vi.spyOn(globalThis, "fetch").mockImplementationOnce(() => response({ items: [timeline], total: 1 }));
+    renderFeature();
+    expect(await screen.findByText("Firma del contrato")).toBeInTheDocument();
+    expect(screen.getByText(`${t("ai.timeline.source")}: Contrato`)).toBeInTheDocument();
+    expect(screen.getByText(t("ai.timeline.unknownDate"))).toBeInTheDocument();
+    expect(screen.getByLabelText(t("ai.review.content"))).toHaveValue(
+      "2026-01-10\tFirma del contrato\tContrato\n\tConsulta inicial\t",
+    );
+    fireEvent.click(screen.getByRole("button", { name: t("ai.review.copy") }));
+    await waitFor(() =>
+      expect(clipboardWriteText).toHaveBeenCalledWith(
+        "2026-01-10 — Firma del contrato — Contrato\nFecha no determinada — Consulta inicial",
+      ));
   });
 
   it("blocks conversion after editing an accepted result until the review persists", async () => {

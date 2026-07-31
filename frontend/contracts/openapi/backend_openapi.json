@@ -46,7 +46,8 @@
               "intake_analysis",
               "client_questions",
               "client_message",
-              "matter_summary"
+              "matter_summary",
+              "matter_timeline"
             ],
             "title": "Feature",
             "type": "string"
@@ -165,7 +166,8 @@
               "intake_analysis",
               "client_questions",
               "client_message",
-              "matter_summary"
+              "matter_summary",
+              "matter_timeline"
             ],
             "title": "Feature",
             "type": "string"
@@ -247,7 +249,8 @@
               "intake_analysis",
               "client_questions",
               "client_message",
-              "matter_summary"
+              "matter_summary",
+              "matter_timeline"
             ],
             "title": "Feature",
             "type": "string"
@@ -1412,7 +1415,8 @@
               "intake_analysis",
               "client_questions",
               "client_message",
-              "matter_summary"
+              "matter_summary",
+              "matter_timeline"
             ],
             "title": "Feature",
             "type": "string"

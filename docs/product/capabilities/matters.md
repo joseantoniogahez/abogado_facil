@@ -23,6 +23,9 @@
 - Generar un resumen estructurado del expediente con IA BYOK, revisarlo y reutilizar el resultado
   guardado sin recomputarlo al consultar el asunto.
 
+- Generar una cronología editable con fechas validadas, eventos sin fecha explícitos y fuente
+  visible cuando fue aportada.
+
 ## Reglas funcionales
 
 - Todos los recursos del expediente están aislados por despacho.
@@ -43,3 +46,4 @@
 - [CORE-011](../plans/implemented/CORE-011_CATALOGO_TIPOS_ASUNTO_PLAN.md)
 - [UX-002](../plans/implemented/UX-002_TABS_DETALLE_ASUNTOS_PLAN.md)
 - [AI-201](../plans/implemented/AI-201_RESUMEN_EXPEDIENTE_PLAN.md)
+- [AI-202](../plans/implemented/AI-202_CRONOLOGIA_HECHOS_PLAN.md)

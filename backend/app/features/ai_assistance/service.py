@@ -1,10 +1,11 @@
+import datetime as dt
 import hmac
 import json
 from datetime import UTC, datetime
 from hashlib import sha256
 from typing import Any, Protocol
 
-from pydantic import BaseModel, Field, ValidationError
+from pydantic import BaseModel, Field, ValidationError, model_validator
 
 from app.core.common.schema import ApplicationSchema
 from app.core.db.ports import UnitOfWorkPort
@@ -53,11 +54,27 @@ class MatterSummary(BaseModel):
     next_steps: list[str] = Field(default_factory=list, max_length=30)
 
 
+class TimelineEvent(BaseModel):
+    date: dt.date | None = None
+    description: str = Field(min_length=1, max_length=2000)
+    source: str | None = Field(default=None, max_length=500)
+
+
+class MatterTimeline(BaseModel):
+    events: list[TimelineEvent] = Field(min_length=1, max_length=50)
+
+    @model_validator(mode="after")
+    def order_events(self):
+        self.events.sort(key=lambda event: (event.date is None, event.date or "", event.description))
+        return self
+
+
 FEATURE_SCHEMAS: dict[str, type[BaseModel]] = {
     "intake_analysis": IntakeAnalysis,
     "client_questions": ClientQuestions,
     "client_message": ClientMessage,
     "matter_summary": MatterSummary,
+    "matter_timeline": MatterTimeline,
 }
 FEATURE_INSTRUCTIONS = {
     "intake_analysis": (
@@ -77,6 +94,12 @@ FEATURE_INSTRUCTIONS = {
         "Resume el expediente con lenguaje neutral y verificable para consulta interna. Devuelve "
         "JSON con summary, matter_status, key_facts, pending_items y next_steps. Distingue hechos "
         "aportados de pendientes, no inventes información y no des asesoría definitiva."
+    ),
+    "matter_timeline": (
+        "Construye una cronología interna únicamente con hechos aportados. Devuelve JSON con events; "
+        "cada evento contiene date en formato YYYY-MM-DD o null, description y source o null. No "
+        "inventes fechas: usa null cuando no exista una fecha verificable e identifica la fuente "
+        "aportada cuando esté disponible."
     ),
 }
 
@@ -337,7 +360,9 @@ class AIAssistanceService:
             reviewed_content = payload.content
             if payload.status in {"accepted", "partially_accepted"}:
                 try:
-                    reviewed_content = FEATURE_SCHEMAS[item.feature].model_validate(payload.content).model_dump()
+                    reviewed_content = (
+                        FEATURE_SCHEMAS[item.feature].model_validate(payload.content).model_dump(mode="json")
+                    )
                 except (KeyError, ValidationError) as exc:
                     raise InvalidInputError("Reviewed content does not match the AI feature schema") from exc
             result = await self.repository.update_result(

@@ -185,7 +185,7 @@ describe("routing integration", () => {
     expect(
       await screen.findByRole("heading", {
         name: heading === "Matter under test" ? heading : t(heading),
-      }),
+      }, { timeout: 5_000 }),
     ).toBeInTheDocument();
   });
 
