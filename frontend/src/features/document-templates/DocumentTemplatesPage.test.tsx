@@ -112,6 +112,12 @@ describe("DocumentTemplatesPage", () => {
       });
     vi.stubGlobal("fetch", fetchMock);
     const user = userEvent.setup();
+    const writeText = vi.spyOn(navigator.clipboard, "writeText").mockResolvedValue(undefined);
+    let exportedBlob: Blob | undefined;
+    let downloadedFilename = "";
+    vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(function (this: HTMLAnchorElement) {
+      downloadedFilename = this.download;
+    });
     renderPage();
 
     await screen.findByRole("region", { name: t("documentTemplates.catalogLabel") });
@@ -127,9 +133,43 @@ describe("DocumentTemplatesPage", () => {
     await user.click(screen.getByRole("button", { name: t("documentDraft.generate") }));
     const editor = await screen.findByLabelText(t("documentDraft.content"));
     expect(editor).toHaveValue("Borrador generado");
+    const copy = screen.getByRole("button", { name: t("documentDraft.copy") });
+    const exportButton = screen.getByRole("button", { name: t("documentDraft.export") });
+    expect(copy).toBeDisabled();
+    expect(exportButton).toBeDisabled();
+    await user.click(screen.getByLabelText(t("documentDraft.reviewConfirmation")));
+    await user.click(copy);
+    expect(writeText).toHaveBeenCalledWith("Borrador generado");
+    expect(await screen.findByRole("status")).toHaveTextContent(t("documentDraft.copied"));
+    vi.stubGlobal("URL", Object.assign(URL, {
+      createObjectURL: vi.fn((blob: Blob) => {
+        exportedBlob = blob;
+        return "blob:draft";
+      }),
+      revokeObjectURL: vi.fn(),
+    }));
+    await user.click(exportButton);
+    expect(downloadedFilename).toBe("borrador-payment_demand.txt");
+    const exportedText = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.addEventListener("load", () => {
+        if (typeof reader.result === "string") resolve(reader.result);
+        else reject(new Error("Expected exported draft text"));
+      });
+      reader.addEventListener("error", () => reject(new Error("Could not read exported draft")));
+      reader.readAsText(exportedBlob!);
+    });
+    expect(exportedText).toBe(`${t("documentDraft.exportWarning")}\n\nBorrador generado`);
+    expect(screen.getByRole("status")).toHaveTextContent(t("documentDraft.exported"));
     await user.clear(editor);
     await user.type(editor, "Borrador revisado");
     expect(editor).toHaveValue("Borrador revisado");
+    expect(copy).toBeDisabled();
+    expect(exportButton).toBeDisabled();
+    writeText.mockRejectedValueOnce(new Error("Clipboard denied"));
+    await user.click(screen.getByLabelText(t("documentDraft.reviewConfirmation")));
+    await user.click(copy);
+    expect(await screen.findByRole("alert")).toHaveTextContent(t("documentDraft.copyError"));
     expect(screen.getByText(t("documentDraft.noAutomaticAction"))).toBeInTheDocument();
   });
 

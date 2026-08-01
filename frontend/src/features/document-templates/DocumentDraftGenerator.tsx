@@ -24,6 +24,8 @@ export const DocumentDraftGenerator = ({ template }: { template: DocumentTemplat
   const [provider, setProvider] = useState<DraftProvider>("openai");
   const [model, setModel] = useState(MODEL_OPTIONS.openai[0].value);
   const [draft, setDraft] = useState<string | null>(null);
+  const [reviewConfirmed, setReviewConfirmed] = useState(false);
+  const [actionStatus, setActionStatus] = useState<"copied" | "exported" | "copyError" | null>(null);
   const input = { template_key: template.key, fields, provider, model };
   const preview = useMutation({ mutationFn: () => previewDocumentDraft(input) });
   const generate = useMutation({
@@ -31,16 +33,47 @@ export const DocumentDraftGenerator = ({ template }: { template: DocumentTemplat
       if (!preview.data) throw new Error("Document draft preview is required");
       return generateDocumentDraft(input, preview.data.confirmation_token);
     },
-    onSuccess: result => setDraft(result.content),
+    onSuccess: (result) => {
+      setDraft(result.content);
+      setReviewConfirmed(false);
+      setActionStatus(null);
+    },
   });
+  const resetDraft = () => {
+    setDraft(null);
+    setReviewConfirmed(false);
+    setActionStatus(null);
+  };
   const updateField = (key: string, value: string) => {
     setFields(previous => ({ ...previous, [key]: value }));
     preview.reset();
-    setDraft(null);
+    resetDraft();
   };
   const requiredComplete = template.fields
     .filter(field => field.required)
     .every(field => fields[field.key]?.trim());
+  const reviewedDraftAvailable = reviewConfirmed && Boolean(draft?.trim());
+  const copyDraft = async () => {
+    if (!reviewedDraftAvailable || draft === null) return;
+    try {
+      await navigator.clipboard.writeText(draft);
+      setActionStatus("copied");
+    }
+    catch {
+      setActionStatus("copyError");
+    }
+  };
+  const exportDraft = () => {
+    if (!reviewedDraftAvailable || draft === null) return;
+    const exportContent = `${t("documentDraft.exportWarning")}\n\n${draft}`;
+    const url = URL.createObjectURL(new Blob([exportContent], { type: "text/plain;charset=utf-8" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `borrador-${template.key}.txt`;
+    link.click();
+    URL.revokeObjectURL(url);
+    setActionStatus("exported");
+  };
 
   return (
     <section aria-labelledby="document-draft-title" className="mt-10 rounded-2xl border border-(--app-border) p-5">
@@ -83,7 +116,7 @@ export const DocumentDraftGenerator = ({ template }: { template: DocumentTemplat
                 setProvider(next);
                 setModel(MODEL_OPTIONS[next][0].value);
                 preview.reset();
-                setDraft(null);
+                resetDraft();
               }}
               value={provider}
             >
@@ -98,7 +131,7 @@ export const DocumentDraftGenerator = ({ template }: { template: DocumentTemplat
               onChange={(event) => {
                 setModel(event.target.value);
                 preview.reset();
-                setDraft(null);
+                resetDraft();
               }}
               value={model}
             >
@@ -144,11 +177,53 @@ export const DocumentDraftGenerator = ({ template }: { template: DocumentTemplat
                 <textarea
                   aria-describedby="document-draft-notice"
                   className="mt-1 min-h-96 w-full rounded-xl border p-3 font-mono text-sm"
-                  onChange={event => setDraft(event.target.value)}
+                  onChange={(event) => {
+                    setDraft(event.target.value);
+                    setReviewConfirmed(false);
+                    setActionStatus(null);
+                  }}
                   value={draft}
                 />
               </label>
               <p className="text-sm text-(--app-subtle)">{t("documentDraft.noAutomaticAction")}</p>
+              <label className="flex items-start gap-2">
+                <input
+                  checked={reviewConfirmed}
+                  className="mt-1"
+                  onChange={(event) => {
+                    setReviewConfirmed(event.target.checked);
+                    setActionStatus(null);
+                  }}
+                  type="checkbox"
+                />
+                <span>{t("documentDraft.reviewConfirmation")}</span>
+              </label>
+              <div aria-describedby="document-draft-notice" className="flex flex-wrap gap-3">
+                <button
+                  className={SECONDARY_ACTION_CLASS_NAME}
+                  disabled={!reviewedDraftAvailable}
+                  onClick={() => void copyDraft()}
+                  type="button"
+                >
+                  {t("documentDraft.copy")}
+                </button>
+                <button
+                  className={SECONDARY_ACTION_CLASS_NAME}
+                  disabled={!reviewedDraftAvailable}
+                  onClick={exportDraft}
+                  type="button"
+                >
+                  {t("documentDraft.export")}
+                </button>
+              </div>
+              {actionStatus === "copyError" ? <p role="alert">{t("documentDraft.copyError")}</p> : null}
+              {actionStatus === "copied" || actionStatus === "exported"
+                ? (
+                    <p aria-live="polite" role="status">
+                      {t(actionStatus === "copied" ? "documentDraft.copied" : "documentDraft.exported")}
+                    </p>
+                  )
+                : null}
             </section>
           )
         : null}

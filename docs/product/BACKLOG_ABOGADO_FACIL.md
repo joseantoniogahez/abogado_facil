@@ -157,11 +157,11 @@ esperada: pruebas de contrato, métricas, ADR, threat model, caso de fallo o dem
 
 ## Fase 5 - Documentos Simples
 
-| ID      | Tipo       | Prioridad | Estado       | Trabajo                                | Entregable / Criterio                                                                        |
-| ------- | ---------- | --------- | ------------ | -------------------------------------- | -------------------------------------------------------------------------------------------- |
-| DOC-001 | Full-stack | P1        | Hecho        | Catálogo de plantillas simples.        | Tipos iniciales: requerimiento de pago, convenio, solicitud de documentos y resumen interno. |
-| DOC-002 | Full-stack | P1        | Hecho        | Generador de borrador desde plantilla. | Formulario, validación, secciones IA controladas y borrador editable.                        |
-| DOC-003 | Frontend   | P1        | Identificado | Copiar/exportar borrador.              | Usuario puede copiar contenido o exportarlo según alcance técnico elegido.                   |
+| ID      | Tipo       | Prioridad | Estado | Trabajo                                | Entregable / Criterio                                                                        |
+| ------- | ---------- | --------- | ------ | -------------------------------------- | -------------------------------------------------------------------------------------------- |
+| DOC-001 | Full-stack | P1        | Hecho  | Catálogo de plantillas simples.        | Tipos iniciales: requerimiento de pago, convenio, solicitud de documentos y resumen interno. |
+| DOC-002 | Full-stack | P1        | Hecho  | Generador de borrador desde plantilla. | Formulario, validación, secciones IA controladas y borrador editable.                        |
+| DOC-003 | Frontend   | P1        | Hecho  | Copiar/exportar borrador.              | Usuario puede copiar contenido o exportarlo según alcance técnico elegido.                   |
 
 ## Seguridad, Privacidad y Operación
 
