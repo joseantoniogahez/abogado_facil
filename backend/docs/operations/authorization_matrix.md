@@ -99,6 +99,8 @@ This table is contract-checked by `tests/routers/test_authorization_policy_cover
 | `PUT`    | `/v1/ai/credentials/{provider}`                            | `authenticated` | No                        |
 | `DELETE` | `/v1/ai/credentials/{provider}`                            | `authenticated` | No                        |
 | `GET`    | `/v1/document-templates`                                   | `authenticated` | No                        |
+| `POST`   | `/v1/document-templates/drafts/preview`                    | `authenticated` | No                        |
+| `POST`   | `/v1/document-templates/drafts`                            | `authenticated` | No                        |
 | `GET`    | `/v1/users/me`                                             | `authenticated` | No                        |
 | `GET`    | `/v1/rbac/roles`                                           | `permission`    | `roles:manage`            |
 | `GET`    | `/v1/rbac/permissions`                                     | `permission`    | `role_permissions:manage` |

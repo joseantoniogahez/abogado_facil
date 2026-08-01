@@ -1,12 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 
 import { ApiError, appendRequestIdDiagnostic, getApiErrorRequestId } from "@/shared/api/errors";
 import { t } from "@/shared/i18n/ui-text";
 import { SECONDARY_ACTION_CLASS_NAME } from "@/shared/ui/actionStyles";
 
 import { DOCUMENT_TEMPLATES_QUERY_KEY, readDocumentTemplates } from "./api";
+import type { DocumentTemplate } from "./contracts";
+import { DocumentDraftGenerator } from "./DocumentDraftGenerator";
 
 export const DocumentTemplatesPage = () => {
+  const [selectedTemplate, setSelectedTemplate] = useState<DocumentTemplate | null>(null);
   const catalog = useQuery({
     queryKey: DOCUMENT_TEMPLATES_QUERY_KEY,
     queryFn: readDocumentTemplates,
@@ -58,11 +62,19 @@ export const DocumentTemplatesPage = () => {
                       </li>
                     ))}
                   </ul>
+                  <button
+                    className={`${SECONDARY_ACTION_CLASS_NAME} mt-5`}
+                    onClick={() => setSelectedTemplate(template)}
+                    type="button"
+                  >
+                    {t("documentTemplates.use")}
+                  </button>
                 </article>
               ))}
             </section>
           )
         : null}
+      {selectedTemplate ? <DocumentDraftGenerator key={selectedTemplate.key} template={selectedTemplate} /> : null}
     </main>
   );
 };

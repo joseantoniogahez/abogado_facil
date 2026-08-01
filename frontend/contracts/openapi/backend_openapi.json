@@ -1394,6 +1394,159 @@
         "title": "DashboardUpcomingTask",
         "type": "object"
       },
+      "DocumentDraftPreviewRequest": {
+        "properties": {
+          "fields": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "maxProperties": 20,
+            "minProperties": 1,
+            "title": "Fields",
+            "type": "object"
+          },
+          "model": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Model",
+            "type": "string"
+          },
+          "provider": {
+            "enum": [
+              "openai",
+              "gemini"
+            ],
+            "title": "Provider",
+            "type": "string"
+          },
+          "template_key": {
+            "enum": [
+              "payment_demand",
+              "payment_agreement",
+              "document_request",
+              "internal_matter_summary"
+            ],
+            "title": "Template Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "template_key",
+          "fields",
+          "provider",
+          "model"
+        ],
+        "title": "DocumentDraftPreviewRequest",
+        "type": "object"
+      },
+      "DocumentDraftPreviewResponse": {
+        "properties": {
+          "character_count": {
+            "title": "Character Count",
+            "type": "integer"
+          },
+          "confirmation_token": {
+            "title": "Confirmation Token",
+            "type": "string"
+          },
+          "cost_notice": {
+            "title": "Cost Notice",
+            "type": "string"
+          },
+          "estimated_max_output_tokens": {
+            "title": "Estimated Max Output Tokens",
+            "type": "integer"
+          },
+          "included_fields": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Included Fields",
+            "type": "array"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "template_key": {
+            "enum": [
+              "payment_demand",
+              "payment_agreement",
+              "document_request",
+              "internal_matter_summary"
+            ],
+            "title": "Template Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "template_key",
+          "provider",
+          "model",
+          "included_fields",
+          "character_count",
+          "estimated_max_output_tokens",
+          "cost_notice",
+          "confirmation_token"
+        ],
+        "title": "DocumentDraftPreviewResponse",
+        "type": "object"
+      },
+      "DocumentDraftResponse": {
+        "properties": {
+          "content": {
+            "title": "Content",
+            "type": "string"
+          },
+          "execution_id": {
+            "title": "Execution Id",
+            "type": "string"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "requires_professional_review": {
+            "const": true,
+            "default": true,
+            "title": "Requires Professional Review",
+            "type": "boolean"
+          },
+          "status": {
+            "const": "draft",
+            "default": "draft",
+            "title": "Status",
+            "type": "string"
+          },
+          "template_key": {
+            "enum": [
+              "payment_demand",
+              "payment_agreement",
+              "document_request",
+              "internal_matter_summary"
+            ],
+            "title": "Template Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "template_key",
+          "content",
+          "provider",
+          "model",
+          "execution_id"
+        ],
+        "title": "DocumentDraftResponse",
+        "type": "object"
+      },
       "DocumentTemplateFieldResponse": {
         "properties": {
           "field_type": {
@@ -1431,8 +1584,7 @@
       "DocumentTemplateListResponse": {
         "properties": {
           "generation_available": {
-            "const": false,
-            "default": false,
+            "default": true,
             "title": "Generation Available",
             "type": "boolean"
           },
@@ -1574,6 +1726,59 @@
           "confirmation_token"
         ],
         "title": "ExecuteAIAssistanceRequest",
+        "type": "object"
+      },
+      "GenerateDocumentDraftRequest": {
+        "properties": {
+          "confirmation_token": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Confirmation Token",
+            "type": "string"
+          },
+          "fields": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "maxProperties": 20,
+            "minProperties": 1,
+            "title": "Fields",
+            "type": "object"
+          },
+          "model": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Model",
+            "type": "string"
+          },
+          "provider": {
+            "enum": [
+              "openai",
+              "gemini"
+            ],
+            "title": "Provider",
+            "type": "string"
+          },
+          "template_key": {
+            "enum": [
+              "payment_demand",
+              "payment_agreement",
+              "document_request",
+              "internal_matter_summary"
+            ],
+            "title": "Template Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "template_key",
+          "fields",
+          "provider",
+          "model",
+          "confirmation_token"
+        ],
+        "title": "GenerateDocumentDraftRequest",
         "type": "object"
       },
       "MatterBillingResponse": {
@@ -4316,6 +4521,80 @@
           }
         ],
         "summary": "List simple document templates",
+        "tags": [
+          "document-templates"
+        ]
+      }
+    },
+    "/v1/document-templates/drafts": {
+      "post": {
+        "description": "Generates a schema-validated editable draft after a current signed preview; it never sends or files it.",
+        "operationId": "generate_document_draft_v1_document_templates_drafts_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateDocumentDraftRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentDraftResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Generate editable document draft",
+        "tags": [
+          "document-templates"
+        ]
+      }
+    },
+    "/v1/document-templates/drafts/preview": {
+      "post": {
+        "description": "Validates template fields and returns the exact BYOK context summary and a signed confirmation token.",
+        "operationId": "preview_document_draft_v1_document_templates_drafts_preview_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocumentDraftPreviewRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentDraftPreviewResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Preview document draft context",
         "tags": [
           "document-templates"
         ]

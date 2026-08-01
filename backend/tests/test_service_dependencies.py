@@ -18,6 +18,7 @@ from app.core.setup.dependencies import (
     get_ai_queue_settings,
     get_audit_log_repository,
     get_audit_log_service,
+    get_document_templates_service,
     get_file_storage,
     get_job_scheduler,
     get_outbox_repository,
@@ -34,6 +35,7 @@ from app.features.ai_jobs.repository import AIJobsRepository
 from app.features.ai_jobs.service import AIJobsService
 from app.features.audit_log.repository import AuditLogRepository
 from app.features.audit_log.service import AuditLogService
+from app.features.document_templates.service import DocumentTemplatesService
 from app.features.outbox.repository import OutboxRepository
 from app.features.outbox.service import OutboxService
 from app.integrations.rq_jobs import RQJobScheduler
@@ -205,3 +207,13 @@ def test_ai_queue_dependencies_build_expected_components() -> None:
     scheduler = asyncio.run(get_job_scheduler(settings))
     assert isinstance(scheduler, RQJobScheduler)
     assert scheduler.handlers == {}
+
+
+def test_document_templates_dependency_builds_service() -> None:
+    provider_factory = MagicMock()
+    jobs_service = MagicMock()
+    settings = AuthSettings(JWT_SECRET_KEY="secret", JWT_ISSUER="issuer", JWT_AUDIENCE="audience")
+    service = asyncio.run(get_document_templates_service(provider_factory, jobs_service, settings))
+    assert isinstance(service, DocumentTemplatesService)
+    assert service.provider_factory is provider_factory
+    assert service.jobs_service is jobs_service

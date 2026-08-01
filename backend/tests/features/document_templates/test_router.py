@@ -18,7 +18,7 @@ def test_document_template_catalog_is_authenticated_and_complete(mock_client: Te
 
     assert response.status_code == HTTPStatus.OK
     payload = response.json()
-    assert payload["generation_available"] is False
+    assert payload["generation_available"] is True
     assert [item["key"] for item in payload["items"]] == [
         "payment_demand",
         "payment_agreement",

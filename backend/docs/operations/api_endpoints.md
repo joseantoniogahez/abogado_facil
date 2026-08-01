@@ -31,6 +31,8 @@ All routes are versioned under `/v1`.
 | `PUT`    | `/v1/ai/credentials/{provider}`                            | Yes  | No                | JSON `SaveAiCredentialRequest`                              | `200` `AiCredentialResponse`                   | `400`, `401`, `500`                                           |
 | `DELETE` | `/v1/ai/credentials/{provider}`                            | Yes  | No                | No body                                                     | `204`                                          | `401`, `404`, `500`                                           |
 | `GET`    | `/v1/document-templates`                                   | Yes  | No                | No body                                                     | `200` `DocumentTemplateListResponse`           | `401`, `500`                                                  |
+| `POST`   | `/v1/document-templates/drafts/preview`                    | Yes  | No                | JSON `DocumentDraftPreviewRequest`                          | `200` `DocumentDraftPreviewResponse`           | `400`, `401`, `500`                                           |
+| `POST`   | `/v1/document-templates/drafts`                            | Yes  | No                | JSON `GenerateDocumentDraftRequest` + signed preview token  | `201` `DocumentDraftResponse`                  | `400`, `401`, `409`, `429`, `500`, `502`, `503`, `504`        |
 | `POST`   | `/v1/token`                                                | No   | No                | OAuth2 form (`username` carries email, plus `password`)     | `200` bearer token                             | `400`, `401`, `403`, `500`                                    |
 | `POST`   | `/v1/users/register`                                       | No   | No                | JSON `RegisterUserRequest`                                  | `201` `AuthenticatedUserResponse`              | `400`, `409`, `500`                                           |
 | `GET`    | `/v1/users/me`                                             | Yes  | No                | No body                                                     | `200` `AuthenticatedUserResponse`              | `401`, `403`, `500`                                           |
@@ -76,6 +78,12 @@ timelines, and checklist suggestions are persisted as ordinary scoped AI results
 events use a validated ISO date or `null`, description, and optional source. Accepted checklist
 suggestions convert into independent custom items without replacing the base template;
 `ChecklistItemResponse.is_ai_suggested` identifies their AI provenance.
+
+Document draft generation validates fields against the immutable template catalog and requires a
+signed preview of the exact template, values, provider, and model. It uses the authenticated user's
+BYOK credential and the common minimized-context, prompt-injection, schema-validation, and `AIJob`
+lifecycle gates. The response is always an editable draft and is never saved, sent, or filed
+automatically.
 | `PATCH` | `/v1/users/me` | Yes | No | JSON `UpdateCurrentUserRequest` | `200` `AuthenticatedUserResponse` | `400`, `401`, `403`, `409`, `500` |
 | `GET` | `/v1/rbac/roles` | Yes | `roles:manage` | No body | `200` `RBACRole[]` | `401`, `403`, `500` |
 | `GET` | `/v1/rbac/permissions` | Yes | `role_permissions:manage` | No body | `200` `RBACPermission[]` | `401`, `403`, `500` |

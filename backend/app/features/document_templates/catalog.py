@@ -84,3 +84,7 @@ DOCUMENT_TEMPLATES: tuple[DocumentTemplate, ...] = (
         ),
     ),
 )
+
+
+def document_template_for(key: str) -> DocumentTemplate | None:
+    return next((template for template in DOCUMENT_TEMPLATES if template.key == key), None)

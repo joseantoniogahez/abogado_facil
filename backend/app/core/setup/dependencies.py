@@ -29,6 +29,7 @@ from app.features.auth.service import AuthService, AuthServicePort
 from app.features.clients.repository import ClientsRepository
 from app.features.clients.service import ClientsService, ClientsServicePort
 from app.features.dashboard.service import DashboardService, DashboardServicePort
+from app.features.document_templates.service import DocumentTemplatesService
 from app.features.matter_calculations.repository import MatterCalculationsRepository
 from app.features.matter_calculations.service import MatterCalculationsService
 from app.features.matter_checklists.repository import MatterChecklistsRepository
@@ -324,6 +325,21 @@ async def get_ai_assistance_service(
 
 
 AIAssistanceServiceDependency = Annotated[AIAssistanceService, Depends(get_ai_assistance_service)]
+
+
+async def get_document_templates_service(
+    provider_factory: Annotated[AiProviderFactory, Depends(get_ai_provider_factory)],
+    jobs_service: AiJobsServiceDependency,
+    auth_settings: AuthSettingsDependency,
+) -> DocumentTemplatesService:
+    return DocumentTemplatesService(
+        provider_factory=provider_factory,
+        jobs_service=jobs_service,
+        preview_signing_key=auth_settings.JWT_SECRET_KEY,
+    )
+
+
+DocumentTemplatesServiceDependency = Annotated[DocumentTemplatesService, Depends(get_document_templates_service)]
 
 
 async def get_ai_queue_settings() -> AIQueueSettings:

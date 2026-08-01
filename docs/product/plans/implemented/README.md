@@ -20,6 +20,7 @@ derivarse de esa carpeta, no de estos planes técnicos.
 | Calculadoras                 | [`CORE-009`](CORE-009_CALCULADORAS_BASICAS_PLAN.md)                       |
 | Interfaz de documentos       | [`CORE-010`](CORE-010_INTERFAZ_DOCUMENTOS_EXPEDIENTE_PLAN.md)             |
 | Plantillas simples           | [`DOC-001`](DOC-001_CATALOGO_PLANTILLAS_SIMPLES_PLAN.md)                  |
+| Borradores desde plantilla   | [`DOC-002`](DOC-002_GENERADOR_BORRADORES_PLAN.md)                         |
 | Catálogo de asuntos          | [`CORE-011`](CORE-011_CATALOGO_TIPOS_ASUNTO_PLAN.md)                      |
 | Avisos legales               | [`LEGAL-001`](LEGAL-001_AVISOS_LEGALES_PLAN.md)                           |
 | Storage de objetos           | [`OPS-004`](OPS-004_MINIO_OBJECT_STORAGE_PLAN.md)                         |
