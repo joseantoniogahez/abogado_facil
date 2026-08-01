@@ -102,6 +102,7 @@ Current features:
 - `auth`
 - `clients`
 - `dashboard`
+- `document_templates`
 - `health`
 - `matter_calculations`
 - `matter_checklists`

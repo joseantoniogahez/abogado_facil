@@ -30,8 +30,8 @@ interface AdminMenuItem {
 }
 
 interface PrimaryMenuItem {
-  key: "routing.nav.clients" | "routing.nav.matters" | "routing.nav.home" | "routing.nav.profile" | "routing.nav.aiSettings";
-  to: "/clients" | "/matters" | "/dashboard" | "/profile" | "/settings/ai";
+  key: "routing.nav.clients" | "routing.nav.matters" | "routing.nav.home" | "routing.nav.profile" | "routing.nav.aiSettings" | "routing.nav.documentTemplates";
+  to: "/clients" | "/matters" | "/dashboard" | "/profile" | "/settings/ai" | "/document-templates";
 }
 
 const PRIMARY_MENU_ITEMS: readonly PrimaryMenuItem[] = [
@@ -54,6 +54,10 @@ const PRIMARY_MENU_ITEMS: readonly PrimaryMenuItem[] = [
   {
     key: "routing.nav.matters",
     to: "/matters",
+  },
+  {
+    key: "routing.nav.documentTemplates",
+    to: "/document-templates",
   },
 ];
 

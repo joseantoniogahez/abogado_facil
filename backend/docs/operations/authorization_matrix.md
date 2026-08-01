@@ -98,6 +98,7 @@ This table is contract-checked by `tests/routers/test_authorization_policy_cover
 | `GET`    | `/v1/ai/credentials`                                       | `authenticated` | No                        |
 | `PUT`    | `/v1/ai/credentials/{provider}`                            | `authenticated` | No                        |
 | `DELETE` | `/v1/ai/credentials/{provider}`                            | `authenticated` | No                        |
+| `GET`    | `/v1/document-templates`                                   | `authenticated` | No                        |
 | `GET`    | `/v1/users/me`                                             | `authenticated` | No                        |
 | `GET`    | `/v1/rbac/roles`                                           | `permission`    | `roles:manage`            |
 | `GET`    | `/v1/rbac/permissions`                                     | `permission`    | `role_permissions:manage` |

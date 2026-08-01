@@ -38,6 +38,7 @@ Router registration is centralized in `app/core/setup/routers.py`.
 - `app.features.matter_payments.router`
 - `app.features.matter_calculations.router`
 - `app.features.matter_documents.router`
+- `app.features.document_templates.router`
 - `app.features.ai_credentials.router`
 - `app.features.ai_assistance.router`
 

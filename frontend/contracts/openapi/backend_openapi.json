@@ -1394,6 +1394,104 @@
         "title": "DashboardUpcomingTask",
         "type": "object"
       },
+      "DocumentTemplateFieldResponse": {
+        "properties": {
+          "field_type": {
+            "enum": [
+              "text",
+              "long_text",
+              "date",
+              "money"
+            ],
+            "title": "Field Type",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "required": {
+            "title": "Required",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "field_type",
+          "required"
+        ],
+        "title": "DocumentTemplateFieldResponse",
+        "type": "object"
+      },
+      "DocumentTemplateListResponse": {
+        "properties": {
+          "generation_available": {
+            "const": false,
+            "default": false,
+            "title": "Generation Available",
+            "type": "boolean"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DocumentTemplateResponse"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "DocumentTemplateListResponse",
+        "type": "object"
+      },
+      "DocumentTemplateResponse": {
+        "properties": {
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "fields": {
+            "items": {
+              "$ref": "#/components/schemas/DocumentTemplateFieldResponse"
+            },
+            "title": "Fields",
+            "type": "array"
+          },
+          "key": {
+            "enum": [
+              "payment_demand",
+              "payment_agreement",
+              "document_request",
+              "internal_matter_summary"
+            ],
+            "title": "Key",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "purpose": {
+            "title": "Purpose",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "name",
+          "description",
+          "purpose",
+          "fields"
+        ],
+        "title": "DocumentTemplateResponse",
+        "type": "object"
+      },
       "DocumentType": {
         "enum": [
           "identification",
@@ -4193,6 +4291,33 @@
         "summary": "Get the authenticated firm's dashboard summary",
         "tags": [
           "dashboard"
+        ]
+      }
+    },
+    "/v1/document-templates": {
+      "get": {
+        "description": "Returns the immutable catalog and field definitions available for future draft generation. This endpoint does not generate, save, send, or file a legal document.",
+        "operationId": "list_document_templates_v1_document_templates_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentTemplateListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "List simple document templates",
+        "tags": [
+          "document-templates"
         ]
       }
     },

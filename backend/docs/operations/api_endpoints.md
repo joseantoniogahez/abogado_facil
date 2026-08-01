@@ -30,6 +30,7 @@ All routes are versioned under `/v1`.
 | `GET`    | `/v1/ai/credentials`                                       | Yes  | No                | No body                                                     | `200` `AiCredentialListResponse`               | `401`, `500`                                                  |
 | `PUT`    | `/v1/ai/credentials/{provider}`                            | Yes  | No                | JSON `SaveAiCredentialRequest`                              | `200` `AiCredentialResponse`                   | `400`, `401`, `500`                                           |
 | `DELETE` | `/v1/ai/credentials/{provider}`                            | Yes  | No                | No body                                                     | `204`                                          | `401`, `404`, `500`                                           |
+| `GET`    | `/v1/document-templates`                                   | Yes  | No                | No body                                                     | `200` `DocumentTemplateListResponse`           | `401`, `500`                                                  |
 | `POST`   | `/v1/token`                                                | No   | No                | OAuth2 form (`username` carries email, plus `password`)     | `200` bearer token                             | `400`, `401`, `403`, `500`                                    |
 | `POST`   | `/v1/users/register`                                       | No   | No                | JSON `RegisterUserRequest`                                  | `201` `AuthenticatedUserResponse`              | `400`, `409`, `500`                                           |
 | `GET`    | `/v1/users/me`                                             | Yes  | No                | No body                                                     | `200` `AuthenticatedUserResponse`              | `401`, `403`, `500`                                           |
@@ -122,6 +123,7 @@ This table classifies each `GET` endpoint as `public`, `authenticated`, or `perm
 | `GET`  | `/v1/health`                                               | `public`        | No                        |
 | `GET`  | `/v1/readiness`                                            | `public`        | No                        |
 | `GET`  | `/v1/ai/credentials`                                       | `authenticated` | No                        |
+| `GET`  | `/v1/document-templates`                                   | `authenticated` | No                        |
 | `GET`  | `/v1/users/me`                                             | `authenticated` | No                        |
 | `GET`  | `/v1/rbac/roles`                                           | `permission`    | `roles:manage`            |
 | `GET`  | `/v1/rbac/permissions`                                     | `permission`    | `role_permissions:manage` |

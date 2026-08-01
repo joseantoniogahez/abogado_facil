@@ -12,6 +12,7 @@ import { LoginPage } from "@/features/auth/LoginPage";
 import { RegisterPage } from "@/features/auth/RegisterPage";
 import { ClientDetailPage, ClientsPage, NewClientPage } from "@/features/clients/ClientsPage";
 import { DashboardPage } from "@/features/dashboard/DashboardPage";
+import { DocumentTemplatesPage } from "@/features/document-templates/DocumentTemplatesPage";
 import { LandingPage } from "@/features/landing/LandingPage";
 import { NotFoundPage } from "@/features/not-found/NotFoundPage";
 import { ProfilePage } from "@/features/profile/ProfilePage";
@@ -87,6 +88,10 @@ export const appRoutes: RouteObject[] = [
           {
             path: "settings/ai",
             element: <AiSettingsPage />,
+          },
+          {
+            path: "document-templates",
+            element: <DocumentTemplatesPage />,
           },
           { path: "clients", element: <ClientsPage /> },
           { path: "clients/new", element: <NewClientPage /> },
