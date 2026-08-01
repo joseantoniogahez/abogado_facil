@@ -15,6 +15,8 @@ summary.
 1. Read `AGENTS.md`.
 1. Identify changed files and classify the change as backend, frontend, full-stack, integration,
    documentation, AI governance, or bootstrap work.
+1. For backend code, load and follow `skills/backend-code-reviewer/SKILL.md`; for frontend code,
+   load and follow `skills/frontend-code-reviewer/SKILL.md`. Apply both for full-stack diffs.
 1. Read the affected playbooks, foundation status files, operation docs, architecture docs, and
    templates for that classification.
 1. Inspect the diff and nearby code.

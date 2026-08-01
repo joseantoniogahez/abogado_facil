@@ -212,11 +212,13 @@ For every backlog item, follow `docs/ai/backlog_tracking.md` and use
    synchronized.
 1. Before completion, review code changes for required updates to READMEs, operation docs,
    architecture docs, contract inventories, foundation status, and other canonical documentation.
-1. Mark an item `Hecho` only after acceptance criteria, required validations, documentation updates,
-   and mandatory human approvals are complete.
+1. Use `Implementado` when engineering, documentation, and validations are complete but a mandatory
+   external approval or release gate remains. Mark an item `Hecho` only after acceptance criteria,
+   required validations, documentation updates, release gates, and mandatory human approvals are
+   complete.
 1. Keep `docs/product/BACKLOG_ABOGADO_FACIL.md` concise: it stores summary status, priority, work, and the
-   deliverable; detailed history belongs in the item plan. Move a completed plan to
-   `docs/product/plans/implemented/` only after the item reaches `Hecho`.
+   deliverable; detailed history belongs in the item plan. Move a technically completed plan to
+   `docs/product/plans/implemented/` after the item reaches `Implementado` or `Hecho`.
 
 ## When to Ask Before Acting
 
@@ -263,6 +265,8 @@ Project skill pack:
 - `skills/backend-capability-builder`
 - `skills/frontend-feature-builder`
 - `skills/project-reviewer`
+- `skills/backend-code-reviewer`
+- `skills/frontend-code-reviewer`
 - `skills/new-app-bootstrapper`
 - `skills/fastapi-agents` as the repository adapter for the official FastAPI library Agent Skill;
   use it when implementing or reviewing FastAPI endpoints, dependencies, middleware, lifecycle,

@@ -1,6 +1,10 @@
 # Asuntos y expediente
 
-## Capacidades disponibles
+## Propósito
+
+Concentrar el seguimiento legal, operativo y financiero de cada asunto del despacho.
+
+## Flujo principal
 
 - Crear, listar, buscar y editar asuntos asociados a un cliente.
 
@@ -37,6 +41,23 @@
 - Los importes del MVP usan MXN y precisión de dos decimales.
 - Los abonos son inmutables y los resultados guardados no se editan ni eliminan.
 - El tab activo del detalle se conserva en la URL mediante el parámetro `tab`; valores inválidos vuelven a `summary`.
+
+## Límites y advertencias
+
+- Los cálculos son estimaciones y el contenido IA requiere revisión humana.
+- Pagos y cálculos guardados conservan su historial como registros inmutables.
+- Las funciones IA están implementadas para validación, pero su release depende de los gates P0-IA.
+
+## Permisos
+
+- Todas las operaciones requieren sesión autenticada y acceso al despacho del asunto.
+- Los recursos ajenos al despacho se comportan como no encontrados.
+
+## Estados de error
+
+- Clientes, asuntos o recursos relacionados inexistentes devuelven no encontrado.
+- Entradas inválidas conservan el estado editable y requieren corrección.
+- Los errores específicos de IA se detallan en `ai-assistance.md`.
 
 ## Referencias técnicas
 

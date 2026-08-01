@@ -18,12 +18,16 @@ Los detalles técnicos, decisiones de implementación y evidencias de validació
 - [`matters.md`](matters.md): asuntos y todas las capacidades integradas en su detalle.
 - [`documents-and-storage.md`](documents-and-storage.md): documentos, almacenamiento y extracción de texto.
 - [`ai-configuration.md`](ai-configuration.md): configuración segura de credenciales BYOK.
+- [`ai-assistance.md`](ai-assistance.md): funciones IA sobre el expediente, revisión y conversión
+  en acciones.
+- [`document-templates.md`](document-templates.md): catálogo, generación, copia y exportación de
+  borradores.
 - [`legal-and-ux.md`](legal-and-ux.md): avisos legales, accesibilidad y jerarquía de acciones.
 
 ## Convenciones
 
-Cada capacidad debe documentar propósito, flujo principal, límites, permisos, estados de error,
-advertencias visibles y referencia al plan técnico que la implementó. No debe incluir comandos,
+Cada capacidad debe usar las secciones `Propósito`, `Flujo principal`, `Límites y advertencias`,
+`Permisos`, `Estados de error` y `Referencias técnicas`. No debe incluir comandos,
 detalles de migración ni historial de decisiones salvo que sean necesarios para entender un
 contrato funcional.
 

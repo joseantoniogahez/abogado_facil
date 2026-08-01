@@ -6,7 +6,7 @@
 - Type: `<Backend | Frontend | Full-stack | AI | Legal | Docs | Ops | Product | Setup>`
 - Priority: `<P0 | P0-IA | P1 | P2>`
 - Plan status: `<Draft | Ready | Complete>`
-- Implementation status: `<Identificado | Listo | En progreso | Bloqueado | Hecho>`
+- Implementation status: `<Identificado | Listo | En progreso | Bloqueado | Implementado | Hecho>`
 - Last updated: `<YYYY-MM-DD>`
 - Backlog source: `docs/product/BACKLOG_ABOGADO_FACIL.md`
 
@@ -111,5 +111,6 @@ Record documents intentionally unchanged and why:
 - Human approvals: <record or not applicable>.
 - Residual risk: <risk or none>.
 
-Do not set the item to `Hecho` while any required criterion, validation, documentation update, or
-approval remains incomplete.
+Use `Implementado` when engineering is complete but a mandatory release gate or external approval
+remains. Do not set the item to `Hecho` while any required criterion, validation, documentation
+update, gate, or approval remains incomplete.

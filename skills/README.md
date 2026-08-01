@@ -50,6 +50,8 @@ unless `--force` is passed.
 | `backend-capability-builder` | The change is backend-only: endpoint, service, repository, model, migration, auth/RBAC, outbox, integration port, tests, or backend docs.            | `AGENTS.md`, backend playbook, backend foundation status, affected backend operation and architecture docs.                                                         | `python -m pytest backend/tests`, backend coverage gate, pre-commit when docs/config/shared files change.                                               |
 | `frontend-feature-builder`   | The change is frontend-only: route, page, shared UI, API consumer, auth-gated screen, RBAC UI, query/mutation behavior, a11y, e2e, or frontend docs. | `AGENTS.md`, frontend playbook, frontend foundation status, affected frontend operation docs.                                                                       | `npm --prefix frontend run check`, `npm --prefix frontend run build`, e2e when auth/routing/error journeys change.                                      |
 | `project-reviewer`           | The user asks for a review, readiness check, PR/diff assessment, or risk scan.                                                                       | `AGENTS.md`, changed-file context, affected backend/frontend playbooks and operation docs.                                                                          | Review evidence, relevant targeted checks when needed, and explicit validation gaps.                                                                    |
+| `backend-code-reviewer`      | A review focuses on FastAPI/backend behavior, contracts, migrations, security, integrations, or tests.                                               | `AGENTS.md`, backend playbook and foundation status, affected operation/architecture docs, and the official FastAPI skill when applicable.                          | Focused backend checks, contract tests, coverage/OpenAPI gates when warranted, and evidence-backed findings.                                            |
+| `frontend-code-reviewer`     | A review focuses on React routes, API consumers, auth/RBAC UI, state, a11y, e2e, performance, or tests.                                              | `AGENTS.md`, frontend playbook and foundation status, and affected frontend operation docs.                                                                         | Focused frontend checks, OpenAPI validation, affected e2e/build gates, and evidence-backed findings.                                                    |
 | `new-app-bootstrapper`       | The task turns this starter kit into a named product or previews/applies new-app identity changes.                                                   | `AGENTS.md`, new-project startup docs, bootstrap checklist, new-app request template, root and service READMEs.                                                     | Bootstrap dry-run, identity diff review, backend tests, frontend check/build, Docker Compose config, pre-commit; e2e when routes/auth/errors change.    |
 | `fastapi-agents`             | Adapter for the official FastAPI library Agent Skill during FastAPI implementation or review.                                                        | Official skill at the installed FastAPI package's `.agents/skills/fastapi/SKILL.md`, then `AGENTS.md`, backend playbook, foundation status, and affected contracts. | Focused backend tests, OpenAPI sync/check when the contract changes, coverage gate, and pre-commit for docs/config changes.                             |
 
@@ -121,6 +123,18 @@ Use for:
 
 Review output should lead with findings ordered by severity. If no issues are found, say that clearly
 and still name residual validation risk.
+
+### `backend-code-reviewer`
+
+Specialized review mode for backend diffs and readiness checks. It traces routes through DI,
+services, persistence or integrations, authorization, errors, OpenAPI, tests, and docs. Use the
+general reviewer instead when the change is documentation-only or spans unrelated repository areas.
+
+### `frontend-code-reviewer`
+
+Specialized review mode for frontend diffs and readiness checks. It traces routes through guards,
+API consumers, contract parsing, queries or mutations, rendered states, accessibility, diagnostics,
+tests, and docs. Use the general reviewer for documentation-only or broad repository reviews.
 
 ### `new-app-bootstrapper`
 

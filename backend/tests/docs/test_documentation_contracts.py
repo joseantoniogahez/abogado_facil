@@ -46,6 +46,28 @@ REQUIRED_TEMPLATE_SECTIONS: tuple[str, ...] = (
     "Reviewer Validation Checklist",
 )
 
+REQUIRED_CAPABILITY_SECTIONS: tuple[str, ...] = (
+    "Propósito",
+    "Flujo principal",
+    "Límites y advertencias",
+    "Permisos",
+    "Estados de error",
+    "Referencias técnicas",
+)
+
+AI_RELEASE_TICKETS: tuple[str, ...] = (
+    "AI-101",
+    "AI-102",
+    "AI-103",
+    "AI-104",
+    "AI-105",
+    "AI-106",
+    "AI-201",
+    "AI-202",
+    "AI-203",
+    "DOC-002",
+)
+
 
 def _iter_markdown_files(root: Path) -> list[Path]:
     return sorted(root.rglob("*.md"))
@@ -159,6 +181,41 @@ def test_product_capability_index_matches_capability_directory() -> None:
     indexed_capabilities = _indexed_local_markdown_filenames(PRODUCT_CAPABILITIES_DIR / "README.md")
 
     assert indexed_capabilities == actual_capabilities
+
+
+def test_product_capabilities_follow_the_canonical_section_contract() -> None:
+    for path in PRODUCT_CAPABILITIES_DIR.glob("*.md"):
+        if path.name == "README.md":
+            continue
+
+        markdown = _read_markdown(path)
+        for heading in REQUIRED_CAPABILITY_SECTIONS:
+            assert f"## {heading}" in markdown, f"{path.name} is missing '## {heading}'"
+        assert "../plans/implemented/" in markdown
+
+
+def test_ai_release_tickets_are_not_done_while_mandatory_gates_are_open() -> None:
+    backlog = _read_markdown(PRODUCT_BACKLOG_PATH)
+    status_pattern = re.compile(
+        r"^\|\s*(?P<ticket>[A-Z]+(?:-[A-Z]+)*-\d+[A-Z]?)\s*\|"
+        r"\s*[^|]+\|\s*[^|]+\|\s*(?P<status>[^|]+?)\s*\|",
+        re.MULTILINE,
+    )
+    statuses = {match.group("ticket"): match.group("status") for match in status_pattern.finditer(backlog)}
+    assert statuses["SEC-001C"] != "Hecho"
+    assert statuses["SEC-002"] != "Hecho"
+
+    for ticket in AI_RELEASE_TICKETS:
+        assert statuses[ticket] == "Implementado"
+
+
+def test_endpoint_summary_keeps_table_rows_contiguous() -> None:
+    markdown = _read_markdown(DOCS_DIR / "operations" / "api_endpoints.md")
+    summary = _extract_section(markdown, "Endpoint Summary")
+    last_row = summary.index("`/v1/rbac/users/{user_id}/roles/{role_id}`")
+    explanatory_text = summary.index("The controlled matter AI feature catalog")
+
+    assert last_row < explanatory_text
 
 
 def test_in_progress_backlog_items_have_pending_plans() -> None:

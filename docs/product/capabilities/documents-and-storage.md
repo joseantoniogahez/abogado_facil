@@ -1,6 +1,11 @@
 # Documentos y almacenamiento
 
-## Capacidades disponibles
+## Propósito
+
+Conservar documentos del expediente fuera de PostgreSQL y hacer disponible su metadata y texto
+extraído cuando sea viable.
+
+## Flujo principal
 
 - Subir documentos PDF, DOCX y TXT desde el detalle del asunto.
 - Listar, descargar y eliminar documentos del asunto.
@@ -14,6 +19,17 @@
 - DOCX y TXT no requieren extracción PDF.
 - El texto extraído queda disponible para futuros flujos de IA, pero la carga no ejecuta análisis de IA.
 - Los archivos no se almacenan dentro de PostgreSQL.
+
+## Permisos
+
+- Cargar, listar, descargar y eliminar requieren sesión autenticada y acceso al despacho del asunto.
+- Los documentos ajenos se comportan como no encontrados.
+
+## Estados de error
+
+- Tipo, tamaño o contenido inválido rechaza la carga antes de presentarla como disponible.
+- Un fallo de parser conserva el archivo y registra la extracción como fallida.
+- Un fallo de almacenamiento no crea metadata que afirme que el archivo está disponible.
 
 ## Referencias técnicas
 

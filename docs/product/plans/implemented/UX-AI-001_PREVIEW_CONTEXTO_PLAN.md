@@ -1,6 +1,6 @@
 # UX-AI-001 - Vista previa del contexto
 
-- Estado: `Hecho`
+- Estado: `Implementado`
 - Última actualización: `2026-07-29`
 - Plan agregado: [`PHASE-3`](PHASE-3_IA_INICIAL_CONTROLADA_PLAN.md)
 
@@ -10,4 +10,6 @@
 - [x] Token HMAC vincula inputs, despacho y versión; cualquier cambio invalida preview.
 - [x] Gates completos, `SEC-001B` y documentación final.
 
-Próxima acción segura: ejecutar validaciones completas y cerrar junto con la Fase 3.
+Gates pendientes para `Hecho`: `SEC-001C`, `SEC-002` y revalidación final del release IA.
+
+Próxima acción segura: ejecutar `SEC-001C`; luego `SEC-002` y el gate final de release.

@@ -3,7 +3,8 @@
 Esta carpeta separa la verdad funcional del producto en dos estados:
 
 - [`capabilities/`](capabilities/): capacidades funcionales actuales; fuente para la IA y futuro manual.
-- [`plans/implemented/`](plans/implemented/): planes técnicos de capacidades ya entregadas.
+- [`plans/implemented/`](plans/implemented/): planes con implementación técnica terminada; algunas
+  capacidades pueden seguir bloqueadas para release por gates o aprobaciones.
 - [`plans/pending/`](plans/pending/): planes técnicos de capacidades todavía pendientes.
 
 El índice y el backlog permanecen aquí:
@@ -14,8 +15,9 @@ El índice y el backlog permanecen aquí:
 
 ## Regla de clasificación
 
-Un plan nuevo se crea en `plans/pending/`. Pasa a `plans/implemented/` únicamente cuando sus
-criterios de aceptación, documentación y gates están completos y el backlog está en `Hecho`.
+Un plan nuevo se crea en `plans/pending/`. Pasa a `plans/implemented/` cuando su implementación,
+documentación y validaciones técnicas están completas y el backlog queda `Implementado` o `Hecho`.
+`Implementado` no autoriza release: los gates y aprobaciones pendientes deben permanecer explícitos.
 La capacidad funcional correspondiente se mantiene en `capabilities/`.
 
 ## Uso por audiencia

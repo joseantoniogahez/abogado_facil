@@ -1,7 +1,8 @@
 # Capacidades implementadas
 
-Estos documentos describen capacidades entregadas y validadas. Cada plan conserva decisiones,
-criterios de aceptación, límites, riesgos residuales y evidencia de validación.
+Estos documentos describen implementaciones técnicas terminadas y validadas. Cada plan conserva
+decisiones, criterios de aceptación, límites, riesgos residuales y evidencia de validación. Un plan
+aquí no implica por sí solo autorización de release; el backlog distingue `Implementado` de `Hecho`.
 
 Funcionan como referencia técnica para la IA y como evidencia del trabajo entregado. La referencia
 funcional estable está en [`../../capabilities/`](../../capabilities/); el manual futuro debe
@@ -47,6 +48,7 @@ derivarse de esa carpeta, no de estos planes técnicos.
 | Auditoría backend final      | [`AUDIT-002`](AUDIT-002_AUDITORIA_BACKEND_FASTAPI_POST_HARDENING_PLAN.md) |
 | OpenAPI en producción        | [`OPS-005`](OPS-005_OPENAPI_PRODUCCION_PLAN.md)                           |
 | CORS endurecido              | [`OPS-006`](OPS-006_CORS_ENDURECIDO_PLAN.md)                              |
+| Revisión documental y skills | [`OPS-003`](OPS-003_REVISION_DOCUMENTAL_Y_SKILLS_REVIEW_PLAN.md)          |
 | Readiness checks             | [`OPS-007`](OPS-007_READINESS_CHECKS_PLAN.md)                             |
 | Rate limiting                | [`OPS-008`](OPS-008_RATE_LIMITING_PLAN.md)                                |
 | Streaming y observabilidad   | [`OPS-009`](OPS-009_STREAMING_OBSERVABILIDAD_IA_PLAN.md)                  |

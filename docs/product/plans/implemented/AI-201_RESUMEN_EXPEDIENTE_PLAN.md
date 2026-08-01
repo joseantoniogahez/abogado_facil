@@ -6,8 +6,8 @@
 - Type: `Full-stack`
 - Priority: `P1`
 - Plan status: `Complete`
-- Implementation status: `Hecho`
-- Last updated: `2026-07-29`
+- Implementation status: `Implementado`
+- Last updated: `2026-08-01`
 - Backlog source: `docs/product/BACKLOG_ABOGADO_FACIL.md`
 
 ## Objective
@@ -39,7 +39,7 @@ validación estructurada, revisión humana, procedencia, regeneración y lectura
 
 ## Dependencies and Decisions
 
-- Dependencies: Fase 3 y gates `P0-IA` ya cerrados.
+- Dependencies: Fase 3 técnicamente completa; `SEC-001C` y `SEC-002` pendientes para release.
 - Decisions closed: reutilizar el slice `ai_assistance`; la consulta sólo lee resultados persistidos.
 - Open questions: ninguna.
 
@@ -50,7 +50,7 @@ validación estructurada, revisión humana, procedencia, regeneración y lectura
 - [x] El resultado guardado aparece en consultas posteriores sin llamar al proveedor.
 - [x] Required documentation is synchronized with delivered behavior.
 - [x] Required validation gates pass and are recorded below.
-- [x] Mandatory human approvals are recorded, or explicitly not applicable.
+- [ ] `SEC-001C` y la aprobación jurídica de `SEC-002` están cerrados y registrados.
 
 ## Affected Contracts and Files
 
@@ -83,10 +83,11 @@ validación estructurada, revisión humana, procedencia, regeneración y lectura
 
 ## Progress Log
 
-| Date       | State       | Completed                                                       | Pending / next safe action         |
-| ---------- | ----------- | --------------------------------------------------------------- | ---------------------------------- |
-| 2026-07-29 | En progreso | Alcance y reutilización del flujo de Fase 3 definidos.          | Implementar esquema, UI y pruebas. |
-| 2026-07-29 | Hecho       | Función, UI, OpenAPI, pruebas, documentación y gates completos. | Ninguna.                           |
+| Date       | State        | Completed                                                           | Pending / next safe action                           |
+| ---------- | ------------ | ------------------------------------------------------------------- | ---------------------------------------------------- |
+| 2026-07-29 | En progreso  | Alcance y reutilización del flujo de Fase 3 definidos.              | Implementar esquema, UI y pruebas.                   |
+| 2026-07-29 | Hecho        | Función, UI, OpenAPI, pruebas, documentación y gates completos.     | Ninguna.                                             |
+| 2026-08-01 | Implementado | Cierre técnico confirmado; estado sincronizado con los gates P0-IA. | Cerrar `SEC-001C`, `SEC-002` y revalidar el release. |
 
 ## Validation Results
 
@@ -102,10 +103,10 @@ validación estructurada, revisión humana, procedencia, regeneración y lectura
 
 - Current state: `matter_summary` está disponible dentro del flujo IA controlado.
 - Changed files and contracts: esquema backend, UI/contrato frontend, OpenAPI y docs.
-- Pending work: ninguna dentro de `AI-201`.
-- Blockers or approvals: ninguno.
+- Pending work: gates transversales `SEC-001C`, `SEC-002` y revalidación final del release IA.
+- Blockers or approvals: pruebas negativas multiusuario y aprobación jurídica obligatoria.
 - Residual risks: exactitud y costo dependen del proveedor BYOK.
-- Next safe action: iniciar `AI-202`.
+- Next safe action: ejecutar `SEC-001C`; luego completar `SEC-002` y revalidar el release.
 
 ## Completion Documentation Review
 
@@ -121,5 +122,5 @@ validación estructurada, revisión humana, procedencia, regeneración y lectura
 - Delivered: resumen estructurado persistente y revisable del expediente.
 - Validation: backend 586/586 con 100%; frontend 261/261, build y pre-commit.
 - Skipped validation: e2e no requerido; no cambió auth, routing ni el pipeline de errores.
-- Human approvals: no aplicable.
-- Residual risk: exactitud y costo dependen del proveedor BYOK; revisión humana obligatoria.
+- Human approvals: pendiente la aprobación jurídica registrada en `SEC-002`.
+- Residual risk: release bloqueado hasta cerrar `SEC-001C` y `SEC-002`; exactitud y costo dependen del proveedor BYOK.

@@ -1,6 +1,6 @@
 # AI-105 - Conversión de resultados en acciones
 
-- Estado: `Hecho`
+- Estado: `Implementado`
 - Última actualización: `2026-07-29`
 - Plan agregado: [`PHASE-3`](PHASE-3_IA_INICIAL_CONTROLADA_PLAN.md)
 
@@ -19,4 +19,6 @@
 
 Validación final: pruebas dirigidas 5/5; frontend check con 261 pruebas; build y 14 e2e aprobados.
 
-Próxima acción segura: ninguna dentro de `AI-105`.
+Gates pendientes para `Hecho`: `SEC-001C`, `SEC-002` y revalidación final del release IA.
+
+Próxima acción segura: ejecutar `SEC-001C`; luego `SEC-002` y el gate final de release.

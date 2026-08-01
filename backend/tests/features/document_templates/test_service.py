@@ -10,6 +10,7 @@ from fastapi import Request
 from app.core.errors.domain import DomainError, DomainErrorType
 from app.core.errors.services import ConflictError, InvalidInputError
 from app.features.auth.principal import CurrentPrincipal
+from app.features.document_templates.catalog import DocumentTemplateKey
 from app.features.document_templates.router import (
     AI_PROVIDER_RETRY_AFTER_SECONDS,
     _firm_id,
@@ -155,7 +156,7 @@ def test_preview_rejects_invalid_template_fields(fields: dict[str, str]) -> None
 def test_preview_rejects_unknown_template_defensively() -> None:
     draft_service, _, _ = service()
     invalid = DocumentDraftPreviewRequest.model_construct(
-        template_key="unknown",
+        template_key=cast(DocumentTemplateKey, "unknown"),
         fields={"name": "value"},
         provider="openai",
         model="model",

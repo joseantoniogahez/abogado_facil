@@ -6,8 +6,8 @@
 - Type: `Full-stack`
 - Priority: `P1`
 - Plan status: `Complete`
-- Implementation status: `Hecho`
-- Last updated: `2026-07-31`
+- Implementation status: `Implementado`
+- Last updated: `2026-08-01`
 - Backlog source: `docs/product/BACKLOG_ABOGADO_FACIL.md`
 
 ## Objective
@@ -32,7 +32,7 @@ reemplazar los elementos base, conservando una marca persistente de procedencia 
 
 ## Dependencies and Decisions
 
-- Dependencies: Fase 3, `AI-201` y `AI-202` completos.
+- Dependencies: Fase 3, `AI-201` y `AI-202` técnicamente completos; `SEC-001C` y `SEC-002` pendientes para release.
 - Decisions closed: las sugerencias se agregan como elementos personalizados pendientes; los
   elementos base y manuales conservan `is_ai_suggested=false`.
 - Open questions: ninguna.
@@ -44,6 +44,7 @@ reemplazar los elementos base, conservando una marca persistente de procedencia 
 - [x] Las sugerencias convertidas quedan marcadas como generadas por IA en API y UI.
 - [x] Documentación, OpenAPI y migración están sincronizados.
 - [x] Gates backend, frontend y pre-commit pasan.
+- [ ] `SEC-001C` y la aprobación jurídica de `SEC-002` están cerrados y registrados.
 
 ## Work Plan
 
@@ -54,10 +55,11 @@ reemplazar los elementos base, conservando una marca persistente de procedencia 
 
 ## Progress Log
 
-| Date       | State       | Completed                                                                                 | Pending / next safe action         |
-| ---------- | ----------- | ----------------------------------------------------------------------------------------- | ---------------------------------- |
-| 2026-07-31 | En progreso | Alcance y decisión de persistencia definidos.                                             | Implementar migración y contratos. |
-| 2026-07-31 | Hecho       | Persistencia, función IA, conversión múltiple, UI, contratos y documentación completados. | Ninguna.                           |
+| Date       | State        | Completed                                                                                 | Pending / next safe action                           |
+| ---------- | ------------ | ----------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| 2026-07-31 | En progreso  | Alcance y decisión de persistencia definidos.                                             | Implementar migración y contratos.                   |
+| 2026-07-31 | Hecho        | Persistencia, función IA, conversión múltiple, UI, contratos y documentación completados. | Ninguna.                                             |
+| 2026-08-01 | Implementado | Cierre técnico confirmado; estado sincronizado con los gates P0-IA.                       | Cerrar `SEC-001C`, `SEC-002` y revalidar el release. |
 
 ## Validation Results
 
@@ -72,10 +74,10 @@ reemplazar los elementos base, conservando una marca persistente de procedencia 
 ## Pause / Handoff Record
 
 - Current state: implementación completa y validada.
-- Pending work: ninguno.
-- Blockers or approvals: ninguno.
+- Pending work: gates transversales `SEC-001C`, `SEC-002` y revalidación final del release IA.
+- Blockers or approvals: pruebas negativas multiusuario y aprobación jurídica obligatoria.
 - Residual risks: utilidad depende del contexto y revisión humana.
-- Next safe action: continuar con el siguiente elemento de Fase 4.
+- Next safe action: ejecutar `SEC-001C`; luego completar `SEC-002` y revalidar el release.
 
 ## Completion Documentation Review
 
@@ -91,5 +93,5 @@ reemplazar los elementos base, conservando una marca persistente de procedencia 
 - Delivered: sugerencias estructuradas, revisión humana, conversión aditiva y procedencia visible.
 - Validation: backend 100%, frontend check/build, OpenAPI y pre-commit.
 - Skipped validation: E2E no aplica; no cambiaron autenticación, rutas ni recorridos de error.
-- Human approvals: no aplicable.
-- Residual risk: la calidad de las sugerencias depende del contexto autorizado y del proveedor.
+- Human approvals: pendiente la aprobación jurídica registrada en `SEC-002`.
+- Residual risk: release bloqueado hasta cerrar `SEC-001C` y `SEC-002`; la calidad depende del contexto y proveedor.

@@ -1,6 +1,10 @@
 # Configuración de IA BYOK
 
-## Capacidades disponibles
+## Propósito
+
+Permitir que cada usuario configure credenciales propias para funciones IA sin exponer sus secretos.
+
+## Flujo principal
 
 - Configurar una API key propia para OpenAI o Google Gemini desde `/settings/ai`.
 - Consultar qué proveedores tienen una credencial configurada sin recuperar ni mostrar el secreto.
@@ -15,8 +19,24 @@
   proveedor.
 - Antes de construir un proveedor para una función de IA, el backend exige una credencial
   configurada y descifrable para el usuario y despacho actuales.
-- Todavía no existen funciones de producto que envíen asuntos, notas o documentos a proveedores
-  externos.
+- Las funciones de asistencia y borradores pueden enviar al proveedor únicamente el contexto
+  autorizado que el usuario confirma en la vista previa; su release sigue bloqueado por los gates
+  P0-IA pendientes.
+
+## Límites y advertencias
+
+- Guardar una clave no prueba conectividad inmediata con el proveedor.
+- La aplicación nunca vuelve a mostrar la clave original ni el valor cifrado.
+
+## Permisos
+
+- Consultar, guardar, reemplazar o eliminar credenciales requiere sesión autenticada.
+- Cada credencial queda limitada al usuario y despacho actuales.
+
+## Estados de error
+
+- Un proveedor no admitido o una clave inválida no se persiste como configuración utilizable.
+- Una credencial ausente o indescifrable bloquea la ejecución IA sin exponer detalles sensibles.
 
 ## Referencias técnicas
 

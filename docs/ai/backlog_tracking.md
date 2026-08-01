@@ -14,8 +14,9 @@ concise status index; each item plan is the detailed source of truth for executi
 - Canonical backend, frontend, and AI governance docs affected by the implementation.
 
 Use uppercase ticket IDs and uppercase snake case for the descriptive plan filename. Create new
-plans under `plans/pending/`; move the same file to `plans/implemented/` when the item is complete. Reuse an
-existing item plan instead of creating a second tracker for the same ticket.
+plans under `plans/pending/`; move the same file to `plans/implemented/` when engineering reaches
+`Implementado` or the item reaches `Hecho`. Reuse an existing item plan instead of creating a second
+tracker for the same ticket.
 
 ## Lifecycle
 
@@ -63,8 +64,9 @@ when progress genuinely depends on unavailable input or an external state change
 1. Run the validation matrix required by `AGENTS.md` and any item-specific gates.
 1. Record final validation evidence, skipped commands with reasons, residual risks, and required
    human approvals in the item plan.
-1. Set the backlog item and plan to `Hecho` only when no required implementation, documentation,
-   validation, or approval remains.
+1. Set the backlog item to `Implementado` when engineering, documentation, and validation are
+   complete but a mandatory external approval or release gate remains. Use `Hecho` only when no
+   required implementation, documentation, validation, gate, or approval remains.
 
 ## Backlog Content Boundary
 
@@ -78,6 +80,8 @@ details, command output, file lists, or pause notes there; those belong in the i
 - `Listo`: scoped and ready to start.
 - `En progreso`: implementation or validation has started and required work remains.
 - `Bloqueado`: progress requires unavailable input, approval, or an external state change.
+- `Implementado`: engineering work and its validations are complete, but release remains blocked by
+  a mandatory external approval or gate; the technical plan stays under `plans/implemented/`.
 - `Hecho`: acceptance criteria, documentation, validations, and mandatory approvals are complete.
 
 ## Documentation Review Checklist

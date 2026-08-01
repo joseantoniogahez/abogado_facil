@@ -6,8 +6,8 @@
 - Type: `Full-stack`
 - Priority: `P1`
 - Plan status: `Complete`
-- Implementation status: `Hecho`
-- Last updated: `2026-07-31`
+- Implementation status: `Implementado`
+- Last updated: `2026-08-01`
 - Backlog source: `docs/product/BACKLOG_ABOGADO_FACIL.md`
 
 ## Objective
@@ -33,7 +33,7 @@ BYOK y obtener un borrador editable sujeto a revisión profesional.
 
 ## Dependencies and Decisions
 
-- Dependencies: `DOC-001`, BYOK, gates de contexto y salida IA, ciclo de `AIJob`.
+- Dependencies: `DOC-001`, BYOK y gates técnicos; `SEC-001C` y `SEC-002` pendientes para release.
 - Decision: preview y generación son globales al despacho y no requieren seleccionar un asunto.
 - Decision: el backend revalida campos y firma su contenido; cualquier cambio exige nuevo preview.
 - Decision: la salida estructurada contiene un solo texto editable y se etiqueta como borrador.
@@ -45,6 +45,7 @@ BYOK y obtener un borrador editable sujeto a revisión profesional.
 - [x] La generación solo ocurre tras preview vigente y usa infraestructura BYOK controlada.
 - [x] El resultado queda editable con advertencia de revisión y sin acciones automáticas.
 - [x] Gates backend, frontend, OpenAPI y pre-commit pasan.
+- [ ] `SEC-001C` y la aprobación jurídica de `SEC-002` están cerrados y registrados.
 
 ## Work Plan
 
@@ -74,10 +75,10 @@ BYOK y obtener un borrador editable sujeto a revisión profesional.
 
 - Current state: implementación completa y validada.
 - Changed files and contracts: API de drafts, DI, OpenAPI, formulario, editor e inventarios.
-- Pending work: ninguno para `DOC-002`; copiar/exportar corresponde a `DOC-003`.
-- Blockers or approvals: ninguno.
+- Pending work: gates transversales `SEC-001C`, `SEC-002` y revalidación final del release IA.
+- Blockers or approvals: pruebas negativas multiusuario y aprobación jurídica obligatoria.
 - Residual risks: calidad del texto dependiente del proveedor y de los datos ingresados.
-- Next safe action: preparar `DOC-003` sobre el editor entregado.
+- Next safe action: ejecutar `SEC-001C`; luego completar `SEC-002` y revalidar el release.
 
 ## Completion Documentation Review
 
@@ -93,5 +94,5 @@ BYOK y obtener un borrador editable sujeto a revisión profesional.
 - Delivered: preview firmado, generación BYOK auditable y borrador editable para cuatro plantillas.
 - Validation: backend 100 %, OpenAPI, frontend check/build y pre-commit.
 - Skipped validation: E2E no aplica; no cambiaron autenticación, ruta ni manejo global de errores.
-- Human approvals: no aplicable.
-- Residual risk: calidad y latencia dependen del proveedor y de la información ingresada.
+- Human approvals: pendiente la aprobación jurídica registrada en `SEC-002`.
+- Residual risk: release bloqueado hasta cerrar `SEC-001C` y `SEC-002`; calidad y latencia dependen del proveedor.

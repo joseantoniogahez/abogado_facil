@@ -46,7 +46,8 @@ Current top-level shape:
 - This port does not decide whether a user has a valid BYOK credential or persist results.
   `app/features/ai_execution/service.py` owns the implemented BYOK validation and provider
   construction policy. `app/features/ai_jobs` owns the persistent, tenant-scoped execution
-  lifecycle; future AI use-case services will validate and supply structured results.
+  lifecycle. `app/features/ai_assistance` and `app/features/document_templates` validate and supply
+  structured results for the implemented product use cases.
 - `app/integrations/ai_outputs.py` converts untrusted provider text into `ValidatedAIOutput` using
   an explicit Pydantic schema and version. The factory-sealed result returns defensive data copies;
   `AIJobsService` rejects arbitrary dictionaries and version mismatches before persistence.
