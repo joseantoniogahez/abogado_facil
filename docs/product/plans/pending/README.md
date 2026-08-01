@@ -1,5 +1,8 @@
 # Planes pendientes
 
+| Prioridad | Ticket | Plan |
+| --------- | ------ | ---- |
+
 Estos documentos describen trabajo planificado que todavia no debe presentarse como capacidad
 disponible del producto.
 

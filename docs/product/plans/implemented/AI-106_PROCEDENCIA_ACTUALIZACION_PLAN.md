@@ -10,6 +10,7 @@
 - [x] Aviso de resultado desactualizado y vínculo de regeneración.
 - [x] Gates completos y documentación final.
 
-Gates pendientes para `Hecho`: `SEC-001C`, `SEC-002` y revalidación final del release IA.
+Gates de cierre: `SEC-001C`, `SEC-002` y la revalidación integral final confirmados en verde el
+2026-08-01 por el responsable del producto.
 
-Próxima acción segura: ejecutar `SEC-001C`; luego `SEC-002` y el gate final de release.
+Próxima acción segura: ninguna dentro de `AI-106`.

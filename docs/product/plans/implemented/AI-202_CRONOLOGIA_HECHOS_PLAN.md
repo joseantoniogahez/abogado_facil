@@ -6,7 +6,7 @@
 - Type: `Full-stack`
 - Priority: `P1`
 - Plan status: `Complete`
-- Implementation status: `Implementado`
+- Implementation status: `Hecho`
 - Last updated: `2026-08-01`
 - Backlog source: `docs/product/BACKLOG_ABOGADO_FACIL.md`
 
@@ -37,7 +37,7 @@ validación estructurada, revisión humana, regeneración, procedencia y lectura
 
 ## Dependencies and Decisions
 
-- Dependencies: `AI-201` y Fase 3 técnicamente completos; `SEC-001C` y `SEC-002` pendientes para release.
+- Dependencies: `AI-201`, Fase 3, `SEC-001C` y `SEC-002` completos.
 - Decisions closed: fechas desconocidas permanecen nulas; la fuente sólo se muestra si existe.
 - Open questions: ninguna.
 
@@ -48,7 +48,7 @@ validación estructurada, revisión humana, regeneración, procedencia y lectura
 - [x] Cada evento puede editarse y guarda su fuente opcional.
 - [x] Required documentation is synchronized with delivered behavior.
 - [x] Required validation gates pass and are recorded below.
-- [ ] `SEC-001C` y la aprobación jurídica de `SEC-002` están cerrados y registrados.
+- [x] `SEC-001C` y la aprobación jurídica de `SEC-002` están cerrados y registrados.
 
 ## Affected Contracts and Files
 
@@ -100,10 +100,10 @@ validación estructurada, revisión humana, regeneración, procedencia y lectura
 
 - Current state: cronología persistente, editable y revisable disponible.
 - Changed files and contracts: asistencia IA backend/frontend, OpenAPI, pruebas y docs.
-- Pending work: gates transversales `SEC-001C`, `SEC-002` y revalidación final del release IA.
-- Blockers or approvals: pruebas negativas multiusuario y aprobación jurídica obligatoria.
+- Pending work: ninguno.
+- Blockers or approvals: ninguno; gates y revalidación integral cerrados.
 - Residual risks: fechas y fuentes dependen de los datos aportados.
-- Next safe action: ejecutar `SEC-001C`; luego completar `SEC-002` y revalidar el release.
+- Next safe action: ninguna dentro de `AI-202`.
 
 ## Completion Documentation Review
 
@@ -119,5 +119,6 @@ validación estructurada, revisión humana, regeneración, procedencia y lectura
 - Delivered: cronología editable con fechas válidas, eventos sin fecha y fuente opcional.
 - Validation: backend 588/588 con 100%; frontend 262/262, build y pre-commit.
 - Skipped validation: e2e no requerido; no cambió auth, routing ni errores.
-- Human approvals: pendiente la aprobación jurídica registrada en `SEC-002`.
-- Residual risk: release bloqueado hasta cerrar `SEC-001C` y `SEC-002`; fechas y fuentes dependen de los datos aportados.
+- Human approvals: `SEC-001C`, `SEC-002` y revalidación integral confirmados; esta última fue
+  reportada en verde por el responsable del producto el 2026-08-01.
+- Residual risk: fechas y fuentes dependen de los datos aportados.

@@ -66,6 +66,7 @@ AI_RELEASE_TICKETS: tuple[str, ...] = (
     "AI-202",
     "AI-203",
     "DOC-002",
+    "UX-AI-001",
 )
 
 
@@ -194,7 +195,7 @@ def test_product_capabilities_follow_the_canonical_section_contract() -> None:
         assert "../plans/implemented/" in markdown
 
 
-def test_ai_release_tickets_are_not_done_while_mandatory_gates_are_open() -> None:
+def test_ai_release_tickets_are_done_after_final_validation() -> None:
     backlog = _read_markdown(PRODUCT_BACKLOG_PATH)
     status_pattern = re.compile(
         r"^\|\s*(?P<ticket>[A-Z]+(?:-[A-Z]+)*-\d+[A-Z]?)\s*\|"
@@ -202,11 +203,11 @@ def test_ai_release_tickets_are_not_done_while_mandatory_gates_are_open() -> Non
         re.MULTILINE,
     )
     statuses = {match.group("ticket"): match.group("status") for match in status_pattern.finditer(backlog)}
-    assert statuses["SEC-001C"] != "Hecho"
-    assert statuses["SEC-002"] != "Hecho"
+    assert statuses["SEC-001C"] == "Hecho"
+    assert statuses["SEC-002"] == "Hecho"
 
     for ticket in AI_RELEASE_TICKETS:
-        assert statuses[ticket] == "Implementado"
+        assert statuses[ticket] == "Hecho"
 
 
 def test_endpoint_summary_keeps_table_rows_contiguous() -> None:

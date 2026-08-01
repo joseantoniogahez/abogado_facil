@@ -6,7 +6,7 @@
 - Type: `Full-stack`
 - Priority: `P1`
 - Plan status: `Complete`
-- Implementation status: `Implementado`
+- Implementation status: `Hecho`
 - Last updated: `2026-08-01`
 - Backlog source: `docs/product/BACKLOG_ABOGADO_FACIL.md`
 
@@ -33,7 +33,7 @@ BYOK y obtener un borrador editable sujeto a revisión profesional.
 
 ## Dependencies and Decisions
 
-- Dependencies: `DOC-001`, BYOK y gates técnicos; `SEC-001C` y `SEC-002` pendientes para release.
+- Dependencies: `DOC-001`, BYOK, `SEC-001C` y `SEC-002` completos.
 - Decision: preview y generación son globales al despacho y no requieren seleccionar un asunto.
 - Decision: el backend revalida campos y firma su contenido; cualquier cambio exige nuevo preview.
 - Decision: la salida estructurada contiene un solo texto editable y se etiqueta como borrador.
@@ -45,7 +45,7 @@ BYOK y obtener un borrador editable sujeto a revisión profesional.
 - [x] La generación solo ocurre tras preview vigente y usa infraestructura BYOK controlada.
 - [x] El resultado queda editable con advertencia de revisión y sin acciones automáticas.
 - [x] Gates backend, frontend, OpenAPI y pre-commit pasan.
-- [ ] `SEC-001C` y la aprobación jurídica de `SEC-002` están cerrados y registrados.
+- [x] `SEC-001C` y la aprobación jurídica de `SEC-002` están cerrados y registrados.
 
 ## Work Plan
 
@@ -63,22 +63,23 @@ BYOK y obtener un borrador editable sujeto a revisión profesional.
 
 ## Validation Results
 
-| Date       | Command                                                         | Result | Notes                                        |
-| ---------- | --------------------------------------------------------------- | ------ | -------------------------------------------- |
-| 2026-07-31 | `python -m pytest backend/tests --cov=app --cov-fail-under=100` | Pass   | 598 pruebas; cobertura total de 100 %.       |
-| 2026-07-31 | `npm --prefix frontend run openapi:sync`                        | Pass   | Contrato actualizado con preview/generación. |
-| 2026-07-31 | `npm --prefix frontend run check`                               | Pass   | Lint, tipos, pruebas, cobertura y contratos. |
-| 2026-07-31 | `npm --prefix frontend run build`                               | Pass   | Build y presupuesto de bundle aprobados.     |
-| 2026-07-31 | `pre-commit run --all-files`                                    | Pass   | Hooks aprobados tras aplicar formato.        |
+| Date       | Command                                                         | Result | Notes                                                                      |
+| ---------- | --------------------------------------------------------------- | ------ | -------------------------------------------------------------------------- |
+| 2026-07-31 | `python -m pytest backend/tests --cov=app --cov-fail-under=100` | Pass   | 598 pruebas; cobertura total de 100 %.                                     |
+| 2026-07-31 | `npm --prefix frontend run openapi:sync`                        | Pass   | Contrato actualizado con preview/generación.                               |
+| 2026-07-31 | `npm --prefix frontend run check`                               | Pass   | Lint, tipos, pruebas, cobertura y contratos.                               |
+| 2026-07-31 | `npm --prefix frontend run build`                               | Pass   | Build y presupuesto de bundle aprobados.                                   |
+| 2026-07-31 | `pre-commit run --all-files`                                    | Pass   | Hooks aprobados tras aplicar formato.                                      |
+| 2026-08-01 | Revalidación integral del release IA                            | Pass   | Confirmada en verde por el responsable del producto; sin salidas adjuntas. |
 
 ## Pause / Handoff Record
 
 - Current state: implementación completa y validada.
 - Changed files and contracts: API de drafts, DI, OpenAPI, formulario, editor e inventarios.
-- Pending work: gates transversales `SEC-001C`, `SEC-002` y revalidación final del release IA.
-- Blockers or approvals: pruebas negativas multiusuario y aprobación jurídica obligatoria.
+- Pending work: ninguno.
+- Blockers or approvals: ninguno; gates y revalidación integral cerrados.
 - Residual risks: calidad del texto dependiente del proveedor y de los datos ingresados.
-- Next safe action: ejecutar `SEC-001C`; luego completar `SEC-002` y revalidar el release.
+- Next safe action: ninguna dentro de `DOC-002`.
 
 ## Completion Documentation Review
 
@@ -94,5 +95,6 @@ BYOK y obtener un borrador editable sujeto a revisión profesional.
 - Delivered: preview firmado, generación BYOK auditable y borrador editable para cuatro plantillas.
 - Validation: backend 100 %, OpenAPI, frontend check/build y pre-commit.
 - Skipped validation: E2E no aplica; no cambiaron autenticación, ruta ni manejo global de errores.
-- Human approvals: pendiente la aprobación jurídica registrada en `SEC-002`.
-- Residual risk: release bloqueado hasta cerrar `SEC-001C` y `SEC-002`; calidad y latencia dependen del proveedor.
+- Human approvals: `SEC-001C`, `SEC-002` y revalidación integral confirmados; esta última fue
+  reportada en verde por el responsable del producto el 2026-08-01.
+- Residual risk: calidad y latencia dependen del proveedor.

@@ -2,6 +2,7 @@ import asyncio
 import logging
 import tempfile
 from collections.abc import AsyncGenerator, Generator
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -9,7 +10,7 @@ from argon2 import PasswordHasher
 from starlette.testclient import TestClient
 
 from app.core.authorization import PERMISSION_SPECS
-from app.core.db.database import Base
+from app.core.db.database import Base, reset_database_runtime
 from app.core.setup.dependencies import get_db_session, get_file_storage
 from app.features.audit_log.models import AuditLogEntry
 from app.features.auth.models import Firm, User
@@ -32,6 +33,21 @@ from utils.testing_support.fixtures import load_mock_data
 @pytest.fixture(scope="session", autouse=True)
 def set_app_http_logger_to_error() -> None:
     logging.getLogger("app.http").setLevel(logging.ERROR)
+
+
+@pytest.fixture(scope="session", autouse=True)
+def database_environment() -> Generator[None]:
+    with (
+        tempfile.TemporaryDirectory(prefix="backend-tests-runtime-db-") as db_tmp_dir,
+        pytest.MonkeyPatch.context() as monkeypatch,
+    ):
+        monkeypatch.setenv("DB_TYPE", "sqlite+aiosqlite")
+        monkeypatch.setenv("DB_NAME", str(Path(db_tmp_dir) / "app.db"))
+        for field_name in ("DB_USER", "DB_PASSWORD", "DB_HOST", "DB_PORT"):
+            monkeypatch.delenv(field_name, raising=False)
+        reset_database_runtime()
+        yield
+        reset_database_runtime()
 
 
 @pytest.fixture(scope="session", autouse=True)

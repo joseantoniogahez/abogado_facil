@@ -136,33 +136,33 @@ esperada: pruebas de contrato, métricas, ADR, threat model, caso de fallo o dem
 
 ## Fase 3 - IA Inicial Controlada
 
-| ID         | Tipo       | Prioridad | Estado       | Trabajo                                  | Entregable / Criterio                                                                                            |
-| ---------- | ---------- | --------- | ------------ | ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| AI-101     | Full-stack | P1        | Implementado | Analizador de relato inicial.            | Primera función real: aplica `UX-AI-001` y `LEGAL-002A`, valida la salida y la entrega a revisión.               |
-| AI-102     | Full-stack | P1        | Implementado | Generador de preguntas para cliente.     | Lista editable/copiable de preguntas, datos críticos y documentos faltantes.                                     |
-| AI-103     | Full-stack | P1        | Implementado | Generador de mensajes para cliente.      | Mensajes para WhatsApp/email copiables y editables antes de enviar.                                              |
-| LEGAL-002A | Frontend   | P0-IA     | Hecho        | Contrato reusable de revisión humana.    | Componente, estados y pruebas de contrato listos para integrarse en `AI-101`, sin crear una pantalla ficticia.   |
-| LEGAL-002B | Frontend   | P1        | Hecho        | Auditoría de consistencia del patrón IA. | Al menos dos funciones reales cumplen `LEGAL-002A` y sus pruebas consumidoras.                                   |
-| UX-AI-001  | Full-stack | P1        | Implementado | Vista previa del contexto.               | Antes de `AI-101`, el usuario revisa fuentes incluidas, proveedor y posible costo antes de ejecutar.             |
-| AI-104     | Full-stack | P1        | Implementado | Persistencia de revisión y aceptación.   | Después de `AI-101`, persiste edición, aceptación parcial o total, rechazo, regeneración y reporte de problemas. |
-| AI-105     | Full-stack | P1        | Implementado | Convertir resultados en acciones.        | Salida se convierte en nota, tarea, pregunta, checklist, documento faltante o mensaje.                           |
-| AI-106     | Full-stack | P1        | Implementado | Procedencia y estado de actualización.   | Fuentes/versiones y aviso cuando un resultado guardado queda desactualizado.                                     |
+| ID         | Tipo       | Prioridad | Estado | Trabajo                                  | Entregable / Criterio                                                                                            |
+| ---------- | ---------- | --------- | ------ | ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| AI-101     | Full-stack | P1        | Hecho  | Analizador de relato inicial.            | Primera función real: aplica `UX-AI-001` y `LEGAL-002A`, valida la salida y la entrega a revisión.               |
+| AI-102     | Full-stack | P1        | Hecho  | Generador de preguntas para cliente.     | Lista editable/copiable de preguntas, datos críticos y documentos faltantes.                                     |
+| AI-103     | Full-stack | P1        | Hecho  | Generador de mensajes para cliente.      | Mensajes para WhatsApp/email copiables y editables antes de enviar.                                              |
+| LEGAL-002A | Frontend   | P0-IA     | Hecho  | Contrato reusable de revisión humana.    | Componente, estados y pruebas de contrato listos para integrarse en `AI-101`, sin crear una pantalla ficticia.   |
+| LEGAL-002B | Frontend   | P1        | Hecho  | Auditoría de consistencia del patrón IA. | Al menos dos funciones reales cumplen `LEGAL-002A` y sus pruebas consumidoras.                                   |
+| UX-AI-001  | Full-stack | P1        | Hecho  | Vista previa del contexto.               | Antes de `AI-101`, el usuario revisa fuentes incluidas, proveedor y posible costo antes de ejecutar.             |
+| AI-104     | Full-stack | P1        | Hecho  | Persistencia de revisión y aceptación.   | Después de `AI-101`, persiste edición, aceptación parcial o total, rechazo, regeneración y reporte de problemas. |
+| AI-105     | Full-stack | P1        | Hecho  | Convertir resultados en acciones.        | Salida se convierte en nota, tarea, pregunta, checklist, documento faltante o mensaje.                           |
+| AI-106     | Full-stack | P1        | Hecho  | Procedencia y estado de actualización.   | Fuentes/versiones y aviso cuando un resultado guardado queda desactualizado.                                     |
 
 ## Fase 4 - Expediente Asistido
 
-| ID     | Tipo       | Prioridad | Estado       | Trabajo                         | Entregable / Criterio                                                       |
-| ------ | ---------- | --------- | ------------ | ------------------------------- | --------------------------------------------------------------------------- |
-| AI-201 | Full-stack | P1        | Implementado | Resumen del expediente.         | Resumen guardado, reutilizable y no recomputado solo por consulta.          |
-| AI-202 | Full-stack | P1        | Implementado | Cronología de hechos.           | Eventos ordenados por fecha, editables y con fuente cuando esté disponible. |
-| AI-203 | Full-stack | P1        | Implementado | Checklist personalizado con IA. | Parte de checklist base y marca sugerencias generadas por IA.               |
+| ID     | Tipo       | Prioridad | Estado | Trabajo                         | Entregable / Criterio                                                       |
+| ------ | ---------- | --------- | ------ | ------------------------------- | --------------------------------------------------------------------------- |
+| AI-201 | Full-stack | P1        | Hecho  | Resumen del expediente.         | Resumen guardado, reutilizable y no recomputado solo por consulta.          |
+| AI-202 | Full-stack | P1        | Hecho  | Cronología de hechos.           | Eventos ordenados por fecha, editables y con fuente cuando esté disponible. |
+| AI-203 | Full-stack | P1        | Hecho  | Checklist personalizado con IA. | Parte de checklist base y marca sugerencias generadas por IA.               |
 
 ## Fase 5 - Documentos Simples
 
-| ID      | Tipo       | Prioridad | Estado       | Trabajo                                | Entregable / Criterio                                                                        |
-| ------- | ---------- | --------- | ------------ | -------------------------------------- | -------------------------------------------------------------------------------------------- |
-| DOC-001 | Full-stack | P1        | Hecho        | Catálogo de plantillas simples.        | Tipos iniciales: requerimiento de pago, convenio, solicitud de documentos y resumen interno. |
-| DOC-002 | Full-stack | P1        | Implementado | Generador de borrador desde plantilla. | Formulario, validación, secciones IA controladas y borrador editable.                        |
-| DOC-003 | Frontend   | P1        | Hecho        | Copiar/exportar borrador.              | Usuario puede copiar contenido o exportarlo según alcance técnico elegido.                   |
+| ID      | Tipo       | Prioridad | Estado | Trabajo                                | Entregable / Criterio                                                                        |
+| ------- | ---------- | --------- | ------ | -------------------------------------- | -------------------------------------------------------------------------------------------- |
+| DOC-001 | Full-stack | P1        | Hecho  | Catálogo de plantillas simples.        | Tipos iniciales: requerimiento de pago, convenio, solicitud de documentos y resumen interno. |
+| DOC-002 | Full-stack | P1        | Hecho  | Generador de borrador desde plantilla. | Formulario, validación, secciones IA controladas y borrador editable.                        |
+| DOC-003 | Frontend   | P1        | Hecho  | Copiar/exportar borrador.              | Usuario puede copiar contenido o exportarlo según alcance técnico elegido.                   |
 
 ## Seguridad, Privacidad y Operación
 
@@ -170,8 +170,8 @@ esperada: pruebas de contrato, métricas, ADR, threat model, caso de fallo o dem
 | ----------- | ---------- | --------- | ------------ | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
 | SEC-001A    | Backend    | P1        | Hecho        | Aislamiento general por despacho.                                 | Matriz de pruebas confirma aislamiento de clientes, asuntos, documentos y resultados por `firm_id`.        |
 | SEC-001B    | Backend    | P0-IA     | Hecho        | Aislamiento del contexto enviado a IA.                            | El contexto de cada llamada se construye solo desde recursos autorizados del despacho actual.              |
-| SEC-001C    | Backend    | P0-IA     | Identificado | Pruebas negativas multiusuario.                                   | Accesos cruzados a clientes, asuntos, documentos y resultados devuelven rechazo o `404` opaco.             |
-| SEC-002     | Legal      | P0-IA     | Identificado | Aviso de privacidad, términos y aprobación jurídica para IA BYOK. | Explica el envío al proveedor, solicita consentimiento y registra revisión jurídica antes del lanzamiento. |
+| SEC-001C    | Backend    | P0-IA     | Hecho        | Pruebas negativas multiusuario.                                   | Accesos cruzados a clientes, asuntos, documentos y resultados devuelven rechazo o `404` opaco.             |
+| SEC-002     | Legal      | P0-IA     | Hecho        | Aviso de privacidad, términos y aprobación jurídica para IA BYOK. | Explica el envío al proveedor, solicita consentimiento y registra revisión jurídica antes del lanzamiento. |
 | SEC-003     | Backend    | P1        | Identificado | Eliminación de datos del usuario.                                 | Usuario puede eliminar documentos/asuntos según política definida.                                         |
 | OPS-001     | Ops        | P1        | Identificado | Límites configurables de archivos y análisis.                     | Tamaño, número de documentos y entrada IA controlados por config.                                          |
 | OPS-002     | Ops        | P1        | Identificado | Backups básicos de PostgreSQL.                                    | Procedimiento documentado antes de despliegue productivo.                                                  |
@@ -218,12 +218,9 @@ esperada: pruebas de contrato, métricas, ADR, threat model, caso de fallo o dem
 
 ## Siguiente Trabajo del Backlog
 
-La implementación técnica de las funciones IA del MVP está disponible para validación, pero su
-release permanece bloqueado por gates P0-IA. La secuencia priorizada es:
+Las funciones IA del MVP superaron los gates P0-IA y la revalidación integral del release. La
+secuencia priorizada continúa con:
 
-1. `SEC-001C`: completar las pruebas negativas multiusuario de los recursos y resultados IA.
-1. `SEC-002`: definir consentimiento, privacidad, términos y registrar aprobación jurídica.
-1. Cambiar las funciones IA de `Implementado` a `Hecho` solo cuando todos los gates sean verificables.
 1. `PROD-AI-001`: cerrar el hero flow y documentar su evidencia de producto.
 1. `OBS-002` y `PROD-AI-003`: completar las métricas operativas y de valor de IA.
 1. `OBS-002`, `PROD-AI-002` y `PROD-AI-003`: medir operación y valor después del flujo funcional.

@@ -15,6 +15,12 @@ from app.core.db.database import (
 )
 
 
+@pytest.fixture(autouse=True)
+def clear_database_environment(monkeypatch: pytest.MonkeyPatch) -> None:
+    for field_name in DatabaseSettings.model_fields:
+        monkeypatch.delenv(field_name, raising=False)
+
+
 def test_build_network_database_url() -> None:
     settings = DatabaseSettings(
         DB_TYPE="postgresql+asyncpg",
