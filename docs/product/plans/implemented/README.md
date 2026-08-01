@@ -62,3 +62,4 @@ derivarse de esa carpeta, no de estos planes técnicos.
 | Fase 3 IA controlada         | [`PHASE-3`](PHASE-3_IA_INICIAL_CONTROLADA_PLAN.md)                        |
 | Resumen IA del expediente    | [`AI-201`](AI-201_RESUMEN_EXPEDIENTE_PLAN.md)                             |
 | Cronología IA del expediente | [`AI-202`](AI-202_CRONOLOGIA_HECHOS_PLAN.md)                              |
+| Checklist personalizado IA   | [`AI-203`](AI-203_CHECKLIST_PERSONALIZADO_IA_PLAN.md)                     |

@@ -47,7 +47,8 @@
               "client_questions",
               "client_message",
               "matter_summary",
-              "matter_timeline"
+              "matter_timeline",
+              "checklist_suggestions"
             ],
             "title": "Feature",
             "type": "string"
@@ -167,7 +168,8 @@
               "client_questions",
               "client_message",
               "matter_summary",
-              "matter_timeline"
+              "matter_timeline",
+              "checklist_suggestions"
             ],
             "title": "Feature",
             "type": "string"
@@ -250,7 +252,8 @@
               "client_questions",
               "client_message",
               "matter_summary",
-              "matter_timeline"
+              "matter_timeline",
+              "checklist_suggestions"
             ],
             "title": "Feature",
             "type": "string"
@@ -747,6 +750,10 @@
             "title": "Id",
             "type": "integer"
           },
+          "is_ai_suggested": {
+            "title": "Is Ai Suggested",
+            "type": "boolean"
+          },
           "is_custom": {
             "title": "Is Custom",
             "type": "boolean"
@@ -784,6 +791,7 @@
           "label",
           "status",
           "is_custom",
+          "is_ai_suggested",
           "position",
           "created_at",
           "updated_at"
@@ -1416,7 +1424,8 @@
               "client_questions",
               "client_message",
               "matter_summary",
-              "matter_timeline"
+              "matter_timeline",
+              "checklist_suggestions"
             ],
             "title": "Feature",
             "type": "string"

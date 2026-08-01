@@ -202,6 +202,7 @@ async def test_regeneration_rejects_a_different_feature() -> None:
                 ]
             },
         ),
+        ("checklist_suggestions", {"suggestions": ["Solicitar identificación", "Verificar domicilio"]}),
     ],
 )
 @run_async
@@ -358,6 +359,25 @@ async def test_list_review_and_convert_enforce_scope_and_acceptance() -> None:
         payload=ConvertAIAssistanceRequest(action_type="checklist", content="Obtener identificación"),
     )
     assert converted_checklist.converted_actions[0]["entity_id"] == 43
+    assert converted_checklist.converted_actions[0]["entity_ids"] == [43]
+
+    suggested = item("accepted")
+    suggested.feature = "checklist_suggestions"
+    repository.get_scoped.return_value = suggested
+    converted_suggestions = await subject.convert(
+        result_id=9,
+        matter_id=3,
+        firm_id=2,
+        payload=ConvertAIAssistanceRequest(
+            action_type="checklist",
+            content="Solicitar identificación\n\nVerificar domicilio",
+        ),
+    )
+    assert converted_suggestions.converted_actions[0]["entity_ids"] == [43, 43]
+    assert subject.checklists_repository.create.await_args_list[1].kwargs["label"] == "Solicitar identificación"
+    assert subject.checklists_repository.create.await_args_list[1].kwargs["position"] == 4
+    assert subject.checklists_repository.create.await_args_list[1].kwargs["is_ai_suggested"] is True
+    assert subject.checklists_repository.create.await_args_list[2].kwargs["position"] == 5
 
 
 @run_async

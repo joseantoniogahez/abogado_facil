@@ -69,10 +69,12 @@ All routes are versioned under `/v1`.
 | `POST`   | `/v1/matters/{matter_id}/ai/results/{result_id}/actions`   | Yes  | No                | JSON `ConvertAIAssistanceRequest`; tasks require `due_date` | `200` `AIAssistanceResultResponse`             | `400`, `401`, `404`, `409`, `500`                             |
 
 The controlled matter AI feature catalog accepts `intake_analysis`, `client_questions`,
-`client_message`, `matter_summary`, and `matter_timeline`. Summaries and timelines are persisted as
-ordinary scoped AI results; `GET /v1/matters/{matter_id}/ai/results` never invokes a provider or
-recomputes them. Timeline events use a validated ISO date or `null`, description, and optional
-source.
+`client_message`, `matter_summary`, `matter_timeline`, and `checklist_suggestions`. Summaries,
+timelines, and checklist suggestions are persisted as ordinary scoped AI results;
+`GET /v1/matters/{matter_id}/ai/results` never invokes a provider or recomputes them. Timeline
+events use a validated ISO date or `null`, description, and optional source. Accepted checklist
+suggestions convert into independent custom items without replacing the base template;
+`ChecklistItemResponse.is_ai_suggested` identifies their AI provenance.
 | `PATCH` | `/v1/users/me` | Yes | No | JSON `UpdateCurrentUserRequest` | `200` `AuthenticatedUserResponse` | `400`, `401`, `403`, `409`, `500` |
 | `GET` | `/v1/rbac/roles` | Yes | `roles:manage` | No body | `200` `RBACRole[]` | `401`, `403`, `500` |
 | `GET` | `/v1/rbac/permissions` | Yes | `role_permissions:manage` | No body | `200` `RBACPermission[]` | `401`, `403`, `500` |

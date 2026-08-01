@@ -86,6 +86,7 @@ const parseTimelineText = (value: string): TimelineEvent[] =>
 
 const resultText = (result: AiResult) => {
   const content = result.reviewed_content ?? result.generated_content;
+  if (result.feature === "checklist_suggestions") return listText(content.suggestions);
   if (result.feature === "matter_timeline") {
     return timelineEvents(content.events)
       .map(event =>
@@ -128,6 +129,7 @@ const editableText = (result: AiResult) => {
   if (result.feature === "client_message")
     return typeof content.message === "string" ? content.message : "";
   if (result.feature === "client_questions") return listText(content.questions);
+  if (result.feature === "checklist_suggestions") return listText(content.suggestions);
   if (result.feature === "matter_timeline") return timelineText(content.events);
   return typeof content.summary === "string" ? content.summary : "";
 };
@@ -140,6 +142,9 @@ const reviewedContent = (result: AiResult, edited: string) => {
       ...content,
       questions: edited.split("\n").map(value => value.trim()).filter(Boolean),
     };
+  }
+  if (result.feature === "checklist_suggestions") {
+    return { ...content, suggestions: edited.split("\n").map(value => value.trim()).filter(Boolean) };
   }
   if (result.feature === "matter_timeline") return { ...content, events: parseTimelineText(edited) };
   return { ...content, summary: edited };
@@ -404,6 +409,7 @@ export const MatterAiAssistance = ({ matterId }: { matterId: number }) => {
             "client_message",
             "matter_summary",
             "matter_timeline",
+            "checklist_suggestions",
           ] as const).map(feature => (
             <option key={feature} value={feature}>{t(`ai.feature.${feature}`)}</option>
           ))}

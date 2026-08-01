@@ -1,7 +1,7 @@
 import { parseChecklist, parseChecklistItem } from "@/features/matters/matter-checklist/contracts";
 
 const item = {
-  id: 1, matter_id: 2, label: "Identificación", status: "pending", is_custom: false, position: 0,
+  id: 1, matter_id: 2, label: "Identificación", status: "pending", is_custom: false, is_ai_suggested: false, position: 0,
   created_at: "2026-05-01T12:00:00Z", updated_at: "2026-05-01T12:00:00Z",
 } as const;
 

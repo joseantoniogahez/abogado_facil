@@ -31,6 +31,7 @@ class ChecklistItemResponse(ApiSchema):
     label: str
     status: ChecklistStatus
     is_custom: bool
+    is_ai_suggested: bool
     position: int
     created_at: datetime
     updated_at: datetime

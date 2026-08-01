@@ -26,6 +26,9 @@
 - Generar una cronología editable con fechas validadas, eventos sin fecha explícitos y fuente
   visible cuando fue aportada.
 
+- Generar sugerencias de checklist con IA, revisarlas y agregarlas como elementos independientes
+  marcados como sugeridos por IA, sin reemplazar el checklist base.
+
 ## Reglas funcionales
 
 - Todos los recursos del expediente están aislados por despacho.
@@ -47,3 +50,4 @@
 - [UX-002](../plans/implemented/UX-002_TABS_DETALLE_ASUNTOS_PLAN.md)
 - [AI-201](../plans/implemented/AI-201_RESUMEN_EXPEDIENTE_PLAN.md)
 - [AI-202](../plans/implemented/AI-202_CRONOLOGIA_HECHOS_PLAN.md)
+- [AI-203](../plans/implemented/AI-203_CHECKLIST_PERSONALIZADO_IA_PLAN.md)

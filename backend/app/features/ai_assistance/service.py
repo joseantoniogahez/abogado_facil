@@ -69,12 +69,17 @@ class MatterTimeline(BaseModel):
         return self
 
 
+class ChecklistSuggestions(BaseModel):
+    suggestions: list[str] = Field(min_length=1, max_length=30)
+
+
 FEATURE_SCHEMAS: dict[str, type[BaseModel]] = {
     "intake_analysis": IntakeAnalysis,
     "client_questions": ClientQuestions,
     "client_message": ClientMessage,
     "matter_summary": MatterSummary,
     "matter_timeline": MatterTimeline,
+    "checklist_suggestions": ChecklistSuggestions,
 }
 FEATURE_INSTRUCTIONS = {
     "intake_analysis": (
@@ -100,6 +105,11 @@ FEATURE_INSTRUCTIONS = {
         "cada evento contiene date en formato YYYY-MM-DD o null, description y source o null. No "
         "inventes fechas: usa null cuando no exista una fecha verificable e identifica la fuente "
         "aportada cuando esté disponible."
+    ),
+    "checklist_suggestions": (
+        "Sugiere elementos adicionales para personalizar el checklist del expediente sin repetir "
+        "el checklist base. Devuelve JSON con suggestions, una lista breve y accionable. No "
+        "marques elementos como completos y no inventes requisitos legales."
     ),
 }
 
@@ -412,18 +422,29 @@ class AIAssistanceService:
                     matter_id=matter_id,
                     firm_id=firm_id,
                 )
-                created = await self.checklists_repository.create(
-                    firm_id=firm_id,
-                    matter_id=matter_id,
-                    label=(
+                labels = (
+                    [line.strip() for line in payload.content.splitlines() if line.strip()]
+                    if item.feature == "checklist_suggestions" and payload.action_type == "checklist"
+                    else [
                         payload.content
                         if payload.action_type == "checklist"
                         else f"Solicitar documento: {payload.content}"
-                    )[:500],
-                    position=position,
-                    is_custom=True,
+                    ]
                 )
-                action["entity_id"] = created.id
+                created_items = []
+                for offset, label in enumerate(labels):
+                    created_items.append(
+                        await self.checklists_repository.create(
+                            firm_id=firm_id,
+                            matter_id=matter_id,
+                            label=label[:500],
+                            position=position + offset,
+                            is_custom=True,
+                            is_ai_suggested=True,
+                        )
+                    )
+                action["entity_id"] = created_items[0].id
+                action["entity_ids"] = [created.id for created in created_items]
                 action["entity_type"] = "checklist"
             actions = [*item.converted_actions, action]
             result = await self.repository.update_result(item, converted_actions=actions)

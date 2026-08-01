@@ -23,6 +23,7 @@ def test_checklist_crud_templates_and_firm_isolation(mock_client: TestClient) ->
     first = mock_client.get(f"/v1/matters/{matter_id}/checklist", headers=reader)
     assert first.status_code == HTTPStatus.OK
     assert first.json()["total"] == 4
+    assert all(item["is_ai_suggested"] is False for item in first.json()["items"])
     assert mock_client.get(f"/v1/matters/{matter_id}/checklist", headers=reader).json()["total"] == 4
     item_id = first.json()["items"][0]["id"]
     updated = mock_client.patch(
@@ -33,6 +34,7 @@ def test_checklist_crud_templates_and_firm_isolation(mock_client: TestClient) ->
     assert custom.status_code == HTTPStatus.CREATED
     assert custom.json()["label"] == "Fotografías"
     assert custom.json()["is_custom"] is True
+    assert custom.json()["is_ai_suggested"] is False
     assert mock_client.get(f"/v1/matters/{matter_id}/checklist", headers=admin).status_code == HTTPStatus.NOT_FOUND
     assert (
         mock_client.post(

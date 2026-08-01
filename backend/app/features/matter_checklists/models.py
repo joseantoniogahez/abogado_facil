@@ -18,5 +18,6 @@ class MatterChecklistItem(BaseModel):
     label: Mapped[str] = mapped_column(Text, nullable=False)
     status: Mapped[str] = mapped_column(String(20), nullable=False, default="pending", server_default="pending")
     is_custom: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default="false")
+    is_ai_suggested: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default="false")
     template_key: Mapped[str | None] = mapped_column(String(120), nullable=True)
     position: Mapped[int] = mapped_column(Integer, nullable=False)

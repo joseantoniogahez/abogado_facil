@@ -149,11 +149,11 @@ esperada: pruebas de contrato, métricas, ADR, threat model, caso de fallo o dem
 
 ## Fase 4 - Expediente Asistido
 
-| ID     | Tipo       | Prioridad | Estado       | Trabajo                         | Entregable / Criterio                                                       |
-| ------ | ---------- | --------- | ------------ | ------------------------------- | --------------------------------------------------------------------------- |
-| AI-201 | Full-stack | P1        | Hecho        | Resumen del expediente.         | Resumen guardado, reutilizable y no recomputado solo por consulta.          |
-| AI-202 | Full-stack | P1        | Hecho        | Cronología de hechos.           | Eventos ordenados por fecha, editables y con fuente cuando esté disponible. |
-| AI-203 | Full-stack | P1        | Identificado | Checklist personalizado con IA. | Parte de checklist base y marca sugerencias generadas por IA.               |
+| ID     | Tipo       | Prioridad | Estado | Trabajo                         | Entregable / Criterio                                                       |
+| ------ | ---------- | --------- | ------ | ------------------------------- | --------------------------------------------------------------------------- |
+| AI-201 | Full-stack | P1        | Hecho  | Resumen del expediente.         | Resumen guardado, reutilizable y no recomputado solo por consulta.          |
+| AI-202 | Full-stack | P1        | Hecho  | Cronología de hechos.           | Eventos ordenados por fecha, editables y con fuente cuando esté disponible. |
+| AI-203 | Full-stack | P1        | Hecho  | Checklist personalizado con IA. | Parte de checklist base y marca sugerencias generadas por IA.               |
 
 ## Fase 5 - Documentos Simples
 

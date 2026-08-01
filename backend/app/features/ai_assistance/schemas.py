@@ -11,6 +11,7 @@ AiFeature = Literal[
     "client_message",
     "matter_summary",
     "matter_timeline",
+    "checklist_suggestions",
 ]
 ReviewStatus = Literal["pending", "accepted", "partially_accepted", "rejected"]
 ActionType = Literal["note", "task", "question", "checklist", "missing_document", "message"]

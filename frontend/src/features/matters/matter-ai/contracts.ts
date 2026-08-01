@@ -5,7 +5,8 @@ export type AiFeature
     | "client_questions"
     | "client_message"
     | "matter_summary"
-    | "matter_timeline";
+    | "matter_timeline"
+    | "checklist_suggestions";
 
 export interface AiContextPreview {
   feature: AiFeature;

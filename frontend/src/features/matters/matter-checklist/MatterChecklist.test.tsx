@@ -15,6 +15,7 @@ const item = {
   label: "Acta de matrimonio",
   status: "pending",
   is_custom: false,
+  is_ai_suggested: false,
   position: 0,
   created_at: "2026-07-14T10:00:00Z",
   updated_at: "2026-07-14T10:00:00Z",
@@ -38,9 +39,12 @@ describe("MatterChecklist", () => {
       if (method === "PATCH") return Promise.resolve(response({ ...item, status: "complete" }));
       if (method === "POST")
         return Promise.resolve(
-          response({ ...item, id: 2, label: "Fotografías", is_custom: true }, 201),
+          response({ ...item, id: 2, label: "Fotografías", is_custom: true, is_ai_suggested: false }, 201),
         );
-      return Promise.resolve(response({ items: [item], total: 1 }));
+      return Promise.resolve(response({
+        items: [item, { ...item, id: 2, label: "Verificar domicilio", is_custom: true, is_ai_suggested: true }],
+        total: 2,
+      }));
     });
     vi.stubGlobal("fetch", fetchMock);
     const client = createQueryClient();
@@ -52,6 +56,7 @@ describe("MatterChecklist", () => {
     );
     const user = userEvent.setup();
     expect(await screen.findByText(item.label)).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(t("matterChecklist.aiSuggested")))).toBeInTheDocument();
     await user.selectOptions(
       screen.getByLabelText(`${t("matterChecklist.statusLabel")}: ${item.label}`),
       "complete",

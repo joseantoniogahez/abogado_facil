@@ -48,6 +48,7 @@ class MatterChecklistsService:
                         template_key=str(position),
                         position=position,
                         is_custom=False,
+                        is_ai_suggested=False,
                     )
             items = await self.repository.list_for_matter(matter_id=matter_id, firm_id=firm_id)
             return items, len(items)
@@ -57,7 +58,12 @@ class MatterChecklistsService:
             await self._require_matter(firm_id=firm_id, matter_id=matter_id)
             position = await self.repository.count_for_matter(matter_id=matter_id, firm_id=firm_id)
             return await self.repository.create(
-                firm_id=firm_id, matter_id=matter_id, label=payload.label, position=position, is_custom=True
+                firm_id=firm_id,
+                matter_id=matter_id,
+                label=payload.label,
+                position=position,
+                is_custom=True,
+                is_ai_suggested=False,
             )
 
     async def update(

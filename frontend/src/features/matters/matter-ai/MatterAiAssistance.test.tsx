@@ -78,6 +78,7 @@ describe("MatterAiAssistance", () => {
     await screen.findByText(t("ai.results.empty"));
     expect(screen.getByRole("option", { name: t("ai.feature.matter_summary") })).toBeInTheDocument();
     expect(screen.getByRole("option", { name: t("ai.feature.matter_timeline") })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: t("ai.feature.checklist_suggestions") })).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText(t("ai.feature.label")), { target: { value: "client_questions" } });
     fireEvent.change(screen.getByLabelText(t("ai.provider")), { target: { value: "gemini" } });
     expect(screen.getByLabelText(t("ai.model"))).toHaveValue("gemini-3.5-flash-lite");
@@ -118,6 +119,20 @@ describe("MatterAiAssistance", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: t("ai.preview") }));
     await screen.findByRole("alert");
+  });
+
+  it("renders editable checklist suggestions", async () => {
+    const suggestions = {
+      ...result("accepted"),
+      feature: "checklist_suggestions",
+      generated_content: { suggestions: ["Solicitar identificación", "Verificar domicilio"] },
+      reviewed_content: { suggestions: ["Solicitar identificación", "Verificar domicilio"] },
+    };
+    vi.spyOn(globalThis, "fetch").mockImplementationOnce(() => response({ items: [suggestions], total: 1 }));
+    renderFeature();
+    expect(await screen.findByLabelText(t("ai.review.content"))).toHaveValue(
+      "Solicitar identificación\nVerificar domicilio",
+    );
   });
 
   it("renders dated and undated timeline events with their available source", async () => {

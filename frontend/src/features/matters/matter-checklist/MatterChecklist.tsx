@@ -49,6 +49,7 @@ export const MatterChecklist = ({ matterId }: { matterId: number }) => {
                     <span>
                       {item.label}
                       {item.is_custom ? ` · ${t("matterChecklist.custom")}` : ""}
+                      {item.is_ai_suggested ? ` · ${t("matterChecklist.aiSuggested")}` : ""}
                     </span>
                     <label>
                       {t("matterChecklist.statusLabel")}
