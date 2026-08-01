@@ -33,12 +33,15 @@ def test_matter_crud_and_firm_isolation(mock_client: TestClient) -> None:
         == "closed"
     )
     assert mock_client.get(f"/v1/matters/{matter_id}", headers=admin).status_code == HTTPStatus.NOT_FOUND
+    assert mock_client.delete(f"/v1/matters/{matter_id}", headers=admin).status_code == HTTPStatus.NOT_FOUND
     assert (
         mock_client.post(
             "/v1/matters", headers=admin, json={"client_id": client_id, "title": "Ajeno", "matter_type": "Otro"}
         ).status_code
         == HTTPStatus.NOT_FOUND
     )
+    assert mock_client.delete(f"/v1/matters/{matter_id}", headers=reader).status_code == HTTPStatus.NO_CONTENT
+    assert mock_client.get(f"/v1/matters/{matter_id}", headers=reader).status_code == HTTPStatus.NOT_FOUND
 
 
 def test_matters_require_auth_and_validate_payload(mock_client: TestClient) -> None:

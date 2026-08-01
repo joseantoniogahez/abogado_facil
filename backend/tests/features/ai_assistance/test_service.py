@@ -9,6 +9,7 @@ from unittest.mock import AsyncMock
 import pytest
 from pydantic import ValidationError
 
+from app.core.config.settings import AILimitSettings
 from app.core.errors.services import ConflictError, InvalidInputError, NotFoundError
 from app.features.ai_assistance.repository import AIAssistanceRepository
 from app.features.ai_assistance.schemas import (
@@ -69,7 +70,7 @@ def payload(feature: str = "intake_analysis") -> ExecuteAIAssistanceRequest:
     )
 
 
-def service(*, found_matter=_DEFAULT, found_result=_DEFAULT, provider_text: str | None = None):
+def service(*, found_matter=_DEFAULT, found_result=_DEFAULT, provider_text: str | None = None, limits=None):
     if found_matter is _DEFAULT:
         found_matter = matter()
     if found_result is _DEFAULT:
@@ -120,6 +121,7 @@ def service(*, found_matter=_DEFAULT, found_result=_DEFAULT, provider_text: str 
             notes_repository=notes,
             tasks_repository=tasks,
             checklists_repository=checklists,
+            limits=limits,
         ),
         repository,
         matters,
@@ -137,6 +139,18 @@ async def test_preview_lists_included_and_excluded_sources() -> None:
     without_description = payload().model_copy(update={"include_matter_description": False})
     result = await subject.preview(matter_id=3, firm_id=2, payload=without_description)
     assert "descripción del asunto" in result.excluded_sources
+
+
+@run_async
+async def test_preview_enforces_configured_ai_limits() -> None:
+    limits = AILimitSettings(AI_INPUT_MAX_CHARS=20, AI_OUTPUT_MAX_TOKENS=321)
+    subject, *_ = service(limits=limits)
+    with pytest.raises(InvalidInputError, match="configured size limit"):
+        await subject.preview(matter_id=3, firm_id=2, payload=payload())
+
+    allowed = payload().model_copy(update={"narrative": "x" * 20})
+    preview = await subject.preview(matter_id=3, firm_id=2, payload=allowed)
+    assert preview.estimated_max_output_tokens == 321
 
 
 @run_async

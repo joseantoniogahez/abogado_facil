@@ -4,24 +4,31 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from pydantic import ValidationError
 
-from app.core.errors.services import NotFoundError
+from app.core.errors.services import InternalError, NotFoundError
 from app.features.auth.principal import CurrentPrincipal
 from app.features.matters.router import _firm_id
 from app.features.matters.schemas.api import CreateMatterRequest, MatterResponse, UpdateMatterRequest
 from app.features.matters.service import MattersService
+from app.integrations.files import FileStorageError
 
 
 def _service():
-    repository, clients = AsyncMock(), AsyncMock()
+    repository, clients, documents, storage = AsyncMock(), AsyncMock(), AsyncMock(), AsyncMock()
     uow = MagicMock()
     uow.__aenter__ = AsyncMock()
     uow.__aexit__ = AsyncMock(return_value=False)
-    return MattersService(repository, clients, uow), repository, clients
+    return (
+        MattersService(repository, clients, uow, documents, storage, "matter-documents"),
+        repository,
+        clients,
+        documents,
+        storage,
+    )
 
 
 def test_service_validates_client_and_updates() -> None:
     async def run() -> None:
-        service, repository, clients = _service()
+        service, repository, clients, _, _ = _service()
         clients.get_for_firm.return_value = object()
         repository.create.return_value = object()
         await service.create(firm_id=1, payload=CreateMatterRequest(client_id=2, title=" Civil ", matter_type="Otro"))
@@ -32,6 +39,30 @@ def test_service_validates_client_and_updates() -> None:
         clients.get_for_firm.return_value = None
         with pytest.raises(NotFoundError):
             await service.list(firm_id=1, client_id=8, limit=10, offset=0)
+
+    asyncio.run(run())
+
+
+def test_service_deletes_documents_and_scoped_matter() -> None:
+    async def run() -> None:
+        service, repository, _, documents, storage = _service()
+        repository.get_for_firm.return_value = object()
+        repository.delete_scoped.return_value = True
+        documents.list_for_matter.return_value = [MagicMock(storage_key="firms/1/matters/2/doc")]
+
+        await service.delete(firm_id=1, matter_id=2)
+
+        storage.delete.assert_awaited_once_with(bucket="matter-documents", path="firms/1/matters/2/doc")
+        repository.delete_scoped.assert_awaited_once_with(matter_id=2, firm_id=1)
+
+        storage.delete.side_effect = FileStorageError("unavailable")
+        with pytest.raises(InternalError):
+            await service.delete(firm_id=1, matter_id=2)
+
+        storage.delete.side_effect = None
+        repository.delete_scoped.return_value = False
+        with pytest.raises(NotFoundError):
+            await service.delete(firm_id=1, matter_id=2)
 
     asyncio.run(run())
 

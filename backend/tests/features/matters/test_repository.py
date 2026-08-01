@@ -15,5 +15,7 @@ def test_repository_scopes_lists_and_counts(mock_database: MockDatabase) -> None
             assert await repository.get_for_firm(matter_id=matter.id, firm_id=2) is None
             assert len(await repository.list_for_firm(firm_id=1, client_id=1, limit=10, offset=0)) == 1
             assert await repository.count_for_firm(firm_id=1, status="active") == 1
+            assert await repository.delete_scoped(matter_id=matter.id, firm_id=2) is False
+            assert await repository.delete_scoped(matter_id=matter.id, firm_id=1) is True
 
     asyncio.run(run())

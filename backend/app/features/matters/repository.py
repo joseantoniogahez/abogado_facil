@@ -30,3 +30,11 @@ class MattersRepository(BaseRepository[Matter]):
         if status is not None:
             query = query.where(Matter.status == status)
         return int((await self.session.scalar(query)) or 0)
+
+    async def delete_scoped(self, *, matter_id: int, firm_id: int) -> bool:
+        matter = await self.get_for_firm(matter_id=matter_id, firm_id=firm_id)
+        if matter is None:
+            return False
+        await self.session.delete(matter)
+        await self.session.flush()
+        return True

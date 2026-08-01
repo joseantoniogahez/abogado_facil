@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from starlette.requests import Request
 
-from app.core.config.settings import AiCredentialSettings, AIQueueSettings, AuthSettings
+from app.core.config.settings import AiCredentialSettings, AILimitSettings, AIQueueSettings, AuthSettings
 from app.core.security.service.encryption import AesGcmSecretEncryption
 from app.core.setup import dependencies
 from app.core.setup.dependencies import (
@@ -14,6 +14,7 @@ from app.core.setup.dependencies import (
     get_ai_credentials_service,
     get_ai_jobs_repository,
     get_ai_jobs_service,
+    get_ai_limit_settings,
     get_ai_provider_factory,
     get_ai_queue_settings,
     get_audit_log_repository,
@@ -194,6 +195,7 @@ def test_ai_assistance_dependencies_build_expected_components() -> None:
             notes,
             tasks,
             checklists,
+            AILimitSettings(),
         )
     )
     assert isinstance(service, AIAssistanceService)
@@ -213,7 +215,8 @@ def test_document_templates_dependency_builds_service() -> None:
     provider_factory = MagicMock()
     jobs_service = MagicMock()
     settings = AuthSettings(JWT_SECRET_KEY="secret", JWT_ISSUER="issuer", JWT_AUDIENCE="audience")
-    service = asyncio.run(get_document_templates_service(provider_factory, jobs_service, settings))
+    limits = asyncio.run(get_ai_limit_settings())
+    service = asyncio.run(get_document_templates_service(provider_factory, jobs_service, settings, limits))
     assert isinstance(service, DocumentTemplatesService)
     assert service.provider_factory is provider_factory
     assert service.jobs_service is jobs_service

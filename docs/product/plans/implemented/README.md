@@ -49,18 +49,22 @@ derivarse de esa carpeta, no de estos planes técnicos.
 | OpenAPI en producción          | [`OPS-005`](OPS-005_OPENAPI_PRODUCCION_PLAN.md)                           |
 | CORS endurecido                | [`OPS-006`](OPS-006_CORS_ENDURECIDO_PLAN.md)                              |
 | Revisión documental y skills   | [`OPS-003`](OPS-003_REVISION_DOCUMENTAL_Y_SKILLS_REVIEW_PLAN.md)          |
+| Límites configurables          | [`OPS-001`](OPS-001_LIMITES_CONFIGURABLES_PLAN.md)                        |
+| Backups PostgreSQL             | [`OPS-002`](OPS-002_BACKUPS_POSTGRESQL_PLAN.md)                           |
 | Readiness checks               | [`OPS-007`](OPS-007_READINESS_CHECKS_PLAN.md)                             |
 | Rate limiting                  | [`OPS-008`](OPS-008_RATE_LIMITING_PLAN.md)                                |
 | Streaming y observabilidad     | [`OPS-009`](OPS-009_STREAMING_OBSERVABILIDAD_IA_PLAN.md)                  |
 | Aislamiento por despacho       | [`SEC-001A`](SEC-001A_AISLAMIENTO_GENERAL_POR_DESPACHO_PLAN.md)           |
 | Pruebas negativas multiusuario | [`SEC-001C`](SEC-001C_PRUEBAS_NEGATIVAS_MULTIUSUARIO_PLAN.md)             |
 | Privacidad y consentimiento IA | [`SEC-002`](SEC-002_PRIVACIDAD_CONSENTIMIENTO_APROBACION_IA_PLAN.md)      |
+| Eliminación de datos           | [`SEC-003`](SEC-003_ELIMINACION_DATOS_USUARIO_PLAN.md)                    |
 | Prompt injection documental    | [`SEC-004`](SEC-004_PROTECCION_PROMPT_INJECTION_DOCUMENTAL_PLAN.md)       |
 | Analizador IA                  | [`AI-101`](AI-101_ANALIZADOR_RELATO_PLAN.md)                              |
 | Preguntas IA                   | [`AI-102`](AI-102_PREGUNTAS_CLIENTE_PLAN.md)                              |
 | Mensajes IA                    | [`AI-103`](AI-103_MENSAJES_CLIENTE_PLAN.md)                               |
 | Revisión y aceptación IA       | [`AI-104`](AI-104_REVISION_ACEPTACION_PLAN.md)                            |
 | Acciones desde IA              | [`AI-105`](AI-105_CONVERSION_ACCIONES_PLAN.md)                            |
+| Hero flow IA                   | [`PROD-AI-001`](PROD-AI-001_HERO_FLOW_PLAN.md)                            |
 | Procedencia IA                 | [`AI-106`](AI-106_PROCEDENCIA_ACTUALIZACION_PLAN.md)                      |
 | Revisión humana de IA          | [`LEGAL-002A`](LEGAL-002A_PATRON_REVISION_HUMANA_PLAN.md)                 |
 | Auditoría de avisos IA         | [`LEGAL-002B`](LEGAL-002B_VALIDACION_AVISOS_IA_PLAN.md)                   |

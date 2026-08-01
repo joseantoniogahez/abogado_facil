@@ -82,6 +82,10 @@ Required object storage configuration:
 - Connection/read timeouts default to 3/10 seconds.
 - `MATTER_DOCUMENT_MAX_SIZE_BYTES` defaults to 10 MiB and `MATTER_DOCUMENT_MAX_PER_MATTER`
   defaults to 50. Uploads are serialized per matter in PostgreSQL while enforcing the quota.
+- `AI_INPUT_MAX_CHARS` defaults to 20,000 and `AI_OUTPUT_MAX_TOKENS` defaults to 1,200.
+- `DOCUMENT_DRAFT_FIELD_MAX_CHARS` defaults to 20,000 per field and
+  `DOCUMENT_DRAFT_OUTPUT_MAX_TOKENS` defaults to 1,800. Values above defensive schema ceilings are
+  rejected at startup.
 
 Features consume `FileStoragePort`; provider code is isolated in `app/integrations/s3.py`, and tests
 use a test-only `FakeFileStorage` or a mocked SDK client without Docker or network access. No feature should

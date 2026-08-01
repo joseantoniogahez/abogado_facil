@@ -1,5 +1,14 @@
 # Minimizacion de contexto para IA
 
+## Límites operativos
+
+- `AI_INPUT_MAX_CHARS` limita la narrativa aceptada por preview y ejecución de asistencia.
+- `AI_OUTPUT_MAX_TOKENS` controla tanto la estimación del preview como la petición al proveedor.
+- `DOCUMENT_DRAFT_FIELD_MAX_CHARS` limita cada campo de una plantilla documental.
+- `DOCUMENT_DRAFT_OUTPUT_MAX_TOKENS` controla preview y petición de borradores.
+- Tamaño y cantidad de archivos usan `MATTER_DOCUMENT_MAX_SIZE_BYTES` y
+  `MATTER_DOCUMENT_MAX_PER_MATTER`.
+
 ## Contrato obligatorio
 
 Toda llamada a OpenAI, Gemini o Mock debe construir primero un `MinimizedAIContext` mediante

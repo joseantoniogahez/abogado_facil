@@ -13,6 +13,10 @@ UPDATE_MATTER_DOC: dict[str, Any] = {
     "summary": "Update matter",
     "description": "Partially updates a firm-scoped matter.",
 }
+DELETE_MATTER_DOC: dict[str, Any] = {
+    "summary": "Delete matter",
+    "description": "Permanently deletes a firm-scoped matter, its stored documents, and dependent records.",
+}
 LIST_MATTER_TYPES_DOC: dict[str, Any] = {
     "summary": "List matter types",
     "description": "Returns the immutable canonical matter type catalog.",

@@ -20,8 +20,7 @@ decisión jurídica ni ejecutar acciones automáticas.
 - El contenido es un borrador sujeto a revisión humana y no constituye asesoría jurídica.
 - Consultar resultados guardados no vuelve a invocar al proveedor.
 - Cambiar función, fuentes, proveedor o modelo invalida la vista previa anterior.
-- Las funciones están implementadas para validación, pero no están autorizadas para release
-  mientras `SEC-001C` y `SEC-002` continúen pendientes.
+- Las funciones superaron `SEC-001C`, `SEC-002` y la revalidación integral del release IA.
 
 ## Permisos
 
@@ -47,3 +46,4 @@ decisión jurídica ni ejecutar acciones automáticas.
 - [AI-203](../plans/implemented/AI-203_CHECKLIST_PERSONALIZADO_IA_PLAN.md)
 - [LEGAL-002A](../plans/implemented/LEGAL-002A_PATRON_REVISION_HUMANA_PLAN.md)
 - [UX-AI-001](../plans/implemented/UX-AI-001_PREVIEW_CONTEXTO_PLAN.md)
+- [PROD-AI-001](../plans/implemented/PROD-AI-001_HERO_FLOW_PLAN.md)

@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config.settings import (
     AiCredentialSettings,
+    AILimitSettings,
     AIQueueSettings,
     AuthSettings,
     MatterDocumentSettings,
@@ -294,6 +295,13 @@ async def get_ai_assistance_repository(session: DbSessionDependency) -> AIAssist
     return AIAssistanceRepository(session=session)
 
 
+async def get_ai_limit_settings() -> AILimitSettings:
+    return AILimitSettings()
+
+
+AILimitSettingsDependency = Annotated[AILimitSettings, Depends(get_ai_limit_settings)]
+
+
 async def get_ai_provider_factory(
     credentials: AiCredentialsServiceDependency,
 ) -> AiProviderFactory:
@@ -310,6 +318,7 @@ async def get_ai_assistance_service(
     notes_repository: MatterNotesRepositoryDependency,
     tasks_repository: MatterTasksRepositoryDependency,
     checklists_repository: MatterChecklistsRepositoryDependency,
+    limits: AILimitSettingsDependency,
 ) -> AIAssistanceService:
     return AIAssistanceService(
         repository=repository,
@@ -321,6 +330,7 @@ async def get_ai_assistance_service(
         notes_repository=notes_repository,
         tasks_repository=tasks_repository,
         checklists_repository=checklists_repository,
+        limits=limits,
     )
 
 
@@ -331,11 +341,13 @@ async def get_document_templates_service(
     provider_factory: Annotated[AiProviderFactory, Depends(get_ai_provider_factory)],
     jobs_service: AiJobsServiceDependency,
     auth_settings: AuthSettingsDependency,
+    limits: AILimitSettingsDependency,
 ) -> DocumentTemplatesService:
     return DocumentTemplatesService(
         provider_factory=provider_factory,
         jobs_service=jobs_service,
         preview_signing_key=auth_settings.JWT_SECRET_KEY,
+        limits=limits,
     )
 
 
@@ -402,8 +414,18 @@ async def get_matters_service(
     repository: MattersRepositoryDependency,
     clients_repository: ClientsRepositoryDependency,
     unit_of_work: UnitOfWorkDependency,
+    documents_repository: MatterDocumentsRepositoryDependency,
+    storage: FileStorageDependency,
+    storage_settings: ObjectStorageSettingsDependency,
 ) -> MattersServicePort:
-    return MattersService(repository=repository, clients_repository=clients_repository, unit_of_work=unit_of_work)
+    return MattersService(
+        repository=repository,
+        clients_repository=clients_repository,
+        unit_of_work=unit_of_work,
+        documents_repository=documents_repository,
+        storage=storage,
+        storage_bucket=storage_settings.S3_BUCKET,
+    )
 
 
 MattersServiceDependency = Annotated[MattersServicePort, Depends(get_matters_service)]

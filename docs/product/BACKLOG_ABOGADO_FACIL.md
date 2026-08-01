@@ -172,12 +172,12 @@ esperada: pruebas de contrato, métricas, ADR, threat model, caso de fallo o dem
 | SEC-001B    | Backend    | P0-IA     | Hecho        | Aislamiento del contexto enviado a IA.                            | El contexto de cada llamada se construye solo desde recursos autorizados del despacho actual.              |
 | SEC-001C    | Backend    | P0-IA     | Hecho        | Pruebas negativas multiusuario.                                   | Accesos cruzados a clientes, asuntos, documentos y resultados devuelven rechazo o `404` opaco.             |
 | SEC-002     | Legal      | P0-IA     | Hecho        | Aviso de privacidad, términos y aprobación jurídica para IA BYOK. | Explica el envío al proveedor, solicita consentimiento y registra revisión jurídica antes del lanzamiento. |
-| SEC-003     | Backend    | P1        | Identificado | Eliminación de datos del usuario.                                 | Usuario puede eliminar documentos/asuntos según política definida.                                         |
-| OPS-001     | Ops        | P1        | Identificado | Límites configurables de archivos y análisis.                     | Tamaño, número de documentos y entrada IA controlados por config.                                          |
-| OPS-002     | Ops        | P1        | Identificado | Backups básicos de PostgreSQL.                                    | Procedimiento documentado antes de despliegue productivo.                                                  |
+| SEC-003     | Backend    | P1        | Hecho        | Eliminación de datos del usuario.                                 | Usuario puede eliminar documentos/asuntos según política definida.                                         |
+| OPS-001     | Ops        | P1        | Hecho        | Límites configurables de archivos y análisis.                     | Tamaño, número de documentos y entrada IA controlados por config.                                          |
+| OPS-002     | Ops        | P1        | Hecho        | Backups básicos de PostgreSQL.                                    | Procedimiento documentado antes de despliegue productivo.                                                  |
 | OPS-003     | Docs       | P1        | Hecho        | Mantener matrices de operaciones actualizadas.                    | Docs, capacidades, contratos semánticos y skills de revisión quedan sincronizados y validados.             |
 | OPS-004     | Ops        | P1        | Hecho        | Base S3-compatible con MinIO.                                     | Compose levanta bucket privado persistente y backend dispone de un puerto probado.                         |
-| PROD-AI-001 | Full-stack | P1        | Identificado | Hero flow de incorporación de cliente.                            | Relato inicial convertido en expediente accionable con revisión y guardado.                                |
+| PROD-AI-001 | Full-stack | P1        | Hecho        | Hero flow de incorporación de cliente.                            | Relato inicial convertido en expediente accionable con revisión y guardado.                                |
 | OBS-002     | Ops        | P1        | Identificado | Métricas operativas de IA.                                        | Dashboard reproducible con éxito, errores, latencia, tokens, costo, reintentos y jobs atascados.           |
 | PROD-AI-002 | Full-stack | P1        | Identificado | Retroalimentación de utilidad.                                    | Usuario clasifica utilidad, corrección, invención o información faltante.                                  |
 | PROD-AI-003 | Full-stack | P1        | Identificado | Métricas de producto de IA.                                       | Medición de valor, aceptación, edición, conversión, regeneración y abandono.                               |
@@ -221,6 +221,5 @@ esperada: pruebas de contrato, métricas, ADR, threat model, caso de fallo o dem
 Las funciones IA del MVP superaron los gates P0-IA y la revalidación integral del release. La
 secuencia priorizada continúa con:
 
-1. `PROD-AI-001`: cerrar el hero flow y documentar su evidencia de producto.
 1. `OBS-002` y `PROD-AI-003`: completar las métricas operativas y de valor de IA.
 1. `OBS-002`, `PROD-AI-002` y `PROD-AI-003`: medir operación y valor después del flujo funcional.

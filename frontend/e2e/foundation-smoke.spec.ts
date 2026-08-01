@@ -39,7 +39,7 @@ const mockUnhandledApiRequests = async (page: Page): Promise<void> => {
 };
 
 test.describe("frontend foundation smoke", () => {
-  test("creates, edits, marks, and deletes an expediente note", async ({ page }) => {
+  test("completes the initial-narrative hero flow into an actionable expediente", async ({ page }) => {
     await page.addInitScript((storageKey) => {
       window.sessionStorage.setItem(storageKey, "seed-token");
     }, ACCESS_TOKEN_STORAGE_KEY);

@@ -16,7 +16,7 @@ class MatterTask(BaseModel):
     )
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     firm_id: Mapped[int] = mapped_column(ForeignKey("firms.id"), nullable=False, index=True)
-    matter_id: Mapped[int] = mapped_column(ForeignKey("matters.id"), nullable=False, index=True)
+    matter_id: Mapped[int] = mapped_column(ForeignKey("matters.id", ondelete="CASCADE"), nullable=False, index=True)
     title: Mapped[str] = mapped_column(Text, nullable=False)
     due_date: Mapped[date] = mapped_column(Date, nullable=False)
     completed: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default="false")

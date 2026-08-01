@@ -82,3 +82,7 @@ with this API.
 Matter document uploads use `400 invalid_input` for unsupported, empty, oversized, or content-mismatched
 files; `409 conflict` when the per-matter quota is reached; opaque `404 not_found` for missing or foreign
 matters/documents; and `500 internal_error` for object-storage failures without provider details.
+
+Matter deletion is permanent: object-storage files are removed first and the database cascades the
+matter deletion to notes, tasks, billing/payments, calculations, checklist items, document metadata,
+and persisted AI results. Missing and cross-firm matter identifiers share the opaque `404` contract.

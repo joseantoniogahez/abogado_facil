@@ -27,6 +27,7 @@ This folder is the canonical backend documentation set. It is organized for thre
 - `operations/document_prompt_injection.md`: mandatory separation of trusted instructions,
   untrusted document data, and disabled tool capabilities.
 - `operations/ai_metrics.md`: bounded provider/function call, error, and latency aggregates.
+- `operations/postgresql_backups.md`: backup, checksum, encryption, retention, and isolated restore drill.
 
 ## Architecture Annexes
 

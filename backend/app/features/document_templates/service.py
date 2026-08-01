@@ -6,6 +6,7 @@ from typing import Any, Protocol
 from pydantic import BaseModel, Field
 
 from app.core.common.schema import ApplicationSchema
+from app.core.config.settings import AILimitSettings
 from app.core.errors.services import ConflictError, InvalidInputError
 from app.features.document_templates.catalog import DocumentTemplate, document_template_for
 from app.features.document_templates.schemas.api import (
@@ -52,13 +53,14 @@ class DocumentTemplatesService:
         provider_factory: ProviderFactoryPort,
         jobs_service: JobsServicePort,
         preview_signing_key: str,
+        limits: AILimitSettings | None = None,
     ) -> None:
         self.provider_factory = provider_factory
         self.jobs_service = jobs_service
         self.preview_signing_key = preview_signing_key.encode()
+        self.limits = limits or AILimitSettings()
 
-    @staticmethod
-    def _validated_fields(payload: DocumentDraftInput) -> tuple[DocumentTemplate, dict[str, str]]:
+    def _validated_fields(self, payload: DocumentDraftInput) -> tuple[DocumentTemplate, dict[str, str]]:
         template = document_template_for(payload.template_key)
         if template is None:
             raise InvalidInputError("Document template is not supported")
@@ -70,7 +72,7 @@ class DocumentTemplatesService:
         if missing:
             raise InvalidInputError("Document draft is missing required fields")
         values = {key: value for key, value in payload.fields.items() if value}
-        if any(len(value) > 20000 for value in values.values()):
+        if any(len(value) > self.limits.DOCUMENT_DRAFT_FIELD_MAX_CHARS for value in values.values()):
             raise InvalidInputError("Document draft field exceeds the allowed size")
         return template, values
 
@@ -98,7 +100,7 @@ class DocumentTemplatesService:
             model=payload.model,
             included_fields=[labels[key] for key in values],
             character_count=sum(len(value) for value in values.values()),
-            estimated_max_output_tokens=1800,
+            estimated_max_output_tokens=self.limits.DOCUMENT_DRAFT_OUTPUT_MAX_TOKENS,
             cost_notice="El proveedor usará tu clave BYOK; revisa el borrador antes de utilizarlo.",
             confirmation_token=self._confirmation_token(firm_id=firm_id, payload=payload, values=values),
         )
@@ -155,7 +157,7 @@ class DocumentTemplatesService:
                     model=payload.model,
                     request_id=request_id,
                     execution_id=job.execution_id,
-                    max_tokens=1800,
+                    max_tokens=self.limits.DOCUMENT_DRAFT_OUTPUT_MAX_TOKENS,
                     response_json_schema=DraftOutput.model_json_schema(),
                 )
             )

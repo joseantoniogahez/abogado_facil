@@ -199,6 +199,13 @@ class MatterDocumentSettings(BaseSettings):
     MATTER_DOCUMENT_MAX_PER_MATTER: int = Field(50, gt=0)
 
 
+class AILimitSettings(BaseSettings):
+    AI_INPUT_MAX_CHARS: int = Field(20_000, ge=20, le=20_000)
+    AI_OUTPUT_MAX_TOKENS: int = Field(1_200, gt=0, le=8_000)
+    DOCUMENT_DRAFT_FIELD_MAX_CHARS: int = Field(20_000, gt=0, le=20_000)
+    DOCUMENT_DRAFT_OUTPUT_MAX_TOKENS: int = Field(1_800, gt=0, le=8_000)
+
+
 class AiCredentialSettings(BaseSettings):
     _PRODUCTION_ENV_VALUES: ClassVar[set[str]] = {"prod", "production", "staging"}
     _LOCAL_ENCRYPTION_KEY: ClassVar[str] = "MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDE="

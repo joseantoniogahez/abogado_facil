@@ -15,7 +15,7 @@ class MatterBilling(BaseModel):
     )
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     firm_id: Mapped[int] = mapped_column(ForeignKey("firms.id"), nullable=False, index=True)
-    matter_id: Mapped[int] = mapped_column(ForeignKey("matters.id"), nullable=False, index=True)
+    matter_id: Mapped[int] = mapped_column(ForeignKey("matters.id", ondelete="CASCADE"), nullable=False, index=True)
     agreed_fee: Mapped[Decimal] = mapped_column(Numeric(14, 2), nullable=False, default=Decimal("0.00"))
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
 
@@ -29,7 +29,7 @@ class MatterPayment(BaseModel):
     )
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     firm_id: Mapped[int] = mapped_column(ForeignKey("firms.id"), nullable=False, index=True)
-    matter_id: Mapped[int] = mapped_column(ForeignKey("matters.id"), nullable=False, index=True)
+    matter_id: Mapped[int] = mapped_column(ForeignKey("matters.id", ondelete="CASCADE"), nullable=False, index=True)
     amount: Mapped[Decimal] = mapped_column(Numeric(14, 2), nullable=False)
     payment_type: Mapped[str] = mapped_column(Text, nullable=False)
     paid_on: Mapped[date] = mapped_column(Date, nullable=False)

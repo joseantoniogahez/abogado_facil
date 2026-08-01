@@ -13,7 +13,7 @@ class AIAssistanceResult(BaseModel):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     firm_id: Mapped[int] = mapped_column(ForeignKey("firms.id"), nullable=False)
-    matter_id: Mapped[int] = mapped_column(ForeignKey("matters.id"), nullable=False)
+    matter_id: Mapped[int] = mapped_column(ForeignKey("matters.id", ondelete="CASCADE"), nullable=False)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     execution_id: Mapped[str] = mapped_column(String(32), nullable=False, unique=True)
     feature: Mapped[str] = mapped_column(String(40), nullable=False)

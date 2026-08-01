@@ -7,6 +7,7 @@ from unittest.mock import AsyncMock
 import pytest
 from fastapi import Request
 
+from app.core.config.settings import AILimitSettings
 from app.core.errors.domain import DomainError, DomainErrorType
 from app.core.errors.services import ConflictError, InvalidInputError
 from app.features.auth.principal import CurrentPrincipal
@@ -50,7 +51,7 @@ def payload(**changes):
     return DocumentDraftPreviewRequest(**values)
 
 
-def service(*, provider_error=None):
+def service(*, provider_error=None, limits=None):
     provider = SimpleNamespace(
         generate=AsyncMock(
             side_effect=provider_error,
@@ -70,6 +71,7 @@ def service(*, provider_error=None):
             provider_factory=factory,
             jobs_service=jobs,
             preview_signing_key="secret",
+            limits=limits,
         ),
         provider,
         jobs,
@@ -101,6 +103,24 @@ async def test_preview_and_generate_schema_validated_editable_draft() -> None:
     assert result.requires_professional_review is True
     provider.generate.assert_awaited_once()
     jobs.succeed.assert_awaited_once()
+
+
+def test_preview_enforces_configured_draft_limits() -> None:
+    limits = AILimitSettings(DOCUMENT_DRAFT_FIELD_MAX_CHARS=10, DOCUMENT_DRAFT_OUTPUT_MAX_TOKENS=456)
+    draft_service, _, _ = service(limits=limits)
+    with pytest.raises(InvalidInputError, match="allowed size"):
+        draft_service.preview(firm_id=3, payload=payload())
+
+    request = payload(
+        fields={
+            "recipient_name": "Ana",
+            "matter_reference": "Uno",
+            "requested_documents": "Dos",
+            "delivery_deadline": "2026-08-15",
+        }
+    )
+    preview = draft_service.preview(firm_id=3, payload=request)
+    assert preview.estimated_max_output_tokens == 456
 
 
 @run_async

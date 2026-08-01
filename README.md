@@ -157,6 +157,9 @@ Stop production stack:
 docker compose -f compose.yaml -f compose.prod.yaml down
 ```
 
+Before deployment, follow the PostgreSQL backup and restore-drill runbook in
+`backend/docs/operations/postgresql_backups.md`.
+
 `compose.prod.yaml` sets `name: abogado-facil-prod`, so production resources stay isolated from dev/test projects.
 
 If production `database` keeps restarting due to an old volume mount path, recreate the production volume:

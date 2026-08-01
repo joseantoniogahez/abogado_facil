@@ -8,6 +8,7 @@ from typing import Any, Protocol
 from pydantic import BaseModel, Field, ValidationError, model_validator
 
 from app.core.common.schema import ApplicationSchema
+from app.core.config.settings import AILimitSettings
 from app.core.db.ports import UnitOfWorkPort
 from app.core.errors.services import ConflictError, InvalidInputError, NotFoundError
 from app.features.ai_assistance.repository import AIAssistanceRepository
@@ -158,6 +159,7 @@ class AIAssistanceService:
         notes_repository: DerivedActionRepositoryPort,
         tasks_repository: DerivedActionRepositoryPort,
         checklists_repository: ChecklistActionRepositoryPort,
+        limits: AILimitSettings | None = None,
     ):
         self.repository = repository
         self.matters_repository = matters_repository
@@ -168,6 +170,7 @@ class AIAssistanceService:
         self.notes_repository = notes_repository
         self.tasks_repository = tasks_repository
         self.checklists_repository = checklists_repository
+        self.limits = limits or AILimitSettings()
 
     def _confirmation_token(
         self,
@@ -233,6 +236,8 @@ class AIAssistanceService:
     async def preview(
         self, *, matter_id: int, firm_id: int, payload: AIContextPreviewRequest
     ) -> AIContextPreviewResponse:
+        if len(payload.narrative) > self.limits.AI_INPUT_MAX_CHARS:
+            raise InvalidInputError("AI input exceeds the configured size limit")
         _, fields, included, excluded, source_version = await self._sources(
             matter_id=matter_id, firm_id=firm_id, payload=payload
         )
@@ -243,7 +248,7 @@ class AIAssistanceService:
             included_sources=included,
             excluded_sources=excluded,
             character_count=sum(len(value) for value in fields.values()),
-            estimated_max_output_tokens=1200,
+            estimated_max_output_tokens=self.limits.AI_OUTPUT_MAX_TOKENS,
             cost_notice="El costo depende del proveedor, modelo y longitud final; se usará tu clave BYOK.",
             confirmation_token=self._confirmation_token(
                 matter_id=matter_id,
@@ -311,7 +316,7 @@ class AIAssistanceService:
                     model=payload.model,
                     request_id=request_id,
                     execution_id=job.execution_id,
-                    max_tokens=1200,
+                    max_tokens=self.limits.AI_OUTPUT_MAX_TOKENS,
                     response_json_schema=FEATURE_SCHEMAS[payload.feature].model_json_schema(),
                 )
             )

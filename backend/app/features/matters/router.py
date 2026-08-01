@@ -7,6 +7,7 @@ from app.core.common.matter_types import MatterType
 from app.core.setup.dependencies import MattersServiceDependency
 from app.features.matters.openapi import (
     CREATE_MATTER_DOC,
+    DELETE_MATTER_DOC,
     GET_MATTER_DOC,
     LIST_MATTER_TYPES_DOC,
     LIST_MATTERS_DOC,
@@ -66,3 +67,12 @@ async def update_matter(
     service: MattersServiceDependency,
 ):
     return await service.update(firm_id=_firm_id(user), matter_id=matter_id, payload=payload)
+
+
+@router.delete("/{matter_id}", status_code=status.HTTP_204_NO_CONTENT, **DELETE_MATTER_DOC)
+async def delete_matter(
+    matter_id: int,
+    user: AuthenticatedReadAccessDependency,
+    service: MattersServiceDependency,
+) -> None:
+    await service.delete(firm_id=_firm_id(user), matter_id=matter_id)

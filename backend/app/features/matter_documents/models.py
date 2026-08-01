@@ -18,7 +18,7 @@ class MatterDocument(BaseModel):
     )
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     firm_id: Mapped[int] = mapped_column(ForeignKey("firms.id"), nullable=False, index=True)
-    matter_id: Mapped[int] = mapped_column(ForeignKey("matters.id"), nullable=False, index=True)
+    matter_id: Mapped[int] = mapped_column(ForeignKey("matters.id", ondelete="CASCADE"), nullable=False, index=True)
     original_filename: Mapped[str] = mapped_column(String(255), nullable=False)
     document_type: Mapped[str] = mapped_column(String(32), nullable=False)
     media_type: Mapped[str] = mapped_column(String(100), nullable=False)

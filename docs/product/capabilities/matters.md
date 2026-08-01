@@ -8,6 +8,8 @@ Concentrar el seguimiento legal, operativo y financiero de cada asunto del despa
 
 - Crear, listar, buscar y editar asuntos asociados a un cliente.
 
+- Eliminar definitivamente un asunto, sus documentos almacenados y sus datos dependientes.
+
 - Seleccionar el tipo de asunto desde un catálogo cerrado que incluye `Otro`.
 
 - Gestionar notas: crear, editar, eliminar y marcar como relevantes.
@@ -37,6 +39,8 @@ Concentrar el seguimiento legal, operativo y financiero de cada asunto del despa
 
 - Todos los recursos del expediente están aislados por despacho.
 - Los recursos inexistentes o ajenos producen el mismo resultado de no encontrado.
+- La eliminación de un asunto es definitiva y borra notas, tareas, pagos, cálculos, checklist,
+  documentos y resultados IA asociados.
 - Los cálculos son estimaciones y no sustituyen asesoría jurídica.
 - Los importes del MVP usan MXN y precisión de dos decimales.
 - Los abonos son inmutables y los resultados guardados no se editan ni eliminan.
@@ -45,6 +49,7 @@ Concentrar el seguimiento legal, operativo y financiero de cada asunto del despa
 ## Límites y advertencias
 
 - Los cálculos son estimaciones y el contenido IA requiere revisión humana.
+- No existe papelera ni recuperación de asuntos eliminados; la retención de backups se define por separado.
 - Pagos y cálculos guardados conservan su historial como registros inmutables.
 - Las funciones IA están implementadas para validación, pero su release depende de los gates P0-IA.
 
@@ -72,3 +77,4 @@ Concentrar el seguimiento legal, operativo y financiero de cada asunto del despa
 - [AI-201](../plans/implemented/AI-201_RESUMEN_EXPEDIENTE_PLAN.md)
 - [AI-202](../plans/implemented/AI-202_CRONOLOGIA_HECHOS_PLAN.md)
 - [AI-203](../plans/implemented/AI-203_CHECKLIST_PERSONALIZADO_IA_PLAN.md)
+- [SEC-003](../plans/implemented/SEC-003_ELIMINACION_DATOS_USUARIO_PLAN.md)
