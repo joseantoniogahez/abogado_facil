@@ -12,10 +12,12 @@ import {
   type AiExecutionInput,
   convertMatterAi,
   executeMatterAi,
+  type FeedbackCategory,
   matterAiQueryKey,
   matterAiQueryOptions,
   previewMatterAi,
   reviewMatterAi,
+  saveAiFeedback,
 } from "./api";
 import type { AiFeature, AiResult } from "./contracts";
 
@@ -221,6 +223,7 @@ const ResultCard = ({
   const [actionType, setActionType] = useState<AiActionType>("note");
   const [taskDueDate, setTaskDueDate] = useState("");
   const [problemReport, setProblemReport] = useState("");
+  const [feedbackCategory, setFeedbackCategory] = useState<FeedbackCategory>("useful");
   const [reviewDirty, setReviewDirty] = useState(false);
   const initial = editableText(result);
   const promptVersion = typeof result.source_snapshot.prompt_version === "string"
@@ -250,6 +253,10 @@ const ResultCard = ({
         queryClient.invalidateQueries({ queryKey: domainQueryKey }),
       ]);
     },
+  });
+  const feedback = useMutation({
+    mutationFn: () => saveAiFeedback(result.id, feedbackCategory),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["ai-insights"] }),
   });
 
   return (
@@ -298,6 +305,24 @@ const ResultCard = ({
       >
         {t("ai.result.regenerate")}
       </button>
+      <div className="flex flex-wrap items-end gap-2 rounded-xl border p-3">
+        <label>
+          {t("ai.feedback.label")}
+          <select
+            className="ml-2 rounded-xl border p-2"
+            onChange={event => setFeedbackCategory(event.target.value as FeedbackCategory)}
+            value={feedbackCategory}
+          >
+            {(["useful", "needs_correction", "fabricated", "missing_information"] as const).map(category => (
+              <option key={category} value={category}>{t(`ai.feedback.${category}`)}</option>
+            ))}
+          </select>
+        </label>
+        <button className={SECONDARY_ACTION_CLASS_NAME} disabled={feedback.isPending} onClick={() => feedback.mutate()} type="button">
+          {t("ai.feedback.save")}
+        </button>
+        {feedback.isSuccess ? <span role="status">{t("ai.feedback.saved")}</span> : null}
+      </div>
       <label>
         {t("ai.review.problem")}
         <textarea

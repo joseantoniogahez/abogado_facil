@@ -124,21 +124,21 @@ Expected AI output:
 
 Recommended preview command before in-place bootstrap:
 
-- `python scripts/bootstrap_new_app.py --app-name "<App Name>" --description "<Description>"`
+- `.\.venv\Scripts\python.exe scripts/bootstrap_new_app.py --app-name "<App Name>" --description "<Description>"`
 
 Recommended apply command after reviewing the preview:
 
-- `python scripts/bootstrap_new_app.py --app-name "<App Name>" --description "<Description>" --write`
+- `.\.venv\Scripts\python.exe scripts/bootstrap_new_app.py --app-name "<App Name>" --description "<Description>" --write`
 
 Commands to run after in-place bootstrap work:
 
 - Docker Compose config validation for affected profiles.
-- `python -m pytest backend/tests`
-- `python -m pytest backend/tests --cov=app --cov-report=term-missing:skip-covered --cov-fail-under=100`
+- `.\.venv\Scripts\python.exe -m pytest backend/tests`
+- `.\.venv\Scripts\python.exe -m pytest backend/tests --cov=app --cov-report=term-missing:skip-covered --cov-fail-under=100`
 - `npm --prefix frontend run check`
 - `npm --prefix frontend run test:e2e:ci` when route, auth, or error journeys change.
 - `npm --prefix frontend run build`
-- `pre-commit run --all-files`
+- `.\.venv\Scripts\python.exe -m pre_commit run --all-files`
 
 ## Reviewer Validation Checklist
 

@@ -12,7 +12,7 @@
 - [x] Run `npm --prefix frontend run openapi:sync`.
 - [x] Run backend suite and 100% coverage validation.
 - [x] Run frontend check, e2e, and build validation.
-- [x] Run `pre-commit run --all-files`.
+- [x] Run `.\.venv\Scripts\python.exe -m pre_commit run --all-files`.
 
 Completed for CORE-002 on 2026-07-12. Canonical decisions and validation evidence remain in the
 ticket plan rather than being duplicated here.

@@ -6,6 +6,7 @@ import { AdminAssignmentsPage } from "@/features/admin-assignments/AdminAssignme
 import { AdminPermissionsPage } from "@/features/admin-permissions/AdminPermissionsPage";
 import { AdminRolesPage } from "@/features/admin-roles/AdminRolesPage";
 import { AdminUsersPage } from "@/features/admin-users/AdminUsersPage";
+import { AiInsightsPage } from "@/features/ai-insights/AiInsightsPage";
 import { AiSettingsPage } from "@/features/ai-settings/AiSettingsPage";
 import { AuditLogPage } from "@/features/audit-log/AuditLogPage";
 import { LoginPage } from "@/features/auth/LoginPage";
@@ -88,6 +89,10 @@ export const appRoutes: RouteObject[] = [
           {
             path: "settings/ai",
             element: <AiSettingsPage />,
+          },
+          {
+            path: "ai/insights",
+            element: <AiInsightsPage />,
           },
           {
             path: "document-templates",

@@ -19,9 +19,9 @@ quality gates green.
 1. Use `frontend/docs/templates/feature_request.md`, `integration_request.md`, or
    `code_change_request.md` when the request needs clearer acceptance criteria.
 1. Confirm route, API, auth, state, UX, a11y, observability, performance, and validation impact.
-1. Use `python scripts/scaffold_feature.py frontend <feature-name> --dry-run` to preview new page
+1. Use `.\.venv\Scripts\python.exe scripts/scaffold_feature.py frontend <feature-name> --dry-run` to preview new page
    structure when adding a new feature route.
-1. Use `python scripts/scaffold_feature.py frontend <feature-name>` only after target paths and
+1. Use `.\.venv\Scripts\python.exe scripts/scaffold_feature.py frontend <feature-name>` only after target paths and
    route scope are clear.
 1. Implement within the existing frontend architecture.
 1. Add or update tests and docs in the same change.
@@ -92,7 +92,7 @@ Also run:
 
 - `npm --prefix frontend run test:e2e:ci` when auth, routing, or error journeys change.
 - `npm --prefix frontend run openapi:check` when API output should be unchanged.
-- `pre-commit run --all-files` when docs, hooks, formatting, Docker, or shared config changed.
+- `.\.venv\Scripts\python.exe -m pre_commit run --all-files` when docs, hooks, formatting, Docker, or shared config changed.
 
 ## Final Report
 

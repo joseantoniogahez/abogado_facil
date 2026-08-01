@@ -100,7 +100,7 @@ Before delivery:
 
 1. Run `npm --prefix frontend run check`.
 1. Run `npm --prefix frontend run build` when routing/build-sensitive changes are included.
-1. Run `.\.venv\Scripts\pre-commit.exe run --all-files`.
+1. Run `.\.venv\Scripts\python.exe -m pre_commit run --all-files`.
 
 ## Reviewer Checklist
 

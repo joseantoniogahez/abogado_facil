@@ -96,6 +96,7 @@ This table is contract-checked by `tests/routers/test_authorization_policy_cover
 | `GET`    | `/v1/health`                                               | `public`        | No                        |
 | `GET`    | `/v1/readiness`                                            | `public`        | No                        |
 | `GET`    | `/v1/ai/credentials`                                       | `authenticated` | No                        |
+| `GET`    | `/v1/ai/insights`                                          | `authenticated` | No                        |
 | `PUT`    | `/v1/ai/credentials/{provider}`                            | `authenticated` | No                        |
 | `DELETE` | `/v1/ai/credentials/{provider}`                            | `authenticated` | No                        |
 | `GET`    | `/v1/document-templates`                                   | `authenticated` | No                        |
@@ -122,7 +123,7 @@ Seed source: `utils/rbac_bootstrap.py`
 ## Notes
 
 - Missing permission returns `403 forbidden` with `meta.permission_id`.
-- Bootstrap command is idempotent: `python -m utils.rbac_bootstrap`.
+- Bootstrap command is idempotent from `backend/`: `..\.venv\Scripts\python.exe -m utils.rbac_bootstrap`.
 - `account_owner` does not inherit `admin_role` or `reader_role`; public registration assigns it
   only for the firm created in the same transaction.
 - Client reads and writes require an active session and derive the tenant boundary from

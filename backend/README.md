@@ -35,11 +35,11 @@ source .venv/bin/activate
 
 Install dependencies:
 
-```bash
+```powershell
 # requirements.txt at repo root is the umbrella manifest used by CI.
 # It includes backend runtime dependencies, backend test dependencies, and shared tooling.
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m pip install --upgrade pip
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
 ## Runtime Configuration
@@ -72,7 +72,7 @@ BYOK credential encryption:
 - `AI_CREDENTIAL_ENCRYPTION_KEY` must be URL-safe base64 that decodes to exactly 32 bytes.
 - Direct local execution uses a development-only default when the variable is unset.
 - Production requires an explicit unique value and rejects the local default. Generate one with
-  `python -c "import base64, secrets; print(base64.urlsafe_b64encode(secrets.token_bytes(32)).decode())"`.
+  `.\.venv\Scripts\python.exe -c "import base64, secrets; print(base64.urlsafe_b64encode(secrets.token_bytes(32)).decode())"`.
 
 Required object storage configuration:
 
@@ -135,31 +135,31 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 From `backend/`:
 
 ```bash
-alembic upgrade head
+..\.venv\Scripts\python.exe -m alembic upgrade head
 ```
 
 Create a migration:
 
-```bash
-alembic revision --autogenerate -m "describe change"
+```powershell
+..\.venv\Scripts\python.exe -m alembic revision --autogenerate -m "describe change"
 ```
 
 Seed RBAC baseline after migrations:
 
-```bash
-python -m utils.rbac_bootstrap --admin-email admin@example.com --admin-password "StrongSeed9"
+```powershell
+..\.venv\Scripts\python.exe -m utils.rbac_bootstrap --admin-email admin@example.com --admin-password "StrongSeed9"
 ```
 
 If you started services with `docker compose up --build` and want to run bootstrap from local PowerShell (without entering the container), run from `backend/`:
 
 ```powershell
-$env:DB_TYPE = "postgresql+asyncpg"; $env:DB_HOST = "localhost"; $env:DB_PORT = "5432"; $env:DB_NAME = "abogado_facil_main"; $env:DB_USER = "my_admin"; $env:DB_PASSWORD = "{{DB_PASSWORD}}"; python -m utils.rbac_bootstrap --admin-email admin@example.com --admin-password "StrongSeed9"
+$env:DB_TYPE = "postgresql+asyncpg"; $env:DB_HOST = "localhost"; $env:DB_PORT = "5432"; $env:DB_NAME = "abogado_facil_main"; $env:DB_USER = "my_admin"; $env:DB_PASSWORD = "{{DB_PASSWORD}}"; ..\.venv\Scripts\python.exe -m utils.rbac_bootstrap --admin-email admin@example.com --admin-password "StrongSeed9"
 ```
 
 macOS/Linux (bash/zsh) equivalent:
 
 ```bash
-DB_TYPE="postgresql+asyncpg" DB_HOST="localhost" DB_PORT="5432" DB_NAME="abogado_facil_main" DB_USER="my_admin" DB_PASSWORD="{{DB_PASSWORD}}" python -m utils.rbac_bootstrap --admin-email admin@example.com --admin-password "StrongSeed9"
+DB_TYPE="postgresql+asyncpg" DB_HOST="localhost" DB_PORT="5432" DB_NAME="abogado_facil_main" DB_USER="my_admin" DB_PASSWORD="{{DB_PASSWORD}}" ../.venv/bin/python -m utils.rbac_bootstrap --admin-email admin@example.com --admin-password "StrongSeed9"
 ```
 
 Note: use `DB_HOST=localhost` for host-side execution.
@@ -183,14 +183,14 @@ Base permissions:
 
 Run from repo root:
 
-```bash
-python -m pytest backend/tests
+```powershell
+.\.venv\Scripts\python.exe -m pytest backend/tests
 ```
 
 CI-equivalent coverage gate:
 
-```bash
-python -m pytest backend/tests --cov=app --cov-report=term-missing:skip-covered --cov-fail-under=100
+```powershell
+.\.venv\Scripts\python.exe -m pytest backend/tests --cov=app --cov-report=term-missing:skip-covered --cov-fail-under=100
 ```
 
 Dockerized backend test run (isolated):

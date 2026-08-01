@@ -12,6 +12,9 @@ from starlette.testclient import TestClient
 from app.core.authorization import PERMISSION_SPECS
 from app.core.db.database import Base, reset_database_runtime
 from app.core.setup.dependencies import get_db_session, get_file_storage
+from app.features.ai_assistance.models import AIAssistanceResult
+from app.features.ai_insights.models import AIResultFeedback
+from app.features.ai_jobs.models import AIJob
 from app.features.audit_log.models import AuditLogEntry
 from app.features.auth.models import Firm, User
 from app.features.clients.models import Client
@@ -168,6 +171,9 @@ def mock_data(
         {"class": MatterPayment, "json": []},
         {"class": MatterDocument, "json": []},
         {"class": MatterCalculation, "json": []},
+        {"class": AIJob, "json": []},
+        {"class": AIAssistanceResult, "json": []},
+        {"class": AIResultFeedback, "json": []},
     ]
 
 

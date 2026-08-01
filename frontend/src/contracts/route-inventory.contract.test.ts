@@ -20,6 +20,7 @@ const ROUTE_OWNER_BY_COMPONENT: Record<string, string> = {
   AdminRolesPage: "features/admin-roles/AdminRolesPage",
   AdminUsersPage: "features/admin-users/AdminUsersPage",
   AiSettingsPage: "features/ai-settings/AiSettingsPage",
+  AiInsightsPage: "features/ai-insights/AiInsightsPage",
   DashboardPage: "features/dashboard/DashboardPage",
   DocumentTemplatesPage: "features/document-templates/DocumentTemplatesPage",
   ClientsPage: "features/clients/ClientsPage",

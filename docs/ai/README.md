@@ -58,7 +58,7 @@ Current product behavior and planning state live under `../product/`; use
 Example:
 
 ```powershell
-python scripts/scaffold_feature.py full-stack audit-log --route /admin/audit-log --with-model --dry-run
-python scripts/bootstrap_new_app.py --app-name "Example Portal" --description "A portal for example workflows."
-python scripts/install_project_skills.py --skill new-app-bootstrapper
+.\.venv\Scripts\python.exe scripts/scaffold_feature.py full-stack audit-log --route /admin/audit-log --with-model --dry-run
+.\.venv\Scripts\python.exe scripts/bootstrap_new_app.py --app-name "Example Portal" --description "A portal for example workflows."
+.\.venv\Scripts\python.exe scripts/install_project_skills.py --skill new-app-bootstrapper
 ```

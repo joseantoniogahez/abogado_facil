@@ -65,6 +65,9 @@ derivarse de esa carpeta, no de estos planes técnicos.
 | Revisión y aceptación IA       | [`AI-104`](AI-104_REVISION_ACEPTACION_PLAN.md)                            |
 | Acciones desde IA              | [`AI-105`](AI-105_CONVERSION_ACCIONES_PLAN.md)                            |
 | Hero flow IA                   | [`PROD-AI-001`](PROD-AI-001_HERO_FLOW_PLAN.md)                            |
+| Métricas operativas IA         | [`OBS-002`](OBS-002_METRICAS_OPERATIVAS_IA_PLAN.md)                       |
+| Retroalimentación IA           | [`PROD-AI-002`](PROD-AI-002_RETROALIMENTACION_UTILIDAD_PLAN.md)           |
+| Métricas de producto IA        | [`PROD-AI-003`](PROD-AI-003_METRICAS_PRODUCTO_IA_PLAN.md)                 |
 | Procedencia IA                 | [`AI-106`](AI-106_PROCEDENCIA_ACTUALIZACION_PLAN.md)                      |
 | Revisión humana de IA          | [`LEGAL-002A`](LEGAL-002A_PATRON_REVISION_HUMANA_PLAN.md)                 |
 | Auditoría de avisos IA         | [`LEGAL-002B`](LEGAL-002B_VALIDACION_AVISOS_IA_PLAN.md)                   |

@@ -1,6 +1,13 @@
 import { defaultQueryPolicy } from "@/app/query-policy";
 import { apiRequest } from "@/shared/api/http";
 
+export type FeedbackCategory = "useful" | "needs_correction" | "fabricated" | "missing_information";
+export const saveAiFeedback = (resultId: number, category: FeedbackCategory) =>
+  apiRequest(`/ai/insights/results/${resultId}/feedback`, {
+    method: "PUT",
+    body: JSON.stringify({ category }),
+  });
+
 import { type AiFeature, parseAiPreview, parseAiResult, parseAiResultList } from "./contracts";
 
 export interface AiExecutionInput {

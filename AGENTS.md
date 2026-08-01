@@ -82,7 +82,7 @@ New application bootstrap:
 - Read root and service READMEs.
 - Use `docs/ai/templates/new_app_request.md` when app identity, scope, or bootstrap mode is not
   already explicit.
-- Use `python scripts/bootstrap_new_app.py --app-name "<App Name>"` to preview identity changes
+- Use `.\.venv\Scripts\python.exe scripts/bootstrap_new_app.py --app-name "<App Name>"` to preview identity changes
   before applying an in-place bootstrap.
 - Identify app name, domain, roles, initial routes, initial data model, integrations, deployment
   target, and branding terms before making broad renames.
@@ -111,6 +111,12 @@ Documentation-only work:
    strategy.
 1. Keep auth, authorization, and error behavior explicit and test-covered.
 1. Preserve unrelated user changes; do not revert files outside the requested work.
+1. Run every repository Python command through the root `.venv`; do not rely on a globally installed
+   `python`, `pytest`, `pre-commit`, `mypy`, or similar executable. In PowerShell, use
+   `.\.venv\Scripts\python.exe` and invoke Python tools with `-m` (for example,
+   `.\.venv\Scripts\python.exe -m pytest` and `.\.venv\Scripts\python.exe -m pre_commit`). On
+   POSIX shells, use `./.venv/bin/python`. Creating `.venv` is the only exception because its
+   interpreter does not exist yet.
 
 ## Documentation Update Rules
 
@@ -155,9 +161,9 @@ AI governance docs to consider:
 
 Backend-only change:
 
-- `python -m pytest backend/tests`
-- `python -m pytest backend/tests --cov=app --cov-report=term-missing:skip-covered --cov-fail-under=100`
-- `pre-commit run --all-files` when docs, hooks, formatting, Docker, or shared config changed.
+- `.\.venv\Scripts\python.exe -m pytest backend/tests`
+- `.\.venv\Scripts\python.exe -m pytest backend/tests --cov=app --cov-report=term-missing:skip-covered --cov-fail-under=100`
+- `.\.venv\Scripts\python.exe -m pre_commit run --all-files` when docs, hooks, formatting, Docker, or shared config changed.
 
 Frontend-only change:
 
@@ -171,12 +177,12 @@ Full-stack change:
 - Run `npm --prefix frontend run openapi:sync` when API output changed.
 - Run `npm --prefix frontend run openapi:check` when API output should be unchanged.
 - Run frontend validation.
-- Run `pre-commit run --all-files` before push-level confidence when practical.
+- Run `.\.venv\Scripts\python.exe -m pre_commit run --all-files` before push-level confidence when practical.
 
 Documentation-only change:
 
 - Run relevant documentation contract tests when available.
-- Run `pre-commit run --files <changed-docs>` or targeted markdown hooks when practical.
+- Run `.\.venv\Scripts\python.exe -m pre_commit run --files <changed-docs>` or targeted markdown hooks when practical.
 
 New app bootstrap:
 
@@ -256,7 +262,7 @@ they are not auto-discovered, invoke them by path or install/copy them into the 
 location.
 
 Use `skills/README.md` as the project skill catalog and manual activation guide.
-Use `python scripts/install_project_skills.py` to preview or install project skills into the active
+Use `.\.venv\Scripts\python.exe scripts/install_project_skills.py` to preview or install project skills into the active
 Codex skills directory.
 
 Project skill pack:
@@ -282,9 +288,9 @@ or implement business logic.
 Examples:
 
 ```powershell
-python scripts/scaffold_feature.py backend audit-log --with-model
-python scripts/scaffold_feature.py frontend audit-log --route /admin/audit-log
-python scripts/scaffold_feature.py full-stack audit-log --route /admin/audit-log --with-model
+.\.venv\Scripts\python.exe scripts/scaffold_feature.py backend audit-log --with-model
+.\.venv\Scripts\python.exe scripts/scaffold_feature.py frontend audit-log --route /admin/audit-log
+.\.venv\Scripts\python.exe scripts/scaffold_feature.py full-stack audit-log --route /admin/audit-log --with-model
 ```
 
 Use `--dry-run` first when exploring paths.
@@ -295,6 +301,6 @@ by default and only writes with `--write`.
 Example:
 
 ```powershell
-python scripts/bootstrap_new_app.py --app-name "Example Portal" --description "A portal for example workflows."
-python scripts/bootstrap_new_app.py --app-name "Example Portal" --description "A portal for example workflows." --write
+.\.venv\Scripts\python.exe scripts/bootstrap_new_app.py --app-name "Example Portal" --description "A portal for example workflows."
+.\.venv\Scripts\python.exe scripts/bootstrap_new_app.py --app-name "Example Portal" --description "A portal for example workflows." --write
 ```

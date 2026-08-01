@@ -36,7 +36,7 @@ When these are not clear, fill `docs/ai/templates/new_app_request.md` and give i
 Run from the repository root:
 
 ```powershell
-python scripts/bootstrap_new_app.py --app-name "Example Portal" --description "A portal for example workflows."
+.\.venv\Scripts\python.exe scripts/bootstrap_new_app.py --app-name "Example Portal" --description "A portal for example workflows."
 ```
 
 The script runs in dry-run mode by default. It prints the identity values it derived and the files it
@@ -45,7 +45,7 @@ would update.
 Use explicit overrides when defaults are not right:
 
 ```powershell
-python scripts/bootstrap_new_app.py `
+.\.venv\Scripts\python.exe scripts/bootstrap_new_app.py `
   --app-name "Example Portal" `
   --slug example-portal `
   --description "A portal for example workflows." `
@@ -59,7 +59,7 @@ python scripts/bootstrap_new_app.py `
 After reviewing the preview, rerun the command with `--write`:
 
 ```powershell
-python scripts/bootstrap_new_app.py `
+.\.venv\Scripts\python.exe scripts/bootstrap_new_app.py `
   --app-name "Example Portal" `
   --slug example-portal `
   --description "A portal for example workflows." `
@@ -102,12 +102,12 @@ Run the gates that prove the renamed foundation still works:
 docker compose config
 docker compose -f compose.test.yaml config
 docker compose -f compose.yaml -f compose.prod.yaml config
-python -m pytest backend/tests
-python -m pytest backend/tests --cov=app --cov-report=term-missing:skip-covered --cov-fail-under=100
+.\.venv\Scripts\python.exe -m pytest backend/tests
+.\.venv\Scripts\python.exe -m pytest backend/tests --cov=app --cov-report=term-missing:skip-covered --cov-fail-under=100
 npm --prefix frontend run check
 npm --prefix frontend run test:e2e:ci
 npm --prefix frontend run build
-pre-commit run --all-files
+.\.venv\Scripts\python.exe -m pre_commit run --all-files
 ```
 
 If route, auth, RBAC, API, runtime, or feature behavior changes during bootstrap, update the affected
@@ -139,7 +139,7 @@ Seed an admin account when needed by following `backend/README.md`.
 For a new full-stack feature, preview the scaffold first:
 
 ```powershell
-python scripts/scaffold_feature.py --dry-run full-stack <feature-name> --route /your-route --with-model
+.\.venv\Scripts\python.exe scripts/scaffold_feature.py --dry-run full-stack <feature-name> --route /your-route --with-model
 ```
 
 Then implement the feature using:

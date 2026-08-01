@@ -20,9 +20,9 @@ and docs synchronized with behavior.
 1. Use `backend/docs/templates/feature_request.md`, `integration_request.md`, or
    `code_change_request.md` when the request needs clearer acceptance criteria.
 1. Confirm API, data, auth, RBAC, error, observability, and validation impact.
-1. Use `python scripts/scaffold_feature.py backend <feature-name> --dry-run` to preview new backend
+1. Use `.\.venv\Scripts\python.exe scripts/scaffold_feature.py backend <feature-name> --dry-run` to preview new backend
    feature structure when adding a new vertical feature.
-1. Use `python scripts/scaffold_feature.py backend <feature-name>` only after target paths and scope
+1. Use `.\.venv\Scripts\python.exe scripts/scaffold_feature.py backend <feature-name>` only after target paths and scope
    are clear.
 1. Implement within the existing backend architecture.
 1. Add or update tests and docs in the same change.
@@ -75,12 +75,12 @@ Add focused tests for:
 
 Run:
 
-- `python -m pytest backend/tests`
-- `python -m pytest backend/tests --cov=app --cov-report=term-missing:skip-covered --cov-fail-under=100`
+- `.\.venv\Scripts\python.exe -m pytest backend/tests`
+- `.\.venv\Scripts\python.exe -m pytest backend/tests --cov=app --cov-report=term-missing:skip-covered --cov-fail-under=100`
 
 Also run:
 
-- `pre-commit run --all-files` when docs, hooks, formatting, Docker, or shared config changed.
+- `.\.venv\Scripts\python.exe -m pre_commit run --all-files` when docs, hooks, formatting, Docker, or shared config changed.
 
 ## Final Report
 

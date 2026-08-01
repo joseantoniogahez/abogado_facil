@@ -21,6 +21,8 @@ from app.features.ai_assistance.service import AIAssistanceService
 from app.features.ai_credentials.repository import AiCredentialsRepository
 from app.features.ai_credentials.service import AiCredentialsService
 from app.features.ai_execution.service import AiProviderFactory
+from app.features.ai_insights.repository import AIInsightsRepository
+from app.features.ai_insights.service import AIInsightsService
 from app.features.ai_jobs.repository import AIJobsRepository
 from app.features.ai_jobs.service import AIJobsService
 from app.features.audit_log.repository import AuditLogRepository
@@ -335,6 +337,20 @@ async def get_ai_assistance_service(
 
 
 AIAssistanceServiceDependency = Annotated[AIAssistanceService, Depends(get_ai_assistance_service)]
+
+
+async def get_ai_insights_repository(session: DbSessionDependency) -> AIInsightsRepository:
+    return AIInsightsRepository(session=session)
+
+
+async def get_ai_insights_service(
+    repository: Annotated[AIInsightsRepository, Depends(get_ai_insights_repository)],
+    unit_of_work: UnitOfWorkDependency,
+) -> AIInsightsService:
+    return AIInsightsService(repository=repository, unit_of_work=unit_of_work)
+
+
+AIInsightsServiceDependency = Annotated[AIInsightsService, Depends(get_ai_insights_service)]
 
 
 async def get_document_templates_service(

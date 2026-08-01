@@ -52,19 +52,19 @@ Use this checklist when turning this starter kit into a new application. Start f
 Preview changes first:
 
 ```powershell
-python scripts/bootstrap_new_app.py --app-name "Example Portal" --description "A portal for example workflows."
+.\.venv\Scripts\python.exe scripts/bootstrap_new_app.py --app-name "Example Portal" --description "A portal for example workflows."
 ```
 
 Apply only after reviewing the preview:
 
 ```powershell
-python scripts/bootstrap_new_app.py --app-name "Example Portal" --description "A portal for example workflows." --write
+.\.venv\Scripts\python.exe scripts/bootstrap_new_app.py --app-name "Example Portal" --description "A portal for example workflows." --write
 ```
 
 Use explicit overrides when defaults are not right:
 
 ```powershell
-python scripts/bootstrap_new_app.py `
+.\.venv\Scripts\python.exe scripts/bootstrap_new_app.py `
   --app-name "Example Portal" `
   --slug example-portal `
   --description "A portal for example workflows." `
@@ -77,12 +77,12 @@ python scripts/bootstrap_new_app.py `
 ## Validation After In-Place Bootstrap
 
 - [ ] Validate Docker Compose config for affected profiles.
-- [ ] Run `python -m pytest backend/tests`.
-- [ ] Run `python -m pytest backend/tests --cov=app --cov-report=term-missing:skip-covered --cov-fail-under=100`.
+- [ ] Run `.\.venv\Scripts\python.exe -m pytest backend/tests`.
+- [ ] Run `.\.venv\Scripts\python.exe -m pytest backend/tests --cov=app --cov-report=term-missing:skip-covered --cov-fail-under=100`.
 - [ ] Run `npm --prefix frontend run check`.
 - [ ] Run `npm --prefix frontend run test:e2e:ci` when route, auth, or error journeys change.
 - [ ] Run `npm --prefix frontend run build`.
-- [ ] Run `pre-commit run --all-files`.
+- [ ] Run `.\.venv\Scripts\python.exe -m pre_commit run --all-files`.
 
 ## Reviewer Checks
 

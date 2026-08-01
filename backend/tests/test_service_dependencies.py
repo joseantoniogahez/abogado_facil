@@ -12,6 +12,8 @@ from app.core.setup.dependencies import (
     get_ai_assistance_service,
     get_ai_credentials_repository,
     get_ai_credentials_service,
+    get_ai_insights_repository,
+    get_ai_insights_service,
     get_ai_jobs_repository,
     get_ai_jobs_service,
     get_ai_limit_settings,
@@ -32,6 +34,8 @@ from app.features.ai_assistance.service import AIAssistanceService
 from app.features.ai_credentials.repository import AiCredentialsRepository
 from app.features.ai_credentials.service import AiCredentialsService
 from app.features.ai_execution.service import AiProviderFactory
+from app.features.ai_insights.repository import AIInsightsRepository
+from app.features.ai_insights.service import AIInsightsService
 from app.features.ai_jobs.repository import AIJobsRepository
 from app.features.ai_jobs.service import AIJobsService
 from app.features.audit_log.repository import AuditLogRepository
@@ -201,6 +205,16 @@ def test_ai_assistance_dependencies_build_expected_components() -> None:
     assert isinstance(service, AIAssistanceService)
     assert service.repository is repository
     assert service.notes_repository is notes
+
+
+def test_ai_insights_dependencies_build_expected_components() -> None:
+    session = MagicMock()
+    repository = asyncio.run(get_ai_insights_repository(session))
+    assert isinstance(repository, AIInsightsRepository)
+    unit_of_work = MagicMock()
+    service = asyncio.run(get_ai_insights_service(repository, unit_of_work))
+    assert isinstance(service, AIInsightsService)
+    assert service.repository is repository
 
 
 def test_ai_queue_dependencies_build_expected_components() -> None:

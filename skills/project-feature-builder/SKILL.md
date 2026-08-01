@@ -23,9 +23,9 @@ definition of done.
 1. Read affected backend operation and architecture docs before editing backend behavior.
 1. Read affected frontend operation docs before editing frontend behavior.
 1. Confirm scope, acceptance criteria, affected contracts, protected files, and validation gates.
-1. Use `python scripts/scaffold_feature.py full-stack <feature-name> --dry-run` to preview new
+1. Use `.\.venv\Scripts\python.exe scripts/scaffold_feature.py full-stack <feature-name> --dry-run` to preview new
    feature structure when adding a new vertical feature.
-1. Use `python scripts/scaffold_feature.py full-stack <feature-name>` only after the target paths and
+1. Use `.\.venv\Scripts\python.exe scripts/scaffold_feature.py full-stack <feature-name>` only after the target paths and
    scope are clear.
 1. Implement the smallest coherent full-stack change.
 1. Update tests, OpenAPI artifacts, docs, and inventories in the same change when contracts move.
@@ -86,8 +86,8 @@ Run the smallest complete gate set for the change.
 
 Backend:
 
-- `python -m pytest backend/tests`
-- `python -m pytest backend/tests --cov=app --cov-report=term-missing:skip-covered --cov-fail-under=100`
+- `.\.venv\Scripts\python.exe -m pytest backend/tests`
+- `.\.venv\Scripts\python.exe -m pytest backend/tests --cov=app --cov-report=term-missing:skip-covered --cov-fail-under=100`
 
 Frontend:
 
@@ -97,7 +97,7 @@ Frontend:
 
 Repository:
 
-- `pre-commit run --all-files` when docs, hooks, formatting, Docker, or shared config changed.
+- `.\.venv\Scripts\python.exe -m pre_commit run --all-files` when docs, hooks, formatting, Docker, or shared config changed.
 
 ## Final Report
 

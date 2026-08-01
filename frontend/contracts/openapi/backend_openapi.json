@@ -288,6 +288,221 @@
         "title": "AIContextPreviewResponse",
         "type": "object"
       },
+      "AIInsightsResponse": {
+        "properties": {
+          "generated_at": {
+            "format": "date-time",
+            "title": "Generated At",
+            "type": "string"
+          },
+          "operational": {
+            "$ref": "#/components/schemas/AIOperationalMetrics"
+          },
+          "product": {
+            "$ref": "#/components/schemas/AIProductMetrics"
+          },
+          "stuck_after_minutes": {
+            "title": "Stuck After Minutes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "generated_at",
+          "stuck_after_minutes",
+          "operational",
+          "product"
+        ],
+        "title": "AIInsightsResponse",
+        "type": "object"
+      },
+      "AIOperationalMetrics": {
+        "properties": {
+          "average_latency_ms": {
+            "title": "Average Latency Ms",
+            "type": "number"
+          },
+          "cost_coverage_percent": {
+            "title": "Cost Coverage Percent",
+            "type": "number"
+          },
+          "cost_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost Usd"
+          },
+          "errors": {
+            "items": {
+              "$ref": "#/components/schemas/CountByName"
+            },
+            "title": "Errors",
+            "type": "array"
+          },
+          "estimated_input_tokens": {
+            "title": "Estimated Input Tokens",
+            "type": "integer"
+          },
+          "estimated_output_tokens": {
+            "title": "Estimated Output Tokens",
+            "type": "integer"
+          },
+          "failed_jobs": {
+            "title": "Failed Jobs",
+            "type": "integer"
+          },
+          "retry_count": {
+            "title": "Retry Count",
+            "type": "integer"
+          },
+          "stuck_jobs": {
+            "title": "Stuck Jobs",
+            "type": "integer"
+          },
+          "success_rate": {
+            "title": "Success Rate",
+            "type": "number"
+          },
+          "successful_jobs": {
+            "title": "Successful Jobs",
+            "type": "integer"
+          },
+          "total_jobs": {
+            "title": "Total Jobs",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total_jobs",
+          "successful_jobs",
+          "failed_jobs",
+          "success_rate",
+          "average_latency_ms",
+          "estimated_input_tokens",
+          "estimated_output_tokens",
+          "cost_usd",
+          "cost_coverage_percent",
+          "retry_count",
+          "stuck_jobs",
+          "errors"
+        ],
+        "title": "AIOperationalMetrics",
+        "type": "object"
+      },
+      "AIProductMetrics": {
+        "properties": {
+          "abandoned_results": {
+            "title": "Abandoned Results",
+            "type": "integer"
+          },
+          "accepted_results": {
+            "title": "Accepted Results",
+            "type": "integer"
+          },
+          "converted_results": {
+            "title": "Converted Results",
+            "type": "integer"
+          },
+          "edited_results": {
+            "title": "Edited Results",
+            "type": "integer"
+          },
+          "feedback": {
+            "items": {
+              "$ref": "#/components/schemas/CountByName"
+            },
+            "title": "Feedback",
+            "type": "array"
+          },
+          "partially_accepted_results": {
+            "title": "Partially Accepted Results",
+            "type": "integer"
+          },
+          "pending_results": {
+            "title": "Pending Results",
+            "type": "integer"
+          },
+          "regenerated_results": {
+            "title": "Regenerated Results",
+            "type": "integer"
+          },
+          "rejected_results": {
+            "title": "Rejected Results",
+            "type": "integer"
+          },
+          "total_results": {
+            "title": "Total Results",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total_results",
+          "accepted_results",
+          "partially_accepted_results",
+          "rejected_results",
+          "pending_results",
+          "edited_results",
+          "converted_results",
+          "regenerated_results",
+          "abandoned_results",
+          "feedback"
+        ],
+        "title": "AIProductMetrics",
+        "type": "object"
+      },
+      "AIResultFeedbackRequest": {
+        "properties": {
+          "category": {
+            "enum": [
+              "useful",
+              "needs_correction",
+              "fabricated",
+              "missing_information"
+            ],
+            "title": "Category",
+            "type": "string"
+          }
+        },
+        "required": [
+          "category"
+        ],
+        "title": "AIResultFeedbackRequest",
+        "type": "object"
+      },
+      "AIResultFeedbackResponse": {
+        "properties": {
+          "category": {
+            "enum": [
+              "useful",
+              "needs_correction",
+              "fabricated",
+              "missing_information"
+            ],
+            "title": "Category",
+            "type": "string"
+          },
+          "result_id": {
+            "title": "Result Id",
+            "type": "integer"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result_id",
+          "category",
+          "updated_at"
+        ],
+        "title": "AIResultFeedbackResponse",
+        "type": "object"
+      },
       "AccessTokenResponse": {
         "properties": {
           "access_token": {
@@ -969,6 +1184,24 @@
           "content"
         ],
         "title": "ConvertAIAssistanceRequest",
+        "type": "object"
+      },
+      "CountByName": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "count"
+        ],
+        "title": "CountByName",
         "type": "object"
       },
       "CreateAdminUserRequest": {
@@ -3187,6 +3420,79 @@
         "summary": "Save Credential",
         "tags": [
           "ai-credentials"
+        ]
+      }
+    },
+    "/v1/ai/insights": {
+      "get": {
+        "operationId": "get_insights_v1_ai_insights_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AIInsightsResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Get firm-scoped operational and product AI metrics",
+        "tags": [
+          "ai-insights"
+        ]
+      }
+    },
+    "/v1/ai/insights/results/{result_id}/feedback": {
+      "put": {
+        "operationId": "save_feedback_v1_ai_insights_results__result_id__feedback_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "result_id",
+            "required": true,
+            "schema": {
+              "title": "Result Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AIResultFeedbackRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AIResultFeedbackResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Create or update structured feedback for an AI result",
+        "tags": [
+          "ai-insights"
         ]
       }
     },

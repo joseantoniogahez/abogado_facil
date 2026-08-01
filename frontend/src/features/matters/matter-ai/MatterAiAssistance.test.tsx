@@ -72,7 +72,8 @@ describe("MatterAiAssistance", () => {
         ...result("accepted"),
         converted_actions: [{ action_type: "note", content: "Resumen" }],
       }))
-      .mockImplementationOnce(() => response({ items: [result("accepted")], total: 1 }));
+      .mockImplementationOnce(() => response({ items: [result("accepted")], total: 1 }))
+      .mockImplementationOnce(() => response({ result_id: 7, category: "useful", updated_at: "2026-08-01T00:00:00Z" }));
 
     renderFeature();
     await screen.findByText(t("ai.results.empty"));
@@ -103,9 +104,13 @@ describe("MatterAiAssistance", () => {
     await waitFor(() => expect(screen.getByText(/Aceptado/)).toBeInTheDocument());
     fireEvent.click(screen.getByRole("button", { name: t("ai.actions.convert") }));
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(8));
+    fireEvent.change(screen.getByLabelText(t("ai.feedback.label")), { target: { value: "fabricated" } });
+    fireEvent.click(screen.getByRole("button", { name: t("ai.feedback.save") }));
+    expect(await screen.findByText(t("ai.feedback.saved"))).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledTimes(9);
     fireEvent.click(screen.getByRole("button", { name: t("ai.result.regenerate") }));
     expect(screen.getByLabelText(t("ai.narrative"))).toHaveValue("");
-    expect(screen.getByRole("status")).toHaveTextContent(t("ai.result.regenerationReady"));
+    expect(screen.getByText(t("ai.result.regenerationReady"))).toBeInTheDocument();
   });
 
   it("renders recoverable API failures", async () => {

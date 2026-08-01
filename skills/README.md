@@ -23,19 +23,19 @@ canonical docs and validation gates.
 Preview installation of all project skills:
 
 ```powershell
-python scripts/install_project_skills.py
+.\.venv\Scripts\python.exe scripts/install_project_skills.py
 ```
 
 Preview one skill:
 
 ```powershell
-python scripts/install_project_skills.py --skill new-app-bootstrapper
+.\.venv\Scripts\python.exe scripts/install_project_skills.py --skill new-app-bootstrapper
 ```
 
 Apply after reviewing the preview:
 
 ```powershell
-python scripts/install_project_skills.py --write
+.\.venv\Scripts\python.exe scripts/install_project_skills.py --write
 ```
 
 By default the installer targets `$CODEX_HOME/skills` or `~/.codex/skills` when `CODEX_HOME` is not
@@ -47,7 +47,7 @@ unless `--force` is passed.
 | Skill                        | Use When                                                                                                                                             | Main Docs to Read                                                                                                                                                   | Typical Validation                                                                                                                                      |
 | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `project-feature-builder`    | A feature touches both backend and frontend, including API, auth/RBAC, OpenAPI, route, UI, tests, or docs.                                           | `AGENTS.md`, backend and frontend playbooks, both foundation status files, affected operation docs, full-stack request template when needed.                        | Backend tests and coverage, OpenAPI sync/check, frontend check, e2e when auth/routing/error journeys change, frontend build, pre-commit when practical. |
-| `backend-capability-builder` | The change is backend-only: endpoint, service, repository, model, migration, auth/RBAC, outbox, integration port, tests, or backend docs.            | `AGENTS.md`, backend playbook, backend foundation status, affected backend operation and architecture docs.                                                         | `python -m pytest backend/tests`, backend coverage gate, pre-commit when docs/config/shared files change.                                               |
+| `backend-capability-builder` | The change is backend-only: endpoint, service, repository, model, migration, auth/RBAC, outbox, integration port, tests, or backend docs.            | `AGENTS.md`, backend playbook, backend foundation status, affected backend operation and architecture docs.                                                         | `.\.venv\Scripts\python.exe -m pytest backend/tests`, backend coverage gate, pre-commit when docs/config/shared files change.                           |
 | `frontend-feature-builder`   | The change is frontend-only: route, page, shared UI, API consumer, auth-gated screen, RBAC UI, query/mutation behavior, a11y, e2e, or frontend docs. | `AGENTS.md`, frontend playbook, frontend foundation status, affected frontend operation docs.                                                                       | `npm --prefix frontend run check`, `npm --prefix frontend run build`, e2e when auth/routing/error journeys change.                                      |
 | `project-reviewer`           | The user asks for a review, readiness check, PR/diff assessment, or risk scan.                                                                       | `AGENTS.md`, changed-file context, affected backend/frontend playbooks and operation docs.                                                                          | Review evidence, relevant targeted checks when needed, and explicit validation gaps.                                                                    |
 | `backend-code-reviewer`      | A review focuses on FastAPI/backend behavior, contracts, migrations, security, integrations, or tests.                                               | `AGENTS.md`, backend playbook and foundation status, affected operation/architecture docs, and the official FastAPI skill when applicable.                          | Focused backend checks, contract tests, coverage/OpenAPI gates when warranted, and evidence-backed findings.                                            |

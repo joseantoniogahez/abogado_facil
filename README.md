@@ -67,12 +67,12 @@ docs/ai/start_new_project.md
 
 Quick flow:
 
-```bash
+```powershell
 # preview identity changes
-python scripts/bootstrap_new_app.py --app-name "Example Portal" --description "A portal for example workflows."
+.\.venv\Scripts\python.exe scripts/bootstrap_new_app.py --app-name "Example Portal" --description "A portal for example workflows."
 
 # apply after reviewing the preview
-python scripts/bootstrap_new_app.py --app-name "Example Portal" --description "A portal for example workflows." --write
+.\.venv\Scripts\python.exe scripts/bootstrap_new_app.py --app-name "Example Portal" --description "A portal for example workflows." --write
 ```
 
 Then review `git diff`, create `.env` from `.env_examples`, run the validation gates listed in
@@ -146,7 +146,7 @@ Production secrets and credentials:
 - Define `JWT_SECRET_KEY`, `JWT_ALGORITHM`, `JWT_ACCESS_TOKEN_EXPIRE_MINUTES`, `JWT_ISSUER`, and `JWT_AUDIENCE` in `.env` before starting.
 - Define `AI_CREDENTIAL_ENCRYPTION_KEY` as URL-safe base64 for exactly 32 random bytes. Generate a
   production value with
-  `python -c "import base64, secrets; print(base64.urlsafe_b64encode(secrets.token_bytes(32)).decode())"`.
+  `.\.venv\Scripts\python.exe -c "import base64, secrets; print(base64.urlsafe_b64encode(secrets.token_bytes(32)).decode())"`.
   Production startup rejects the local default from `.env_examples`.
 - Define `S3_ENDPOINT_URL`, `S3_REGION`, `S3_BUCKET`, `S3_ACCESS_KEY`, and `S3_SECRET_KEY`; production
   has no object-storage credential defaults and does not publish MinIO ports.
@@ -201,11 +201,11 @@ source .venv/bin/activate
 
 Install tooling:
 
-```bash
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
+```powershell
+.\.venv\Scripts\python.exe -m pip install --upgrade pip
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
 npm --prefix frontend install
-pre-commit install --install-hooks --hook-type pre-commit --hook-type pre-push
+.\.venv\Scripts\python.exe -m pre_commit install --install-hooks --hook-type pre-commit --hook-type pre-push
 ```
 
 The root `requirements.txt` is the umbrella Python manifest used by CI; it includes backend runtime dependencies, backend test dependencies, and repository tooling.
@@ -214,26 +214,26 @@ Before running hooks, make sure Docker is running so local Docker-based hooks ca
 
 Run repository hooks:
 
-```bash
-pre-commit run --all-files
+```powershell
+.\.venv\Scripts\python.exe -m pre_commit run --all-files
 ```
 
 Run heavier pre-push hooks locally:
 
-```bash
-pre-commit run --all-files --hook-stage pre-push
+```powershell
+.\.venv\Scripts\python.exe -m pre_commit run --all-files --hook-stage pre-push
 ```
 
 ## AI Workflow Helpers
 
 Preview feature scaffolds:
 
-```bash
-python scripts/scaffold_feature.py full-stack audit-log --route /admin/audit-log --with-model --dry-run
+```powershell
+.\.venv\Scripts\python.exe scripts/scaffold_feature.py full-stack audit-log --route /admin/audit-log --with-model --dry-run
 ```
 
 Preview new-app identity bootstrap:
 
-```bash
-python scripts/bootstrap_new_app.py --app-name "Example Portal" --description "A portal for example workflows."
+```powershell
+.\.venv\Scripts\python.exe scripts/bootstrap_new_app.py --app-name "Example Portal" --description "A portal for example workflows."
 ```

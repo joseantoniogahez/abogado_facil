@@ -99,6 +99,7 @@ Current features:
 - `ai_credentials`
 - `ai_execution`
 - `ai_jobs`
+- `ai_insights`
 - `audit_log`
 - `auth`
 - `clients`
@@ -117,6 +118,10 @@ Current features:
 
 `outbox`, `ai_execution`, and `ai_jobs` are service capabilities without public routers. The
 remaining routed features are registered through `app/core/setup/routers.py`.
+
+`ai_insights` is the explicit read-model exception that aggregates the canonical persisted
+`ai_jobs` and `ai_assistance` records. It may import only those two feature model modules; it must
+not invoke their services or bypass tenant scoping.
 
 ## Dependency direction
 

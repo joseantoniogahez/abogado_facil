@@ -14,8 +14,8 @@ For implementation rules and extension workflows, see `../backend_playbook.md`.
 
 Run the idempotent RBAC bootstrap command from `backend/`:
 
-```bash
-python -m utils.rbac_bootstrap --admin-email admin@example.com --admin-password "StrongSeed9"
+```powershell
+..\.venv\Scripts\python.exe -m utils.rbac_bootstrap --admin-email admin@example.com --admin-password "StrongSeed9"
 ```
 
 This command:

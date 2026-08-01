@@ -77,19 +77,19 @@ If the user wants those changes, split the work into a follow-up feature request
 Preview:
 
 ```powershell
-python scripts/bootstrap_new_app.py --app-name "Example Portal" --description "A portal for example workflows."
+.\.venv\Scripts\python.exe scripts/bootstrap_new_app.py --app-name "Example Portal" --description "A portal for example workflows."
 ```
 
 Apply after preview:
 
 ```powershell
-python scripts/bootstrap_new_app.py --app-name "Example Portal" --description "A portal for example workflows." --write
+.\.venv\Scripts\python.exe scripts/bootstrap_new_app.py --app-name "Example Portal" --description "A portal for example workflows." --write
 ```
 
 Use explicit overrides when defaults are not correct:
 
 ```powershell
-python scripts/bootstrap_new_app.py `
+.\.venv\Scripts\python.exe scripts/bootstrap_new_app.py `
   --app-name "Example Portal" `
   --slug example-portal `
   --description "A portal for example workflows." `
@@ -104,11 +104,11 @@ python scripts/bootstrap_new_app.py `
 For identity-only bootstrap, run:
 
 - Docker Compose config validation for affected profiles.
-- `python -m pytest backend/tests`
-- `python -m pytest backend/tests --cov=app --cov-report=term-missing:skip-covered --cov-fail-under=100`
+- `.\.venv\Scripts\python.exe -m pytest backend/tests`
+- `.\.venv\Scripts\python.exe -m pytest backend/tests --cov=app --cov-report=term-missing:skip-covered --cov-fail-under=100`
 - `npm --prefix frontend run check`
 - `npm --prefix frontend run build`
-- `pre-commit run --all-files`
+- `.\.venv\Scripts\python.exe -m pre_commit run --all-files`
 
 Also run `npm --prefix frontend run test:e2e:ci` when route, auth, or error journeys change.
 

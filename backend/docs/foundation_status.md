@@ -50,9 +50,9 @@ Status date: `2026-07-25`
 
 Run these from repository root before delivery:
 
-- `python -m pytest backend/tests`
-- `python -m pytest backend/tests --cov=app --cov-report=term-missing:skip-covered --cov-fail-under=100` (CI-equivalent)
-- `pre-commit run --all-files` (recommended before push)
+- `.\.venv\Scripts\python.exe -m pytest backend/tests`
+- `.\.venv\Scripts\python.exe -m pytest backend/tests --cov=app --cov-report=term-missing:skip-covered --cov-fail-under=100` (CI-equivalent)
+- `.\.venv\Scripts\python.exe -m pre_commit run --all-files` (recommended before push)
 
 ## Change Management Rules
 

@@ -71,6 +71,8 @@ All routes are versioned under `/v1`.
 | `GET`    | `/v1/matters/{matter_id}/ai/results`                       | Yes  | No                        | Path `matter_id`                                            | `200` `AIAssistanceResultListResponse`         | `401`, `404`, `500`                                           |
 | `PATCH`  | `/v1/matters/{matter_id}/ai/results/{result_id}`           | Yes  | No                        | JSON `ReviewAIAssistanceRequest`                            | `200` `AIAssistanceResultResponse`             | `400`, `401`, `404`, `500`                                    |
 | `POST`   | `/v1/matters/{matter_id}/ai/results/{result_id}/actions`   | Yes  | No                        | JSON `ConvertAIAssistanceRequest`; tasks require `due_date` | `200` `AIAssistanceResultResponse`             | `400`, `401`, `404`, `409`, `500`                             |
+| `GET`    | `/v1/ai/insights`                                          | Yes  | No                        | None                                                        | `200` `AIInsightsResponse`                     | `401`, `500`                                                  |
+| `PUT`    | `/v1/ai/insights/results/{result_id}/feedback`             | Yes  | No                        | JSON structured feedback category                           | `200` `AIResultFeedbackResponse`               | `400`, `401`, `404`, `500`                                    |
 | `PATCH`  | `/v1/users/me`                                             | Yes  | No                        | JSON `UpdateCurrentUserRequest`                             | `200` `AuthenticatedUserResponse`              | `400`, `401`, `403`, `409`, `500`                             |
 | `GET`    | `/v1/rbac/roles`                                           | Yes  | `roles:manage`            | No body                                                     | `200` `RBACRole[]`                             | `401`, `403`, `500`                                           |
 | `GET`    | `/v1/rbac/permissions`                                     | Yes  | `role_permissions:manage` | No body                                                     | `200` `RBACPermission[]`                       | `401`, `403`, `500`                                           |
@@ -132,6 +134,7 @@ This table classifies each `GET` endpoint as `public`, `authenticated`, or `perm
 | `GET`  | `/v1/health`                                               | `public`        | No                        |
 | `GET`  | `/v1/readiness`                                            | `public`        | No                        |
 | `GET`  | `/v1/ai/credentials`                                       | `authenticated` | No                        |
+| `GET`  | `/v1/ai/insights`                                          | `authenticated` | No                        |
 | `GET`  | `/v1/document-templates`                                   | `authenticated` | No                        |
 | `GET`  | `/v1/users/me`                                             | `authenticated` | No                        |
 | `GET`  | `/v1/rbac/roles`                                           | `permission`    | `roles:manage`            |
