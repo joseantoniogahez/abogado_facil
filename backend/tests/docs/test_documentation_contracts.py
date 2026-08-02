@@ -293,6 +293,10 @@ def test_rq_worker_uses_json_and_only_validated_queue_configuration() -> None:
 def test_ai_provider_error_catalog_matches_runtime_codes() -> None:
     error_contract = _read_markdown(DOCS_DIR / "operations" / "ai_provider_errors.md")
     queue_contract = _read_markdown(DOCS_DIR / "operations" / "rq_ai_queue.md")
+    requirements = (BACKEND_DIR / "requirements.txt").read_text(encoding="utf-8")
+
+    assert "openai==2.46.0" in requirements
+    assert "google-genai==2.13.0" in requirements
 
     for code in AiProviderErrorCode:
         assert f"`{code.value}`" in error_contract

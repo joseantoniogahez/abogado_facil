@@ -35,10 +35,12 @@ Current top-level shape:
 
 - `app/integrations/ai_providers.py` owns the provider-neutral `AiProviderPort`, request/response
   contracts, and `OpenAIProvider`, `GeminiProvider`, and `MockProvider` adapters.
-- OpenAI and Gemini use an injected HTTP transport so tests never call external providers and future
-  runtime wiring can own timeouts, retries, and observability.
-- Provider credentials are transported only in headers. Gemini uses `x-goog-api-key`; credentials
-  must never be placed in URLs that can be retained by access logs or intermediaries.
+- OpenAI and Gemini use the official asynchronous Python SDK clients (`openai` and `google-genai`).
+  Each adapter accepts an injected SDK client so tests never call external providers; production
+  construction keeps credentials exclusively in backend memory and disables SDK-level retries so
+  the repository's RQ retry policy remains the single retry owner.
+- The SDKs own provider authentication and transport details. Adapters never add credentials to
+  URLs, logs, jobs, exceptions, request models, or response contracts.
 - Provider errors are normalized to `AiProviderError` with a closed provider-neutral code, public
   message, and explicit retry decision. API keys, URLs, response bodies, and provider error details
   are never included in the exception or its public contract. The canonical catalog and HTTP

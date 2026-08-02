@@ -2,11 +2,14 @@
 
 import asyncio
 import logging
-from collections.abc import Callable, Mapping
-from typing import Any
-from unittest.mock import MagicMock
+from collections.abc import Callable
+from types import SimpleNamespace
+from unittest.mock import AsyncMock, MagicMock
 
+import httpx
+import openai
 import pytest
+from google.genai import errors as genai_errors
 
 from app.integrations.ai_context import build_minimized_ai_context
 from app.integrations.ai_providers import (
@@ -41,32 +44,38 @@ def run(coroutine):
 
 
 def _openai_factory(scenario: str, logger: MagicMock) -> OpenAIProvider:
-    async def transport(url: str, headers: Mapping[str, str], body: bytes) -> tuple[int, Any]:
-        outcomes = {
-            "success": (200, {"choices": [{"message": {"content": "normalized result"}}]}),
-            "timeout": (504, {"error": EXTERNAL_DETAIL}),
-            "rate_limit": (429, {"error": EXTERNAL_DETAIL}),
-            "invalid_response": (200, {"choices": []}),
-        }
-        return outcomes[scenario]
-
-    return OpenAIProvider(api_key=API_KEY, model=REQUEST.model, transport=transport, logger=logger)
+    request = httpx.Request("POST", "https://provider.invalid")
+    outcomes = {
+        "success": SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content="normalized result"))]),
+        "timeout": openai.APITimeoutError(request=request),
+        "rate_limit": openai.RateLimitError(
+            EXTERNAL_DETAIL,
+            response=httpx.Response(429, request=request),
+            body={"error": EXTERNAL_DETAIL},
+        ),
+        "invalid_response": SimpleNamespace(choices=[]),
+    }
+    create = AsyncMock()
+    outcome = outcomes[scenario]
+    create.side_effect = outcome if isinstance(outcome, Exception) else None
+    create.return_value = outcome
+    client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=create)))
+    return OpenAIProvider(api_key=API_KEY, model=REQUEST.model, client=client, logger=logger)
 
 
 def _gemini_factory(scenario: str, logger: MagicMock) -> GeminiProvider:
-    async def transport(url: str, headers: Mapping[str, str], body: bytes) -> tuple[int, Any]:
-        outcomes = {
-            "success": (
-                200,
-                {"candidates": [{"content": {"parts": [{"text": "normalized result"}]}}]},
-            ),
-            "timeout": (504, {"error": EXTERNAL_DETAIL}),
-            "rate_limit": (429, {"error": EXTERNAL_DETAIL}),
-            "invalid_response": (200, {"candidates": []}),
-        }
-        return outcomes[scenario]
-
-    return GeminiProvider(api_key=API_KEY, model=REQUEST.model, transport=transport, logger=logger)
+    outcomes = {
+        "success": SimpleNamespace(text="normalized result"),
+        "timeout": genai_errors.APIError(504, {"error": EXTERNAL_DETAIL}),
+        "rate_limit": genai_errors.APIError(429, {"error": EXTERNAL_DETAIL}),
+        "invalid_response": SimpleNamespace(text=None),
+    }
+    generate_content = AsyncMock()
+    outcome = outcomes[scenario]
+    generate_content.side_effect = outcome if isinstance(outcome, Exception) else None
+    generate_content.return_value = outcome
+    client = SimpleNamespace(models=SimpleNamespace(generate_content=generate_content))
+    return GeminiProvider(api_key=API_KEY, model=REQUEST.model, client=client, logger=logger)
 
 
 def _mock_factory(scenario: str, logger: MagicMock) -> MockProvider:
@@ -75,11 +84,7 @@ def _mock_factory(scenario: str, logger: MagicMock) -> MockProvider:
         "rate_limit": AiProviderErrorCode.RATE_LIMITED,
         "invalid_response": AiProviderErrorCode.INVALID_RESPONSE,
     }
-    return MockProvider(
-        response="normalized result",
-        failure_code=failures.get(scenario),
-        logger=logger,
-    )
+    return MockProvider(response="normalized result", failure_code=failures.get(scenario), logger=logger)
 
 
 PROVIDERS: tuple[tuple[str, ProviderFactory], ...] = (
@@ -92,18 +97,14 @@ PROVIDERS: tuple[tuple[str, ProviderFactory], ...] = (
 @pytest.mark.parametrize(("provider_name", "factory"), PROVIDERS)
 def test_providers_share_success_contract(provider_name: str, factory: ProviderFactory) -> None:
     logger = MagicMock(spec=logging.Logger)
-
     response = run(factory("success", logger).generate(REQUEST))
-
     assert response.provider == provider_name
     assert response.model == REQUEST.model
     assert response.text == "normalized result"
     log_text = " ".join(str(call) for call in logger.log.call_args_list)
-    assert REQUEST.request_id in log_text
-    assert REQUEST.execution_id in log_text
+    assert REQUEST.request_id in log_text and REQUEST.execution_id in log_text
     assert REQUEST.context.render_untrusted_data() not in log_text
-    assert response.text not in log_text
-    assert API_KEY not in log_text
+    assert response.text not in log_text and API_KEY not in log_text
 
 
 @pytest.mark.parametrize(("provider_name", "factory"), PROVIDERS)
@@ -123,24 +124,18 @@ def test_providers_share_safe_failure_and_retry_contract(
     expected_retryable: bool,
 ) -> None:
     logger = MagicMock(spec=logging.Logger)
-
     with pytest.raises(AiProviderError) as captured:
         run(factory(scenario, logger).generate(REQUEST))
-
     failure = captured.value.to_public_failure()
     assert failure.code == expected_code.value
     assert failure.retryable is expected_retryable
     assert provider_name not in failure.message.lower()
-    assert EXTERNAL_DETAIL not in failure.message
-    assert API_KEY not in failure.message
-
+    assert EXTERNAL_DETAIL not in failure.message and API_KEY not in failure.message
     log_text = " ".join(str(call) for call in logger.log.call_args_list)
     assert expected_code.value in log_text
-    assert REQUEST.request_id in log_text
-    assert REQUEST.execution_id in log_text
+    assert REQUEST.request_id in log_text and REQUEST.execution_id in log_text
     assert REQUEST.context.render_untrusted_data() not in log_text
-    assert EXTERNAL_DETAIL not in log_text
-    assert API_KEY not in log_text
+    assert EXTERNAL_DETAIL not in log_text and API_KEY not in log_text
 
 
 @pytest.mark.parametrize(("provider_name", "factory"), PROVIDERS)
@@ -157,16 +152,13 @@ def test_handler_contract_hands_only_recoverable_failures_to_rq(
             if error.retryable:
                 retryable_failures.append(error)
                 raise
-            return
 
     with pytest.raises(AiProviderError) as timeout:
         run(execute("timeout"))
     assert timeout.value.code is AiProviderErrorCode.TIMEOUT
-
     with pytest.raises(AiProviderError) as rate_limit:
         run(execute("rate_limit"))
     assert rate_limit.value.code is AiProviderErrorCode.RATE_LIMITED
-
     assert run(execute("invalid_response")) is None
     assert [error.code for error in retryable_failures] == [
         AiProviderErrorCode.TIMEOUT,

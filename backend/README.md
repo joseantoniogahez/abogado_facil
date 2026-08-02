@@ -92,10 +92,12 @@ use a test-only `FakeFileStorage` or a mocked SDK client without Docker or netwo
 import `boto3` directly.
 
 AI observability is metadata-only: prompts, document text, credentials, tokens, authorization
-headers, and provider exception details must not be passed to technical logs. Use
+headers, and provider exception details must not be passed to technical logs. OpenAI and Gemini use
+their pinned official asynchronous Python SDKs through injectable clients, with SDK retries disabled
+for OpenAI so RQ remains the retry owner. Use
 `app.core.common.observability.log_layer_event` for structured events; sensitive field names are
 redacted centrally and tests enforce the negative contract. Provider credentials belong in
-authorization headers, never in request URLs; the Gemini adapter uses `x-goog-api-key`.
+provider authentication details, including credentials, never enter application URLs or contracts.
 
 AI background work uses RQ 2.10 over the shared Redis service. The producer uses JSON serialization
 and enqueues only the opaque `execution_id`; prompts, credentials, context, results, and provider

@@ -41,6 +41,7 @@ derivarse de esa carpeta, no de estos planes técnicos.
 | Ciclo de vida de IA            | [`AI-009`](AI-009_CICLO_VIDA_EJECUCIONES_IA_PLAN.md)                      |
 | Resiliencia RQ/Redis           | [`AI-010`](AI-010_RESILIENCIA_RQ_REDIS_PLAN.md)                           |
 | Taxonomía de errores IA        | [`AI-011`](AI-011_TAXONOMIA_ERRORES_IA_PLAN.md)                           |
+| SDK oficiales de proveedores   | [`AI-012`](AI-012_SDK_OFICIALES_PROVEEDORES_PLAN.md)                      |
 | Observabilidad de IA           | [`OBS-001`](OBS-001_OBSERVABILIDAD_CORRELACIONADA_IA_PLAN.md)             |
 | Contratos multi-provider       | [`TEST-AI-001`](TEST-AI-001_CONTRATOS_FALLOS_MULTI_PROVIDER_PLAN.md)      |
 | Threat model de IA             | [`DOCS-AI-002`](DOCS-AI-002_FLUJO_DATOS_THREAT_MODEL_PLAN.md)             |

@@ -131,7 +131,7 @@ esperada: pruebas de contrato, métricas, ADR, threat model, caso de fallo o dem
 | AI-009      | Backend    | P0-IA     | Hecho  | Ciclo de vida de ejecuciones de IA.             | `AIJob` con estados, intentos, versiones, resultado, error y correlación.                                                     |
 | AI-010      | Backend    | P1        | Hecho  | Resiliencia de proveedores.                     | Timeouts, reintentos recuperables, backoff, rate limits y prevención de duplicados.                                           |
 | AI-011      | Backend    | P1        | Hecho  | Taxonomía normalizada de errores.               | OpenAI, Gemini y mock mapean errores al contrato común y seguro para frontend.                                                |
-| AI-012      | Backend    | P1        | Listo  | Adoptar SDK oficiales de OpenAI y Gemini.       | Adaptadores usan SDK Python oficiales sin romper el puerto común, seguridad, errores, resiliencia ni pruebas.                 |
+| AI-012      | Backend    | P1        | Hecho  | Adoptar SDK oficiales de OpenAI y Gemini.       | Adaptadores usan SDK Python oficiales sin romper el puerto común, seguridad, errores, resiliencia ni pruebas.                 |
 | AI-013      | Full-stack | P1        | Listo  | Descubrir modelos disponibles por credencial.   | Solo proveedores con API key aparecen; backend consulta sus modelos disponibles y llena el selector sin opciones precargadas. |
 | OBS-001     | Ops        | P1        | Hecho  | Observabilidad correlacionada.                  | `request_id` permite seguir API → `AIJob` → proveedor → resultado sin datos sensibles.                                        |
 | TEST-AI-001 | Backend    | P1        | Hecho  | Pruebas de contrato y fallos multi-provider.    | Contratos OpenAI/Gemini/mock y escenarios de timeout, rate limit, JSON inválido y reintentos.                                 |
@@ -223,7 +223,6 @@ esperada: pruebas de contrato, métricas, ADR, threat model, caso de fallo o dem
 Las funciones IA del MVP superaron los gates P0-IA y la revalidación integral del release. La
 secuencia priorizada continúa con:
 
-1. `AI-012`: adoptar los SDK Python oficiales de OpenAI y Gemini conservando los contratos actuales.
 1. `AI-013`: descubrir los proveedores y modelos disponibles para las credenciales configuradas.
 1. `UX-AI-002`: completar el onboarding BYOK guiado sobre el catálogo dinámico de proveedores y modelos.
 1. `DOCS-AI-001`, `DOCS-AI-003` y `DOCS-AI-004`: consolidar evidencia pública de arquitectura y operación.

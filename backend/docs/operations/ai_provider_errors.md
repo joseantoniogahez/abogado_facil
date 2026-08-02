@@ -27,7 +27,12 @@ mensaje externo, prompt ni contexto legal.
 Los códigos son provider-neutral. La interfaz no debe convertirlos de nuevo en mensajes específicos
 de OpenAI o Gemini.
 
-## Mapeo de transporte
+## Mapeo de SDK y transporte
+
+Los adaptadores usan los clientes asíncronos oficiales de `openai==2.46.0` y
+`google-genai==2.13.0`. Las excepciones tipadas de cada SDK se traducen al catálogo interno antes
+de cruzar el puerto; el texto, cuerpo y headers de la excepción externa nunca se propagan. Los
+clientes permanecen inyectables para que las pruebas sean deterministas y no usen red.
 
 | Entrada externa                          | Código normalizado               |
 | ---------------------------------------- | -------------------------------- |
@@ -39,7 +44,7 @@ de OpenAI o Gemini.
 | JSON o estructura de respuesta no válida | `provider_invalid_response`      |
 | URL no HTTPS, inválida o sin hostname    | `provider_configuration_error`   |
 
-El mapeo usa estado y clase de fallo, nunca el cuerpo controlado por el proveedor. Esto evita que
+El mapeo usa estado y clase de fallo del SDK, nunca el cuerpo controlado por el proveedor. Esto evita que
 detalles sensibles o no confiables crucen el adaptador. Un worker puede usar `retryable` para decidir
 si RQ debe reintentar y debe persistir exclusivamente `error_code` al agotar los intentos.
 
@@ -65,9 +70,8 @@ indisponibilidad usa `503`; timeout usa `504`; y configuración interna usa `500
 conserva el código estable `provider_*` y el mensaje público constante.
 
 Las funciones de asistencia que requieren resultados estructurados envían a Gemini el esquema JSON
-esperado mediante `responseMimeType=application/json` y `responseJsonSchema`. El adaptador concatena
-las partes textuales, ignora metadatos de pensamiento y el servicio vuelve a validar localmente el
-JSON contra el esquema de la función antes de persistirlo.
+esperado mediante `GenerateContentConfig(response_mime_type="application/json", response_json_schema=...)`. El SDK normaliza el texto de respuesta y el servicio vuelve a validar
+localmente el JSON contra el esquema de la función antes de persistirlo.
 
 ## Mock y pruebas
 

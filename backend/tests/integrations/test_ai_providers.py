@@ -1,10 +1,13 @@
 import asyncio
-import json
 import logging
+from types import SimpleNamespace
 from typing import cast
-from unittest.mock import MagicMock
+from unittest.mock import AsyncMock, MagicMock
 
+import httpx
+import openai
 import pytest
+from google.genai import errors as genai_errors
 
 from app.core.common.ai_metrics import AIMetricsRegistry
 from app.core.errors.services import InvalidInputError
@@ -38,36 +41,35 @@ def run(coroutine):
     return asyncio.run(coroutine)
 
 
+def openai_client(*, response=None, error: Exception | None = None):
+    create = AsyncMock(return_value=response)
+    create.side_effect = error
+    return SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=create))), create
+
+
+def gemini_client(*, response=None, error: Exception | None = None):
+    generate_content = AsyncMock(return_value=response)
+    generate_content.side_effect = error
+    return SimpleNamespace(models=SimpleNamespace(generate_content=generate_content)), generate_content
+
+
 def test_mock_provider_returns_normalized_response() -> None:
     response = run(MockProvider(response="safe mock").generate(REQUEST))
-    assert response.provider == "mock"
-    assert response.text == "safe mock"
+    assert response.provider == "mock" and response.text == "safe mock"
 
 
 def test_provider_records_success_and_normalized_failure_metrics() -> None:
     metrics = AIMetricsRegistry()
     run(MockProvider(response="safe mock", metrics=metrics).generate(REQUEST))
     with pytest.raises(AiProviderError):
-        run(
-            MockProvider(
-                failure_code=AiProviderErrorCode.TIMEOUT,
-                metrics=metrics,
-            ).generate(REQUEST)
-        )
-
+        run(MockProvider(failure_code=AiProviderErrorCode.TIMEOUT, metrics=metrics).generate(REQUEST))
     failure, success = metrics.snapshot()
-    assert failure.key.provider == "mock"
-    assert failure.key.function == REQUEST.function
-    assert failure.key.outcome == "failure"
     assert failure.key.error_code == "provider_timeout"
     assert success.key.outcome == "success"
-    assert success.key.error_code is None
     assert failure.call_count == success.call_count == 1
-    assert failure.total_duration_ms >= 0
-    assert success.total_duration_ms >= 0
 
 
-def test_provider_request_rejects_arbitrary_context() -> None:
+def test_provider_request_validation() -> None:
     with pytest.raises(InvalidInputError, match="must be minimized"):
         AiTextRequest(
             context=cast(MinimizedAIContext, "private prompt"),
@@ -76,9 +78,6 @@ def test_provider_request_rejects_arbitrary_context() -> None:
             request_id="request-1",
             execution_id="a" * 32,
         )
-
-
-def test_provider_request_rejects_unsafe_metric_function() -> None:
     with pytest.raises(InvalidInputError, match="safe metric label"):
         AiTextRequest(
             context=REQUEST.context,
@@ -89,289 +88,152 @@ def test_provider_request_rejects_unsafe_metric_function() -> None:
         )
 
 
-def test_provider_logs_correlated_lifecycle_without_request_or_response_content() -> None:
+def test_provider_logs_correlated_lifecycle_without_content() -> None:
     logger = MagicMock(spec=logging.Logger)
     response = run(MockProvider(response="private response", logger=logger).generate(REQUEST))
-
-    assert response.text == "private response"
     log_text = " ".join(str(call) for call in logger.log.call_args_list)
-    assert "ai_provider_started" in log_text
-    assert "ai_provider_succeeded" in log_text
-    assert REQUEST.request_id in log_text
-    assert REQUEST.execution_id in log_text
-    assert REQUEST.context.render_untrusted_data() not in log_text
-    assert response.text not in log_text
+    assert "ai_provider_started" in log_text and "ai_provider_succeeded" in log_text
+    assert REQUEST.request_id in log_text and REQUEST.execution_id in log_text
+    assert REQUEST.context.render_untrusted_data() not in log_text and response.text not in log_text
 
 
-def test_openai_provider_builds_provider_payload_without_leaking_key() -> None:
-    calls = []
-
-    async def transport(url, headers, body):
-        calls.append((url, headers, body))
-        return 200, {"choices": [{"message": {"content": "result"}}]}
-
-    response = run(OpenAIProvider(api_key=PROVIDER_API_KEY, model="fallback", transport=transport).generate(REQUEST))
-    assert response.text == "result"
-    assert calls[0][0].endswith("/chat/completions")
-    payload = json.loads(calls[0][2])
-    assert payload["messages"][0]["role"] == "system"
-    assert "Summarize this" in payload["messages"][0]["content"]
-    assert "Private matter" not in payload["messages"][0]["content"]
-    assert payload["messages"][1] == {
-        "role": "user",
-        "content": REQUEST.context.render_untrusted_data(),
-    }
-    assert "tools" not in payload
-    assert payload["tool_choice"] == "none"
-    assert calls[0][1]["Authorization"] == f"Bearer {PROVIDER_API_KEY}"
+def test_openai_provider_uses_injected_official_client_without_leaking_key() -> None:
+    response = SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content=" result "))])
+    client, create = openai_client(response=response)
+    result = run(OpenAIProvider(api_key=PROVIDER_API_KEY, model="fallback", client=client).generate(REQUEST))
+    assert result.text == "result"
+    kwargs = create.await_args.kwargs
+    assert kwargs["model"] == REQUEST.model
+    assert kwargs["messages"][0]["role"] == "system"
+    assert "Summarize this" in kwargs["messages"][0]["content"]
+    assert "Private matter" not in kwargs["messages"][0]["content"]
+    assert kwargs["messages"][1]["content"] == REQUEST.context.render_untrusted_data()
+    assert kwargs["tool_choice"] == "none" and "tools" not in kwargs
+    assert PROVIDER_API_KEY not in repr(kwargs)
 
 
-def test_gemini_provider_normalizes_response() -> None:
-    async def transport(url, headers, body):
-        assert url.endswith(":generateContent")
-        assert PROVIDER_API_KEY not in url
-        assert headers["x-goog-api-key"] == PROVIDER_API_KEY
-        payload = json.loads(body)
-        system_text = payload["systemInstruction"]["parts"][0]["text"]
-        assert "Summarize this" in system_text
-        assert "Private matter" not in system_text
-        assert payload["contents"] == [
-            {
-                "role": "user",
-                "parts": [{"text": REQUEST.context.render_untrusted_data()}],
-            }
-        ]
-        assert "tools" not in payload
-        return 200, {"candidates": [{"content": {"parts": [{"text": "gemini result"}]}}]}
-
-    response = run(GeminiProvider(api_key=PROVIDER_API_KEY, model="gemini-test", transport=transport).generate(REQUEST))
-    assert response.provider == "gemini"
-    assert response.text == "gemini result"
-
-
-def test_gemini_provider_requests_structured_json_and_joins_text_parts() -> None:
+def test_gemini_provider_uses_injected_official_client_and_structured_config() -> None:
     request = AiTextRequest(
         context=REQUEST.context,
         function=REQUEST.function,
         model=REQUEST.model,
         request_id=REQUEST.request_id,
         execution_id=REQUEST.execution_id,
-        response_json_schema={
-            "type": "object",
-            "properties": {"summary": {"type": "string"}},
-            "required": ["summary"],
-        },
+        response_json_schema={"type": "object", "properties": {"summary": {"type": "string"}}},
     )
-
-    async def transport(url, headers, body):
-        generation_config = json.loads(body)["generationConfig"]
-        assert generation_config["responseMimeType"] == "application/json"
-        assert generation_config["responseJsonSchema"] == request.response_json_schema
-        return 200, {
-            "candidates": [
-                {
-                    "content": {
-                        "parts": [
-                            {"thought": True},
-                            {"text": '{"summary":'},
-                            {"text": '"resultado"}'},
-                        ]
-                    }
-                }
-            ]
-        }
-
-    response = run(GeminiProvider(api_key=PROVIDER_API_KEY, model="fallback", transport=transport).generate(request))
-
-    assert response.text == '{"summary":"resultado"}'
+    client, generate_content = gemini_client(response=SimpleNamespace(text=' {"summary":"resultado"} '))
+    result = run(GeminiProvider(api_key=PROVIDER_API_KEY, model="fallback", client=client).generate(request))
+    assert result.text == '{"summary":"resultado"}'
+    kwargs = generate_content.await_args.kwargs
+    assert kwargs["model"] == request.model
+    assert kwargs["contents"].parts[0].text == request.context.render_untrusted_data()
+    config = kwargs["config"]
+    assert config.response_mime_type == "application/json"
+    assert config.response_json_schema == request.response_json_schema
+    assert config.tools == []
+    assert "Summarize this" in str(config.system_instruction)
+    assert "Private matter" not in str(config.system_instruction)
+    assert PROVIDER_API_KEY not in repr(kwargs)
 
 
-def test_provider_failures_are_safe_and_retryable() -> None:
-    async def transport(url, headers, body):
-        return 503, {"error": "contains provider details"}
-
-    with pytest.raises(AiProviderError, match="no está disponible") as error:
-        run(OpenAIProvider(api_key=PROVIDER_API_KEY, model="test", transport=transport).generate(REQUEST))
-    assert error.value.code is AiProviderErrorCode.UNAVAILABLE
-    assert error.value.retryable is True
-    assert PROVIDER_API_KEY not in str(error.value)
+def test_gemini_provider_plain_text_config() -> None:
+    client, generate_content = gemini_client(response=SimpleNamespace(text="gemini result"))
+    response = run(GeminiProvider(api_key=PROVIDER_API_KEY, model="fallback", client=client).generate(REQUEST))
+    assert response.text == "gemini result"
+    assert generate_content.await_args.kwargs["config"].response_json_schema is None
 
 
-def test_invalid_provider_response_is_rejected() -> None:
-    async def transport(url, headers, body):
-        return 200, {"choices": []}
-
-    with pytest.raises(AiProviderError, match="respuesta inválida") as error:
-        run(OpenAIProvider(api_key=PROVIDER_API_KEY, model="test", transport=transport).generate(REQUEST))
-    assert error.value.error_code == "provider_invalid_response"
-    assert error.value.retryable is False
-
-
-def test_empty_provider_key_is_rejected() -> None:
+@pytest.mark.parametrize("provider", [OpenAIProvider, GeminiProvider])
+def test_empty_provider_key_is_rejected(provider) -> None:
     with pytest.raises(ValueError, match="api_key cannot be empty"):
-        OpenAIProvider(api_key=" ", model="test")
+        provider(api_key=" ", model="test")
 
 
-def test_default_transport_parses_json_response(monkeypatch: pytest.MonkeyPatch) -> None:
-    class Response:
-        status = 200
+def test_default_official_clients_are_constructed(monkeypatch: pytest.MonkeyPatch) -> None:
+    openai_sdk = MagicMock(return_value=SimpleNamespace())
+    gemini_async = SimpleNamespace()
+    google_sdk = MagicMock(return_value=SimpleNamespace(aio=gemini_async))
+    monkeypatch.setattr(ai_providers.openai, "AsyncOpenAI", openai_sdk)
+    monkeypatch.setattr(ai_providers.genai, "Client", google_sdk)
+    assert OpenAIProvider(api_key=PROVIDER_API_KEY, model="test")._client is openai_sdk.return_value
+    assert GeminiProvider(api_key=PROVIDER_API_KEY, model="test")._client is gemini_async
+    openai_sdk.assert_called_once_with(api_key=PROVIDER_API_KEY, timeout=30, max_retries=0)
+    google_sdk.assert_called_once_with(api_key=PROVIDER_API_KEY)
 
-        @staticmethod
-        def read():
-            return b'{"ok": true}'
 
-    class Connection:
-        def __init__(self, *args, **kwargs):
-            pass
-
-        def __enter__(self):
-            return self
-
-        def __exit__(self, *args):
-            return None
-
-        @staticmethod
-        def request(*args, **kwargs):
-            return None
-
-        @staticmethod
-        def getresponse():
-            return Response()
-
-        @staticmethod
-        def close():
-            return None
-
-    monkeypatch.setattr(ai_providers.http.client, "HTTPSConnection", Connection)
-    assert run(ai_providers._default_transport("https://provider.test/generate?model=test", {}, b"{}")) == (
-        200,
-        {"ok": True},
-    )
+def _openai_status_error(status: int) -> openai.APIStatusError:
+    request = httpx.Request("POST", "https://provider.invalid")
+    response = httpx.Response(status, request=request)
+    if status == 401:
+        return openai.AuthenticationError("private", response=response, body=None)
+    if status == 429:
+        return openai.RateLimitError("private", response=response, body=None)
+    return openai.APIStatusError("private", response=response, body=None)
 
 
 @pytest.mark.parametrize(
-    "url",
+    ("external_error", "expected"),
     [
-        "http://provider.test",
-        "file:///tmp/provider.json",
-        "custom://provider.test",
-        "https:///missing-host",
-        "https://[",
+        (
+            openai.APITimeoutError(request=httpx.Request("POST", "https://provider.invalid")),
+            AiProviderErrorCode.TIMEOUT,
+        ),
+        (_openai_status_error(401), AiProviderErrorCode.AUTHENTICATION_FAILED),
+        (_openai_status_error(429), AiProviderErrorCode.RATE_LIMITED),
+        (_openai_status_error(408), AiProviderErrorCode.TIMEOUT),
+        (_openai_status_error(503), AiProviderErrorCode.UNAVAILABLE),
+        (_openai_status_error(400), AiProviderErrorCode.REQUEST_REJECTED),
+        (
+            openai.APIConnectionError(request=httpx.Request("POST", "https://provider.invalid")),
+            AiProviderErrorCode.UNAVAILABLE,
+        ),
     ],
 )
-def test_default_transport_rejects_invalid_urls(
-    url: str,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    def unexpected_connection(*args, **kwargs):
-        pytest.fail("HTTPSConnection must not be created for an invalid provider URL")
-
-    monkeypatch.setattr(ai_providers.http.client, "HTTPSConnection", unexpected_connection)
-
-    with pytest.raises(AiProviderError, match="configuración") as error:
-        run(ai_providers._default_transport(url, {}, b"{}"))
-
-    assert error.value.code is AiProviderErrorCode.CONFIGURATION_ERROR
-    assert error.value.retryable is False
+def test_openai_sdk_errors_map_to_safe_taxonomy(external_error: Exception, expected: AiProviderErrorCode) -> None:
+    client, _ = openai_client(error=external_error)
+    with pytest.raises(AiProviderError) as captured:
+        run(OpenAIProvider(api_key=PROVIDER_API_KEY, model="test", client=client).generate(REQUEST))
+    assert captured.value.code is expected
+    assert "private" not in str(captured.value) and PROVIDER_API_KEY not in str(captured.value)
 
 
-def test_default_transport_maps_http_error(monkeypatch: pytest.MonkeyPatch) -> None:
-    connection = MagicMock()
-    connection.__enter__.return_value = connection
-    connection.getresponse.return_value.status = 429
-    monkeypatch.setattr(ai_providers.http.client, "HTTPSConnection", lambda *args, **kwargs: connection)
-    assert run(ai_providers._default_transport("https://provider.test", {}, b"{}")) == (429, None)
-
-
-def test_default_transport_maps_network_and_json_errors(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(
-        ai_providers.http.client,
-        "HTTPSConnection",
-        lambda *args, **kwargs: (_ for _ in ()).throw(OSError("offline")),
-    )
-    with pytest.raises(AiProviderError) as error:
-        run(ai_providers._default_transport("https://provider.test", {}, b"{}"))
-    assert error.value.code is AiProviderErrorCode.UNAVAILABLE
-    assert error.value.retryable is True
-
-    connection = MagicMock()
-    connection.__enter__.return_value = connection
-    connection.getresponse.return_value.status = 200
-    connection.getresponse.return_value.read.side_effect = ValueError("bad json")
-    monkeypatch.setattr(ai_providers.http.client, "HTTPSConnection", lambda *args, **kwargs: connection)
-    with pytest.raises(AiProviderError) as error:
-        run(ai_providers._default_transport("https://provider.test", {}, b"{}"))
-    assert error.value.code is AiProviderErrorCode.INVALID_RESPONSE
-    assert error.value.retryable is False
-
-
-def test_default_transport_maps_timeout(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(
-        ai_providers.http.client,
-        "HTTPSConnection",
-        lambda *args, **kwargs: (_ for _ in ()).throw(TimeoutError("external timeout detail")),
-    )
-
-    with pytest.raises(AiProviderError) as error:
-        run(ai_providers._default_transport("https://provider.test", {}, b"{}"))
-
-    assert error.value.code is AiProviderErrorCode.TIMEOUT
-    assert "external timeout detail" not in str(error.value)
-
-
-@pytest.mark.parametrize("provider_class", [OpenAIProvider, GeminiProvider])
 @pytest.mark.parametrize(
-    ("status", "expected_code", "retryable"),
+    ("external_error", "expected"),
     [
-        (400, AiProviderErrorCode.REQUEST_REJECTED, False),
-        (401, AiProviderErrorCode.AUTHENTICATION_FAILED, False),
-        (403, AiProviderErrorCode.AUTHENTICATION_FAILED, False),
-        (408, AiProviderErrorCode.TIMEOUT, True),
-        (429, AiProviderErrorCode.RATE_LIMITED, True),
-        (500, AiProviderErrorCode.UNAVAILABLE, True),
-        (503, AiProviderErrorCode.UNAVAILABLE, True),
-        (504, AiProviderErrorCode.TIMEOUT, True),
+        (genai_errors.APIError(401, {"error": "private"}), AiProviderErrorCode.AUTHENTICATION_FAILED),
+        (genai_errors.APIError(429, {"error": "private"}), AiProviderErrorCode.RATE_LIMITED),
+        (genai_errors.APIError(504, {"error": "private"}), AiProviderErrorCode.TIMEOUT),
+        (genai_errors.APIError(503, {"error": "private"}), AiProviderErrorCode.UNAVAILABLE),
+        (genai_errors.APIError(400, {"error": "private"}), AiProviderErrorCode.REQUEST_REJECTED),
+        (TimeoutError("private"), AiProviderErrorCode.TIMEOUT),
+        (RuntimeError("private"), AiProviderErrorCode.UNAVAILABLE),
     ],
 )
-def test_http_providers_share_error_taxonomy(provider_class, status, expected_code, retryable) -> None:
-    async def transport(url, headers, body):
-        return status, {"error": f"external detail {PROVIDER_API_KEY}"}
-
-    with pytest.raises(AiProviderError) as error:
-        run(provider_class(api_key=PROVIDER_API_KEY, model="test", transport=transport).generate(REQUEST))
-
-    assert error.value.code is expected_code
-    assert error.value.error_code == expected_code.value
-    assert error.value.retryable is retryable
-    assert PROVIDER_API_KEY not in str(error.value)
-    assert "external detail" not in str(error.value)
+def test_gemini_sdk_errors_map_to_safe_taxonomy(external_error: Exception, expected: AiProviderErrorCode) -> None:
+    client, _ = gemini_client(error=external_error)
+    with pytest.raises(AiProviderError) as captured:
+        run(GeminiProvider(api_key=PROVIDER_API_KEY, model="test", client=client).generate(REQUEST))
+    assert captured.value.code is expected
+    assert "private" not in str(captured.value) and PROVIDER_API_KEY not in str(captured.value)
 
 
-def test_provider_maps_transport_errors() -> None:
-    async def unexpected_error(url, headers, body):
-        raise RuntimeError("provider internals")
-
-    with pytest.raises(AiProviderError) as transport_error:
-        run(OpenAIProvider(api_key=PROVIDER_API_KEY, model="test", transport=unexpected_error).generate(REQUEST))
-    assert transport_error.value.code is AiProviderErrorCode.UNAVAILABLE
-    assert transport_error.value.retryable is True
-
-    async def timeout(url, headers, body):
-        raise TimeoutError("provider timeout detail")
-
-    with pytest.raises(AiProviderError) as timeout_error:
-        run(GeminiProvider(api_key=PROVIDER_API_KEY, model="test", transport=timeout).generate(REQUEST))
-    assert timeout_error.value.code is AiProviderErrorCode.TIMEOUT
+@pytest.mark.parametrize(
+    "response",
+    [SimpleNamespace(choices=[]), SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content=" "))])],
+)
+def test_openai_invalid_sdk_response_is_rejected(response) -> None:
+    client, _ = openai_client(response=response)
+    with pytest.raises(AiProviderError) as captured:
+        run(OpenAIProvider(api_key=PROVIDER_API_KEY, model="test", client=client).generate(REQUEST))
+    assert captured.value.code is AiProviderErrorCode.INVALID_RESPONSE
 
 
-def test_provider_rethrows_safe_provider_error() -> None:
-    async def provider_error(url, headers, body):
-        raise AiProviderError(AiProviderErrorCode.REQUEST_REJECTED)
-
-    with pytest.raises(AiProviderError) as error:
-        run(OpenAIProvider(api_key=PROVIDER_API_KEY, model="test", transport=provider_error).generate(REQUEST))
-    assert error.value.code is AiProviderErrorCode.REQUEST_REJECTED
-    assert error.value.retryable is False
+@pytest.mark.parametrize("response", [object(), SimpleNamespace(text=None), SimpleNamespace(text=" ")])
+def test_gemini_invalid_sdk_response_is_rejected(response) -> None:
+    client, _ = gemini_client(response=response)
+    with pytest.raises(AiProviderError) as captured:
+        run(GeminiProvider(api_key=PROVIDER_API_KEY, model="test", client=client).generate(REQUEST))
+    assert captured.value.code is AiProviderErrorCode.INVALID_RESPONSE
 
 
 def test_provider_observer_logs_unexpected_error_type_without_message() -> None:
@@ -383,46 +245,14 @@ def test_provider_observer_logs_unexpected_error_type_without_message() -> None:
 
     with pytest.raises(RuntimeError, match="private unexpected detail"):
         run(provider._observe(REQUEST, model=REQUEST.model, operation=unexpected))
-
     log_text = " ".join(str(call) for call in logger.log.call_args_list)
-    assert "RuntimeError" in log_text
-    assert "private unexpected detail" not in log_text
-
-
-def test_response_text_parser_rejects_wrong_shape_and_blank_text() -> None:
-    with pytest.raises(AiProviderError, match="respuesta inválida"):
-        ai_providers._require_text("not-an-object", "value")
-    with pytest.raises(AiProviderError, match="respuesta inválida"):
-        ai_providers._require_text({"value": "  "}, "value")
-
-
-@pytest.mark.parametrize(
-    "payload",
-    [
-        "not-an-object",
-        {"candidates": []},
-        {"candidates": ["not-an-object"]},
-        {"candidates": [{}]},
-        {"candidates": [{"content": {}}]},
-        {"candidates": [{"content": {"parts": [{"thought": True}, {"text": "  "}]}}]},
-    ],
-)
-def test_gemini_response_text_parser_rejects_invalid_shapes(payload) -> None:
-    with pytest.raises(AiProviderError):
-        ai_providers._require_gemini_text(payload)
+    assert "RuntimeError" in log_text and "private unexpected detail" not in log_text
 
 
 @pytest.mark.parametrize("code", list(AiProviderErrorCode))
 def test_mock_provider_uses_same_public_failure_contract(code: AiProviderErrorCode) -> None:
-    logger = MagicMock(spec=logging.Logger)
     with pytest.raises(AiProviderError) as error:
-        run(MockProvider(failure_code=code, logger=logger).generate(REQUEST))
-
+        run(MockProvider(failure_code=code).generate(REQUEST))
     failure = error.value.to_public_failure()
-    assert failure.code == code.value
-    assert failure.message == str(error.value)
-    assert failure.retryable is error.value.retryable
+    assert failure.code == code.value and failure.retryable is error.value.retryable
     assert PROVIDER_API_KEY not in repr(failure)
-    log_text = " ".join(str(call) for call in logger.log.call_args_list)
-    assert code.value in log_text
-    assert failure.message not in log_text

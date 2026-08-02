@@ -1,8 +1,5 @@
 """Provider-neutral contracts and safe adapters for text-generation providers."""
 
-import asyncio
-import http.client
-import json
 import logging
 import re
 from collections.abc import Awaitable, Callable, Mapping
@@ -10,7 +7,11 @@ from dataclasses import dataclass
 from enum import StrEnum
 from time import perf_counter
 from typing import Any, Protocol
-from urllib.parse import SplitResult, urlsplit
+
+import openai
+from google import genai
+from google.genai import errors as genai_errors
+from google.genai import types as genai_types
 
 from app.core.common.ai_metrics import AI_METRICS, AIMetricsRegistry
 from app.core.common.observability import AiCorrelationContext, log_ai_event
@@ -98,98 +99,57 @@ class AiProviderPort(Protocol):
     async def generate(self, request: AiTextRequest) -> AiTextResponse: ...
 
 
-JsonTransport = Callable[[str, Mapping[str, str], bytes], Awaitable[tuple[int, Any]]]
-
-
-def _validate_provider_url(url: str) -> tuple[SplitResult, str]:
+def _require_openai_text(response: Any) -> str:
     try:
-        parsed_url = urlsplit(url)
-        _ = parsed_url.port
-    except ValueError as exc:
-        raise AiProviderError(AiProviderErrorCode.CONFIGURATION_ERROR) from exc
-    hostname = parsed_url.hostname
-    if (
-        parsed_url.scheme != "https"
-        or hostname is None
-        or parsed_url.username is not None
-        or parsed_url.password is not None
-        or parsed_url.fragment
-    ):
-        raise AiProviderError(AiProviderErrorCode.CONFIGURATION_ERROR)
-    return parsed_url, hostname
-
-
-def _default_transport(url: str, headers: Mapping[str, str], body: bytes) -> Awaitable[tuple[int, Any]]:
-    async def send() -> tuple[int, Any]:
-        def request() -> tuple[int, Any]:
-            parsed_url, hostname = _validate_provider_url(url)
-            request_target = parsed_url.path or "/"
-            if parsed_url.query:
-                request_target = f"{request_target}?{parsed_url.query}"
-            connection: http.client.HTTPSConnection | None = None
-            try:
-                connection = http.client.HTTPSConnection(hostname, parsed_url.port, timeout=30)
-                connection.request("POST", request_target, body=body, headers=dict(headers))
-                response = connection.getresponse()
-                if response.status < 200 or response.status >= 300:
-                    return response.status, None
-                return response.status, json.loads(response.read())
-            except TimeoutError as exc:
-                raise AiProviderError(AiProviderErrorCode.TIMEOUT) from exc
-            except ValueError as exc:
-                raise AiProviderError(AiProviderErrorCode.INVALID_RESPONSE) from exc
-            except (http.client.HTTPException, OSError) as exc:
-                raise AiProviderError(AiProviderErrorCode.UNAVAILABLE) from exc
-            finally:
-                if connection is not None:
-                    connection.close()
-
-        return await asyncio.to_thread(request)
-
-    return send()
-
-
-def _require_text(payload: Any, path: str) -> str:
-    value: Any = payload
-    for key in path.split("."):
-        if isinstance(value, list) and key.isdigit():
-            try:
-                value = value[int(key)]
-            except IndexError as exc:
-                raise AiProviderError(AiProviderErrorCode.INVALID_RESPONSE) from exc
-        elif isinstance(value, Mapping):
-            value = value.get(key)
-        else:
-            raise AiProviderError(AiProviderErrorCode.INVALID_RESPONSE)
-    if not isinstance(value, str) or not value.strip():
+        text = response.choices[0].message.content
+    except (AttributeError, IndexError, TypeError) as exc:
+        raise AiProviderError(AiProviderErrorCode.INVALID_RESPONSE) from exc
+    if not isinstance(text, str) or not text.strip():
         raise AiProviderError(AiProviderErrorCode.INVALID_RESPONSE)
-    return value.strip()
+    return text.strip()
 
 
-def _require_gemini_text(payload: Any) -> str:
-    """Return all textual response parts, ignoring Gemini thought metadata."""
-    if not isinstance(payload, Mapping):
+def _require_gemini_text(response: Any) -> str:
+    """Return SDK-normalized text while rejecting empty or malformed responses."""
+    try:
+        text = response.text
+    except (AttributeError, ValueError) as exc:
+        raise AiProviderError(AiProviderErrorCode.INVALID_RESPONSE) from exc
+    if not isinstance(text, str) or not text.strip():
         raise AiProviderError(AiProviderErrorCode.INVALID_RESPONSE)
-    candidates = payload.get("candidates")
-    if not isinstance(candidates, list) or not candidates:
-        raise AiProviderError(AiProviderErrorCode.INVALID_RESPONSE)
-    candidate = candidates[0]
-    if not isinstance(candidate, Mapping):
-        raise AiProviderError(AiProviderErrorCode.INVALID_RESPONSE)
-    content = candidate.get("content")
-    if not isinstance(content, Mapping):
-        raise AiProviderError(AiProviderErrorCode.INVALID_RESPONSE)
-    parts = content.get("parts")
-    if not isinstance(parts, list):
-        raise AiProviderError(AiProviderErrorCode.INVALID_RESPONSE)
-    text_parts = [
-        text.strip()
-        for part in parts
-        if isinstance(part, Mapping) and isinstance((text := part.get("text")), str) and text.strip()
-    ]
-    if not text_parts:
-        raise AiProviderError(AiProviderErrorCode.INVALID_RESPONSE)
-    return "".join(text_parts)
+    return text.strip()
+
+
+def _status_error_code(status: int) -> AiProviderErrorCode:
+    if status in {401, 403}:
+        return AiProviderErrorCode.AUTHENTICATION_FAILED
+    if status == 429:
+        return AiProviderErrorCode.RATE_LIMITED
+    if status in {408, 504}:
+        return AiProviderErrorCode.TIMEOUT
+    if status >= 500 or status < 100:
+        return AiProviderErrorCode.UNAVAILABLE
+    return AiProviderErrorCode.REQUEST_REJECTED
+
+
+def _map_openai_error(exc: Exception) -> AiProviderError:
+    if isinstance(exc, openai.APITimeoutError):
+        return AiProviderError(AiProviderErrorCode.TIMEOUT)
+    if isinstance(exc, openai.AuthenticationError):
+        return AiProviderError(AiProviderErrorCode.AUTHENTICATION_FAILED)
+    if isinstance(exc, openai.RateLimitError):
+        return AiProviderError(AiProviderErrorCode.RATE_LIMITED)
+    if isinstance(exc, openai.APIStatusError):
+        return AiProviderError(_status_error_code(exc.status_code))
+    return AiProviderError(AiProviderErrorCode.UNAVAILABLE)
+
+
+def _map_gemini_error(exc: Exception) -> AiProviderError:
+    if isinstance(exc, genai_errors.APIError):
+        return AiProviderError(_status_error_code(exc.code))
+    if isinstance(exc, TimeoutError):
+        return AiProviderError(AiProviderErrorCode.TIMEOUT)
+    return AiProviderError(AiProviderErrorCode.UNAVAILABLE)
 
 
 class _ObservedAiProvider:
@@ -288,60 +248,32 @@ class _ObservedAiProvider:
         return AiTextResponse(provider=self.provider, model=model, text=text)
 
 
-class _HttpAiProvider(_ObservedAiProvider):
-    provider: str
+class OpenAIProvider(_ObservedAiProvider):
+    provider = "openai"
 
     def __init__(
         self,
         *,
         api_key: str,
         model: str,
-        transport: JsonTransport | None = None,
+        client: Any | None = None,
         logger: logging.Logger | None = None,
         metrics: AIMetricsRegistry | None = None,
     ):
         super().__init__(logger=logger, metrics=metrics)
         if not api_key.strip():
             raise ValueError("api_key cannot be empty")
-        self._api_key = api_key
         self._model = model
-        self._transport = transport or _default_transport
-
-    async def _post(self, *, url: str, headers: Mapping[str, str], body: dict[str, Any]) -> Any:
-        try:
-            status, payload = await self._transport(url, headers, json.dumps(body).encode("utf-8"))
-        except AiProviderError:
-            raise
-        except TimeoutError as exc:
-            raise AiProviderError(AiProviderErrorCode.TIMEOUT) from exc
-        except Exception as exc:
-            raise AiProviderError(AiProviderErrorCode.UNAVAILABLE) from exc
-        if status in {401, 403}:
-            raise AiProviderError(AiProviderErrorCode.AUTHENTICATION_FAILED)
-        if status == 429:
-            raise AiProviderError(AiProviderErrorCode.RATE_LIMITED)
-        if status in {408, 504}:
-            raise AiProviderError(AiProviderErrorCode.TIMEOUT)
-        if status >= 500 or status < 100:
-            raise AiProviderError(AiProviderErrorCode.UNAVAILABLE)
-        if status < 200 or status >= 300:
-            raise AiProviderError(AiProviderErrorCode.REQUEST_REJECTED)
-        return payload
-
-
-class OpenAIProvider(_HttpAiProvider):
-    provider = "openai"
+        self._client = client or openai.AsyncOpenAI(api_key=api_key, timeout=30, max_retries=0)
 
     async def generate(self, request: AiTextRequest) -> AiTextResponse:
         model = request.model or self._model
 
         async def execute() -> str:
-            payload = await self._post(
-                url="https://api.openai.com/v1/chat/completions",
-                headers={"Authorization": f"Bearer {self._api_key}", "Content-Type": "application/json"},
-                body={
-                    "model": model,
-                    "messages": [
+            try:
+                response = await self._client.chat.completions.create(
+                    model=model,
+                    messages=[
                         {
                             "role": "system",
                             "content": f"{UNTRUSTED_DATA_POLICY}\n\n{request.context.instruction}",
@@ -351,51 +283,62 @@ class OpenAIProvider(_HttpAiProvider):
                             "content": request.context.render_untrusted_data(),
                         },
                     ],
-                    "max_tokens": request.max_tokens,
-                    "tool_choice": "none",
-                },
-            )
-            return _require_text(payload, "choices.0.message.content") if isinstance(payload, Mapping) else ""
+                    max_tokens=request.max_tokens,
+                    tool_choice="none",
+                )
+            except Exception as exc:
+                raise _map_openai_error(exc) from exc
+            return _require_openai_text(response)
 
         return await self._observe(request, model=model, operation=execute)
 
 
-class GeminiProvider(_HttpAiProvider):
+class GeminiProvider(_ObservedAiProvider):
     provider = "gemini"
+
+    def __init__(
+        self,
+        *,
+        api_key: str,
+        model: str,
+        client: Any | None = None,
+        logger: logging.Logger | None = None,
+        metrics: AIMetricsRegistry | None = None,
+    ):
+        super().__init__(logger=logger, metrics=metrics)
+        if not api_key.strip():
+            raise ValueError("api_key cannot be empty")
+        self._model = model
+        self._client = client or genai.Client(api_key=api_key).aio
 
     async def generate(self, request: AiTextRequest) -> AiTextResponse:
         model = request.model or self._model
 
         async def execute() -> str:
-            generation_config: dict[str, Any] = {"maxOutputTokens": request.max_tokens}
+            config: dict[str, Any] = {
+                "max_output_tokens": request.max_tokens,
+                "system_instruction": f"{UNTRUSTED_DATA_POLICY}\n\n{request.context.instruction}",
+                "tools": [],
+            }
             if request.response_json_schema is not None:
-                generation_config.update(
+                config.update(
                     {
-                        "responseMimeType": "application/json",
-                        "responseJsonSchema": dict(request.response_json_schema),
+                        "response_mime_type": "application/json",
+                        "response_json_schema": dict(request.response_json_schema),
                     }
                 )
-            payload = await self._post(
-                url=f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
-                headers={"Content-Type": "application/json", "x-goog-api-key": self._api_key},
-                body={
-                    "systemInstruction": {
-                        "parts": [
-                            {
-                                "text": f"{UNTRUSTED_DATA_POLICY}\n\n{request.context.instruction}",
-                            }
-                        ]
-                    },
-                    "contents": [
-                        {
-                            "role": "user",
-                            "parts": [{"text": request.context.render_untrusted_data()}],
-                        }
-                    ],
-                    "generationConfig": generation_config,
-                },
-            )
-            return _require_gemini_text(payload)
+            try:
+                response = await self._client.models.generate_content(
+                    model=model,
+                    contents=genai_types.Content(
+                        role="user",
+                        parts=[genai_types.Part(text=request.context.render_untrusted_data())],
+                    ),
+                    config=genai_types.GenerateContentConfig(**config),
+                )
+            except Exception as exc:
+                raise _map_gemini_error(exc) from exc
+            return _require_gemini_text(response)
 
         return await self._observe(request, model=model, operation=execute)
 
