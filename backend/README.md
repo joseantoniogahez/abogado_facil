@@ -183,6 +183,32 @@ Base permissions:
 - `user_roles:manage`
 - `users:manage`
 
+### Local Compose demo data
+
+With the local Compose stack running, seed fictional product data on demand from the repository
+root:
+
+```bash
+docker compose exec backend python -m app.core.db.local_seed
+```
+
+The versioned fixture at `app/core/db/local_seed.json` contains the local-only credentials and all
+editable seed values. The command validates the complete fixture and its matter types before opening
+a transaction, then idempotently creates two firms, two `account_owner` users, four clients, and one
+matter of every canonical type for each client (32 matters with the current catalog). No BYOK
+credentials, AI jobs, results, reviews, or feedback are created.
+
+To clear tenant-owned application data and immediately recreate the fixture, run:
+
+```bash
+docker compose exec backend python -m app.core.db.local_seed --reset
+```
+
+Warning: `--reset` is destructive. It deletes users, firms, clients, matters and their dependent
+application records in one transaction, while preserving RBAC roles and permissions. Both modes
+abort before database writes unless the process has `APP_ENV=local`; builds, startup, tests, staging,
+and production never invoke this utility automatically.
+
 ## Testing and Validation
 
 Run from repo root:

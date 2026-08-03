@@ -1,0 +1,74 @@
+{
+  "users": [
+    {
+      "email": "ana.local@example.test",
+      "login_phrase": "LocalDemo-Ana-2026",
+      "first_name": "Ana",
+      "middle_name": "Lucía",
+      "last_name": "Torres",
+      "display_name": "Ana Torres",
+      "disabled": false,
+      "firm_name": "Torres Legal Demo",
+      "clients": [
+        {
+          "full_name": "Mariana López Demo",
+          "phone_country_code": "52",
+          "phone": "5551001001",
+          "email": "mariana.lopez@example.test",
+          "address": "Av. Reforma 100, Ciudad de México",
+          "notes": "Cliente ficticio para pruebas locales.",
+          "matter_title_prefix": "Mariana López"
+        },
+        {
+          "full_name": "Roberto Sánchez Demo",
+          "phone_country_code": "52",
+          "phone": "5551001002",
+          "email": "roberto.sanchez@example.test",
+          "address": "Calle Naranjo 24, Ciudad de México",
+          "notes": "Cliente ficticio para pruebas locales.",
+          "matter_title_prefix": "Roberto Sánchez"
+        }
+      ]
+    },
+    {
+      "email": "diego.local@example.test",
+      "login_phrase": "LocalDemo-Diego-2026",
+      "first_name": "Diego",
+      "middle_name": null,
+      "last_name": "Ramírez",
+      "display_name": "Diego Ramírez",
+      "disabled": false,
+      "firm_name": "Ramírez Abogados Demo",
+      "clients": [
+        {
+          "full_name": "Elena Vargas Demo",
+          "phone_country_code": "52",
+          "phone": "5552002001",
+          "email": "elena.vargas@example.test",
+          "address": "Calzada del Valle 80, Monterrey",
+          "notes": "Cliente ficticio para pruebas locales.",
+          "matter_title_prefix": "Elena Vargas"
+        },
+        {
+          "full_name": "Jorge Castillo Demo",
+          "phone_country_code": "52",
+          "phone": "5552002002",
+          "email": "jorge.castillo@example.test",
+          "address": "Av. Patria 315, Guadalajara",
+          "notes": "Cliente ficticio para pruebas locales.",
+          "matter_title_prefix": "Jorge Castillo"
+        }
+      ]
+    }
+  ],
+  "matter_templates": [
+    {"matter_type": "Pensión alimenticia", "title_suffix": "Pensión alimenticia", "status": "active", "counterparty": "Contraparte ficticia de alimentos", "description": "Evaluación inicial ficticia de pensión alimenticia.", "next_action": "Revisar comprobantes de ingresos", "next_action_date": "2026-08-10"},
+    {"matter_type": "Divorcio básico", "title_suffix": "Divorcio básico", "status": "pending", "counterparty": "Cónyuge ficticio", "description": "Expediente ficticio de divorcio básico.", "next_action": "Preparar convenio preliminar", "next_action_date": "2026-08-12"},
+    {"matter_type": "Despido / asunto laboral inicial", "title_suffix": "Asunto laboral", "status": "active", "counterparty": "Empresa ficticia, S.A.", "description": "Consulta ficticia por terminación laboral.", "next_action": "Calcular prestaciones estimadas", "next_action_date": "2026-08-14"},
+    {"matter_type": "Cobro de deuda", "title_suffix": "Cobro de deuda", "status": "active", "counterparty": "Deudor ficticio", "description": "Cobro ficticio documentado mediante pagaré.", "next_action": "Revisar documentos base", "next_action_date": "2026-08-17"},
+    {"matter_type": "Convenio de pago", "title_suffix": "Convenio de pago", "status": "pending", "counterparty": "Acreedor ficticio", "description": "Negociación ficticia de calendario de pagos.", "next_action": "Enviar propuesta de calendario", "next_action_date": "2026-08-19"},
+    {"matter_type": "Arrendamiento", "title_suffix": "Arrendamiento", "status": "active", "counterparty": "Arrendador ficticio", "description": "Revisión ficticia de obligaciones de arrendamiento.", "next_action": "Analizar contrato vigente", "next_action_date": "2026-08-21"},
+    {"matter_type": "Sucesorio básico", "title_suffix": "Sucesorio básico", "status": "pending", "counterparty": "Interesado ficticio", "description": "Integración ficticia de expediente sucesorio.", "next_action": "Solicitar actas faltantes", "next_action_date": "2026-08-24"},
+    {"matter_type": "Otro", "title_suffix": "Consulta general", "status": "closed", "counterparty": "Sin contraparte", "description": "Consulta jurídica general ficticia concluida.", "next_action": "Archivar constancia de cierre", "next_action_date": "2026-08-28"}
+  ]
+}

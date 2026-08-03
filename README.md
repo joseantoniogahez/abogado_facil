@@ -105,6 +105,29 @@ Notes:
 - Compose creates the private `S3_BUCKET` idempotently. Object data lives in the named
   `object_storage_data` volume and survives container recreation.
 
+### Local demo data
+
+After the local backend is healthy and its migrations have completed, create the deterministic demo
+dataset manually:
+
+```bash
+docker compose exec backend python -m app.core.db.local_seed
+```
+
+The command is idempotent and creates two fictional users (credentials are documented in
+`backend/app/core/db/local_seed.json`), two firms, four clients, and 32 matters. It is never run by
+the image build or service startup and refuses to run unless `APP_ENV=local`.
+
+To delete all local application data and recreate the fixture in one transaction, use the explicit
+destructive option:
+
+```bash
+docker compose exec backend python -m app.core.db.local_seed --reset
+```
+
+`--reset` preserves the RBAC role and permission catalogs, but deletes users and all tenant-owned
+application records. Do not use it against a database containing data you need.
+
 ## Run Tests (Docker Compose)
 
 From repository root:

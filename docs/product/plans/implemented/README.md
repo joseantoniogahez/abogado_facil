@@ -79,3 +79,4 @@ derivarse de esa carpeta, no de estos planes técnicos.
 | Resumen IA del expediente      | [`AI-201`](AI-201_RESUMEN_EXPEDIENTE_PLAN.md)                             |
 | Cronología IA del expediente   | [`AI-202`](AI-202_CRONOLOGIA_HECHOS_PLAN.md)                              |
 | Checklist personalizado IA     | [`AI-203`](AI-203_CHECKLIST_PERSONALIZADO_IA_PLAN.md)                     |
+| Datos locales de Compose       | [`OPS-010`](OPS-010_LOCAL_COMPOSE_TEST_DATA_PLAN.md)                      |
