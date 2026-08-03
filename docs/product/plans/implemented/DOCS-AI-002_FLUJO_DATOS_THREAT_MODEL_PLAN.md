@@ -7,7 +7,7 @@
 - Priority: `P1`
 - Plan status: `Complete`
 - Implementation status: `Hecho`
-- Last updated: `2026-07-26`
+- Last updated: `2026-08-02`
 - Backlog source: `docs/product/BACKLOG_ABOGADO_FACIL.md`
 
 ## Objective
@@ -78,10 +78,11 @@ una vista integral que conecte las fronteras y el threat model.
 
 ## Progress Log
 
-| Date       | State       | Completed                                 | Pending / next safe action      |
-| ---------- | ----------- | ----------------------------------------- | ------------------------------- |
-| 2026-07-26 | En progreso | Alcance y ubicacion definidos             | Escribir y validar el documento |
-| 2026-07-26 | Hecho       | Threat model, contratos y gates completos | Continuar con SEC-004           |
+| Date       | State       | Completed                                               | Pending / next safe action      |
+| ---------- | ----------- | ------------------------------------------------------- | ------------------------------- |
+| 2026-07-26 | En progreso | Alcance y ubicacion definidos                           | Escribir y validar el documento |
+| 2026-07-26 | Hecho       | Threat model, contratos y gates completos               | Continuar con SEC-004           |
+| 2026-08-02 | Hecho       | Revalidado contra flujos reales y gates P0-IA cumplidos | Ninguna                         |
 
 ## Validation Results
 
@@ -97,8 +98,8 @@ una vista integral que conecte las fronteras y el threat model.
 - Changed files and contracts: arquitectura IA, indice backend, prueba contractual y tracking.
 - Pending work: none.
 - Blockers or approvals: none.
-- Residual risks: `SEC-004` sigue siendo gate previo a funciones IA reales.
-- Next safe action: continuar con `SEC-004`.
+- Residual risks: sesgo o fabricación schema-valid, disponibilidad/cuota y uso externo del borrador.
+- Next safe action: revalidar al agregar funciones, herramientas o proveedores.
 
 ## Completion Documentation Review
 
@@ -121,4 +122,4 @@ Record documents intentionally unchanged and why:
 - Validation: 547 backend tests, 100% coverage, 37 documentation tests and all pre-commit hooks.
 - Skipped validation: none.
 - Human approvals: not applicable.
-- Residual risk: `SEC-004` and `LEGAL-002A` remain explicit gates before real AI workflows.
+- Residual risk: probabilistic quality, provider operations and post-copy user behavior remain explicit.

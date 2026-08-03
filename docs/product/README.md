@@ -6,6 +6,7 @@ Esta carpeta separa la verdad funcional del producto en dos estados:
 - [`plans/implemented/`](plans/implemented/): planes con implementación técnica terminada; algunas
   capacidades pueden seguir bloqueadas para release por gates o aprobaciones.
 - [`plans/pending/`](plans/pending/): planes técnicos de capacidades todavía pendientes.
+- [`evidence/`](evidence/): evaluaciones, casos de estudio y evidencia reproducible de portafolio.
 
 El índice y el backlog permanecen aquí:
 

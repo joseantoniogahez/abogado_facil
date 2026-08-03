@@ -47,6 +47,11 @@ derivarse de esa carpeta, no de estos planes técnicos.
 | Observabilidad de IA           | [`OBS-001`](OBS-001_OBSERVABILIDAD_CORRELACIONADA_IA_PLAN.md)             |
 | Contratos multi-provider       | [`TEST-AI-001`](TEST-AI-001_CONTRATOS_FALLOS_MULTI_PROVIDER_PLAN.md)      |
 | Threat model de IA             | [`DOCS-AI-002`](DOCS-AI-002_FLUJO_DATOS_THREAT_MODEL_PLAN.md)             |
+| Arquitectura de integración IA | [`DOCS-AI-001`](DOCS-AI-001_ARQUITECTURA_INTEGRACION_IA_PLAN.md)          |
+| ADR BYOK multi-provider        | [`DOCS-AI-003`](DOCS-AI-003_ADR_BYOK_MULTI_PROVIDER_PLAN.md)              |
+| Errores y reintentos IA        | [`DOCS-AI-004`](DOCS-AI-004_CATALOGO_ERRORES_REINTENTOS_PLAN.md)          |
+| Evaluación prompts y schemas   | [`DOCS-AI-005`](DOCS-AI-005_EVALUACION_PROMPTS_SCHEMAS_PLAN.md)           |
+| Caso de estudio hero flow      | [`DOCS-AI-006`](DOCS-AI-006_HERO_FLOW_CASE_STUDY_PLAN.md)                 |
 | Auditoría backend inicial      | [`AUDIT-001`](AUDIT-001_AUDITORIA_BACKEND_FASTAPI_INICIAL_PLAN.md)        |
 | Auditoría backend final        | [`AUDIT-002`](AUDIT-002_AUDITORIA_BACKEND_FASTAPI_POST_HARDENING_PLAN.md) |
 | OpenAPI en producción          | [`OPS-005`](OPS-005_OPENAPI_PRODUCCION_PLAN.md)                           |

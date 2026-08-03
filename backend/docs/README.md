@@ -22,6 +22,7 @@ This folder is the canonical backend documentation set. It is organized for thre
 - `operations/ai_job_lifecycle.md`: persistent AI execution states, isolation, correlation, and safe result/error storage.
 - `operations/rq_ai_queue.md`: RQ/Redis transport, JSON payload boundary, retry, timeout, TTL, and deduplication policy.
 - `operations/ai_provider_errors.md`: provider-neutral failure codes, safe public messages, and retry policy.
+- `operations/ai_failure_catalog.md`: reproducible provider failures, HTTP outcomes, and retry examples.
 - `operations/structured_ai_outputs.md`: schema validation and version gate before AI results can be persisted or consumed.
 - `operations/ai_context_minimization.md`: allowlisted, bounded context gate before any AI provider call.
 - `operations/document_prompt_injection.md`: mandatory separation of trusted instructions,
@@ -34,6 +35,8 @@ This folder is the canonical backend documentation set. It is organized for thre
 - `architecture/clean_architecture_ports_adapters.md`: feature ownership and dependency direction.
 - `architecture/ai_data_flow_threat_model.md`: AI data flow, trust boundaries, controls, residual
   risks, and release gates.
+- `architecture/ai_integration_architecture.md`: ports, adapters, jobs, results, and extension boundaries.
+- `architecture/adr_byok_multi_provider.md`: accepted BYOK and multi-provider decision and trade-offs.
 - `architecture/dependency_injection.md`: dependency providers and request-scoped wiring rules.
 - `architecture/unit_of_work.md`: transaction boundary behavior and rollback/commit policy.
 - `architecture/openapi_documentation.md`: OpenAPI metadata split and naming conventions.

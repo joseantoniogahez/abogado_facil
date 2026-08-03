@@ -2,8 +2,8 @@
 
 ## Scope
 
-This document joins the backend AI contracts into one trust-boundary view. It describes the
-foundation delivered in Phase 2; it does not authorize a public AI feature by itself.
+This document joins the backend AI contracts into one trust-boundary view. It covers the current
+public AI assistance and document-draft flows after all P0-IA gates were completed.
 
 ## Data Flow
 
@@ -59,18 +59,19 @@ flowchart LR
 | Mutating a validated result     | callers receive a defensive copy and persistence receives a fresh copy                         | schemas still need `extra="forbid"` and function-specific constraints                        |
 | Provider error/content leakage  | normalized errors, redacted logs and content-free metrics                                      | provider SDK/transport changes require contract tests                                        |
 | Prompt injection in documents   | trusted instruction and escaped untrusted data use separate provider channels; tools are empty | model output remains probabilistic and must pass schema validation plus `LEGAL-002A` review  |
-| Autonomous legal action         | no Phase 2 handler or public AI workflow performs actions                                      | `LEGAL-002A` is required before user-facing results                                          |
+| Autonomous legal action         | no tools; review is required and conversion is an explicit later action                        | users can still misuse a reviewed draft outside the application                              |
 
-## Release Gates
+## Gate status and residual risk
 
-Phase 2 supplies internal infrastructure, not a production legal AI workflow. Before enabling the
-first document-backed function, the `SEC-004` infrastructure control described above is mandatory
-and the remaining gates are:
+`SEC-001B`, `SEC-001C`, `SEC-002`, `SEC-004`, `LEGAL-002A` and the structured-output, redaction and
+BYOK gates are implemented and tested for the current synchronous product flows. Adding a new
+function still requires its own closed schema, context allowlist, negative tenant tests and review
+consumer tests. RQ remains an available transport contract; current assistance and document-draft
+use cases execute synchronously and must not be described as queued handlers.
 
-1. apply `LEGAL-002A`;
-1. define a closed schema and reviewed context allowlist for that function;
-1. register and test a real RQ handler that reconstructs scope from PostgreSQL;
-1. add negative multi-user, prompt-injection and redaction tests.
+Residual risks are model bias or fabrication that remains schema-valid, provider availability and
+quota, user misuse after copying, operational key rotation, and lack of production outcome samples.
+None of these controls make the model a legal decision maker.
 
 Canonical detailed contracts are:
 

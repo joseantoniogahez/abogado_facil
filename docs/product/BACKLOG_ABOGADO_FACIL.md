@@ -196,12 +196,12 @@ esperada: pruebas de contrato, métricas, ADR, threat model, caso de fallo o dem
 
 | ID          | Tipo | Prioridad | Estado       | Trabajo                              | Entregable / Criterio                                                                 |
 | ----------- | ---- | --------- | ------------ | ------------------------------------ | ------------------------------------------------------------------------------------- |
-| DOCS-AI-001 | Docs | P1        | Identificado | Arquitectura de integración IA.      | Diagrama de puertos, adaptadores, jobs, resultados y límites de confianza.            |
+| DOCS-AI-001 | Docs | P1        | Hecho        | Arquitectura de integración IA.      | Diagrama de puertos, adaptadores, jobs, resultados y límites de confianza.            |
 | DOCS-AI-002 | Docs | P1        | Hecho        | Flujo de datos y threat model.       | Contexto, aislamiento, prompt injection, credenciales y datos sensibles documentados. |
-| DOCS-AI-003 | Docs | P1        | Identificado | ADR de BYOK y multi-provider.        | Decisiones, alternativas y trade-offs registrados.                                    |
-| DOCS-AI-004 | Docs | P1        | Identificado | Catálogo de errores y reintentos.    | Taxonomía, política de retry y ejemplos de fallos reproducibles.                      |
-| DOCS-AI-005 | Docs | P1        | Identificado | Evaluación de prompts y schemas.     | Casos de evaluación, resultados y cambios documentados.                               |
-| DOCS-AI-006 | Docs | P1        | Identificado | Caso de estudio del hero flow.       | Problema, flujo, decisiones, riesgos, métricas y resultado observado.                 |
+| DOCS-AI-003 | Docs | P1        | Hecho        | ADR de BYOK y multi-provider.        | Decisiones, alternativas y trade-offs registrados.                                    |
+| DOCS-AI-004 | Docs | P1        | Hecho        | Catálogo de errores y reintentos.    | Taxonomía, política de retry y ejemplos de fallos reproducibles.                      |
+| DOCS-AI-005 | Docs | P1        | Hecho        | Evaluación de prompts y schemas.     | Casos de evaluación, resultados y cambios documentados.                               |
+| DOCS-AI-006 | Docs | P1        | Hecho        | Caso de estudio del hero flow.       | Problema, flujo, decisiones, riesgos, métricas y resultado observado.                 |
 | DEMO-AI-001 | Docs | P1        | Identificado | Guion de demo técnica y de producto. | Recorrido reproducible del hero flow y sus escenarios de fallo.                       |
 
 ## Fuera del MVP
@@ -224,4 +224,4 @@ esperada: pruebas de contrato, métricas, ADR, threat model, caso de fallo o dem
 Las funciones IA del MVP superaron los gates P0-IA y la revalidación integral del release. La
 secuencia priorizada continúa con:
 
-1. `DOCS-AI-001`, `DOCS-AI-003` y `DOCS-AI-004`: consolidar evidencia pública de arquitectura y operación.
+1. `DEMO-AI-001`: preparar el recorrido reproducible del hero flow y sus escenarios de fallo.
