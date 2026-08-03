@@ -13,6 +13,8 @@ El índice y el backlog permanecen aquí:
 - [`BACKLOG_ABOGADO_FACIL.md`](BACKLOG_ABOGADO_FACIL.md): estado resumido y prioridades.
 - [`REQUERIMIENTOS_ABOGADO_FACIL_IA.md`](REQUERIMIENTOS_ABOGADO_FACIL_IA.md): requerimientos y
   visión de producto.
+- [`CIERRE_MVP_2026-08-02.md`](CIERRE_MVP_2026-08-02.md): revisión final, alcance cerrado y
+  condiciones explícitas para reabrir trabajo.
 
 ## Regla de clasificación
 

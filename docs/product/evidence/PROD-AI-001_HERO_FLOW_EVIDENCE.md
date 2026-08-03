@@ -34,7 +34,7 @@ omitir la revisión humana ni ejecutar acciones automáticas.
 - El cliente y asunto se crean antes del análisis; el relato no crea entidades sin confirmación.
 - No existe envío automático de mensajes ni actuación jurídica autónoma.
 - Exactitud, costo y latencia dependen del proveedor/modelo BYOK.
-- Feedback de utilidad y métricas agregadas pertenecen a tickets posteriores.
+- Feedback de utilidad y métricas agregadas están disponibles en el dashboard de insights.
 
 ## Criterio de aprobación
 

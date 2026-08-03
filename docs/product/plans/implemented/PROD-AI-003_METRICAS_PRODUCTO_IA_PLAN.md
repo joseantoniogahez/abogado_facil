@@ -42,15 +42,22 @@ regeneración, abandono y utilidad reportada.
 
 ## Work Plan
 
-- [ ] Agregar consultas/contratos de métricas de producto.
-- [ ] Presentar métricas y probar aislamiento/cálculos/UI.
-- [ ] Validar y documentar.
+- [x] Agregar consultas/contratos de métricas de producto.
+- [x] Presentar métricas y probar aislamiento/cálculos/UI.
+- [x] Validar y documentar.
 
 ## Progress Log
 
-| Date       | State        | Completed        | Pending / next safe action     |
-| ---------- | ------------ | ---------------- | ------------------------------ |
-| 2026-08-01 | Identificado | Plan formalizado | Iniciar después de PROD-AI-002 |
+| Date       | State        | Completed                                         | Pending / next safe action     |
+| ---------- | ------------ | ------------------------------------------------- | ------------------------------ |
+| 2026-08-01 | Identificado | Plan formalizado                                  | Iniciar después de PROD-AI-002 |
+| 2026-08-01 | Hecho        | Métricas derivadas, UI y validaciones completadas | Ninguna                        |
+
+## Completion Summary
+
+- Delivered: métricas de aceptación, edición, conversión, regeneración, abandono y feedback.
+- Pending work: none.
+- Residual risk: sin muestra productiva, las métricas demuestran instrumentación, no impacto.
 
 ## Validation Results
 

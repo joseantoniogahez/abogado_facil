@@ -52,6 +52,7 @@ derivarse de esa carpeta, no de estos planes técnicos.
 | Errores y reintentos IA        | [`DOCS-AI-004`](DOCS-AI-004_CATALOGO_ERRORES_REINTENTOS_PLAN.md)          |
 | Evaluación prompts y schemas   | [`DOCS-AI-005`](DOCS-AI-005_EVALUACION_PROMPTS_SCHEMAS_PLAN.md)           |
 | Caso de estudio hero flow      | [`DOCS-AI-006`](DOCS-AI-006_HERO_FLOW_CASE_STUDY_PLAN.md)                 |
+| Demo técnica y de producto     | [`DEMO-AI-001`](DEMO-AI-001_GUION_DEMO_TECNICA_PRODUCTO_PLAN.md)          |
 | Auditoría backend inicial      | [`AUDIT-001`](AUDIT-001_AUDITORIA_BACKEND_FASTAPI_INICIAL_PLAN.md)        |
 | Auditoría backend final        | [`AUDIT-002`](AUDIT-002_AUDITORIA_BACKEND_FASTAPI_POST_HARDENING_PLAN.md) |
 | OpenAPI en producción          | [`OPS-005`](OPS-005_OPENAPI_PRODUCCION_PLAN.md)                           |

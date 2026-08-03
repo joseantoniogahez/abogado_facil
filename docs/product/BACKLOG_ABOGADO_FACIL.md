@@ -14,6 +14,7 @@ decisiones, avance, pausas, validaciones y cierre se registran en el plan corres
 - Prioridad: `P0` imprescindible para arrancar, `P1` MVP, `P2` posterior al MVP, `P0-IA` release gate que bloquea el lanzamiento de cualquier función que llame a un proveedor de IA
 - Tipo: `Setup`, `Producto`, `Backend`, `Frontend`, `Full-stack`, `IA`, `Docs`, `Legal`, `Ops`
 - Competencia de portafolio: `BE-AI`, `AI-PRODUCT`, `AMBAS`, `FOUNDATION`
+- Estado de decisiones: `Adoptada` o `Diferida` fuera del ciclo cerrado.
 
 ### Release gates de IA
 
@@ -45,22 +46,22 @@ Las viñetas siguientes describen exclusivamente el estado inicial del 2026-07-0
 
 ## Decisiones de Producto
 
-| ID      | Decisión                     | Propuesta inicial                                                                                                      | Estado    |
-| ------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------- | --------- |
-| DEC-001 | Nombre público               | Abogado Fácil                                                                                                          | Listo     |
-| DEC-002 | Slug interno                 | `abogado-facil`                                                                                                        | Listo     |
-| DEC-003 | Env prefix                   | `abogado_facil`                                                                                                        | Listo     |
-| DEC-004 | Frontend package             | `abogado-facil-frontend`                                                                                               | Listo     |
-| DEC-005 | Compose dev/test/prod        | `abogado-facil-dev`, `abogado-facil-tests`, `abogado-facil-prod`                                                       | Listo     |
-| DEC-006 | DB name                      | `abogado_facil_main`                                                                                                   | Listo     |
-| DEC-007 | JWT issuer/audience          | `abogado-facil`, `abogado-facil-api`                                                                                   | Listo     |
-| DEC-008 | Descripción corta            | SaaS web para abogados independientes y despachos pequeños con expedientes, tareas, documentos e IA BYOK.              | Listo     |
-| DEC-009 | Roles MVP                    | `account_owner` público, limitado a su despacho y sin herencia del rol administrativo técnico.                         | Listo     |
-| DEC-010 | Storage de documentos        | MinIO en Compose mediante API S3; archivos fuera de PostgreSQL y metadata en la base.                                  | Listo     |
-| DEC-011 | Proveedor despliegue inicial | Local/Docker primero; elegir target productivo después.                                                                | Pendiente |
-| DEC-012 | Tracker principal            | Estado resumido aquí y detalle en un plan Markdown por ticket; migrar a GitHub Issues cuando el alcance se estabilice. | Listo     |
-| DEC-013 | Identidad de acceso MVP      | Email normalizado; no se requiere compatibilidad ni migración de datos de usernames existentes.                        | Listo     |
-| DEC-014 | Despacho inicial             | Un despacho por alta; nombre no nulo con fallback a `display_name`; el alta es su único owner.                         | Listo     |
+| ID      | Decisión                     | Propuesta inicial                                                                                                      | Estado   |
+| ------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------- | -------- |
+| DEC-001 | Nombre público               | Abogado Fácil                                                                                                          | Adoptada |
+| DEC-002 | Slug interno                 | `abogado-facil`                                                                                                        | Adoptada |
+| DEC-003 | Env prefix                   | `abogado_facil`                                                                                                        | Adoptada |
+| DEC-004 | Frontend package             | `abogado-facil-frontend`                                                                                               | Adoptada |
+| DEC-005 | Compose dev/test/prod        | `abogado-facil-dev`, `abogado-facil-tests`, `abogado-facil-prod`                                                       | Adoptada |
+| DEC-006 | DB name                      | `abogado_facil_main`                                                                                                   | Adoptada |
+| DEC-007 | JWT issuer/audience          | `abogado-facil`, `abogado-facil-api`                                                                                   | Adoptada |
+| DEC-008 | Descripción corta            | SaaS web para abogados independientes y despachos pequeños con expedientes, tareas, documentos e IA BYOK.              | Adoptada |
+| DEC-009 | Roles MVP                    | `account_owner` público, limitado a su despacho y sin herencia del rol administrativo técnico.                         | Adoptada |
+| DEC-010 | Storage de documentos        | MinIO en Compose mediante API S3; archivos fuera de PostgreSQL y metadata en la base.                                  | Adoptada |
+| DEC-011 | Proveedor despliegue inicial | Local/Docker cerrado; el target productivo se decidirá en una iniciativa futura.                                       | Diferida |
+| DEC-012 | Tracker principal            | Estado resumido aquí y detalle en un plan Markdown por ticket; migrar a GitHub Issues cuando el alcance se estabilice. | Adoptada |
+| DEC-013 | Identidad de acceso MVP      | Email normalizado; no se requiere compatibilidad ni migración de datos de usernames existentes.                        | Adoptada |
+| DEC-014 | Despacho inicial             | Un despacho por alta; nombre no nulo con fallback a `display_name`; el alta es su único owner.                         | Adoptada |
 
 ## Fase 0 - Bootstrap y Base Pública
 
@@ -194,15 +195,15 @@ esperada: pruebas de contrato, métricas, ADR, threat model, caso de fallo o dem
 
 ## Evidencia pública de portafolio
 
-| ID          | Tipo | Prioridad | Estado       | Trabajo                              | Entregable / Criterio                                                                 |
-| ----------- | ---- | --------- | ------------ | ------------------------------------ | ------------------------------------------------------------------------------------- |
-| DOCS-AI-001 | Docs | P1        | Hecho        | Arquitectura de integración IA.      | Diagrama de puertos, adaptadores, jobs, resultados y límites de confianza.            |
-| DOCS-AI-002 | Docs | P1        | Hecho        | Flujo de datos y threat model.       | Contexto, aislamiento, prompt injection, credenciales y datos sensibles documentados. |
-| DOCS-AI-003 | Docs | P1        | Hecho        | ADR de BYOK y multi-provider.        | Decisiones, alternativas y trade-offs registrados.                                    |
-| DOCS-AI-004 | Docs | P1        | Hecho        | Catálogo de errores y reintentos.    | Taxonomía, política de retry y ejemplos de fallos reproducibles.                      |
-| DOCS-AI-005 | Docs | P1        | Hecho        | Evaluación de prompts y schemas.     | Casos de evaluación, resultados y cambios documentados.                               |
-| DOCS-AI-006 | Docs | P1        | Hecho        | Caso de estudio del hero flow.       | Problema, flujo, decisiones, riesgos, métricas y resultado observado.                 |
-| DEMO-AI-001 | Docs | P1        | Identificado | Guion de demo técnica y de producto. | Recorrido reproducible del hero flow y sus escenarios de fallo.                       |
+| ID          | Tipo | Prioridad | Estado | Trabajo                              | Entregable / Criterio                                                                 |
+| ----------- | ---- | --------- | ------ | ------------------------------------ | ------------------------------------------------------------------------------------- |
+| DOCS-AI-001 | Docs | P1        | Hecho  | Arquitectura de integración IA.      | Diagrama de puertos, adaptadores, jobs, resultados y límites de confianza.            |
+| DOCS-AI-002 | Docs | P1        | Hecho  | Flujo de datos y threat model.       | Contexto, aislamiento, prompt injection, credenciales y datos sensibles documentados. |
+| DOCS-AI-003 | Docs | P1        | Hecho  | ADR de BYOK y multi-provider.        | Decisiones, alternativas y trade-offs registrados.                                    |
+| DOCS-AI-004 | Docs | P1        | Hecho  | Catálogo de errores y reintentos.    | Taxonomía, política de retry y ejemplos de fallos reproducibles.                      |
+| DOCS-AI-005 | Docs | P1        | Hecho  | Evaluación de prompts y schemas.     | Casos de evaluación, resultados y cambios documentados.                               |
+| DOCS-AI-006 | Docs | P1        | Hecho  | Caso de estudio del hero flow.       | Problema, flujo, decisiones, riesgos, métricas y resultado observado.                 |
+| DEMO-AI-001 | Docs | P1        | Hecho  | Guion de demo técnica y de producto. | Recorrido reproducible del hero flow y sus escenarios de fallo.                       |
 
 ## Fuera del MVP
 
@@ -219,9 +220,8 @@ esperada: pruebas de contrato, métricas, ADR, threat model, caso de fallo o dem
 - Facturación electrónica.
 - Multi-despacho avanzado.
 
-## Siguiente Trabajo del Backlog
+## Cierre del Backlog
 
-Las funciones IA del MVP superaron los gates P0-IA y la revalidación integral del release. La
-secuencia priorizada continúa con:
-
-1. `DEMO-AI-001`: preparar el recorrido reproducible del hero flow y sus escenarios de fallo.
+El ciclo MVP queda cerrado el 2026-08-02: todos los tickets están `Hecho`, no quedan gates P0-IA ni
+trabajo P0/P1 abierto y cualquier ampliación requiere un ticket y plan nuevos. La revisión, riesgos
+residuales y condiciones para reabrir se registran en `docs/product/CIERRE_MVP_2026-08-02.md`.

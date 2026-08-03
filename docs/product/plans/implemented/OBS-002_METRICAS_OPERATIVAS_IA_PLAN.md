@@ -49,16 +49,17 @@ histórica ni UI. `AIJob` no conserva duración ni estimaciones de uso/costo.
 
 ## Work Plan
 
-- [ ] Extender telemetría persistente de `AIJob` y migración.
-- [ ] Crear agregación/API firm-scoped y UI.
-- [ ] Añadir pruebas backend/frontend y sincronizar contratos/documentación.
-- [ ] Ejecutar gates full-stack.
+- [x] Extender telemetría persistente de `AIJob` y migración.
+- [x] Crear agregación/API firm-scoped y UI.
+- [x] Añadir pruebas backend/frontend y sincronizar contratos/documentación.
+- [x] Ejecutar gates full-stack.
 
 ## Progress Log
 
-| Date       | State       | Completed                         | Pending / next safe action |
-| ---------- | ----------- | --------------------------------- | -------------------------- |
-| 2026-08-01 | En progreso | Alcance y decisiones formalizados | Implementar persistencia   |
+| Date       | State       | Completed                                                  | Pending / next safe action |
+| ---------- | ----------- | ---------------------------------------------------------- | -------------------------- |
+| 2026-08-01 | En progreso | Alcance y decisiones formalizados                          | Implementar persistencia   |
+| 2026-08-01 | Hecho       | Persistencia, API, UI, pruebas y documentación completadas | Ninguna                    |
 
 ## Validation Results
 
@@ -69,7 +70,7 @@ histórica ni UI. `AIJob` no conserva duración ni estimaciones de uso/costo.
 
 ## Pause / Handoff Record
 
-- Current state: plan activo.
-- Changed files and contracts: plan y backlog.
-- Pending work: implementación completa.
-- Next safe action: extender `AIJob` y agregar el slice `ai_insights`.
+- Current state: dashboard operativo completo y aislado por despacho.
+- Changed files and contracts: `AIJob`, `ai_insights`, API, UI, pruebas y documentación.
+- Pending work: none.
+- Next safe action: abrir un ticket nuevo para ampliar telemetría.
