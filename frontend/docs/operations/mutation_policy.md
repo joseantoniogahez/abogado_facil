@@ -44,4 +44,6 @@ This document defines deterministic mutation retry and invalidation behavior by 
 - An unauthorized profile update clears the cached session; a successful update replaces the
   complete cached product account profile.
 - AI credential mutations do not retry automatically, clear stale action feedback before each
-  attempt, and refresh provider status after success.
+  attempt, and refresh provider status and the dynamic model catalog after success. The AI settings
+  connection check also uses explicit user retry so credential, permission, or quota failures are
+  visible and actionable.

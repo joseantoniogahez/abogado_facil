@@ -33,6 +33,7 @@ derivarse de esa carpeta, no de estos planes técnicos.
 | Tabs de detalle de asuntos     | [`UX-002`](UX-002_TABS_DETALLE_ASUNTOS_PLAN.md)                           |
 | Credenciales BYOK              | [`AI-001`](AI-001_CREDENCIALES_BYOK_PLAN.md)                              |
 | Configuración de IA            | [`AI-002`](AI-002_PANTALLA_CONFIGURACION_IA_PLAN.md)                      |
+| Onboarding BYOK guiado         | [`UX-AI-002`](UX-AI-002_ONBOARDING_BYOK_GUIADO_PLAN.md)                   |
 | Proveedores de IA              | [`AI-003`](AI-003_MULTI_PROVIDER_PLAN.md)                                 |
 | Validación BYOK para IA        | [`AI-004`](AI-004_VALIDACION_BYOK_PLAN.md)                                |
 | Logs y datos sensibles IA      | [`AI-005`](AI-005_POLITICA_LOGS_DATOS_SENSIBLES_PLAN.md)                  |

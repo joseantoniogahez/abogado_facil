@@ -77,7 +77,7 @@ Frontend URL: `http://localhost:3000`
 - `/welcome`: authenticated session entry point
 - `/dashboard`: authenticated dashboard with firm-scoped metrics and upcoming tasks
 - `/profile`: authenticated current-user profile management
-- `/settings/ai`: authenticated BYOK provider credential management
+- `/settings/ai`: guided authenticated BYOK onboarding, connection verification, credential management, and a clearly labelled local mock walkthrough
 - `/clients`, `/clients/new`, `/clients/:clientId`, `/clients/:clientId/edit`: authenticated client management
 - `/matters`, `/matters/new`, `/matters/:matterId`, `/matters/:matterId/edit`: authenticated matter management
 - `/admin/audit-log`: authenticated administrator audit log review

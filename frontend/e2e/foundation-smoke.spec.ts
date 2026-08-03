@@ -498,6 +498,19 @@ test.describe("frontend foundation smoke", () => {
         });
         return;
       }
+      if (method === "GET" && pathname === "/v1/ai/credentials/models") {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            providers: credentials.map(item => ({
+              provider: item.provider,
+              models: [{ id: `${item.provider}-smoke-model`, label: `${item.provider} smoke model` }],
+            })),
+          }),
+        });
+        return;
+      }
       if (method === "PUT" && pathname === "/v1/ai/credentials/gemini") {
         expect(request.postDataJSON()).toEqual({ api_key: "gemini-smoke-key" }); // pragma: allowlist secret
         const geminiCredential = {
@@ -514,8 +527,9 @@ test.describe("frontend foundation smoke", () => {
         });
         return;
       }
-      if (method === "DELETE" && pathname === "/v1/ai/credentials/openai") {
-        credentials = credentials.filter(item => item.provider !== "openai");
+      if (method === "DELETE" && pathname.startsWith("/v1/ai/credentials/")) {
+        const provider = pathname.split("/").at(-1);
+        credentials = credentials.filter(item => item.provider !== provider);
         await route.fulfill({ status: 204 });
         return;
       }
@@ -525,15 +539,16 @@ test.describe("frontend foundation smoke", () => {
     await page.goto("/settings/ai");
 
     await expect(page.getByRole("heading", { name: t("aiSettings.title") })).toBeVisible();
-    await expect(page.getByText(t("aiSettings.configured"), { exact: true })).toHaveCount(1);
+    await expect(page.getByText(t("aiSettings.verify.success", { count: 1 }))).toBeVisible();
+    await page.getByRole("radio", { name: /Google Gemini/ }).click();
     await page.locator("#gemini-key").fill("gemini-smoke-key");
-    await page.getByRole("button", { name: t("aiSettings.save") }).nth(1).click();
+    await page.getByRole("button", { name: t("aiSettings.save") }).click();
     await expect(page.getByRole("status")).toHaveText(t("aiSettings.success.save"));
-    await expect(page.getByText(t("aiSettings.configured"), { exact: true })).toHaveCount(2);
+    await expect(page.getByText(t("aiSettings.verify.success", { count: 1 }))).toBeVisible();
 
-    await page.getByRole("button", { name: t("aiSettings.delete") }).first().click();
-    await expect(page.getByRole("status")).toHaveText(t("aiSettings.success.delete"));
-    await expect(page.getByText(t("aiSettings.notConfigured"), { exact: true })).toHaveCount(1);
+    await page.getByRole("button", { name: t("aiSettings.delete") }).click();
+    await expect(page.getByText(t("aiSettings.success.delete"))).toBeVisible();
+    await expect(page.getByRole("button", { name: t("aiSettings.save") })).toBeVisible();
   });
 
   test("redirects authenticated legacy welcome route to dashboard", async ({ page }) => {

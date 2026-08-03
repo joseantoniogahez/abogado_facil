@@ -114,6 +114,10 @@ This document is the canonical consumer-side inventory of backend endpoints used
   generation disabled; an empty catalog directs the user to configure a credential. Saving or
   deleting a credential invalidates the catalog query, and no provider/model options are precached.
 
+- AI settings uses the same dynamic catalog as a post-save connection check. A discovered model
+  marks the selected provider ready; errors and empty provider results remain actionable without
+  exposing a secret. Its mock walkthrough is local-only and sends no provider or generation request.
+
 - `readAuditLogEntries` is routed through `/admin/audit-log`, which requires `audit_logs:read` before the page can request the endpoint.
 
 - `readRbacRoles` is permission-gated on `/admin/users`: the page only requests `/rbac/roles` when the current session has `roles:manage`; otherwise it hides role-related controls and does not send `role_ids`.

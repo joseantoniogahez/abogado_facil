@@ -168,23 +168,23 @@ esperada: pruebas de contrato, métricas, ADR, threat model, caso de fallo o dem
 
 ## Seguridad, Privacidad y Operación
 
-| ID          | Tipo       | Prioridad | Estado       | Trabajo                                                           | Entregable / Criterio                                                                                                            |
-| ----------- | ---------- | --------- | ------------ | ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| SEC-001A    | Backend    | P1        | Hecho        | Aislamiento general por despacho.                                 | Matriz de pruebas confirma aislamiento de clientes, asuntos, documentos y resultados por `firm_id`.                              |
-| SEC-001B    | Backend    | P0-IA     | Hecho        | Aislamiento del contexto enviado a IA.                            | El contexto de cada llamada se construye solo desde recursos autorizados del despacho actual.                                    |
-| SEC-001C    | Backend    | P0-IA     | Hecho        | Pruebas negativas multiusuario.                                   | Accesos cruzados a clientes, asuntos, documentos y resultados devuelven rechazo o `404` opaco.                                   |
-| SEC-002     | Legal      | P0-IA     | Hecho        | Aviso de privacidad, términos y aprobación jurídica para IA BYOK. | Explica el envío al proveedor, solicita consentimiento y registra revisión jurídica antes del lanzamiento.                       |
-| SEC-003     | Backend    | P1        | Hecho        | Eliminación de datos del usuario.                                 | Usuario puede eliminar documentos/asuntos según política definida.                                                               |
-| OPS-001     | Ops        | P1        | Hecho        | Límites configurables de archivos y análisis.                     | Tamaño, número de documentos y entrada IA controlados por config.                                                                |
-| OPS-002     | Ops        | P1        | Hecho        | Backups básicos de PostgreSQL.                                    | Procedimiento documentado antes de despliegue productivo.                                                                        |
-| OPS-003     | Docs       | P1        | Hecho        | Mantener matrices de operaciones actualizadas.                    | Docs, capacidades, contratos semánticos y skills de revisión quedan sincronizados y validados.                                   |
-| OPS-004     | Ops        | P1        | Hecho        | Base S3-compatible con MinIO.                                     | Compose levanta bucket privado persistente y backend dispone de un puerto probado.                                               |
-| OPS-010     | Ops        | P1        | Hecho        | Crear datos de prueba manualmente en el entorno local de Compose. | Un script ejecutado dentro del backend genera desde JSON 2 usuarios, 4 clientes y 32 asuntos; solo funciona con `APP_ENV=local`. |
-| PROD-AI-001 | Full-stack | P1        | Hecho        | Hero flow de incorporación de cliente.                            | Relato inicial convertido en expediente accionable con revisión y guardado.                                                      |
-| OBS-002     | Ops        | P1        | Hecho        | Métricas operativas de IA.                                        | Dashboard reproducible con éxito, errores, latencia, tokens, costo, reintentos y jobs atascados.                                 |
-| PROD-AI-002 | Full-stack | P1        | Hecho        | Retroalimentación de utilidad.                                    | Usuario clasifica utilidad, corrección, invención o información faltante.                                                        |
-| PROD-AI-003 | Full-stack | P1        | Hecho        | Métricas de producto de IA.                                       | Medición de valor, aceptación, edición, conversión, regeneración y abandono.                                                     |
-| UX-AI-002   | Frontend   | P1        | Identificado | Onboarding BYOK guiado.                                           | Guía por proveedor, validación accionable y modo demostrativo explícito con mock.                                                |
+| ID          | Tipo       | Prioridad | Estado | Trabajo                                                           | Entregable / Criterio                                                                                                            |
+| ----------- | ---------- | --------- | ------ | ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| SEC-001A    | Backend    | P1        | Hecho  | Aislamiento general por despacho.                                 | Matriz de pruebas confirma aislamiento de clientes, asuntos, documentos y resultados por `firm_id`.                              |
+| SEC-001B    | Backend    | P0-IA     | Hecho  | Aislamiento del contexto enviado a IA.                            | El contexto de cada llamada se construye solo desde recursos autorizados del despacho actual.                                    |
+| SEC-001C    | Backend    | P0-IA     | Hecho  | Pruebas negativas multiusuario.                                   | Accesos cruzados a clientes, asuntos, documentos y resultados devuelven rechazo o `404` opaco.                                   |
+| SEC-002     | Legal      | P0-IA     | Hecho  | Aviso de privacidad, términos y aprobación jurídica para IA BYOK. | Explica el envío al proveedor, solicita consentimiento y registra revisión jurídica antes del lanzamiento.                       |
+| SEC-003     | Backend    | P1        | Hecho  | Eliminación de datos del usuario.                                 | Usuario puede eliminar documentos/asuntos según política definida.                                                               |
+| OPS-001     | Ops        | P1        | Hecho  | Límites configurables de archivos y análisis.                     | Tamaño, número de documentos y entrada IA controlados por config.                                                                |
+| OPS-002     | Ops        | P1        | Hecho  | Backups básicos de PostgreSQL.                                    | Procedimiento documentado antes de despliegue productivo.                                                                        |
+| OPS-003     | Docs       | P1        | Hecho  | Mantener matrices de operaciones actualizadas.                    | Docs, capacidades, contratos semánticos y skills de revisión quedan sincronizados y validados.                                   |
+| OPS-004     | Ops        | P1        | Hecho  | Base S3-compatible con MinIO.                                     | Compose levanta bucket privado persistente y backend dispone de un puerto probado.                                               |
+| OPS-010     | Ops        | P1        | Hecho  | Crear datos de prueba manualmente en el entorno local de Compose. | Un script ejecutado dentro del backend genera desde JSON 2 usuarios, 4 clientes y 32 asuntos; solo funciona con `APP_ENV=local`. |
+| PROD-AI-001 | Full-stack | P1        | Hecho  | Hero flow de incorporación de cliente.                            | Relato inicial convertido en expediente accionable con revisión y guardado.                                                      |
+| OBS-002     | Ops        | P1        | Hecho  | Métricas operativas de IA.                                        | Dashboard reproducible con éxito, errores, latencia, tokens, costo, reintentos y jobs atascados.                                 |
+| PROD-AI-002 | Full-stack | P1        | Hecho  | Retroalimentación de utilidad.                                    | Usuario clasifica utilidad, corrección, invención o información faltante.                                                        |
+| PROD-AI-003 | Full-stack | P1        | Hecho  | Métricas de producto de IA.                                       | Medición de valor, aceptación, edición, conversión, regeneración y abandono.                                                     |
+| UX-AI-002   | Frontend   | P1        | Hecho  | Onboarding BYOK guiado.                                           | Guía por proveedor, validación accionable y modo demostrativo explícito con mock.                                                |
 
 ### Gate adicional de seguridad de IA
 
@@ -224,5 +224,4 @@ esperada: pruebas de contrato, métricas, ADR, threat model, caso de fallo o dem
 Las funciones IA del MVP superaron los gates P0-IA y la revalidación integral del release. La
 secuencia priorizada continúa con:
 
-1. `UX-AI-002`: completar el onboarding BYOK guiado sobre el catálogo dinámico de proveedores y modelos.
 1. `DOCS-AI-001`, `DOCS-AI-003` y `DOCS-AI-004`: consolidar evidencia pública de arquitectura y operación.
