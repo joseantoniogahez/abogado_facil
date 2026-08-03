@@ -110,6 +110,8 @@ Run `npm run e2e:install` once per machine before `npm run test:e2e` or `npm run
 - typecheck
 - coverage gate
 - OpenAPI artifact freshness gate (`openapi:check`)
+- Dynamic BYOK provider/model selectors backed by `/v1/ai/credentials/models`; loading, empty, and
+  recoverable error states keep real AI generation disabled.
 - dependency audit gate (`deps:audit`)
 
 Recommended CI-equivalent frontend gate:

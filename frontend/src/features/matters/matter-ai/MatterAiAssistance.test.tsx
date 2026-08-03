@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { vi } from "vitest";
 
+import { AI_MODELS_QUERY_KEY } from "@/shared/ai-models/api";
 import { t } from "@/shared/i18n/ui-text";
 
 import { MatterAiAssistance } from "./MatterAiAssistance";
@@ -36,6 +37,10 @@ const response = (body: unknown, ok = true) =>
 
 const renderFeature = () => {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } });
+  client.setQueryData(AI_MODELS_QUERY_KEY, [
+    { provider: "openai", models: [{ id: "gpt-4.1-mini", label: "GPT-4.1 mini" }, { id: "gpt-4.1", label: "GPT-4.1" }] },
+    { provider: "gemini", models: [{ id: "gemini-3.5-flash-lite", label: "Gemini 3.5 Flash-Lite" }, { id: "gemini-2.5-flash", label: "Gemini 2.5 Flash" }, { id: "gemini-2.5-flash-lite", label: "Gemini 2.5 Flash-Lite" }] },
+  ]);
   return render(
     <QueryClientProvider client={client}>
       <MatterAiAssistance matterId={3} />

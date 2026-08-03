@@ -10,6 +10,7 @@ import {
   parseDocumentTemplateCatalog,
 } from "@/features/document-templates/contracts";
 import { DocumentTemplatesPage } from "@/features/document-templates/DocumentTemplatesPage";
+import { AI_MODELS_QUERY_KEY } from "@/shared/ai-models/api";
 import { t } from "@/shared/i18n/ui-text";
 
 const template = (key: string, name: string) => ({
@@ -34,11 +35,18 @@ const catalog = {
   ],
 };
 
-const renderPage = () => render(
-  <QueryClientProvider client={createQueryClient()}>
-    <DocumentTemplatesPage />
-  </QueryClientProvider>,
-);
+const renderPage = () => {
+  const client = createQueryClient();
+  client.setQueryData(AI_MODELS_QUERY_KEY, [
+    { provider: "openai", models: [{ id: "gpt-4.1-mini", label: "GPT-4.1 mini" }] },
+    { provider: "gemini", models: [{ id: "gemini-2.5-flash", label: "Gemini 2.5 Flash" }] },
+  ]);
+  return render(
+    <QueryClientProvider client={client}>
+      <DocumentTemplatesPage />
+    </QueryClientProvider>,
+  );
+};
 
 describe("DocumentTemplatesPage", () => {
   it("renders the four catalog entries and their required fields accessibly", async () => {

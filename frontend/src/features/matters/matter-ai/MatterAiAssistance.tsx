@@ -1,6 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
+import { aiModelsQueryOptions } from "@/shared/ai-models/api";
+import type { AiProvider } from "@/shared/ai-models/contracts";
 import { t } from "@/shared/i18n/ui-text";
 import { ACCENT_ACTION_CLASS_NAME, SECONDARY_ACTION_CLASS_NAME } from "@/shared/ui/actionStyles";
 import { AiHumanReview, type AiReviewDecision } from "@/shared/ui/AiHumanReview";
@@ -20,21 +22,6 @@ import {
   saveAiFeedback,
 } from "./api";
 import type { AiFeature, AiResult } from "./contracts";
-
-const MODEL_OPTIONS = {
-  openai: [
-    { value: "gpt-4.1-mini", label: "GPT-4.1 mini" },
-    { value: "gpt-4.1", label: "GPT-4.1" },
-  ],
-  gemini: [
-    { value: "gemini-3.5-flash-lite", label: "Gemini 3.5 Flash-Lite" },
-    { value: "gemini-2.5-flash", label: "Gemini 2.5 Flash" },
-    { value: "gemini-2.5-flash-lite", label: "Gemini 2.5 Flash-Lite" },
-  ],
-} as const;
-
-type AiProvider = keyof typeof MODEL_OPTIONS;
-
 const AI_ACTION_TYPES = [
   "note",
   "task",
@@ -203,11 +190,6 @@ const SupportingDetails = ({ result }: { result: AiResult }) => {
       ))}
     </div>
   );
-};
-
-const DEFAULT_MODELS: Record<AiProvider, string> = {
-  openai: MODEL_OPTIONS.openai[0].value,
-  gemini: MODEL_OPTIONS.gemini[0].value,
 };
 
 const ResultCard = ({
@@ -379,18 +361,25 @@ const ResultCard = ({
 export const MatterAiAssistance = ({ matterId }: { matterId: number }) => {
   const queryClient = useQueryClient();
   const results = useQuery(matterAiQueryOptions(matterId));
+  const catalog = useQuery(aiModelsQueryOptions);
   const [input, setInput] = useState<AiExecutionInput>({
     feature: "intake_analysis",
     narrative: "",
     provider: "openai",
-    model: DEFAULT_MODELS.openai,
+    model: "",
     include_matter_description: true,
   });
-  const preview = useMutation({ mutationFn: () => previewMatterAi(matterId, input) });
+  const firstProvider = catalog.data?.find(entry => entry.models.length > 0);
+  const activeProvider = input.model ? input.provider : firstProvider?.provider ?? input.provider;
+  const selectedModels = catalog.data?.find(entry => entry.provider === activeProvider)?.models ?? [];
+  const activeModel = input.model ? input.model : (selectedModels[0]?.id ?? "");
+  const requestInput = { ...input, provider: activeProvider, model: activeModel };
+  const catalogReady = catalog.isSuccess && selectedModels.length > 0;
+  const preview = useMutation({ mutationFn: () => previewMatterAi(matterId, requestInput) });
   const execute = useMutation({
     mutationFn: () => {
       if (!preview.data) throw new Error("Context preview is required");
-      return executeMatterAi(matterId, input, preview.data.confirmation_token);
+      return executeMatterAi(matterId, requestInput, preview.data.confirmation_token);
     },
     onSuccess: async () => {
       preview.reset();
@@ -461,12 +450,14 @@ export const MatterAiAssistance = ({ matterId }: { matterId: number }) => {
             className="mt-1 w-full rounded-xl border p-3"
             onChange={(event) => {
               const provider = event.target.value as AiProvider;
-              updateInput({ ...input, provider, model: DEFAULT_MODELS[provider] });
+              const models = catalog.data?.find(entry => entry.provider === provider)?.models ?? [];
+              updateInput({ ...input, provider, model: models[0]?.id ?? "" });
             }}
-            value={input.provider}
+            value={activeProvider}
           >
-            <option value="openai">OpenAI</option>
-            <option value="gemini">Gemini</option>
+            {(catalog.data ?? []).filter(entry => entry.models.length).map(entry => (
+              <option key={entry.provider} value={entry.provider}>{entry.provider === "openai" ? "OpenAI" : "Gemini"}</option>
+            ))}
           </select>
         </label>
         <label>
@@ -474,10 +465,10 @@ export const MatterAiAssistance = ({ matterId }: { matterId: number }) => {
           <select
             className="mt-1 w-full rounded-xl border p-3"
             onChange={event => updateInput({ ...input, model: event.target.value })}
-            value={input.model}
+            value={activeModel}
           >
-            {MODEL_OPTIONS[input.provider].map(model => (
-              <option key={model.value} value={model.value}>{model.label}</option>
+            {selectedModels.map(model => (
+              <option key={model.id} value={model.id}>{model.label}</option>
             ))}
           </select>
         </label>
@@ -492,12 +483,15 @@ export const MatterAiAssistance = ({ matterId }: { matterId: number }) => {
       </label>
       <button
         className={`${SECONDARY_ACTION_CLASS_NAME} w-fit`}
-        disabled={preview.isPending || input.narrative.trim().length < 20}
+        disabled={!catalogReady || preview.isPending || input.narrative.trim().length < 20}
         onClick={() => preview.mutate()}
         type="button"
       >
         {t("ai.preview")}
       </button>
+      {catalog.isPending ? <p role="status">{t("ai.models.loading")}</p> : null}
+      {catalog.isError ? <p role="alert">{t("ai.models.error")}</p> : null}
+      {catalog.isSuccess && !catalogReady ? <p role="status">{t("ai.models.empty")}</p> : null}
       {preview.data
         ? (
             <aside className="rounded-xl border p-4" aria-label={t("ai.preview.title")}>

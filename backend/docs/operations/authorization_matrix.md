@@ -96,6 +96,7 @@ This table is contract-checked by `tests/routers/test_authorization_policy_cover
 | `GET`    | `/v1/health`                                               | `public`        | No                        |
 | `GET`    | `/v1/readiness`                                            | `public`        | No                        |
 | `GET`    | `/v1/ai/credentials`                                       | `authenticated` | No                        |
+| `GET`    | `/v1/ai/credentials/models`                                | `authenticated` | No                        |
 | `GET`    | `/v1/ai/insights`                                          | `authenticated` | No                        |
 | `PUT`    | `/v1/ai/credentials/{provider}`                            | `authenticated` | No                        |
 | `DELETE` | `/v1/ai/credentials/{provider}`                            | `authenticated` | No                        |

@@ -21,3 +21,17 @@ class AiCredentialResponse(ApiSchema):
 
 class AiCredentialListResponse(ApiSchema):
     items: list[AiCredentialResponse]
+
+
+class AiModelResponse(ApiSchema):
+    id: str
+    label: str
+
+
+class AiProviderModelsResponse(ApiSchema):
+    provider: AiProvider
+    models: list[AiModelResponse]
+
+
+class AiModelCatalogResponse(ApiSchema):
+    providers: list[AiProviderModelsResponse]

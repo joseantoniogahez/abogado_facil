@@ -9,6 +9,7 @@ from cryptography.exceptions import InvalidTag
 from app.core.errors.services import InvalidInputError, NotFoundError
 from app.core.security.service.encryption import AesGcmSecretEncryption
 from app.features.ai_credentials.service import AiCredentialsService
+from app.integrations.ai_providers import AiModel
 
 
 class Uow:
@@ -87,3 +88,26 @@ def test_aes_gcm_rejects_bad_key_and_detects_tampering() -> None:
     assert adapter.decrypt(ciphertext, nonce) == "secret"
     with pytest.raises(InvalidTag):
         adapter.decrypt(ciphertext[:-2] + "aa", nonce)
+
+
+def test_model_catalog_only_calls_configured_providers(monkeypatch) -> None:
+    async def run() -> None:
+        repository = AsyncMock()
+        target = service(repository)
+        credential = item("openai")
+        credential.encrypted_api_key, credential.nonce = target.encryption.encrypt("secret-key")
+        repository.list_for_user.return_value = [credential]
+        openai_list = AsyncMock(return_value=[AiModel(id="gpt-test", label="GPT test")])
+        gemini_list = AsyncMock()
+        monkeypatch.setattr("app.features.ai_credentials.service.list_openai_models", openai_list)
+        monkeypatch.setattr("app.features.ai_credentials.service.list_gemini_models", gemini_list)
+
+        catalog = await target.list_models(user_id=1, firm_id=2)
+        assert catalog.providers[0].models[0].id == "gpt-test"
+        openai_list.assert_awaited_once_with(api_key="secret-key")  # pragma: allowlist secret
+        gemini_list.assert_not_awaited()
+        await target.validate_model(user_id=1, firm_id=2, provider="openai", model="gpt-test")
+        with pytest.raises(InvalidInputError, match="not available"):
+            await target.validate_model(user_id=1, firm_id=2, provider="openai", model="missing")
+
+    asyncio.run(run())

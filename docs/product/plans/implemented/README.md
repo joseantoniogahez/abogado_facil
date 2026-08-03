@@ -10,6 +10,7 @@ derivarse de esa carpeta, no de estos planes técnicos.
 
 | Área                           | Documento                                                                 |
 | ------------------------------ | ------------------------------------------------------------------------- |
+| Catálogo de modelos BYOK       | [`AI-013`](AI-013_DESCUBRIMIENTO_MODELOS_BYOK_PLAN.md)                    |
 | Clientes                       | [`CORE-001`](CORE-001_GESTION_CLIENTES_PLAN.md)                           |
 | Asuntos                        | [`CORE-002`](CORE-002_GESTION_ASUNTOS_PLAN.md)                            |
 | Notas                          | [`CORE-003`](CORE-003_NOTAS_EXPEDIENTE_PLAN.md)                           |

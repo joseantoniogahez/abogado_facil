@@ -11,6 +11,7 @@ from app.integrations.ai_providers import AiProviderPort, GeminiProvider, OpenAI
 
 class AiCredentialReader(Protocol):
     async def get_secret(self, *, user_id: int, firm_id: int, provider: str) -> str: ...
+    async def validate_model(self, *, user_id: int, firm_id: int, provider: str, model: str) -> None: ...
 
 
 ProviderConstructor = Callable[..., AiProviderPort]
@@ -29,6 +30,7 @@ class AiProviderFactory:
             raise InvalidInputError(message="Unsupported AI provider")
         try:
             api_key = await self.credentials.get_secret(user_id=user_id, firm_id=firm_id, provider=provider)
+            await self.credentials.validate_model(user_id=user_id, firm_id=firm_id, provider=provider, model=model)
         except NotFoundError as exc:
             raise InvalidInputError(message="AI provider credential is not configured") from exc
         except (InvalidTag, TypeError, ValueError) as exc:

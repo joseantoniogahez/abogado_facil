@@ -7,6 +7,7 @@ import { PRIMARY_ACTION_CLASS_NAME, SECONDARY_ACTION_CLASS_NAME } from "@/shared
 
 import {
   AI_CREDENTIALS_QUERY_KEY,
+  AI_MODELS_QUERY_KEY,
   deleteAiCredential,
   readAiCredentials,
   saveAiCredential,
@@ -31,7 +32,10 @@ export const AiSettingsPage = () => {
     onSuccess: async () => {
       setMessage(t("aiSettings.success.save"));
       setKeys({ openai: "", gemini: "" });
-      await queryClient.invalidateQueries({ queryKey: AI_CREDENTIALS_QUERY_KEY });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: AI_CREDENTIALS_QUERY_KEY }),
+        queryClient.invalidateQueries({ queryKey: AI_MODELS_QUERY_KEY }),
+      ]);
     },
     onError: setActionError,
   });
@@ -44,7 +48,10 @@ export const AiSettingsPage = () => {
     },
     onSuccess: async () => {
       setMessage(t("aiSettings.success.delete"));
-      await queryClient.invalidateQueries({ queryKey: AI_CREDENTIALS_QUERY_KEY });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: AI_CREDENTIALS_QUERY_KEY }),
+        queryClient.invalidateQueries({ queryKey: AI_MODELS_QUERY_KEY }),
+      ]);
     },
     onError: setActionError,
   });

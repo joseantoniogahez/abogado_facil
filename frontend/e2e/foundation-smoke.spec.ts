@@ -291,6 +291,19 @@ test.describe("frontend foundation smoke", () => {
         await route.fulfill({ status: 204 });
         return;
       }
+      if (method === "GET" && pathname === "/v1/ai/credentials/models") {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            providers: [{
+              provider: "openai",
+              models: [{ id: "gpt-4.1-mini", label: "GPT-4.1 mini" }],
+            }],
+          }),
+        });
+        return;
+      }
       throw new Error(`Unhandled API request in matter note smoke: ${method} ${pathname}`);
     });
 

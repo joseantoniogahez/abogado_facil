@@ -11,6 +11,7 @@ This document is the canonical consumer-side inventory of backend endpoints used
 | `/users/me`                                             | `GET`    | `shared/auth/session.ts`                                      | `readCurrentUser`                                | `bearer`  | product account profile + permissions snapshot    |
 | `/users/me`                                             | `PATCH`  | `shared/auth/session.ts`                                      | `updateCurrentUser`                              | `bearer`  | updated product account profile + permissions     |
 | `/ai/credentials`                                       | `GET`    | `features/ai-settings/api.ts`                                 | `readAiCredentials`                              | `bearer`  | provider configuration status                     |
+| `/ai/credentials/models`                                | `GET`    | `shared/ai-models/api.ts`                                     | `aiModelsQueryOptions`                           | `bearer`  | configured providers and text-generation models   |
 | `/ai/credentials/{provider}`                            | `PUT`    | `features/ai-settings/api.ts`                                 | `saveAiCredential`                               | `bearer`  | provider configuration status                     |
 | `/ai/credentials/{provider}`                            | `DELETE` | `features/ai-settings/api.ts`                                 | `deleteAiCredential`                             | `bearer`  | no body                                           |
 | `/document-templates`                                   | `GET`    | `features/document-templates/api.ts`                          | `readDocumentTemplates`                          | `bearer`  | `DocumentTemplateCatalog`                         |
@@ -108,6 +109,10 @@ This document is the canonical consumer-side inventory of backend endpoints used
 - Matter AI execution is disabled until preview returns a signed confirmation token. Any change to
   the feature, narrative, provider, model or included sources clears the preview and requires a new
   confirmation; the backend independently rejects mismatched or stale tokens.
+
+- Matter AI and document drafts share the authenticated BYOK model catalog. Loading and errors keep
+  generation disabled; an empty catalog directs the user to configure a credential. Saving or
+  deleting a credential invalidates the catalog query, and no provider/model options are precached.
 
 - `readAuditLogEntries` is routed through `/admin/audit-log`, which requires `audit_logs:read` before the page can request the endpoint.
 

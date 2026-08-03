@@ -15,6 +15,7 @@ def run(coro):
 def test_build_requires_scoped_credential_before_constructing_provider() -> None:
     credentials = Mock()
     credentials.get_secret = AsyncMock(return_value="test-api-key")
+    credentials.validate_model = AsyncMock()
     constructor = Mock(return_value=object())
     factory = AiProviderFactory(credentials, {"openai": constructor})
 
@@ -31,6 +32,7 @@ def test_build_requires_scoped_credential_before_constructing_provider() -> None
 def test_build_rejects_invalid_credential_without_provider_call(failure, message: str) -> None:
     credentials = Mock()
     credentials.get_secret = AsyncMock(side_effect=failure)
+    credentials.validate_model = AsyncMock()
     constructor = Mock()
     factory = AiProviderFactory(credentials, {"openai": constructor})
 
@@ -42,6 +44,7 @@ def test_build_rejects_invalid_credential_without_provider_call(failure, message
 def test_build_rejects_empty_credential_without_provider_call() -> None:
     credentials = Mock()
     credentials.get_secret = AsyncMock(return_value="   ")
+    credentials.validate_model = AsyncMock()
     constructor = Mock()
     factory = AiProviderFactory(credentials, {"openai": constructor})
 

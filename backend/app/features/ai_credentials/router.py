@@ -2,7 +2,12 @@ from fastapi import APIRouter, status
 
 from app.core.authorization.dependencies import AuthenticatedReadAccessDependency
 from app.core.setup.dependencies import AiCredentialsServiceDependency
-from app.features.ai_credentials.schemas import AiCredentialListResponse, AiCredentialResponse, SaveAiCredentialRequest
+from app.features.ai_credentials.schemas import (
+    AiCredentialListResponse,
+    AiCredentialResponse,
+    AiModelCatalogResponse,
+    SaveAiCredentialRequest,
+)
 
 router = APIRouter(prefix="/ai/credentials", tags=["ai-credentials"])
 
@@ -18,6 +23,13 @@ async def list_credentials(
     user: AuthenticatedReadAccessDependency, service: AiCredentialsServiceDependency
 ) -> AiCredentialListResponse:
     return await service.list(user_id=user.id, firm_id=_firm_id(user))
+
+
+@router.get("/models", response_model=AiModelCatalogResponse)
+async def list_models(
+    user: AuthenticatedReadAccessDependency, service: AiCredentialsServiceDependency
+) -> AiModelCatalogResponse:
+    return await service.list_models(user_id=user.id, firm_id=_firm_id(user))
 
 
 @router.put("/{provider}", response_model=AiCredentialResponse, status_code=status.HTTP_200_OK)

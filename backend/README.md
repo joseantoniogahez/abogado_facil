@@ -95,6 +95,8 @@ AI observability is metadata-only: prompts, document text, credentials, tokens, 
 headers, and provider exception details must not be passed to technical logs. OpenAI and Gemini use
 their pinned official asynchronous Python SDKs through injectable clients, with SDK retries disabled
 for OpenAI so RQ remains the retry owner. Use
+`GET /v1/ai/credentials/models` to discover text-generation models for the authenticated user's
+scoped BYOK credentials; the chosen model is revalidated before provider construction. Use
 `app.core.common.observability.log_layer_event` for structured events; sensitive field names are
 redacted centrally and tests enforce the negative contract. Provider credentials belong in
 provider authentication details, including credentials, never enter application URLs or contracts.

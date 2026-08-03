@@ -99,6 +99,51 @@ class AiProviderPort(Protocol):
     async def generate(self, request: AiTextRequest) -> AiTextResponse: ...
 
 
+@dataclass(frozen=True)
+class AiModel:
+    """Provider-neutral model available to the current BYOK credential."""
+
+    id: str
+    label: str
+
+
+async def list_openai_models(*, api_key: str, client: Any | None = None) -> list[AiModel]:
+    sdk = client or openai.AsyncOpenAI(api_key=api_key, timeout=30, max_retries=0)
+    try:
+        response = await sdk.models.list()
+    except Exception as exc:
+        raise _map_openai_error(exc) from exc
+    models = []
+    for item in response.data:
+        model_id = getattr(item, "id", "")
+        lowered = model_id.lower()
+        if (
+            isinstance(model_id, str)
+            and model_id.startswith("gpt-")
+            and not any(marker in lowered for marker in ("audio", "image", "realtime", "transcribe", "tts"))
+        ):
+            models.append(AiModel(id=model_id, label=model_id))
+    return sorted(models, key=lambda item: item.id)
+
+
+async def list_gemini_models(*, api_key: str, client: Any | None = None) -> list[AiModel]:
+    sdk: genai.Client = client or genai.Client(api_key=api_key).aio
+    try:
+        pager = await sdk.models.list()
+        items = [item async for item in pager]
+    except Exception as exc:
+        raise _map_gemini_error(exc) from exc
+    models = []
+    for item in items:
+        actions = getattr(item, "supported_actions", None) or []
+        name = getattr(item, "name", "")
+        if isinstance(name, str) and name.startswith("models/gemini") and "generateContent" in actions:
+            model_id = name.removeprefix("models/")
+            label = getattr(item, "display_name", None) or model_id
+            models.append(AiModel(id=model_id, label=label))
+    return sorted(models, key=lambda item: item.id)
+
+
 def _require_openai_text(response: Any) -> str:
     try:
         text = response.choices[0].message.content

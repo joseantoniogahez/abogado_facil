@@ -28,6 +28,7 @@ All routes are versioned under `/v1`.
 | `GET`    | `/v1/health`                                               | No   | No                        | No body                                                     | `200` `{ "status": "ok" }`                     | -                                                             |
 | `GET`    | `/v1/readiness`                                            | No   | No                        | No body                                                     | `200` `{ "status": "ready", "checks": {...} }` | `503`                                                         |
 | `GET`    | `/v1/ai/credentials`                                       | Yes  | No                        | No body                                                     | `200` `AiCredentialListResponse`               | `401`, `500`                                                  |
+| `GET`    | `/v1/ai/credentials/models`                                | Yes  | No                        | No body                                                     | `200` `AiModelCatalogResponse`                 | `401`, `500`                                                  |
 | `PUT`    | `/v1/ai/credentials/{provider}`                            | Yes  | No                        | JSON `SaveAiCredentialRequest`                              | `200` `AiCredentialResponse`                   | `400`, `401`, `500`                                           |
 | `DELETE` | `/v1/ai/credentials/{provider}`                            | Yes  | No                        | No body                                                     | `204`                                          | `401`, `404`, `500`                                           |
 | `GET`    | `/v1/document-templates`                                   | Yes  | No                        | No body                                                     | `200` `DocumentTemplateListResponse`           | `401`, `500`                                                  |
@@ -107,6 +108,12 @@ BYOK credential and the common minimized-context, prompt-injection, schema-valid
 lifecycle gates. The response is always an editable draft and is never saved, sent, or filed
 automatically.
 
+The BYOK model catalog lists only providers configured for the authenticated user and firm. The
+backend decrypts each credential only for its provider SDK call, filters the result to text-generation
+models, returns identifiers and display labels without secrets, and revalidates the selected model
+before building a provider for preview or execution. The catalog is deliberately uncached so a saved
+or deleted credential is reflected on the next request.
+
 Protected rows (`Permission != No`) are contract-checked by
 `tests/routers/test_authorization_policy_coverage.py`.
 
@@ -134,6 +141,7 @@ This table classifies each `GET` endpoint as `public`, `authenticated`, or `perm
 | `GET`  | `/v1/health`                                               | `public`        | No                        |
 | `GET`  | `/v1/readiness`                                            | `public`        | No                        |
 | `GET`  | `/v1/ai/credentials`                                       | `authenticated` | No                        |
+| `GET`  | `/v1/ai/credentials/models`                                | `authenticated` | No                        |
 | `GET`  | `/v1/ai/insights`                                          | `authenticated` | No                        |
 | `GET`  | `/v1/document-templates`                                   | `authenticated` | No                        |
 | `GET`  | `/v1/users/me`                                             | `authenticated` | No                        |
@@ -198,5 +206,6 @@ This table classifies each `GET` endpoint as `public`, `authenticated`, or `perm
 - Extracted text and extraction state are internal metadata and do not change
   `MatterDocumentResponse` or the public document endpoint shapes.
 - `GET /v1/ai/credentials`
+- `GET /v1/ai/credentials/models`
 - `PUT /v1/ai/credentials/{provider}`
 - `DELETE /v1/ai/credentials/{provider}`

@@ -605,6 +605,65 @@
         "title": "AiCredentialResponse",
         "type": "object"
       },
+      "AiModelCatalogResponse": {
+        "properties": {
+          "providers": {
+            "items": {
+              "$ref": "#/components/schemas/AiProviderModelsResponse"
+            },
+            "title": "Providers",
+            "type": "array"
+          }
+        },
+        "required": [
+          "providers"
+        ],
+        "title": "AiModelCatalogResponse",
+        "type": "object"
+      },
+      "AiModelResponse": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label"
+        ],
+        "title": "AiModelResponse",
+        "type": "object"
+      },
+      "AiProviderModelsResponse": {
+        "properties": {
+          "models": {
+            "items": {
+              "$ref": "#/components/schemas/AiModelResponse"
+            },
+            "title": "Models",
+            "type": "array"
+          },
+          "provider": {
+            "enum": [
+              "openai",
+              "gemini"
+            ],
+            "title": "Provider",
+            "type": "string"
+          }
+        },
+        "required": [
+          "provider",
+          "models"
+        ],
+        "title": "AiProviderModelsResponse",
+        "type": "object"
+      },
       "AssignedRole": {
         "properties": {
           "id": {
@@ -3343,6 +3402,32 @@
           }
         ],
         "summary": "List Credentials",
+        "tags": [
+          "ai-credentials"
+        ]
+      }
+    },
+    "/v1/ai/credentials/models": {
+      "get": {
+        "operationId": "list_models_v1_ai_credentials_models_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiModelCatalogResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "List Models",
         "tags": [
           "ai-credentials"
         ]

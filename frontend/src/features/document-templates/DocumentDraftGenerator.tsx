@@ -1,6 +1,7 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
+import { aiModelsQueryOptions } from "@/shared/ai-models/api";
 import { t } from "@/shared/i18n/ui-text";
 import { ACCENT_ACTION_CLASS_NAME, SECONDARY_ACTION_CLASS_NAME } from "@/shared/ui/actionStyles";
 import { AiGeneratedContentNotice } from "@/shared/ui/AiGeneratedContentNotice";
@@ -8,25 +9,20 @@ import { AiGeneratedContentNotice } from "@/shared/ui/AiGeneratedContentNotice";
 import { generateDocumentDraft, previewDocumentDraft } from "./api";
 import type { DocumentTemplate, DraftProvider } from "./contracts";
 
-const MODEL_OPTIONS = {
-  openai: [
-    { value: "gpt-4.1-mini", label: "GPT-4.1 mini" },
-    { value: "gpt-4.1", label: "GPT-4.1" },
-  ],
-  gemini: [
-    { value: "gemini-3.5-flash-lite", label: "Gemini 3.5 Flash-Lite" },
-    { value: "gemini-2.5-flash", label: "Gemini 2.5 Flash" },
-  ],
-} as const;
-
 export const DocumentDraftGenerator = ({ template }: { template: DocumentTemplate }) => {
+  const catalog = useQuery(aiModelsQueryOptions);
   const [fields, setFields] = useState<Record<string, string>>({});
   const [provider, setProvider] = useState<DraftProvider>("openai");
-  const [model, setModel] = useState(MODEL_OPTIONS.openai[0].value);
+  const [model, setModel] = useState("");
   const [draft, setDraft] = useState<string | null>(null);
   const [reviewConfirmed, setReviewConfirmed] = useState(false);
   const [actionStatus, setActionStatus] = useState<"copied" | "exported" | "copyError" | null>(null);
-  const input = { template_key: template.key, fields, provider, model };
+  const first = catalog.data?.find(entry => entry.models.length > 0);
+  const activeProvider = model ? provider : first?.provider ?? provider;
+  const selectedModels = catalog.data?.find(entry => entry.provider === activeProvider)?.models ?? [];
+  const activeModel = model ? model : (selectedModels[0]?.id ?? "");
+  const input = { template_key: template.key, fields, provider: activeProvider, model: activeModel };
+  const catalogReady = catalog.isSuccess && selectedModels.length > 0;
   const preview = useMutation({ mutationFn: () => previewDocumentDraft(input) });
   const generate = useMutation({
     mutationFn: () => {
@@ -114,14 +110,15 @@ export const DocumentDraftGenerator = ({ template }: { template: DocumentTemplat
               onChange={(event) => {
                 const next = event.target.value as DraftProvider;
                 setProvider(next);
-                setModel(MODEL_OPTIONS[next][0].value);
+                setModel(catalog.data?.find(entry => entry.provider === next)?.models[0]?.id ?? "");
                 preview.reset();
                 resetDraft();
               }}
-              value={provider}
+              value={activeProvider}
             >
-              <option value="openai">OpenAI</option>
-              <option value="gemini">Gemini</option>
+              {(catalog.data ?? []).filter(entry => entry.models.length).map(entry => (
+                <option key={entry.provider} value={entry.provider}>{entry.provider === "openai" ? "OpenAI" : "Gemini"}</option>
+              ))}
             </select>
           </label>
           <label>
@@ -133,22 +130,25 @@ export const DocumentDraftGenerator = ({ template }: { template: DocumentTemplat
                 preview.reset();
                 resetDraft();
               }}
-              value={model}
+              value={activeModel}
             >
-              {MODEL_OPTIONS[provider].map(option => (
-                <option key={option.value} value={option.value}>{option.label}</option>
+              {selectedModels.map(option => (
+                <option key={option.id} value={option.id}>{option.label}</option>
               ))}
             </select>
           </label>
         </div>
         <button
           className={`${SECONDARY_ACTION_CLASS_NAME} w-fit`}
-          disabled={!requiredComplete || preview.isPending}
+          disabled={!catalogReady || !requiredComplete || preview.isPending}
           onClick={() => preview.mutate()}
           type="button"
         >
           {t("documentDraft.preview")}
         </button>
+        {catalog.isPending ? <p role="status">{t("ai.models.loading")}</p> : null}
+        {catalog.isError ? <p role="alert">{t("ai.models.error")}</p> : null}
+        {catalog.isSuccess && !catalogReady ? <p role="status">{t("ai.models.empty")}</p> : null}
       </form>
       {preview.data
         ? (

@@ -20,6 +20,8 @@ from app.integrations.ai_providers import (
     GeminiProvider,
     MockProvider,
     OpenAIProvider,
+    list_gemini_models,
+    list_openai_models,
 )
 
 REQUEST = AiTextRequest(
@@ -159,6 +161,52 @@ def test_default_official_clients_are_constructed(monkeypatch: pytest.MonkeyPatc
     assert GeminiProvider(api_key=PROVIDER_API_KEY, model="test")._client is gemini_async
     openai_sdk.assert_called_once_with(api_key=PROVIDER_API_KEY, timeout=30, max_retries=0)
     google_sdk.assert_called_once_with(api_key=PROVIDER_API_KEY)
+
+
+def test_official_model_lists_are_filtered_and_normalized() -> None:
+    openai_list = AsyncMock(
+        return_value=SimpleNamespace(
+            data=[SimpleNamespace(id="gpt-text"), SimpleNamespace(id="gpt-audio"), SimpleNamespace(id="embedding-1")]
+        )
+    )
+    openai_sdk = SimpleNamespace(models=SimpleNamespace(list=openai_list))
+
+    class Pager:
+        def __aiter__(self):
+            return self
+
+        async def __anext__(self):
+            if hasattr(self, "done"):
+                raise StopAsyncIteration
+            self.done = True
+            return SimpleNamespace(
+                name="models/gemini-text", display_name="Gemini Text", supported_actions=["generateContent"]
+            )
+
+    gemini_list = AsyncMock(return_value=Pager())
+    gemini_sdk = SimpleNamespace(models=SimpleNamespace(list=gemini_list))
+
+    assert [item.id for item in run(list_openai_models(api_key=PROVIDER_API_KEY, client=openai_sdk))] == ["gpt-text"]
+    assert [item.id for item in run(list_gemini_models(api_key=PROVIDER_API_KEY, client=gemini_sdk))] == ["gemini-text"]
+
+
+@pytest.mark.parametrize(
+    ("function", "client"),
+    [
+        (
+            list_openai_models,
+            SimpleNamespace(models=SimpleNamespace(list=AsyncMock(side_effect=RuntimeError("secret")))),
+        ),
+        (
+            list_gemini_models,
+            SimpleNamespace(models=SimpleNamespace(list=AsyncMock(side_effect=RuntimeError("secret")))),
+        ),
+    ],
+)
+def test_model_list_failures_are_safe(function, client) -> None:
+    with pytest.raises(AiProviderError, match="no est") as captured:
+        run(function(api_key=PROVIDER_API_KEY, client=client))
+    assert "secret" not in str(captured.value)
 
 
 def _openai_status_error(status: int) -> openai.APIStatusError:
