@@ -151,7 +151,7 @@ The repository includes a GitHub Actions workflow at `.github/workflows/ci.yaml`
 
 It runs three independent quality gates:
 
-- `pre-commit`: runs repository hooks in CI for both `pre-commit` and `pre-push` stages
+- `pre-commit`: audits Python dependencies and runs the repository's `pre-push` hooks
 - `backend`: runs `python -m pytest backend/tests --cov=app --cov-report=term-missing:skip-covered --cov-fail-under=100`
 - `frontend`: runs frontend quality gate (`npm --prefix frontend run check`), smoke e2e (`npm --prefix frontend run test:e2e:ci`), and production build
 
@@ -246,6 +246,9 @@ Run heavier pre-push hooks locally:
 ```powershell
 .\.venv\Scripts\python.exe -m pre_commit run --all-files --hook-stage pre-push
 ```
+
+The `pre-push` stage includes `pip-audit` against the root dependency manifest. CI also runs this
+audit explicitly so the dependency security gate remains visible in the workflow log.
 
 ## AI Workflow Helpers
 

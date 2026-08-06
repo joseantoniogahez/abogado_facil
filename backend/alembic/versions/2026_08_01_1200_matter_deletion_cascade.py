@@ -49,6 +49,8 @@ def _replace_foreign_keys(*, ondelete: str | None) -> None:
             for foreign_key in inspector.get_foreign_keys(table_name)
             if foreign_key["constrained_columns"] == ["matter_id"] and foreign_key["referred_table"] == "matters"
         )
+        if constraint_name is None:
+            raise RuntimeError(f"Matter foreign key on {table_name} must be named")
         op.drop_constraint(constraint_name, table_name, type_="foreignkey")
         op.create_foreign_key(
             constraint_name,

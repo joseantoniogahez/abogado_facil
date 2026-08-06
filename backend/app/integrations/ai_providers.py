@@ -6,7 +6,7 @@ from collections.abc import Awaitable, Callable, Mapping
 from dataclasses import dataclass
 from enum import StrEnum
 from time import perf_counter
-from typing import Any, Protocol
+from typing import Any, Protocol, cast
 
 import openai
 from google import genai
@@ -127,7 +127,7 @@ async def list_openai_models(*, api_key: str, client: Any | None = None) -> list
 
 
 async def list_gemini_models(*, api_key: str, client: Any | None = None) -> list[AiModel]:
-    sdk: genai.Client = client or genai.Client(api_key=api_key).aio
+    sdk = cast(genai.client.AsyncClient, client) if client is not None else genai.Client(api_key=api_key).aio
     try:
         pager = await sdk.models.list()
         items = [item async for item in pager]

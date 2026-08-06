@@ -8,6 +8,7 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.db.ports import UnitOfWorkPort
 from app.core.errors.services import NotFoundError
 from app.features.ai_insights.repository import AIInsightsRepository
 from app.features.ai_insights.router import _firm_id, get_insights, save_feedback
@@ -138,7 +139,10 @@ async def test_service_and_router_delegate_scoped_identity() -> None:
         insights=AsyncMock(return_value="metrics"),
         upsert_feedback=AsyncMock(return_value=SimpleNamespace(category="useful")),
     )
-    service = AIInsightsService(repository, Uow())
+    service = AIInsightsService(
+        cast(AIInsightsRepository, repository),
+        cast(UnitOfWorkPort, Uow()),
+    )
     assert await service.get_insights(firm_id=3) == "metrics"
     assert (await service.save_feedback(result_id=1, user_id=2, firm_id=3, category="useful")).category == "useful"
     repository.upsert_feedback.return_value = None
@@ -149,8 +153,9 @@ async def test_service_and_router_delegate_scoped_identity() -> None:
     router_service = SimpleNamespace(
         get_insights=AsyncMock(return_value="metrics"), save_feedback=AsyncMock(return_value="saved")
     )
-    assert await get_insights(user, router_service) == "metrics"
-    assert await save_feedback(1, AIResultFeedbackRequest(category="useful"), user, router_service) == "saved"
+    typed_router_service = cast(AIInsightsService, router_service)
+    assert await get_insights(user, typed_router_service) == "metrics"
+    assert await save_feedback(1, AIResultFeedbackRequest(category="useful"), user, typed_router_service) == "saved"
     assert _firm_id(user) == 3
     with pytest.raises(ValueError):
         _firm_id(cast(CurrentPrincipal, SimpleNamespace(firm_id=None)))

@@ -18,4 +18,4 @@ def test_ai_limit_settings_defaults_and_bounds() -> None:
         {"DOCUMENT_DRAFT_OUTPUT_MAX_TOKENS": 0},
     ):
         with pytest.raises(ValidationError):
-            AILimitSettings(**values)
+            AILimitSettings.model_validate(values)

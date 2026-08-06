@@ -53,8 +53,12 @@ class AIInsightsRepository:
             (await self.session.scalars(select(AIResultFeedback).where(AIResultFeedback.firm_id == firm_id))).all()
         )
         now = datetime.now(UTC)
-        terminal = [job for job in jobs if job.completed_at and job.started_at]
-        latencies = [(job.completed_at - job.started_at).total_seconds() * 1000 for job in terminal]
+        latencies: list[float] = []
+        for job in jobs:
+            completed_at = job.completed_at
+            started_at = job.started_at
+            if completed_at is not None and started_at is not None:
+                latencies.append((completed_at - started_at).total_seconds() * 1000)
         successful = [job for job in jobs if job.status == "succeeded"]
         failed = [job for job in jobs if job.status == "failed"]
         errors = Counter(job.error_code for job in failed if job.error_code)

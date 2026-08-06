@@ -63,6 +63,9 @@ def test_build_rejects_tampered_aes_gcm_credential_without_provider_call() -> No
         async def get_secret(self, *, user_id: int, firm_id: int, provider: str) -> str:
             return encryption.decrypt(tampered_ciphertext, nonce)
 
+        async def validate_model(self, *, user_id: int, firm_id: int, provider: str, model: str) -> None:
+            pass
+
     constructor = Mock()
     factory = AiProviderFactory(TamperedCredentialReader(), {"openai": constructor})
 

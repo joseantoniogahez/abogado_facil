@@ -49,6 +49,9 @@ jobs:
       - name: Prepare local environment file for compose validation hooks
         run: cp .env_examples .env
 
+      - name: Audit Python dependencies
+        run: python -m pip_audit -r requirements.txt
+
       - name: Run pre-push hooks
         run: pre-commit run --all-files --hook-stage pre-push --show-diff-on-failure
 
