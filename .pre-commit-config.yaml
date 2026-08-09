@@ -190,7 +190,7 @@ repos:
           - pydantic==2.13.4
           - pydantic-settings==2.14.2
           - PyJWT==2.13.0
-          - pypdf==6.14.2
+          - pypdf==6.15.0
           - pytest==9.1.1
           - redis==7.1.0
           - rq==2.10.0
