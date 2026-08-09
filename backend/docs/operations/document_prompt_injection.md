@@ -20,8 +20,8 @@ solicitudes de ejecutar acciones permanece dentro del campo de datos y no puede 
 ## Capacidades prohibidas
 
 `AiTextRequest` no acepta herramientas, funciones, URLs, callbacks ni configuracion de ejecucion.
-Los adaptadores no incluyen el campo `tools`; OpenAI ademas fija `tool_choice="none"`. Mock comparte
-el mismo request sin ninguna ruta de ejecucion.
+Ningún adaptador habilita herramientas: Gemini envía el campo `tools` como lista vacía, OpenAI
+fija `tool_choice="none"`, y Mock comparte el mismo request sin ninguna ruta de ejecucion.
 
 Agregar tool calling, recuperacion autonoma, navegacion o mutaciones requiere otro contrato,
 threat model, allowlist de herramientas, autorizacion por accion, revision humana y pruebas. No es

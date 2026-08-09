@@ -1,7 +1,9 @@
 # AI Agent Operating Guide
 
-This repository is a FastAPI, React, PostgreSQL, and Docker starter kit intended to become an
-AI-governed foundation for new applications.
+This repository contains ABOGADO_FACIL, a FastAPI, React, PostgreSQL, and Docker application derived
+from a reusable starter kit. It retains an AI-governed foundation, but the current worktree is an
+already bootstrapped product rather than a pristine template. See `docs/ai/template_provenance.md`
+for the verified source revision and reuse boundary.
 
 Use this file as the first orientation point for AI-assisted work. It routes tasks to the canonical
 project docs, validation gates, and delivery expectations without replacing the backend or frontend
@@ -9,7 +11,7 @@ playbooks.
 
 ## Mission
 
-Build and evolve applications from this foundation with AI assistance while preserving:
+Build and evolve ABOGADO_FACIL with AI assistance while preserving:
 
 - documented architecture boundaries,
 - explicit API, auth, RBAC, routing, and runtime contracts,
@@ -34,6 +36,7 @@ For repository setup and service overview, read:
 
 Backend-only feature or capability:
 
+- Read `docs/product/README.md` and the affected capability document when product behavior changes.
 - Read `backend/docs/backend_playbook.md`.
 - Read `backend/docs/foundation_status.md`.
 - Read affected backend operation docs in `backend/docs/operations/`.
@@ -43,6 +46,7 @@ Backend-only feature or capability:
 
 Frontend-only feature or capability:
 
+- Read `docs/product/README.md` and the affected capability document when product behavior changes.
 - Read `frontend/docs/frontend_playbook.md`.
 - Read `frontend/docs/foundation_status.md`.
 - Read affected frontend operation docs in `frontend/docs/operations/`.
@@ -51,6 +55,7 @@ Frontend-only feature or capability:
 
 Full-stack feature:
 
+- Read `docs/product/README.md` and the affected capability document.
 - Read the backend and frontend playbooks.
 - Read both foundation status files.
 - Use `docs/ai/templates/full_stack_feature_request.md` when scope is not already explicit.
@@ -77,13 +82,16 @@ Review work:
 
 New application bootstrap:
 
+- Read `docs/ai/template_provenance.md` and confirm the starting worktree is a pristine or otherwise
+  compatible starter snapshot.
 - Read `docs/ai/start_new_project.md`.
 - Read `docs/ai/new_app_bootstrap_checklist.md`.
 - Read root and service READMEs.
 - Use `docs/ai/templates/new_app_request.md` when app identity, scope, or bootstrap mode is not
   already explicit.
 - Use `.\.venv\Scripts\python.exe scripts/bootstrap_new_app.py --app-name "<App Name>"` to preview identity changes
-  before applying an in-place bootstrap.
+  before applying an in-place bootstrap only in a compatible starter snapshot. The script is not an
+  idempotent rebranding tool and must not be used to rename the current ABOGADO_FACIL worktree.
 - Identify app name, domain, roles, initial routes, initial data model, integrations, deployment
   target, and branding terms before making broad renames.
 - Update project identity consistently across Compose names, env examples, JWT issuer/audience,
@@ -288,15 +296,17 @@ or implement business logic.
 Examples:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts/scaffold_feature.py backend audit-log --with-model
-.\.venv\Scripts\python.exe scripts/scaffold_feature.py frontend audit-log --route /admin/audit-log
-.\.venv\Scripts\python.exe scripts/scaffold_feature.py full-stack audit-log --route /admin/audit-log --with-model
+.\.venv\Scripts\python.exe scripts/scaffold_feature.py --dry-run backend audit-log --with-model
+.\.venv\Scripts\python.exe scripts/scaffold_feature.py --dry-run frontend audit-log --route /admin/audit-log
+.\.venv\Scripts\python.exe scripts/scaffold_feature.py --dry-run full-stack audit-log --route /admin/audit-log --with-model
 ```
 
-Use `--dry-run` first when exploring paths.
+Remove `--dry-run` only after reviewing paths and scope.
 
 Use `scripts/bootstrap_new_app.py` to preview or apply new-app identity changes. The script previews
-by default and only writes with `--write`.
+by default and only writes with `--write`. It requires the pristine starter identity documented in
+`docs/ai/template_provenance.md`; it is intentionally unsupported as a second bootstrap of this
+already branded application.
 
 Example:
 

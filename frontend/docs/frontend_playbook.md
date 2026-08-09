@@ -27,6 +27,8 @@ Dependency direction:
 
 1. Route definitions are centralized in `src/app/routes.tsx`.
 1. Shared API calls must flow through `src/shared/api/http.ts`.
+1. API response payloads must use runtime parsers rather than TypeScript assertions alone; known
+   implementation gaps must stay recorded in `docs/operations/api_consumer_matrix.md` until fixed.
 1. API error normalization must be handled in `src/shared/api/errors.ts`.
 1. Session/auth state operations must be handled through `src/shared/auth/session.ts`.
 1. Token persistence behavior must be encapsulated in `src/shared/auth/storage.ts`.
@@ -99,7 +101,7 @@ During coding:
 Before delivery:
 
 1. Run `npm --prefix frontend run check`.
-1. Run `npm --prefix frontend run build` when routing/build-sensitive changes are included.
+1. Run `npm --prefix frontend run build`.
 1. Run `.\.venv\Scripts\python.exe -m pre_commit run --all-files`.
 
 ## Reviewer Checklist

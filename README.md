@@ -14,9 +14,10 @@ SaaS web para abogados independientes y despachos pequeños con expedientes, tar
 - `backend/README.md`: backend-only setup, API behavior, migrations, and backend tests.
 - `frontend/README.md`: frontend-only setup, scripts, tests, and API client configuration.
 - `docs/product/README.md`: current product capabilities, backlog, and implementation-plan indexes.
-- `AGENTS.md`: AI assistant operating guide for this starter kit.
-- `docs/ai/start_new_project.md`: new-project bootstrap workflow for turning this starter kit into
-  a named application.
+- `AGENTS.md`: AI assistant operating guide for this application and its reusable foundation.
+- `docs/ai/template_provenance.md`: verified template revision, documentation layers, and reuse
+  boundary.
+- `docs/ai/start_new_project.md`: bootstrap workflow for a pristine compatible template snapshot.
 
 ## Project Structure
 
@@ -57,26 +58,16 @@ Copy-Item .env_examples .env
 
 See `.env_examples` for variable descriptions.
 
-## Use This As a New Project Starter
+## Template Provenance and Reuse
 
-Start with the detailed guide:
+ABOGADO_FACIL was bootstrapped from the pinned template revision documented in
+`docs/ai/template_provenance.md`. The current worktree now contains product-specific behavior and is
+not a pristine input for `scripts/bootstrap_new_app.py`; that helper intentionally refuses a second
+identity bootstrap when the original starter tokens are absent.
 
-```bash
-docs/ai/start_new_project.md
-```
-
-Quick flow:
-
-```powershell
-# preview identity changes
-.\.venv\Scripts\python.exe scripts/bootstrap_new_app.py --app-name "Example Portal" --description "A portal for example workflows."
-
-# apply after reviewing the preview
-.\.venv\Scripts\python.exe scripts/bootstrap_new_app.py --app-name "Example Portal" --description "A portal for example workflows." --write
-```
-
-Then review `git diff`, create `.env` from `.env_examples`, run the validation gates listed in
-`docs/ai/start_new_project.md`, and start the stack with `docker compose up --build`.
+To create another application, start from the compatible upstream snapshot and follow
+`docs/ai/start_new_project.md`. Extracting later reusable improvements from ABOGADO_FACIL is a
+separate engineering task and must not copy legal-domain behavior by default.
 
 ## Run Full Stack (Docker)
 
@@ -255,11 +246,8 @@ audit explicitly so the dependency security gate remains visible in the workflow
 Preview feature scaffolds:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts/scaffold_feature.py full-stack audit-log --route /admin/audit-log --with-model --dry-run
+.\.venv\Scripts\python.exe scripts/scaffold_feature.py --dry-run full-stack audit-log --route /admin/audit-log --with-model
 ```
 
-Preview new-app identity bootstrap:
-
-```powershell
-.\.venv\Scripts\python.exe scripts/bootstrap_new_app.py --app-name "Example Portal" --description "A portal for example workflows."
-```
+The identity bootstrap helper applies only to a pristine compatible starter snapshot. See
+`docs/ai/template_provenance.md` before using it.

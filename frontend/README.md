@@ -71,21 +71,13 @@ Frontend URL: `http://localhost:3000`
 
 ## Current Route Surface
 
-- `/`: public landing page
-- `/login`: public credential entry flow
-- `/register`: public self-service registration
-- `/welcome`: authenticated session entry point
-- `/dashboard`: authenticated dashboard with firm-scoped metrics and upcoming tasks
-- `/profile`: authenticated current-user profile management
-- `/settings/ai`: guided authenticated BYOK onboarding, connection verification, credential management, and a clearly labelled local mock walkthrough
-- `/clients`, `/clients/new`, `/clients/:clientId`, `/clients/:clientId/edit`: authenticated client management
-- `/matters`, `/matters/new`, `/matters/:matterId`, `/matters/:matterId/edit`: authenticated matter management
-- `/admin/audit-log`: authenticated administrator audit log review
-- `/admin/assignments`: authenticated RBAC user-role assignments
-- `/admin/permissions`: authenticated RBAC role-permission assignments
-- `/admin/users`: authenticated RBAC user administration
-- `/admin/roles`: authenticated RBAC role and permission administration
-- Matter detail includes notes, checklists, tasks, payments, calculations, and document management.
+The canonical route and access-policy inventory is
+[`docs/operations/route_inventory.md`](docs/operations/route_inventory.md). It includes public
+authentication routes, protected product routes, the compatibility redirect from `/welcome` to
+`/dashboard`, and the exact permission required by each administration route.
+
+Do not maintain a second route catalog in this README. Update the canonical inventory and its
+contract test whenever route or guard behavior changes.
 
 ## Testing and Quality Gates
 
@@ -110,8 +102,6 @@ Run `npm run e2e:install` once per machine before `npm run test:e2e` or `npm run
 - typecheck
 - coverage gate
 - OpenAPI artifact freshness gate (`openapi:check`)
-- Dynamic BYOK provider/model selectors backed by `/v1/ai/credentials/models`; loading, empty, and
-  recoverable error states keep real AI generation disabled.
 - dependency audit gate (`deps:audit`)
 
 Recommended CI-equivalent frontend gate:

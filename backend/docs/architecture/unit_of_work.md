@@ -18,6 +18,8 @@ With UoW, a use case either:
 - DI provider: `app/core/setup/dependencies.py` (`get_unit_of_work`)
 - Service usage:
   - `app/features/ai_credentials/service.py`
+  - `app/features/ai_assistance/service.py`
+  - `app/features/ai_insights/service.py`
   - `app/features/ai_jobs/service.py`
   - `app/features/auth/service.py`
   - `app/features/auth/profile_updates.py`
@@ -71,6 +73,8 @@ Examples in current code:
 - `AuthService.register`
 - `AuthProfileUpdates.persist_user_changes` (called by `AuthService.update_current_user`)
 - `AiCredentialsService` save/delete operations
+- `AIAssistanceService` result creation, review, and conversion operations
+- `AIInsightsService.save_feedback`
 - Client, matter, note, checklist, task, payment, calculation, and document write operations
 - `RBACService` write methods (create/update/delete/assignment operations)
 - `OutboxService.enqueue` and `OutboxService.mark_published`

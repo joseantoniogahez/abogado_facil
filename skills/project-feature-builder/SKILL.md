@@ -1,7 +1,7 @@
-<!--
+---
 name: project-feature-builder
 description: Full-stack feature delivery for this FastAPI, React, PostgreSQL, and Docker starter kit. Use when Codex must add or change a user-facing capability that touches both backend and frontend, including API endpoints, data models, auth or RBAC behavior, OpenAPI contract sync, routes, UI state, tests, and project documentation.
--->
+---
 
 # Project Feature Builder
 
@@ -23,7 +23,7 @@ definition of done.
 1. Read affected backend operation and architecture docs before editing backend behavior.
 1. Read affected frontend operation docs before editing frontend behavior.
 1. Confirm scope, acceptance criteria, affected contracts, protected files, and validation gates.
-1. Use `.\.venv\Scripts\python.exe scripts/scaffold_feature.py full-stack <feature-name> --dry-run` to preview new
+1. Use `.\.venv\Scripts\python.exe scripts/scaffold_feature.py --dry-run full-stack <feature-name>` to preview new
    feature structure when adding a new vertical feature.
 1. Use `.\.venv\Scripts\python.exe scripts/scaffold_feature.py full-stack <feature-name>` only after the target paths and
    scope are clear.

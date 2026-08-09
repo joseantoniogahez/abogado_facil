@@ -13,14 +13,16 @@ Main provider groups:
 - Request and transaction state: `get_db_session`, `get_unit_of_work`, and
   `get_request_permission_scope_cache`.
 - Feature repositories: auth, audit log, RBAC, outbox, clients, matters, notes, checklists, tasks,
-  payments, calculations, documents, AI credentials, and AI jobs.
+  payments, calculations, documents, AI credentials, AI jobs, AI assistance, and AI insights.
 - Feature services: auth, audit log, RBAC, outbox, dashboard, clients, matters, notes, checklists,
-  tasks, payments, calculations, documents, AI credentials, and AI jobs.
+  tasks, payments, calculations, documents, AI credentials, AI jobs, AI assistance, AI insights,
+  and document templates.
 - Security and settings: `get_auth_settings`, `get_ai_credential_settings`,
-  `get_secret_encryption`, `get_password_service`, and `get_token_service`.
+  `get_ai_limit_settings`, `get_secret_encryption`, `get_password_service`, and
+  `get_token_service`.
 - Integration adapters and settings: `get_file_storage`, `get_pdf_text_extractor`,
   `get_object_storage_settings`, `get_matter_document_settings`, `get_ai_queue_settings`, and
-  `get_job_scheduler`.
+  `get_job_scheduler`, plus `get_ai_provider_factory` for scoped provider construction.
 
 The executable provider catalog is `app/core/setup/dependencies.py`; add new request-scoped wiring
 there and update this grouping when a new provider category is introduced.

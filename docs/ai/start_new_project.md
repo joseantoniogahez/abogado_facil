@@ -1,14 +1,22 @@
-# Start a New Project From This Starter Kit
+# Start a New Project From a Compatible Starter Snapshot
 
-This repository is ready to use as a governed starter for new FastAPI, React, PostgreSQL, and Docker
-applications.
+This workflow applies to the pristine starter snapshot identified in
+`docs/ai/template_provenance.md`, or to a newer upstream revision that has been reviewed explicitly.
+The current ABOGADO_FACIL worktree has already been bootstrapped and is not compatible with a second
+run of the exact-replacement identity script.
 
-Use this guide when you want to turn the starter kit into a named product. Use `AGENTS.md` as the
-assistant operating guide and `docs/ai/new_app_bootstrap_checklist.md` as the detailed checklist.
+Use this guide when you want to turn a compatible starter snapshot into a named product. Use
+`AGENTS.md` as the assistant operating guide and `docs/ai/new_app_bootstrap_checklist.md` as the
+detailed checklist.
+
+Do not use this workflow to rebrand ABOGADO_FACIL or to copy its product-specific legal behavior.
+Extracting reusable improvements added after its bootstrap requires a separate scoped migration.
 
 ## Recommended Flow
 
-1. Create a new repository or branch from this starter kit.
+1. Create a new repository or branch from the pinned compatible starter snapshot.
+1. Confirm that the snapshot still contains the original starter identity expected by
+   `scripts/bootstrap_new_app.py`.
 1. Decide the app identity values before renaming files.
 1. Preview the bootstrap changes.
 1. Apply the bootstrap changes only after reviewing the preview.

@@ -23,13 +23,15 @@ From repo root:
 python -m venv .venv
 ```
 
-Activate:
+Activate in Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+Activate in macOS/Linux:
 
 ```bash
-# Windows PowerShell
-.venv/Scripts/Activate.ps1
-
-# macOS/Linux
 source .venv/bin/activate
 ```
 
@@ -93,19 +95,23 @@ import `boto3` directly.
 
 AI observability is metadata-only: prompts, document text, credentials, tokens, authorization
 headers, and provider exception details must not be passed to technical logs. OpenAI and Gemini use
-their pinned official asynchronous Python SDKs through injectable clients, with SDK retries disabled
-for OpenAI so RQ remains the retry owner. Use
+their pinned official asynchronous Python SDKs through injectable clients. OpenAI SDK retries are
+disabled so they are not duplicated by application-level policy. Current public AI assistance and
+document-draft requests execute synchronously without an RQ retry loop and return a normalized
+failure when provider work fails. Use
 `GET /v1/ai/credentials/models` to discover text-generation models for the authenticated user's
 scoped BYOK credentials; the chosen model is revalidated before provider construction. Use
 `app.core.common.observability.log_layer_event` for structured events; sensitive field names are
 redacted centrally and tests enforce the negative contract. Provider credentials belong in
 provider authentication details, including credentials, never enter application URLs or contracts.
 
-AI background work uses RQ 2.10 over the shared Redis service. The producer uses JSON serialization
-and enqueues only the opaque `execution_id`; prompts, credentials, context, results, and provider
-errors remain outside Redis. `AI_QUEUE_JOB_TIMEOUT_SECONDS`, `AI_QUEUE_MAX_RETRIES`,
-`AI_QUEUE_RETRY_BACKOFF_SECONDS`, queue/result/failure TTLs, and `AI_QUEUE_NAME` control the worker.
-Compose starts one worker with scheduler support by default so delayed retry intervals work.
+RQ 2.10 and the shared Redis service provide the available background-job transport, but the
+production handler catalog is currently empty: public AI assistance and document-draft requests do
+not enqueue work. A future registered handler may enqueue only the opaque `execution_id` through
+JSON serialization; prompts, credentials, context, results, and provider errors must remain outside
+Redis. `AI_QUEUE_JOB_TIMEOUT_SECONDS`, `AI_QUEUE_MAX_RETRIES`, `AI_QUEUE_RETRY_BACKOFF_SECONDS`,
+queue/result/failure TTLs, and `AI_QUEUE_NAME` configure that transport. Compose starts one idle
+worker with scheduler support so delayed retries are available once a handler is registered.
 
 PDF uploads are parsed locally through `PdfTextExtractorPort`. When a text layer is available, its
 normalized content is stored with the document metadata for future AI workflows. Scanned PDFs are
@@ -124,11 +130,18 @@ For network databases, set:
 
 ## Run Backend Locally
 
-From repo root:
+From repo root in Windows PowerShell:
+
+```powershell
+Set-Location backend
+..\.venv\Scripts\python.exe -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+From repo root in macOS/Linux:
 
 ```bash
 cd backend
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+../.venv/bin/python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 - API docs: `http://localhost:8000/docs`
@@ -136,22 +149,44 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
 ## Migrations and Bootstrap
 
-From `backend/`:
+From `backend/` in Windows PowerShell:
 
-```bash
+```powershell
 ..\.venv\Scripts\python.exe -m alembic upgrade head
 ```
 
+From `backend/` in macOS/Linux:
+
+```bash
+../.venv/bin/python -m alembic upgrade head
+```
+
 Create a migration:
+
+Windows PowerShell:
 
 ```powershell
 ..\.venv\Scripts\python.exe -m alembic revision --autogenerate -m "describe change"
 ```
 
+macOS/Linux:
+
+```bash
+../.venv/bin/python -m alembic revision --autogenerate -m "describe change"
+```
+
 Seed RBAC baseline after migrations:
+
+Windows PowerShell:
 
 ```powershell
 ..\.venv\Scripts\python.exe -m utils.rbac_bootstrap --admin-email admin@example.com --admin-password "StrongSeed9"
+```
+
+macOS/Linux:
+
+```bash
+../.venv/bin/python -m utils.rbac_bootstrap --admin-email admin@example.com --admin-password "StrongSeed9"
 ```
 
 If you started services with `docker compose up --build` and want to run bootstrap from local PowerShell (without entering the container), run from `backend/`:
@@ -255,24 +290,9 @@ docker compose -f compose.yaml -f compose.prod.yaml down
 
 ## Current Backend Layout
 
-The backend keeps shared runtime concerns in `app/core`, integrations in `app/integrations`, and
-vertical product slices in `app/features`:
+The backend keeps shared runtime concerns in `app/core`, external ports and adapters in
+`app/integrations`, and vertical product or internal capability slices in `app/features`.
 
-- `app/core`: shared runtime, config, security, authorization, db, setup
-- `app/integrations`: S3-compatible storage, PDF text extraction, jobs, broker, search, and outbox adapters
-- `app/features/auth`: register, login, current-user profile
-- `app/features/audit_log`: administrator audit log review
-- `app/features/health`: health endpoint
-- `app/features/rbac`: roles, permissions, user-role assignment
-- `app/features/dashboard`: firm-scoped dashboard summary
-- `app/features/clients`: client management
-- `app/features/matters`: matter management
-- `app/features/matter_notes`: matter notes
-- `app/features/matter_checklists`: matter checklists
-- `app/features/matter_tasks`: matter tasks and upcoming reminders
-- `app/features/matter_payments`: matter fees and payments
-- `app/features/matter_calculations`: deterministic matter calculations
-- `app/features/matter_documents`: matter document metadata and storage operations
-- `app/features/outbox`: outbox capability
-- `app/features/ai_credentials`: encrypted per-user BYOK credential management
-- `app/features/ai_execution`: scoped BYOK validation before provider construction
+The contract-checked current feature inventory, service-only exceptions, and dependency rules live
+in `docs/architecture/clean_architecture_ports_adapters.md`; keep that document synchronized instead
+of duplicating the full feature list here.

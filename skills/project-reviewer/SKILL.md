@@ -1,7 +1,7 @@
-<!--
+---
 name: project-reviewer
 description: Review changes against this AI-governed FastAPI, React, PostgreSQL, and Docker starter kit. Use when Codex is asked to review a diff, branch, pull request, implementation, architecture change, documentation change, or readiness state, especially for bugs, regressions, missing tests, docs drift, contract drift, auth or RBAC risk, security issues, and validation gaps.
--->
+---
 
 # Project Reviewer
 

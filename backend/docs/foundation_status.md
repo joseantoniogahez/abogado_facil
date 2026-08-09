@@ -7,7 +7,7 @@ This document replaces backlog-style historical tracking for backend foundation 
 
 ## Current Foundation Snapshot
 
-Status date: `2026-07-25`
+Last verified: `2026-08-08`
 
 - Foundation maturity: `ready for feature delivery`.
 - Architecture baseline enforced:
@@ -22,8 +22,9 @@ Status date: `2026-07-25`
   - Dependency-injection and OpenAPI documentation patterns.
   - Documentation contracts for backend paths/router inventory, product-plan indexes, active item
     plans, and production BYOK encryption-key wiring.
-  - RQ/Redis background-job transport with JSON-only payloads, deterministic deduplication,
-    configurable retry/backoff, and PostgreSQL-owned AI lifecycle.
+  - RQ/Redis background-job transport provisioned with JSON-only payloads, deterministic
+    deduplication, configurable retry/backoff, and PostgreSQL-owned AI lifecycle. Its production
+    handler catalog is empty; current assistance and document-draft calls remain synchronous.
   - Closed provider-neutral AI failure taxonomy with safe public messages and explicit retry
     decisions shared by OpenAI, Gemini, and Mock adapters.
   - Validated AI correlation context and redaction-safe lifecycle events spanning `AIJob`, RQ,

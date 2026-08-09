@@ -13,7 +13,11 @@ All routes are versioned under `/v1`.
 - Sensitive surfaces return `429 rate_limited` after the configured quota; clients should honor `Retry-After`.
 - Normalized error responses echo the same `request_id` in the `X-Request-ID` response header.
 - Request validation errors are normalized to `400 invalid_input` (not exposed as `422`).
-- Write endpoints (`POST`/`PUT`/`PATCH`/`DELETE`) run inside a Unit of Work transaction scope.
+- Mutating service use cases run inside a Unit of Work transaction scope. An HTTP verb alone does
+  not imply a transaction: login and read-only preview `POST` endpoints do not persist changes.
+- Generated OpenAPI response metadata has a known coverage gap; see
+  `../architecture/openapi_documentation.md`. The runtime statuses below must not be removed merely
+  because a feature has not yet enumerated them in OpenAPI.
 - Browser cross-origin access is disabled when `API_CORS_ORIGINS` is empty. When configured, only
   explicit origins are accepted; allowed methods are `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, and
   `OPTIONS`, allowed request headers are `Accept`, `Authorization`, and `Content-Type`, credentials
@@ -34,8 +38,8 @@ All routes are versioned under `/v1`.
 | `GET`    | `/v1/document-templates`                                   | Yes  | No                        | No body                                                     | `200` `DocumentTemplateListResponse`           | `401`, `500`                                                  |
 | `POST`   | `/v1/document-templates/drafts/preview`                    | Yes  | No                        | JSON `DocumentDraftPreviewRequest`                          | `200` `DocumentDraftPreviewResponse`           | `400`, `401`, `500`                                           |
 | `POST`   | `/v1/document-templates/drafts`                            | Yes  | No                        | JSON `GenerateDocumentDraftRequest` + signed preview token  | `201` `DocumentDraftResponse`                  | `400`, `401`, `409`, `429`, `500`, `502`, `503`, `504`        |
-| `POST`   | `/v1/token`                                                | No   | No                        | OAuth2 form (`username` carries email, plus `password`)     | `200` bearer token                             | `400`, `401`, `403`, `500`                                    |
-| `POST`   | `/v1/users/register`                                       | No   | No                        | JSON `RegisterUserRequest`                                  | `201` `AuthenticatedUserResponse`              | `400`, `409`, `500`                                           |
+| `POST`   | `/v1/token`                                                | No   | No                        | OAuth2 form (`username` carries email, plus `password`)     | `200` bearer token                             | `400`, `401`, `403`, `429`, `500`                             |
+| `POST`   | `/v1/users/register`                                       | No   | No                        | JSON `RegisterUserRequest`                                  | `201` `AuthenticatedUserResponse`              | `400`, `409`, `429`, `500`                                    |
 | `GET`    | `/v1/users/me`                                             | Yes  | No                        | No body                                                     | `200` `AuthenticatedUserResponse`              | `401`, `403`, `500`                                           |
 | `POST`   | `/v1/clients`                                              | Yes  | No                        | JSON `CreateClientRequest`                                  | `201` `ClientResponse`                         | `400`, `401`, `500`                                           |
 | `GET`    | `/v1/clients`                                              | Yes  | No                        | Query `search`, `limit`, `offset`                           | `200` `ClientListResponse`                     | `400`, `401`, `500`                                           |
@@ -63,7 +67,7 @@ All routes are versioned under `/v1`.
 | `POST`   | `/v1/matters/{matter_id}/calculations/preview`             | Yes  | No                        | JSON `CalculateMatterRequest`                               | `200` `MatterCalculationResponse`              | `400`, `401`, `404`, `500`                                    |
 | `POST`   | `/v1/matters/{matter_id}/calculations`                     | Yes  | No                        | JSON `CalculateMatterRequest`                               | `201` `MatterCalculationResponse`              | `400`, `401`, `404`, `500`                                    |
 | `GET`    | `/v1/matters/{matter_id}/calculations`                     | Yes  | No                        | Path `matter_id`                                            | `200` saved calculation list                   | `400`, `401`, `404`, `500`                                    |
-| `POST`   | `/v1/matters/{matter_id}/documents`                        | Yes  | No                        | Multipart `document_type` + PDF/DOCX/TXT `file`             | `201` `MatterDocumentResponse`                 | `400`, `401`, `404`, `409`, `500`                             |
+| `POST`   | `/v1/matters/{matter_id}/documents`                        | Yes  | No                        | Multipart `document_type` + PDF/DOCX/TXT `file`             | `201` `MatterDocumentResponse`                 | `400`, `401`, `404`, `409`, `429`, `500`                      |
 | `GET`    | `/v1/matters/{matter_id}/documents`                        | Yes  | No                        | Path `matter_id`                                            | `200` `MatterDocumentListResponse`             | `400`, `401`, `404`, `500`                                    |
 | `GET`    | `/v1/matters/{matter_id}/documents/{document_id}/download` | Yes  | No                        | Path identifiers                                            | `200` streamed attachment                      | `400`, `401`, `404`, `500`                                    |
 | `DELETE` | `/v1/matters/{matter_id}/documents/{document_id}`          | Yes  | No                        | Path identifiers                                            | `204` no body                                  | `400`, `401`, `404`, `500`                                    |
@@ -205,7 +209,3 @@ This table classifies each `GET` endpoint as `public`, `authenticated`, or `perm
 - Existing documents use `unprocessed`, while DOCX and TXT uploads use `not_applicable`.
 - Extracted text and extraction state are internal metadata and do not change
   `MatterDocumentResponse` or the public document endpoint shapes.
-- `GET /v1/ai/credentials`
-- `GET /v1/ai/credentials/models`
-- `PUT /v1/ai/credentials/{provider}`
-- `DELETE /v1/ai/credentials/{provider}`

@@ -2,10 +2,23 @@
 
 ## How to Use This Template With the AI Assistant
 
+1. Start from the pristine compatible snapshot defined in `docs/ai/template_provenance.md`, or name
+   a newer template revision that has been reviewed explicitly.
 1. Fill every section with concrete details before asking the assistant to bootstrap a new app.
-1. Decide whether the work should rename this repository in place or prepare a reusable checklist.
+1. Decide whether the work should rename that compatible snapshot in place or prepare a reusable
+   checklist.
 1. Define protected files and validation commands before broad rename work begins.
 1. Paste the completed template in your request to the assistant.
+
+Do not use this template to request a second bootstrap of the current ABOGADO_FACIL worktree. A
+rebrand or extraction of later foundation improvements requires a separate code-change scope.
+
+## Starting Snapshot
+
+- Template repository:
+- Commit or tag:
+- Evidence that `scripts/bootstrap_new_app.py` is compatible with this snapshot:
+- Newer-than-pinned upstream changes reviewed, if any:
 
 ## App Identity
 
@@ -21,7 +34,7 @@
 
 Choose one:
 
-- Rename this repository in place.
+- Rename the compatible starter snapshot in place.
 - Create a plan only.
 - Create a branch-ready checklist and leave code unchanged.
 - Prepare a new-app scaffold workflow for later execution.
@@ -143,6 +156,7 @@ Commands to run after in-place bootstrap work:
 ## Reviewer Validation Checklist
 
 - [ ] App identity is explicit and consistently applied.
+- [ ] The starting template revision is explicit and compatible with the bootstrap helper.
 - [ ] Bootstrap mode is explicit.
 - [ ] Compose names, database name, JWT issuer, and JWT audience are addressed.
 - [ ] Backend auth, RBAC, seed, data, and API expectations are explicit.

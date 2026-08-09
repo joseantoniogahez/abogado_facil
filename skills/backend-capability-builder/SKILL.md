@@ -1,7 +1,7 @@
-<!--
+---
 name: backend-capability-builder
 description: Backend feature and capability delivery for this FastAPI starter kit. Use when Codex must add or change backend-only behavior such as API endpoints, vertical feature slices, services, repositories, schemas, SQLAlchemy models, Alembic migrations, auth, RBAC permissions, outbox behavior, integration ports, tests, and backend documentation.
--->
+---
 
 # Backend Capability Builder
 
@@ -20,7 +20,7 @@ and docs synchronized with behavior.
 1. Use `backend/docs/templates/feature_request.md`, `integration_request.md`, or
    `code_change_request.md` when the request needs clearer acceptance criteria.
 1. Confirm API, data, auth, RBAC, error, observability, and validation impact.
-1. Use `.\.venv\Scripts\python.exe scripts/scaffold_feature.py backend <feature-name> --dry-run` to preview new backend
+1. Use `.\.venv\Scripts\python.exe scripts/scaffold_feature.py --dry-run backend <feature-name>` to preview new backend
    feature structure when adding a new vertical feature.
 1. Use `.\.venv\Scripts\python.exe scripts/scaffold_feature.py backend <feature-name>` only after target paths and scope
    are clear.

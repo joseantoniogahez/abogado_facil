@@ -12,7 +12,8 @@ This document defines the global capture behavior for uncaught runtime errors an
 - Handlers are installed once at app bootstrap (`src/main.tsx`).
 - Captured failures emit structured observability events through `src/shared/observability/events.ts`.
 - Correlation behavior:
-  - If runtime failure is or wraps an `ApiError`, `request_id` is propagated.
+  - If the runtime failure value is directly an `ApiError`, `request_id` is propagated.
+  - Wrapped errors and `Error.cause` chains are not traversed by the current implementation.
   - Otherwise, `request_id` is logged as `null`.
 
 ## Implementation and Tests

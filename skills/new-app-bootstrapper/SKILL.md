@@ -1,20 +1,22 @@
 ---
 name: new-app-bootstrapper
-description: New application bootstrap workflow for this FastAPI, React, PostgreSQL, and Docker starter kit. Use when Codex must turn the starter kit into a named product, preview or apply identity changes, update Compose/env/JWT/package/README/UI naming surfaces, preserve behavior during identity-only bootstrap, or guide a user through the new-app request template and validation gates.
+description: Bootstrap a named application from a pristine compatible FastAPI, React, PostgreSQL, and Docker starter snapshot. Use when Codex must verify template provenance, preview or apply first-time identity changes, update Compose/env/JWT/package/README/UI naming surfaces, preserve behavior during identity-only bootstrap, or guide a user through the new-app request template and validation gates. Do not use to rebrand an already bootstrapped product such as the current ABOGADO_FACIL worktree.
 ---
 
 # New App Bootstrapper
 
 ## Overview
 
-Bootstrap this starter kit into a named application while keeping identity changes separate from
-feature design. Use the dry-run-first script flow and keep canonical docs as the source of truth.
+Bootstrap a pristine compatible starter snapshot into a named application while keeping identity
+changes separate from feature design. Verify provenance before using the dry-run-first script and
+keep canonical docs as the source of truth.
 
 ## Required Reading
 
 Read in this order:
 
 1. `AGENTS.md`
+1. `docs/ai/template_provenance.md`
 1. `docs/ai/start_new_project.md`
 1. `docs/ai/new_app_bootstrap_checklist.md`
 1. `docs/ai/templates/new_app_request.md` when app identity or scope is incomplete
@@ -39,6 +41,7 @@ Identity-only bootstrap may update:
 
 Identity-only bootstrap must not:
 
+- run against an already bootstrapped product whose original starter tokens are absent,
 - add product features,
 - change API behavior,
 - add routes,
@@ -51,6 +54,7 @@ If the user wants those changes, split the work into a follow-up feature request
 
 ## Workflow
 
+1. Confirm the starting commit is a pristine or explicitly reviewed compatible template snapshot.
 1. Confirm bootstrap mode: plan only, dry-run preview, or in-place apply.
 1. Confirm app identity values:
    - application name,
@@ -65,7 +69,7 @@ If the user wants those changes, split the work into a follow-up feature request
    files, and protected files when the user asks for more than identity-only bootstrap.
 1. If identity details are incomplete, ask a concise question or use
    `docs/ai/templates/new_app_request.md`.
-1. Run `scripts/bootstrap_new_app.py` without `--write` first.
+1. Run `scripts/bootstrap_new_app.py` without `--write` first only after compatibility is confirmed.
 1. Review the dry-run output with the user-facing assumptions.
 1. Apply with `--write` only when the requested scope is clear.
 1. Review `git diff` for identity consistency.

@@ -11,7 +11,7 @@ This document defines deterministic mutation retry and invalidation behavior by 
 | Auth logout mutation       | No retry                                         | Clear `SESSION_QUERY_KEY` and invalidate session query                                                                                                              |
 | Auth registration mutation | No retry                                         | Keep session unchanged; show explicit login transition                                                                                                              |
 | Profile update mutation    | No retry                                         | Write returned profile through `SESSION_QUERY_KEY`                                                                                                                  |
-| AI credential mutation     | No retry                                         | Invalidate `AI_CREDENTIALS_QUERY_KEY`                                                                                                                               |
+| AI credential mutation     | No retry                                         | Invalidate `AI_CREDENTIALS_QUERY_KEY` and `AI_MODELS_QUERY_KEY`                                                                                                     |
 | Client/matter mutation     | Default mutation policy                          | Explicit domain list/detail and dashboard invalidation                                                                                                              |
 | Matter note mutation       | Default mutation policy                          | Invalidate only the note list for its matter                                                                                                                        |
 | Matter document mutation   | Default mutation policy                          | Invalidate only the document list for its matter                                                                                                                    |
@@ -47,3 +47,26 @@ This document defines deterministic mutation retry and invalidation behavior by 
   attempt, and refresh provider status and the dynamic model catalog after success. The AI settings
   connection check also uses explicit user retry so credential, permission, or quota failures are
   visible and actionable.
+
+## Current Contract Violation
+
+The default retry function is currently inherited by non-idempotent writes, including the
+`POST /matters/{matter_id}/payments` consumer. A network failure can occur after the backend has
+accepted a write but before the browser receives the response; retrying that request without an
+idempotency key can create a duplicate payment or another duplicate resource.
+
+The required invariant is:
+
+- non-idempotent mutations must not retry automatically unless end-to-end idempotency is proven;
+- explicit user retry must remain available for recoverable failures;
+- idempotent operations may opt into a bounded retry after their backend contract is verified.
+
+The current implementation does not yet satisfy this invariant. This is a code/contract remediation
+item; the table above records current behavior and must not be interpreted as approving automatic
+retry for non-idempotent writes.
+
+Evidence:
+
+- Default retry implementation: `src/app/mutation-policy.ts`
+- Payment consumer: `src/features/matters/matter-payments/MatterPayments.tsx`
+- Payment request functions: `src/features/matters/matter-payments/api.ts`

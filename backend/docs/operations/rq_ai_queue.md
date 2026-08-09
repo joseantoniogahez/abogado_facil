@@ -1,11 +1,15 @@
 # Cola de IA con RQ y Redis
 
-## Runtime
+## Alcance y runtime disponible
 
-El proceso FastAPI produce trabajos mediante `RQJobScheduler`; el servicio `ai-worker` de Compose
-consume la cola configurada en `AI_QUEUE_NAME`. Ambos usan RQ 2.10, el mismo Redis y
+`RQJobScheduler` permite que FastAPI produzca trabajos y el servicio `ai-worker` de Compose consume
+la cola configurada en `AI_QUEUE_NAME`. Ambos usan RQ 2.10, el mismo Redis y
 `rq.serializers.JSONSerializer`. El worker se ejecuta con scheduler porque los retries diferidos lo
-requieren.
+requieren una vez que exista un handler registrado.
+
+El catálogo productivo de handlers está vacío. Los endpoints actuales de asistencia y borradores
+ejecutan sincrónicamente y no encolan trabajo; el worker permanece disponible pero no procesa una
+función IA pública.
 
 La imagen compartida define `/app/prestart.sh` como entrypoint para ejecutar Alembic antes de
 FastAPI. Compose elimina explícitamente ese entrypoint en `ai-worker` y espera a que `backend` esté
@@ -43,11 +47,12 @@ PostgreSQL; la correlación nunca amplía el payload Redis.
   distribuida por proveedor requiere handlers reales y se cerrará antes de habilitar una función IA
   pública; RQ 2.10 publicado no expone aún la API `RateLimit` descrita por documentación futura.
 
-RQ aplica su retry cuando el handler termina con excepción. Por ello, un handler de IA debe capturar
-`AiProviderError`: persiste y termina normalmente cuando `retryable=False`, y sólo relanza cuando
-`retryable=True`. La suite contractual verifica que timeout y rate limit llegan a RQ, mientras una
-respuesta inválida se registra como fallo definitivo. Los intervalos configurados se prueban como
-parte del contrato del scheduler.
+RQ aplica su retry cuando un handler registrado termina con excepción. Por ello, un futuro handler
+de IA debe capturar `AiProviderError`: persistirá y terminará normalmente cuando
+`retryable=False`, y sólo relanzará cuando `retryable=True`. La suite actual verifica que el
+scheduler adjunta los intervalos y el objeto `Retry` configurados; cada handler productivo deberá
+añadir pruebas que demuestren el tratamiento de timeout, rate limit y fallos definitivos antes de
+registrarse.
 
 ## Registro de handlers
 

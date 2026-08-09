@@ -18,9 +18,12 @@ OpenAPI metadata is owned by the feature that exposes the endpoint.
 - shared helpers: `app/core/common/openapi.py`
 - feature docs:
   - `app/features/audit_log/openapi.py`
+  - `app/features/ai_assistance/openapi.py`
+  - `app/features/ai_insights/openapi.py`
   - `app/features/auth/openapi.py`
   - `app/features/clients/openapi.py`
   - `app/features/dashboard/openapi.py`
+  - `app/features/document_templates/openapi.py`
   - `app/features/health/openapi.py`
   - `app/features/matters/openapi.py`
   - `app/features/matter_checklists/openapi.py`
@@ -38,6 +41,17 @@ The AI credential and matter-calculation routers currently derive their schema m
 request/response models and FastAPI defaults. Any custom summaries, examples, parameters, or error
 responses added to those surfaces must be placed in feature-local OpenAPI modules before being
 consumed by their routers.
+
+## Known response-documentation gap
+
+A baseline comparison on 2026-08-08 found that generated OpenAPI response metadata omitted one or
+more runtime statuses declared by 41 of the 70 endpoint rows in `../operations/api_endpoints.md`.
+That baseline also omitted the already-active `429` contract from the endpoint inventory for login
+and registration; after correcting those two rows, 43 of 70 rows declare at least one runtime status
+that generated OpenAPI does not yet enumerate. This is a documentation-coverage gap, not evidence
+that the normalized runtime errors are unavailable. Do not remove runtime statuses from the
+endpoint inventory to make the counts agree; complete feature-owned `responses` metadata and add a
+contract test in a dedicated follow-up.
 
 ## Router pattern
 

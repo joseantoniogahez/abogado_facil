@@ -1,12 +1,17 @@
 # New App Bootstrap Checklist
 
-Use this checklist when turning this starter kit into a new application. Start from
-`docs/ai/start_new_project.md`; when app identity or scope is still unclear, fill
-`docs/ai/templates/new_app_request.md`. Keep `AGENTS.md` as the operating guide.
+Use this checklist when turning the pristine compatible starter snapshot identified in
+`docs/ai/template_provenance.md` into a new application. Start from `docs/ai/start_new_project.md`;
+when app identity or scope is still unclear, fill `docs/ai/templates/new_app_request.md`. Keep
+`AGENTS.md` as the operating guide.
+
+This is not a second-bootstrap or rebranding checklist for the current ABOGADO_FACIL worktree.
 
 ## Before Changing Files
 
 - [ ] Confirm bootstrap mode: plan only, in-place rename, or scaffold workflow.
+- [ ] Confirm the worktree is a pristine compatible starter snapshot and still contains the exact
+  identity tokens required by `scripts/bootstrap_new_app.py`.
 - [ ] Confirm application name, public product name, and internal slug.
 - [ ] Confirm product description and landing-page positioning.
 - [ ] Confirm initial user types, roles, permissions, and admin workflows.

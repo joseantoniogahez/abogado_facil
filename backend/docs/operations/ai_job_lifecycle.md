@@ -3,8 +3,9 @@
 ## Alcance
 
 `app.features.ai_jobs` registra ejecuciones de IA como una capacidad backend interna. No expone un
-router ni ejecuta proveedores por sí misma. Las funciones IA futuras deben crear y transicionar un
-`AIJob` mediante el servicio antes de persistir o mostrar un resultado.
+router ni ejecuta proveedores por sí misma. Las funciones actuales de asistencia y borradores crean
+y transicionan un `AIJob` mediante el servicio antes de persistir o mostrar un resultado; cualquier
+función nueva debe conservar el mismo gate.
 
 ## Datos y aislamiento
 
@@ -48,8 +49,9 @@ Además, `AIJobsService.succeed` sólo acepta `ValidatedAIOutput` producido por
   worker persiste el código normalizado y nunca el mensaje o cuerpo externo.
 - `OBS-001` conecta la correlación persistente con RQ y los adaptadores; cada worker futuro debe
   recuperar el par desde este registro antes de llamar al proveedor.
-- Los endpoints de producto decidirán qué resultados estructurados están autorizados y validados.
+- Los endpoints de producto deciden qué resultados estructurados están autorizados y validados.
 - `AI-007` exige en `structured_ai_outputs.md` validación y versión coincidente antes de persistir,
   mostrar, copiar o exportar un resultado.
-- `AI-008` exige en `ai_context_minimization.md` que el worker reconstruya datos aislados y que
-  `AiTextRequest` reciba solo campos autorizados y necesarios mediante `MinimizedAIContext`.
+- `AI-008` exige en `ai_context_minimization.md` que cada caller use datos aislados y que
+  `AiTextRequest` reciba solo campos autorizados y necesarios mediante `MinimizedAIContext`; un
+  futuro worker deberá reconstruirlos desde PostgreSQL con el scope persistido.

@@ -52,7 +52,7 @@ unless `--force` is passed.
 | `project-reviewer`           | The user asks for a review, readiness check, PR/diff assessment, or risk scan.                                                                       | `AGENTS.md`, changed-file context, affected backend/frontend playbooks and operation docs.                                                                          | Review evidence, relevant targeted checks when needed, and explicit validation gaps.                                                                    |
 | `backend-code-reviewer`      | A review focuses on FastAPI/backend behavior, contracts, migrations, security, integrations, or tests.                                               | `AGENTS.md`, backend playbook and foundation status, affected operation/architecture docs, and the official FastAPI skill when applicable.                          | Focused backend checks, contract tests, coverage/OpenAPI gates when warranted, and evidence-backed findings.                                            |
 | `frontend-code-reviewer`     | A review focuses on React routes, API consumers, auth/RBAC UI, state, a11y, e2e, performance, or tests.                                              | `AGENTS.md`, frontend playbook and foundation status, and affected frontend operation docs.                                                                         | Focused frontend checks, OpenAPI validation, affected e2e/build gates, and evidence-backed findings.                                                    |
-| `new-app-bootstrapper`       | The task turns this starter kit into a named product or previews/applies new-app identity changes.                                                   | `AGENTS.md`, new-project startup docs, bootstrap checklist, new-app request template, root and service READMEs.                                                     | Bootstrap dry-run, identity diff review, backend tests, frontend check/build, Docker Compose config, pre-commit; e2e when routes/auth/errors change.    |
+| `new-app-bootstrapper`       | The task turns a pristine compatible starter snapshot into a named product or previews/applies first-time identity changes.                          | `AGENTS.md`, template provenance, new-project startup docs, bootstrap checklist, new-app request template, root and service READMEs.                                | Provenance check, bootstrap dry-run, identity diff review, backend tests, frontend check/build, Docker Compose config, pre-commit.                      |
 | `fastapi-agents`             | Adapter for the official FastAPI library Agent Skill during FastAPI implementation or review.                                                        | Official skill at the installed FastAPI package's `.agents/skills/fastapi/SKILL.md`, then `AGENTS.md`, backend playbook, foundation status, and affected contracts. | Focused backend tests, OpenAPI sync/check when the contract changes, coverage gate, and pre-commit for docs/config changes.                             |
 
 ## Current Skills
@@ -138,11 +138,13 @@ tests, and docs. Use the general reviewer for documentation-only or broad reposi
 
 ### `new-app-bootstrapper`
 
-New-project bootstrap workflow for turning this starter kit into a named application.
+New-project bootstrap workflow for turning a pristine compatible starter snapshot into a named
+application.
 
 Use for:
 
 - dry-run or applied identity bootstrap,
+- verifying the pinned or explicitly reviewed template revision before first-time bootstrap,
 - Compose/env/JWT/package/README/UI naming changes,
 - new-app request shaping when identity or scope is incomplete,
 - separating identity-only bootstrap from follow-up product features.
@@ -150,6 +152,7 @@ Use for:
 Do not use for:
 
 - ordinary feature delivery after the app has already been bootstrapped,
+- rebranding or running a second bootstrap against the current ABOGADO_FACIL worktree,
 - backend-only or frontend-only feature work.
 
 ### `fastapi-agents`

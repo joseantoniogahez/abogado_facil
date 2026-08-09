@@ -45,7 +45,8 @@ These templates are designed for developers to request concrete AI-driven change
 1. `frontend_playbook.md`
 1. Relevant operation contract document(s) touched by the request.
 1. `foundation_status.md`
-1. The completed request template in `templates/`.
+1. The completed request template in `templates/` when the request used one or its scope was not
+   already explicit.
 
 ### Human Reviewer Onboarding
 

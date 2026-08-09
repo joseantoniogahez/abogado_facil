@@ -11,12 +11,11 @@ public AI assistance and document-draft flows after all P0-IA gates were complet
 flowchart LR
     U[Authenticated user] --> A[Product use case]
     A --> J[(PostgreSQL AIJob)]
-    A --> Q[RQ / Redis]
-    Q --> W[AI worker]
-    W --> J
-    W --> C[Minimized context builder]
+    A --> C[Minimized context builder]
+    A --> E[ai_execution: scoped BYOK]
     C --> P[Provider adapter]
-    K[(Encrypted BYOK)] --> W
+    E --> P
+    K[(Encrypted BYOK)] --> E
     P --> V[Schema validator]
     V --> J
     J --> A
@@ -26,26 +25,36 @@ flowchart LR
    `user_id`.
 1. It creates an `AIJob` containing correlation, provider, model, function and schema versions, but
    no prompt, credential or document text.
-1. RQ/Redis receives only the catalogued handler and opaque `execution_id`.
-1. The worker reloads the tenant-scoped job and data from PostgreSQL, decrypts the user's BYOK key
-   in memory, and builds context through `build_minimized_ai_context`.
+1. It builds context through `build_minimized_ai_context` from the already tenant-scoped product
+   data.
+1. `ai_execution` resolves the user-and-firm-scoped credential, decrypts it only in API process
+   memory, and constructs the selected provider adapter.
 1. The provider receives only the sealed `MinimizedAIContext`. Provider text remains untrusted.
 1. `validate_ai_output` parses the complete response against the function's Pydantic schema and
    returns a sealed `ValidatedAIOutput`.
 1. `AIJobsService.succeed` verifies the schema version and persists a defensive copy of validated
    JSON. Logs and metrics contain operational metadata only.
 
+## Available RQ transport
+
+RQ/Redis and the Compose `ai-worker` are provisioned as an available background transport, but the
+production scheduler handler catalog is empty. Current AI assistance and document-draft endpoints
+execute the provider call synchronously and do not send a payload to Redis. Once a production
+handler is explicitly registered, the queue boundary permits only its catalogued name, an opaque
+`execution_id`, and operational RQ metadata; the worker must reconstruct tenant-scoped context from
+PostgreSQL.
+
 ## Trust Boundaries
 
-| Boundary                      | Untrusted input                   | Required control                                                                                                    |
-| ----------------------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| Browser to API                | identity claims, request data     | authentication, tenant-scoped authorization, input schemas                                                          |
-| PostgreSQL to worker          | mutable product/document data     | reload by job `firm_id` and `user_id`; explicit allowlist                                                           |
-| Application to Redis          | producer-controlled job command   | catalogued handler, JSON serializer, opaque execution ID only                                                       |
-| Stored credential to provider | encrypted secret at rest          | production key wiring, scoped lookup, decrypt only in memory                                                        |
-| Document/context to model     | legal and user-authored text      | minimization, escaped untrusted-data envelope, separate system instruction, no tools                                |
-| Provider to application       | arbitrary text and malformed JSON | closed error taxonomy and sealed schema validation result                                                           |
-| Runtime to logs/metrics       | correlation and failure metadata  | allowlisted fields and content-free context/output representations; no prompts, documents, responses or credentials |
+| Boundary                                   | Untrusted input                   | Required control                                                                                                    |
+| ------------------------------------------ | --------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Browser to API                             | identity claims, request data     | authentication, tenant-scoped authorization, input schemas                                                          |
+| PostgreSQL to worker                       | mutable product/document data     | reload by job `firm_id` and `user_id`; explicit allowlist                                                           |
+| Application to Redis (available transport) | producer-controlled job command   | catalogued handler, JSON serializer, opaque execution ID only                                                       |
+| Stored credential to provider              | encrypted secret at rest          | production key wiring, scoped lookup, decrypt only in memory                                                        |
+| Document/context to model                  | legal and user-authored text      | minimization, escaped untrusted-data envelope, separate system instruction, no tools                                |
+| Provider to application                    | arbitrary text and malformed JSON | closed error taxonomy and sealed schema validation result                                                           |
+| Runtime to logs/metrics                    | correlation and failure metadata  | allowlisted fields and content-free context/output representations; no prompts, documents, responses or credentials |
 
 ## Threats and Controls
 
@@ -53,7 +62,7 @@ flowchart LR
 | ------------------------------- | ---------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
 | Cross-firm or cross-user access | every `AIJob` read and mutation requires both IDs; context must be loaded with the same scope  | negative multi-user tests remain mandatory per feature                                       |
 | Credential disclosure           | AES-GCM at rest, keys omitted from API and logs, provider headers only                         | operational key rotation and incident procedures remain deployment responsibilities          |
-| Sensitive data in Redis         | JSON payload contains only `execution_id`; deterministic catalogued jobs                       | real handlers must preserve this boundary                                                    |
+| Sensitive data in Redis         | production catalog is empty; any registered JSON job may contain only `execution_id`           | real handlers must preserve this boundary                                                    |
 | Context over-collection         | sealed builder requires authorized and necessary fields and bounded payloads                   | product allowlists must be reviewed per function                                             |
 | Forged validation marker        | `MinimizedAIContext` and `ValidatedAIOutput` reject direct construction                        | Python process memory is trusted application code; unsafe reflection is outside the boundary |
 | Mutating a validated result     | callers receive a defensive copy and persistence receives a fresh copy                         | schemas still need `extra="forbid"` and function-specific constraints                        |

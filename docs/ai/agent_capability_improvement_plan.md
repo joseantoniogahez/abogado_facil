@@ -1,11 +1,15 @@
 # Agent Capability Improvement Plan
 
-Status date: `2026-06-30`
+Status verified: `2026-08-08`
 
 ## Purpose
 
 Improve how future AI agents use this starter kit after it has been copied or bootstrapped into a
 new project.
+
+Phases 1–3 are implemented. Phases 4–5 are conditional decision records, not active backlog or
+authorization to create a plugin or MCP. The current ABOGADO_FACIL reuse boundary is documented in
+`docs/ai/template_provenance.md`.
 
 The repository already has enough documentation to guide implementation. This plan focuses on
 making the agent capabilities easier to discover, install, activate, and reuse across projects.
@@ -24,6 +28,8 @@ Already available:
   - `skills/backend-capability-builder`
   - `skills/frontend-feature-builder`
   - `skills/project-reviewer`
+  - `skills/backend-code-reviewer`
+  - `skills/frontend-code-reviewer`
   - `skills/new-app-bootstrapper`
   - `skills/fastapi-agents`
 - Repository scripts:
@@ -69,8 +75,8 @@ Acceptance criteria:
 
 Validation:
 
-- `pre-commit run --files AGENTS.md docs/ai/README.md skills/README.md`
-- `quick_validate.py skills/fastapi-agents`
+- `.\.venv\Scripts\python.exe -m pre_commit run --files AGENTS.md docs/ai/README.md skills/README.md`
+- Run the active `skill-creator` `quick_validate.py` against `skills/fastapi-agents`.
 
 ## Phase 2: New App Bootstrapper Skill
 
@@ -100,8 +106,8 @@ Acceptance criteria:
 
 Validation:
 
-- `quick_validate.py skills/new-app-bootstrapper`
-- `pre-commit run --files AGENTS.md skills/README.md skills/new-app-bootstrapper/SKILL.md`
+- Run the active `skill-creator` `quick_validate.py` against `skills/new-app-bootstrapper`.
+- `.\.venv\Scripts\python.exe -m pre_commit run --files AGENTS.md skills/README.md skills/new-app-bootstrapper/SKILL.md`
 
 ## Phase 3: Project Skill Installer
 
@@ -127,13 +133,15 @@ Acceptance criteria:
 
 Validation:
 
-- `python -m py_compile scripts/install_project_skills.py`
+- `.\.venv\Scripts\python.exe -m py_compile scripts/install_project_skills.py`
 - Dry-run install all skills.
 - Dry-run install one selected skill.
 - Invalid skill name fails clearly.
-- `pre-commit run --files scripts/install_project_skills.py skills/README.md docs/ai/README.md`
+- `.\.venv\Scripts\python.exe -m pre_commit run --files scripts/install_project_skills.py skills/README.md docs/ai/README.md`
 
 ## Phase 4: Plugin Packaging Evaluation
+
+Status: decision gate only; no active implementation.
 
 Goal:
 
@@ -166,6 +174,8 @@ Validation:
 - A fresh project can use the plugin and still follow repository docs.
 
 ## Phase 5: MCP Decision Point
+
+Status: decision gate only; no active implementation.
 
 Goal:
 

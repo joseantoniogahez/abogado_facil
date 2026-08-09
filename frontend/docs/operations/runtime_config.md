@@ -1,6 +1,7 @@
 # Frontend Runtime Configuration Contract
 
-This document defines the runtime configuration contract enforced by frontend startup and API utilities.
+This document defines the build-time Vite configuration contract that frontend startup and API
+utilities validate when the generated bundle runs in the browser.
 
 ## Required Configuration
 
@@ -14,6 +15,14 @@ This document defines the runtime configuration contract enforced by frontend st
 - Frontend startup calls `readFrontendEnvConfig()` from `src/shared/api/env.ts`.
 - Invalid configuration throws `FrontendEnvError` and blocks runtime boot.
 - API URL builders (`getApiBaseUrl`, `buildApiUrl`) use the same validated config path.
+
+## Build-Time Delivery
+
+- Vite resolves `VITE_API_ORIGIN` and `VITE_API_BASE_PATH` while building the static bundle.
+- Changing those variables on an already-built production container does not reconfigure its
+  JavaScript. Rebuild the frontend image or bundle after changing either value.
+- `compose.yaml` passes both values as frontend build arguments. Its repeated container environment
+  values do not replace the values already embedded in the static assets.
 
 ## Validation References
 

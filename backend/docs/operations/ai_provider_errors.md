@@ -8,9 +8,9 @@ OpenAI, Gemini y Mock traducen sus fallos a `AiProviderError`. El error expone �
 - un mensaje público constante en español;
 - `retryable`: decisión explícita para la política de ejecución.
 
-`to_public_failure()` produce el contrato seguro `code`, `message` y `retryable` que podrán consumir
-futuros endpoints y el frontend. No contiene nombre del proveedor, URL, API key, cuerpo de respuesta,
-mensaje externo, prompt ni contexto legal.
+`to_public_failure()` produce el contrato seguro `code`, `message` y `retryable` que consumen los
+endpoints síncronos actuales y que puede reutilizar el frontend. No contiene nombre del proveedor,
+URL, API key, cuerpo de respuesta, mensaje externo, prompt ni contexto legal.
 
 ## Taxonomía
 
@@ -45,8 +45,9 @@ clientes permanecen inyectables para que las pruebas sean deterministas y no use
 | URL no HTTPS, inválida o sin hostname    | `provider_configuration_error`   |
 
 El mapeo usa estado y clase de fallo del SDK, nunca el cuerpo controlado por el proveedor. Esto evita que
-detalles sensibles o no confiables crucen el adaptador. Un worker puede usar `retryable` para decidir
-si RQ debe reintentar y debe persistir exclusivamente `error_code` al agotar los intentos.
+detalles sensibles o no confiables crucen el adaptador. Un futuro worker registrado podrá usar
+`retryable` para decidir si RQ debe reintentar y deberá persistir exclusivamente `error_code` al
+agotar los intentos.
 
 La suite contractual multi-provider exige la misma decisión en OpenAI, Gemini y Mock:
 
@@ -54,9 +55,10 @@ La suite contractual multi-provider exige la misma decisión en OpenAI, Gemini y
 - JSON o estructura de respuesta inválida produce `retryable=False`;
 - el contrato público y los logs omiten clave, prompt, payload y detalle externo.
 
-Esta clasificación no encola por sí sola. El handler captura cada `AiProviderError`, persiste como
-fallo definitivo los casos no recuperables y sólo relanza los recuperables para activar el retry de
-RQ.
+Esta clasificación no encola por sí sola. El catálogo productivo de handlers está vacío y los
+endpoints síncronos traducen el fallo a HTTP. Un futuro handler capturará cada `AiProviderError`,
+persistirá como fallo definitivo los casos no recuperables y sólo relanzará los recuperables para
+activar el retry de RQ.
 
 El endpoint síncrono `POST /v1/matters/{matter_id}/ai/results` traduce
 `provider_rate_limited` a la respuesta normalizada `429 rate_limited`, con el mensaje público

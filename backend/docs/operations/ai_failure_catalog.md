@@ -15,13 +15,15 @@ Este catálogo complementa el contrato normativo de
 
 ## Política de retry
 
-Sólo rate limit, timeout e indisponibilidad son transitorios. En RQ, el handler relanza únicamente
-esos fallos y el scheduler aplica `AI_QUEUE_MAX_RETRIES` con
-`AI_QUEUE_RETRY_BACKOFF_SECONDS`. Los SDK tienen retries deshabilitados. Autenticación, request
-rechazado, configuración y respuesta inválida terminan el job sin repetir ni intentar “reparar” el
-JSON. Un retry agotado persiste sólo el código normalizado.
+Sólo rate limit, timeout e indisponibilidad son transitorios. Los endpoints síncronos actuales no
+usan el retry de RQ y traducen el fallo al resultado HTTP de la tabla. Cuando se registre un
+handler, éste deberá relanzar únicamente esos fallos y el scheduler aplicará
+`AI_QUEUE_MAX_RETRIES` con `AI_QUEUE_RETRY_BACKOFF_SECONDS`. Los adapters no deben duplicar esa
+política con retries propios. Autenticación, request rechazado, configuración y respuesta inválida
+terminarán el job sin repetir ni intentar “reparar” el JSON. Un retry agotado persistirá sólo el
+código normalizado.
 
-## Escenarios mínimos de prueba
+## Escenarios mínimos antes de registrar un handler
 
 1. Timeout y rate limit alcanzan el mecanismo de retry con los intervalos configurados.
 1. JSON inválido falla una sola vez, no persiste texto crudo y no produce acción.

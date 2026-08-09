@@ -12,13 +12,21 @@ This runbook defines triage flow and error-code diagnostics for frontend inciden
 
 ## Error Taxonomy and Actions
 
-| Error Code       | Typical Surface                    | Initial Action                                                     | Escalation Trigger                                     |
-| ---------------- | ---------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------ |
-| `unauthorized`   | Login/protected route              | Verify token/session state and expected auth flow.                 | Repeated auth failures for valid accounts.             |
-| `forbidden`      | Protected API operation            | Verify permission scope and user role mapping.                     | Policy mismatch between backend authz and UI behavior. |
-| `internal_error` | API request or route fallback      | Use `request_id` for backend correlation; gather impacted endpoint | Any persistent 5xx pattern.                            |
-| `network_error`  | API communication failure          | Validate connectivity/API origin/runtime config.                   | Widespread outage across users/regions.                |
-| `invalid_input`  | Form submission / API parsing path | Validate payload contract expectations and user input constraints. | Contract drift or backend schema mismatch.             |
+| Error Code       | Typical Surface                    | Initial Action                                                     | Escalation Trigger                                          |
+| ---------------- | ---------------------------------- | ------------------------------------------------------------------ | ----------------------------------------------------------- |
+| `unauthorized`   | Login/protected route              | Verify token/session state and expected auth flow.                 | Repeated auth failures for valid accounts.                  |
+| `forbidden`      | Protected API operation            | Verify permission scope and user role mapping.                     | Policy mismatch between backend authz and UI behavior.      |
+| `internal_error` | API request or route fallback      | Use `request_id` for backend correlation; gather impacted endpoint | Any persistent 5xx pattern.                                 |
+| `network_error`  | API communication failure          | Validate connectivity/API origin/runtime config.                   | Widespread outage across users/regions.                     |
+| `invalid_input`  | Form submission / API parsing path | Validate payload contract expectations and user input constraints. | Contract drift or backend schema mismatch.                  |
+| `not_found`      | Detail or nested-resource request  | Verify resource identifier and tenant/firm ownership.              | Resource exists but is inaccessible through expected scope. |
+| `conflict`       | Create/update operation            | Review current state and repeat only after user reconciliation.    | Recurrent optimistic-state or uniqueness conflict.          |
+| `rate_limited`   | Provider-backed or write operation | Respect server guidance and avoid automatic write retries.         | Sustained throttling or missing recovery guidance.          |
+
+This is a baseline taxonomy, not an exhaustive registry. Consult
+`docs/operations/api_consumer_matrix.md` for endpoint-specific codes and handling. Provider-specific
+codes must be preserved from the backend payload and investigated against the relevant integration
+contract rather than normalized to an invented generic code.
 
 ## Required Incident Artifact
 

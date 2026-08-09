@@ -4,15 +4,28 @@ This document defines the deterministic end-to-end smoke baseline for the fronte
 
 ## Scope
 
-- Critical registration, email login, profile, and logout journey.
+- Registration, email login, and profile journeys.
 - Canonical dashboard navigation, legacy `/welcome` redirect, and protected route behavior.
 - Protected `/settings/ai` BYOK status, save, and delete journey with authenticated API requests.
-- Protected client list, creation, detail, editing, search, and dashboard counter/action journey.
+- Protected client creation, detail, editing, list, and search journey.
 - Matter detail smoke covers embedded note CRUD and document upload, list, authenticated download,
-  and confirmed deletion with strict API mocks.
+  and confirmed deletion with strict API mocks. The same scenario covers the initial-narrative AI
+  preview, execution, human review, and conversion into a matter note.
 - Error fallback behavior for protected session validation.
 - Admin protected route error diagnostics for RBAC `403 forbidden` responses.
 - Admin audit-log route visibility for sessions with `audit_logs:read`.
+- Admin assignments and permissions diagnostics plus direct-navigation redirects for missing
+  permissions.
+
+## Coverage Gaps
+
+- The Playwright suite does not currently exercise logout. Logout behavior is covered by
+  `src/shared/routing/RootLayout.test.tsx`, not by this e2e baseline.
+- The client e2e scenario does not verify a post-mutation dashboard counter or dashboard action.
+- `/ai/insights` and `/document-templates` do not currently have dedicated Playwright scenarios.
+
+These gaps must not be described as delivered e2e coverage. Add or update Playwright scenarios when
+one of these journeys becomes a release requirement.
 
 ## Runner Contract
 

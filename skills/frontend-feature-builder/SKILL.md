@@ -1,7 +1,7 @@
-<!--
+---
 name: frontend-feature-builder
 description: Frontend feature delivery for this Vite, React, TypeScript, React Router, TanStack Query, and Tailwind starter kit. Use when Codex must add or change frontend-only behavior such as routes, pages, shared UI, API consumers, auth-gated screens, RBAC UI, query or mutation flows, runtime config, accessibility, e2e smoke coverage, tests, and frontend documentation.
--->
+---
 
 # Frontend Feature Builder
 
@@ -19,7 +19,7 @@ quality gates green.
 1. Use `frontend/docs/templates/feature_request.md`, `integration_request.md`, or
    `code_change_request.md` when the request needs clearer acceptance criteria.
 1. Confirm route, API, auth, state, UX, a11y, observability, performance, and validation impact.
-1. Use `.\.venv\Scripts\python.exe scripts/scaffold_feature.py frontend <feature-name> --dry-run` to preview new page
+1. Use `.\.venv\Scripts\python.exe scripts/scaffold_feature.py --dry-run frontend <feature-name>` to preview new page
    structure when adding a new feature route.
 1. Use `.\.venv\Scripts\python.exe scripts/scaffold_feature.py frontend <feature-name>` only after target paths and
    route scope are clear.
